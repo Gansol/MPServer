@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class SceneLoader : MonoBehaviour
+{
+
+    AsyncOperation Loader;
+    private int progress;
+    public GameObject ProgressLabel;
+    /*
+    private float fps = 10.0f;
+    private float time;
+    //一组动画的贴图，在编辑器中赋值。
+    public Texture2D[] animations;
+    private int nowFram;
+    */
+
+    private void Start()
+    {
+        Debug.Log(Global.loadScene);
+        progress = 0;
+        StartCoroutine(LoadLevel(Global.loadScene));
+
+    }
+
+    private IEnumerator LoadLevel(string Scene)
+    {
+        Debug.Log("Scene:" + Scene);
+        Loader = Application.LoadLevelAsync(Scene);
+
+        while (!Loader.isDone)
+        {
+            if (Loader.progress > 0)
+            {
+                progress = (int)(Loader.progress * 100);
+                Draw();
+                Debug.Log("progress:" + progress);
+            }
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    void Draw()
+    {
+        //GUI.Label(new Rect(30, 160, 600, 20), "(1) " + progress.ToString() + "%"); // 顯示登入回傳
+        ProgressLabel.GetComponent<UILabel>().text = progress.ToString() + "%";
+    }
+
+    /*
+    void DrawAnimation(Texture2D[] tex)
+    {
+
+        time += Time.deltaTime;
+
+        if (time >= 1.0 / fps)
+        {
+
+            nowFram++;
+
+            time = 0;
+
+            if (nowFram >= tex.Length)
+            {
+                nowFram = 0;
+            }
+        }
+        GUI.DrawTexture(new Rect(100, 100, 40, 60), tex[nowFram]);
+
+        //在这里显示读取的进度。
+        GUI.Label(new Rect(100, 180, 300, 60), "lOADING!!!!!" + progress);
+
+    }
+  */
+}

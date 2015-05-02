@@ -1,0 +1,174 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Text.RegularExpressions;
+using System;
+
+public class EggMice : MonoBehaviour
+{
+    PoolManager poolManager;
+    BattleManager battleManager;        // 戰鬥事件管理者
+    Animator animator;                  // 動畫管理者
+
+    //    private bool isDisappear;         // 老鼠是否消失
+    private static bool dieFlag;               // 老鼠是否死亡  
+    private static bool disFlag;               // 老鼠是否消失  
+    private static bool clickFlag;             // 只能按一次老鼠
+    private static bool dieOnce;               // 只能死一次
+    private float aliveTime;            // 老鼠存活時間   
+    private float animTime;             // 動畫撥放時間
+
+    private string animState;           // 動畫狀態
+
+    void Awake()
+    {
+        battleManager = new BattleManager();
+        animator = GetComponent<Animator>();
+        poolManager = new PoolManager();
+        //isDisappear = false;
+        dieFlag = false;
+        disFlag = true;
+        clickFlag = true;
+
+        aliveTime = 0.0f;
+        animTime = 0.0f;
+
+        animState = "";
+
+    }
+
+
+    void Update()
+    {
+        aliveTime = Time.time;                                                              // 老鼠存活時間                             
+        AnimatorStateInfo currentState = this.animator.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
+
+        if (currentState.nameHash == Animator.StringToHash("Layer1.up"))                    // 如果 目前 動化狀態 是 up
+        {
+            animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
+            //Debug.Log("Time: " + animTime);
+            if (animTime > 1)   // 動畫撥放完畢時
+            {
+                this.animator.Play("eating");   // 老鼠開始吃東西
+            }
+        }
+        else if (currentState.nameHash == Animator.StringToHash("Layer1.die"))              // 如果 目前 動化狀態 是 die
+        {
+            animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
+            //Debug.Log(time);
+
+            if (animTime > 3)   // 動畫撥放完畢時
+            {
+                this.animator.Play("default");  // 回到基本狀態
+                animState = "die";              // 狀態=死亡
+                OnDisappear(aliveTime);
+                Debug.Log("IN DIE2");
+            }
+        }
+        else if (currentState.nameHash == Animator.StringToHash("Layer1.eating"))
+        {
+            animTime = currentState.normalizedTime; // 目前播放的動畫 "總"時間
+            //Debug.Log("Time: " + animTime);
+
+            if (animTime > 10)                       // 動畫撥放完畢時
+            {
+                this.animator.Play("disppear");     // 老鼠消失了
+                
+            }
+
+        }
+        else if (currentState.nameHash == Animator.StringToHash("Layer1.disppear"))
+        {
+            if (disFlag)
+            {
+                animTime = currentState.normalizedTime; // 目前播放的動畫 "總"時間
+                // Debug.Log("Time: " + animTime);
+                if (clickFlag)
+                {
+                    if (animTime > 0.1)                      // 動畫撥放完畢時
+                    {
+                        this.animator.Play("default");      // 老鼠消失了 回到初始狀態
+                        animState = "disppear";                  // 狀態=死亡 (這怪怪的)
+                        OnDisappear(aliveTime);
+                        Debug.Log("Disppear! AMIN");
+                    }
+                }
+                disFlag = false;
+            }
+        }
+        else if (currentState.nameHash == Animator.StringToHash("Layer1.default"))
+        {
+            Debug.Log("WTF!!!!!");
+        }
+    }
+
+
+    void OnClick()
+    {
+        if (clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
+        {
+            clickFlag = false;
+            collider2D.enabled = false;
+            animator.Play("die");   // 播放 死亡動畫
+            Debug.Log("HIT ME!");
+            dieFlag = false;
+        }
+    }
+
+    void OnDisappear(float aliveTime)   //老鼠消失時 處理事件
+    {
+        
+        if (!dieFlag && animState!="eating")
+        {
+            dieFlag = true;
+            try
+            {
+                if (animState == "disppear")
+                {
+                    Debug.Log("Disppear! FUNC");
+                    transform.parent = GameObject.Find("ObjectPool/" + this.name).transform;
+                    battleManager.LostScore(this.name, aliveTime);  // 跑掉掉分
+                    this.gameObject.GetComponent<UISprite>().enabled = false;
+                    collider2D.enabled = false;
+
+                    Global.MiceCount--;
+                }
+                else if (animState == "die")
+                {
+                
+                    Debug.Log("Die! FUNC");
+                    transform.parent = GameObject.Find("ObjectPool/" + this.name).transform;
+                    battleManager.UpadateScore(this.name);  // 跑掉掉分
+                    this.gameObject.GetComponent<UISprite>().enabled = false;
+                    collider2D.enabled = false;
+
+                    Global.MiceCount--;
+                }
+                else
+                {
+                   
+                    Debug.Log("Die! FUCKKKKKKKKKKKKKKKKKKKKKKKKKKK !!!");
+                }
+            
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message + "   " + e.StackTrace + "   " + e.Data);
+                throw e;
+            }
+        }
+    }
+
+    public void Play() //初始+播放出現動畫
+    {
+        animator = GetComponent<Animator>();
+        battleManager = new BattleManager();
+        animTime = 0.0f;
+        aliveTime = 0.0f;
+        animState = "";
+        clickFlag = true;
+        collider2D.enabled = true;
+        dieFlag = false;
+        disFlag = true;
+        animator.Play("up");
+    }
+}
