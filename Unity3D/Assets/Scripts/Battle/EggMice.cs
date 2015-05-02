@@ -81,7 +81,6 @@ public class EggMice : MonoBehaviour
             {
                 if (animTime > 10)                       // 動畫撥放完畢時
                 {
-
                     GetComponent<Animator>().Play("disppear");     // 老鼠消失了
                     eatingFlag = true;
                 }
