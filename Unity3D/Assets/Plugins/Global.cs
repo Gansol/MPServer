@@ -71,7 +71,7 @@ public class Global : MonoBehaviour
     public static int MaxScore = 0;         // 最高分
     public static int SumScore = 0;         // 總分
     public static string MiceAll = "";      // 全部老鼠 JSON資料
-    public static string Team = "";         // 隊伍老鼠 JSON資料
+    public static string Team = "{\"1\":\"HAHA\"}";         // 隊伍老鼠 JSON資料
     public static string MiceAmount = "";   // 老鼠數量 JSON資料
     public static string Friend = "";       // 好友列表 JSON資料
 
