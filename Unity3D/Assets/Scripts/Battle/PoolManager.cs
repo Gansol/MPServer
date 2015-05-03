@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using MiniJSON;
+using System;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -22,6 +23,7 @@ using MiniJSON;
 
 public class PoolManager : MonoBehaviour
 {
+    Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> dictMice;
     private HashSet<int> _myMice;
     private HashSet<int> _otherMice;
@@ -63,7 +65,7 @@ public class PoolManager : MonoBehaviour
         _miceCount = 0;
         _myMice = new HashSet<int>();
         _otherMice = new HashSet<int>();
-
+        _tmpDict = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
         /*
         clone = new GameObject();
@@ -147,24 +149,23 @@ public class PoolManager : MonoBehaviour
 
     public void MergeMice()
     {
-        Dictionary<int, string> _tmpDict = new Dictionary<int, string>();
-        //_tmpDict = Json.Deserialize(Global.Team) as Dictionary<int, string>;
-
-        _tmpDict.Add(1, "EggMice");
+        _tmpDict = Json.Deserialize(Global.Team) as Dictionary<string, object>;
+        Debug.Log(_tmpDict.Count);
+        //_tmpDict.Add(1, "EggMice");
         //_tmpDict.Add(2, "BggMice");
         //把自己的老鼠存入HashSet中等待比較，再把老鼠存入合併好的老鼠Dict中
-        foreach (KeyValuePair<int, string> item in _tmpDict)
+        foreach (KeyValuePair<string, object> item in _tmpDict)
         {
-            _myMice.Add(item.Key);
-            dictMice.Add(item.Key, item.Value);
+            _myMice.Add(Int16.Parse(item.Key));
+            dictMice.Add(Int16.Parse(item.Key), item.Value.ToString());
         }
 
-        //_tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<int, string>;
-        _tmpDict.Add(2, "BlackMice");
+        _tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<string, object>;
+        //_tmpDict.Add(2, "BlackMice");
         //把對手的老鼠存入HashSet中等待比較
-        foreach (KeyValuePair<int, string> item in _tmpDict)
+        foreach (KeyValuePair<string, object> item in _tmpDict)
         {
-            _otherMice.Add(item.Key);
+            _otherMice.Add(Int16.Parse(item.Key));
         }
 
         _otherMice.ExceptWith(_myMice); // 把對手重複的老鼠丟掉
@@ -173,10 +174,10 @@ public class PoolManager : MonoBehaviour
         {
             foreach (int item in _otherMice)    // 加入合併好的老鼠Dict
             {
-                string miceName;
-                _tmpDict.TryGetValue(item, out miceName);
+                object miceName;
+                _tmpDict.TryGetValue(item.ToString(), out miceName);
 
-                dictMice.Add(item, miceName);
+                dictMice.Add(item, miceName.ToString());
             }
         }
         mergeFlag = true;

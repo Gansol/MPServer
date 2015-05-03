@@ -104,8 +104,8 @@ namespace MPServer
                                 string account = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Account];
                                 string password = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Password];
                                 string nickname = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Nickname];
-                                int age = (int)operationRequest.Parameters[(byte)JoinMemberParameterCode.Age];
-                                int sex = (int)operationRequest.Parameters[(byte)JoinMemberParameterCode.Sex];
+                                byte age = (byte)operationRequest.Parameters[(byte)JoinMemberParameterCode.Age];
+                                byte sex = (byte)operationRequest.Parameters[(byte)JoinMemberParameterCode.Sex];
                                 string IP = LocalIP;
                                 string email = "example@example.com";
                                 string joinTime = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.JoinDate];

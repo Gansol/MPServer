@@ -21,7 +21,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event JoinMemberEventHandler JoinMemberEvent;
 
     //委派事件 登入
-    public delegate void LoginEventHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, int sex, int age);
+    public delegate void LoginEventHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age);
     public event LoginEventHandler LoginEvent;
 
     //委派事件 接收技能傷害
@@ -198,8 +198,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             string getReturn = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
                             string getMemberID = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
                             string getNickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
-                            int getSex = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
-                            int getAge = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
+                            byte getSex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
+                            byte getAge = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
                             int getPirmaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
 
                             LoginEvent(true, "", getReturn, getPirmaryID, getMemberID, getNickname, getSex, getAge); // send member data to loginEvent
@@ -404,12 +404,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 加入會員 
     /// </summary>
-    public void JoinMember(string Account, string Password, string Nickname, string Age, string Sex)
+    public void JoinMember(string Account, string Password, string Nickname, byte Age, byte Sex)
     {
         try
         {
-            Int16 age = Convert.ToInt16(Age);
-            Int16 sex = Convert.ToInt16(Sex);
+            byte age = Convert.ToByte(Age);
+            byte sex = Convert.ToByte(Sex);
 
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
