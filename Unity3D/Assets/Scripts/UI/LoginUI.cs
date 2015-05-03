@@ -104,7 +104,7 @@ public class LoginUI : MonoBehaviour
                     getAccount = GUI.TextField(new Rect(110, 70, 100, 20), getAccount, 16);
 
                     GUI.Label(new Rect(30, 100, 80, 20), "Passowrd:");
-                    getPassowrd = GUI.TextField(new Rect(110, 100, 100, 20), getPassowrd, '*');
+                    getPassowrd = GUI.PasswordField(new Rect(110, 100, 100, 20), getPassowrd, '*');
 
                     GUI.Label(new Rect(30, 130, 80, 20), "Nickname:");
                     getNickname = GUI.TextField(new Rect(110, 130, 100, 20), getNickname, 12);
@@ -121,9 +121,11 @@ public class LoginUI : MonoBehaviour
 
                     if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
                     {
-
-                        Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, getAge, getSex);
-
+                       // Debug.Log(getAge);
+                        byte age = Convert.ToByte (getAge);
+                        byte sex = Convert.ToByte(getSex);
+                        Debug.Log(getPassowrd);
+                        Global.photonService.JoinMember(getAccount, getPassowrd, getNickname,age,sex );
                     }
                 }
 
@@ -186,7 +188,7 @@ public class LoginUI : MonoBehaviour
         Global.Ret = returnCode;
     }
 
-    private void doLoginEvent(bool loginStatus, string message, string returnCode, int primaryID, string account, string nickname, int sex, int age)
+    private void doLoginEvent(bool loginStatus, string message, string returnCode, int primaryID, string account, string nickname, byte sex, byte age)
     {
         if (loginStatus) // 若登入成功，將會員資料存起來
         {

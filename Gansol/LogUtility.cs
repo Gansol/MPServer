@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Text;
+using System.Security.Cryptography;
 using System.IO;
+
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----

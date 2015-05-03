@@ -60,8 +60,8 @@ public class Global : MonoBehaviour
     public static string Account = "";      // 帳號
     public static string Nickname = "";     // 暱稱
     public static int RoomID = -1;          // 房間ID
-    public static int Sex = 0;              // 性別
-    public static int Age = 0;              // 年齡
+    public static byte Sex = 0;              // 性別
+    public static byte Age = 0;              // 年齡
     public static int Rice = 0;             // 遊戲幣
     public static Int16 Gold = 0;           // 金幣
 
@@ -79,7 +79,7 @@ public class Global : MonoBehaviour
     {
         public static int PrimaryID = 0;        // 主索引
         public static string Nickname = "";     // 暱稱
-        public static int Sex = 0;              // 性別
+        public static byte Sex = 0;              // 性別
         public static string Team = "";         // 隊伍老鼠 JSON資料
     }
 

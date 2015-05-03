@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Runtime.InteropServices;//＊＊＊＊Web 和 Mobile不能用!!!!!＊＊＊＊＊
+
+namespace MPCOM
+{
+    [Serializable()]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]//＊＊＊＊Web 和 Mobile不能用!!!!!＊＊＊＊＊
+    public struct GameData
+    {
+        public Int32 ReturnCode; //回傳值
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]//＊＊＊＊Web 和 Mobile不能用!!!!!＊＊＊＊＊
+        public string ReturnMessage; //回傳說明文字<30全形字
+
+        public Dictionary<int,int> miceID; //老鼠ID
+        public Int32 itemID; //道具ID
+        public Int32 miceAttack; //老鼠 攻擊力
+        public Int32 miceSkill; ////老鼠 技能
+        public Int32 miceSpeed; //老鼠 速度
+        public Int32 miceBossHP; //老鼠 速度
+
+        public Int32 maxLife; //生命
+        public Int32 life; //生命
+        public Int32 energy; //能量
+        public Int32 maxCombo; //最大Combo數
+        public Int32 score; //分數
+        public Int32 topScore; //最高分
+        public Int32 rank; //等級
+        public Int32 miceAmount; //老鼠數量
+        public Int32 miceCost; //老鼠
+
+
+
+        public Int32 total_inventory_limted; //背包 數量限制
+        public Int32 total_miceCost_limted; //老鼠 花費限制
+        public Int32 total_inventory_character; //玩家 全部 老鼠資料
+        public Int32 total_inventory_equipment; //玩家 裝備 老鼠資料
+
+        
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string Friend; //要改LIST
+
+    }
+}
