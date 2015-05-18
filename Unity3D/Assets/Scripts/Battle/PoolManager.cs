@@ -27,9 +27,9 @@ public class PoolManager : MonoBehaviour
     private Dictionary<int, string> dictMice;
     private HashSet<int> _myMice;
     private HashSet<int> _otherMice;
-    private List<GameObject> Pool;
+    //private List<GameObject> Pool;
     private GameObject clone;
-    private int _miceCount;
+    //private int _miceCount;
     private byte miceID;
     private string miceName;
     private int[] _miceIDArray;
@@ -59,10 +59,10 @@ public class PoolManager : MonoBehaviour
     currentTime=0;
         clearTime = 10;
         poolingFlag = false;      // 初始化物件池
-        Pool = new List<GameObject>();
+        //Pool = new List<GameObject>();
         //dictObjectPool = new Dictionary<string, List<GameObject>>();
         dictMice = new Dictionary<int, string>();
-        _miceCount = 0;
+        //_miceCount = 0;
         _myMice = new HashSet<int>();
         _otherMice = new HashSet<int>();
         _tmpDict = new Dictionary<string, object>();

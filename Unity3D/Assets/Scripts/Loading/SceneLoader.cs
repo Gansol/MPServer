@@ -5,7 +5,6 @@ public class SceneLoader : MonoBehaviour
 {
 
     AsyncOperation Loader;
-    private int progress;
     public GameObject ProgressLabel;
     /*
     private float fps = 10.0f;
@@ -18,7 +17,7 @@ public class SceneLoader : MonoBehaviour
     private void Start()
     {
         Debug.Log(Global.loadScene);
-        progress = 0;
+        ProgressLabel.GetComponent<UILabel>().text = "0%";
         StartCoroutine(LoadLevel(Global.loadScene));
 
     }
@@ -29,7 +28,7 @@ public class SceneLoader : MonoBehaviour
         AsyncOperation op = Application.LoadLevelAsync(Scene);
         
         op.allowSceneActivation = false;
-        while (op.progress < 0.90f)
+        while (op.progress < 0.90f && op.isDone==false)
         {
             Draw((int)op.progress * 100);
             yield return new WaitForEndOfFrame();
@@ -37,8 +36,10 @@ public class SceneLoader : MonoBehaviour
 
         Draw(100);
         yield return new WaitForEndOfFrame();
-        op.allowSceneActivation = true;
-        
+        if (op.isDone)
+        {
+            op.allowSceneActivation = true;
+        }
 
         /* 動畫版 Android會出錯
          * 

@@ -17,7 +17,7 @@ public class LoginUI : MonoBehaviour
     private string joinResult = "";
     private string loginResult = "";
     //private string JoinRoomResult = "";
-    private bool macthing = false;
+    //private bool macthing = false;
     private float ckeckTime;
     private bool checkFlag = true;
 

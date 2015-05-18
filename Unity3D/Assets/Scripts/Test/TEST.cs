@@ -3,14 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 
-public class TEST : MonoBehaviour
-{
+public class TEST : MonoBehaviour{
+
+    public GameObject a;
+    Vector3 aa;
     void Start()
     {
-        //var string = "{s}";
-        var dict = Json.Deserialize(Global.Team) as Dictionary<string, object>;
-        Debug.Log(dict);
+        aa = new Vector3(-500, 0, 0);
     }
 
-
+    void Update()
+    {
+        Debug.Log(a.transform.localPosition.x);
+        a.transform.localPosition = Vector3.Lerp(a.transform.localPosition, aa, 0.1f);
+    }
 }
