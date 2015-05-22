@@ -22,7 +22,7 @@ public class LoadingBattle : MonoBehaviour
 
     private IEnumerator LoadLevel()
     {
-        Application.LoadLevel("LoadScene");  //之後要改成LoadScene
+        Application.LoadLevel(Global.loadScene);  //之後要改成LoadScene
         yield return null;
     }
 
