@@ -55,8 +55,8 @@ public class PoolManager : MonoBehaviour
 
     void Awake()
     {
-           lastTime=0;
-    currentTime=0;
+        lastTime = 0;
+        currentTime = 0;
         clearTime = 10;
         poolingFlag = false;      // 初始化物件池
         //Pool = new List<GameObject>();
@@ -86,14 +86,15 @@ public class PoolManager : MonoBehaviour
 
             for (int i = 0; i < spawnCount; i++)
             {
-                clone = (GameObject)Instantiate(ObjectDeck[item.Key-1]);   //等傳老鼠ID名稱近來這要改
-                clone.name = item.Value ;
+                clone = (GameObject)Instantiate(ObjectDeck[item.Key - 1]);   //　等傳老鼠ID名稱近來這要改
+                clone.name = item.Value;
                 clone.transform.parent = ObjectPool.transform.FindChild(item.Value).transform;
                 clone.transform.localScale = Vector3.one;
-                clone.GetComponent<UISprite>().width = objWidth;
-                clone.GetComponent<UISprite>().height = objHeight;
+                //clone.GetComponent<UISprite>().width = objWidth;    // ＊＊＊＊要改＊＊＊＊
+                //clone.GetComponent<UISprite>().height = objHeight;  // ＊＊＊＊要改＊＊＊＊
                 //clone.tag = "Mice";
-                clone.GetComponent<UISprite>().enabled = false;
+                //clone.GetComponent<UISprite>().enabled = false;
+                clone.transform.GetChild(0).gameObject.SetActive(false);    // 新版 子物件隱藏
             }
         }
 
@@ -116,8 +117,8 @@ public class PoolManager : MonoBehaviour
             clone.name = miceName;
             clone.transform.parent = ObjectPool.transform.FindChild(miceName).transform;
             clone.transform.localScale = Vector3.one;
-            clone.GetComponent<UISprite>().width = 260;
-            clone.GetComponent<UISprite>().height = 290;
+            //clone.GetComponent<UISprite>().width = 260;
+            //clone.GetComponent<UISprite>().height = 290;
 
             return clone;
         }
@@ -127,10 +128,10 @@ public class PoolManager : MonoBehaviour
             GameObject mice;
 
             mice = ObjectPool.transform.FindChild(miceName).GetChild(i).gameObject;
-            
-            if (mice.name == miceName && !mice.GetComponent<UISprite>().enabled)//等傳老鼠ID名稱近來這要改 nicename
+
+            if (mice.name == miceName && !mice.transform.GetChild(0).gameObject.activeSelf)//等傳老鼠ID名稱近來這要改 nicename
             {
-                mice.GetComponent<UISprite>().enabled = true;
+                mice.transform.GetChild(0).gameObject.SetActive(true);
                 return mice;
             }
 

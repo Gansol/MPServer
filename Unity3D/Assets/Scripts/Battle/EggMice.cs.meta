@@ -1,9 +1,0 @@
-fileFormatVersion: 2
-guid: c8eb9da882fe1b64b82042705164942e
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences:
-  - ObjecPool: {fileID: 194268, guid: a3b46b8b816146f43ac1158f30af32a1, type: 2}
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 

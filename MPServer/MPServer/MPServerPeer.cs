@@ -23,6 +23,7 @@ using Gansol;
  * room.waitingList[1].TryGetValue("RoomActor1", out otherActor);
  * 1是代表字典檔中的 第1間房 多間房需要修改值
  * 這裡的otherAcotr都是單一玩家，需要取得多人要改寫
+ * 回傳給另外玩家時，需要判斷他是否斷線了
  * ***************************************************************/
 
 namespace MPServer
