@@ -70,7 +70,7 @@ public class LoginUI : MonoBehaviour
                         if (GUI.Button(new Rect(100, 200, 250, 100), "Matching Game"))
                         {
                             Global.photonService.MatchGame(Global.PrimaryID);
-                            Debug.Log("click");
+                            //Debug.Log("click");
                             Global.isMatching = true;
                         }
                     }

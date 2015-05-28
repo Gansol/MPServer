@@ -754,7 +754,7 @@ namespace MPServer
                                     primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
                                     byte mission = (byte)operationRequest.Parameters[(byte)BattleParameterCode.Mission];
-                                    byte missionRate = (byte)operationRequest.Parameters[(byte)BattleParameterCode.MissionRate];
+                                    float missionRate = (float)operationRequest.Parameters[(byte)BattleParameterCode.MissionRate];
 
                                     MPCOM.BattleUI battleUI = new MPCOM.BattleUI();
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission,missionRate));
@@ -796,7 +796,7 @@ namespace MPServer
                                     Log.Debug("BattleUI OK");
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(mission, missionRate)); //計算分數
                                     Log.Debug("BattleData OK");
-                                    short missionScore = battleData.missionScore;
+                                    Int16 missionScore = battleData.missionScore;
 
                                     if (battleData.ReturnCode == "S503")//計算分數成功 回傳玩家資料
                                     {

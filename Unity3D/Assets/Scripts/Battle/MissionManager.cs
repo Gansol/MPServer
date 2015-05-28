@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using MPProtocol;
+using System;
 
 /*
  * 1.當任意一方達成XXX收穫時
@@ -19,7 +20,7 @@ public class MissionManager : MonoBehaviour
     public Mission mission = Mission.Harvest;                   // 顯是目前執行任務
     BattleManager battleManager;
 
-    public int missionInterval = 10;
+    public int missionInterval = 10;    // 目前還沒用到
 
     private int activeScore;                                    // grandmother know it!
     private int activeTime;                                     // 遊戲開始後 啟動任務時間
@@ -27,7 +28,7 @@ public class MissionManager : MonoBehaviour
 
     private float gameTime;                                     // 遊戲時間
     private float lastGameTime;                                 // 上一次完成任務的時間
-    private float missionScore;                                 // 任務所需分數
+    private Int16 missionScore;                                 // 任務所需分數
     private float lastScore;                                    // 任務開始前分數
     private float missionRate;                                    // 任務倍率
 
@@ -36,12 +37,14 @@ public class MissionManager : MonoBehaviour
     {
         Global.photonService.ApplyMissionEvent += OnApplyMissionEvent;
         Global.photonService.ShowMissionScoreEvent += OnShowMissionScoreEvent;
+        Global.photonService.MissionCompleteEvent += MissionCompleteEvent;
         battleManager = GetComponent<BattleManager>();
 
         activeScore = 1000;
         activeTime = 15;
         missionTime = 60;
         missionRate = 1.0f;
+        lastGameTime = 0;
     }
 
     // Update is called once per frame
@@ -50,10 +53,10 @@ public class MissionManager : MonoBehaviour
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
-            gameTime = Time.time;    // 遊戲時間
-
-            if (Global.missionFlag)
-            {
+            gameTime = Time.timeSinceLevelLoad;   // 遊戲時間
+            //Debug.Log(gameTime);
+            //if (Global.missionFlag)
+            //{
                 if (missionMode == MissionMode.Closed)
                 {
                     // 任務結束 並判斷下次會觸發的任務
@@ -63,7 +66,7 @@ public class MissionManager : MonoBehaviour
                         {
                             mission = Mission.Harvest;
                             missionMode = MissionMode.Open;
-                            activeScore += 5000;
+                            activeTime += 900;
                         }
                     }
                 }
@@ -72,7 +75,7 @@ public class MissionManager : MonoBehaviour
                     missionMode = MissionMode.Closed;
                     mission = Mission.None;
                     lastGameTime = gameTime;
-                    Global.missionFlag = false;
+                    //Global.missionFlag = false;
                 }
                 else if (missionMode == MissionMode.Completing)
                 {
@@ -80,7 +83,7 @@ public class MissionManager : MonoBehaviour
                     {
                         // clac
                         Global.photonService.MissionComplete((byte)mission, missionRate);
-                        missionMode = MissionMode.Completed;
+                        Global.isMissionCompleted = false;
                     }
                 }
                 else if (missionMode == MissionMode.Opening)
@@ -96,9 +99,10 @@ public class MissionManager : MonoBehaviour
                             {
                                 ShowMissionLabel(mission, missionScore);
 
-                                if ((battleManager.score - lastScore) >= missionScore)      // success
+                                if ((battleManager.score - lastScore) >= (missionScore -190))      // success
                                 {
-                                    missionMode = MissionMode.Completing;    
+                                    missionMode = MissionMode.Completing;
+                                    Global.isMissionCompleted = true;
                                 }
                                 else if (gameTime > missionTime)                            // failed
                                 {
@@ -113,14 +117,14 @@ public class MissionManager : MonoBehaviour
                 {
                     // 任務開始時
                     lastScore = battleManager.score;        // 儲存任務開始前的分數
-                    Global.photonService.SendMission((byte)mission,missionRate);
+                    Global.photonService.SendMission((byte)mission,missionRate);        // 會一直傳
                 }
 
-            }
+            //}
         }
     }
 
-    void ShowMissionLabel(Mission mission,float missionScore)
+    void ShowMissionLabel(Mission mission, Int16 missionScore)
     {
         // show message box
         //if (flag)
@@ -141,17 +145,24 @@ public class MissionManager : MonoBehaviour
         Debug.Log("MISSION Failed...");
     }
 
-    void OnApplyMissionEvent(Mission mission,float missionScore)
+    void OnApplyMissionEvent(Mission mission, Int16 missionScore)
     {
         // recive server send event message
+        Global.missionFlag = true;
         this.missionScore = missionScore;
         this.mission = mission;
         missionMode = MissionMode.Opening;
     }
 
-    void OnShowMissionScoreEvent(float missionScore)
+    void MissionCompleteEvent(Int16 missionScore)
     {
         // to show message box
-        Debug.Log("Other Player Complete Mission !   Get +" + missionScore);
+        Debug.Log(" Mission Completed !   Get +" + missionScore);
+    }
+
+    void OnShowMissionScoreEvent(Int16 missionScore)
+    {
+        // to show message box
+        Debug.Log("Other Player Completed Mission !   Get +" + missionScore);
     }
 }

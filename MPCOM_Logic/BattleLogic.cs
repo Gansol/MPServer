@@ -99,7 +99,7 @@ namespace MPCOM
                             }
                             else
                             {
-                                battleData.missionScore = (short)Math.Round((missionRate * harvestReward), 0);
+                                battleData.missionScore = (Int16)Math.Round((missionRate * harvestReward), 0);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
@@ -131,7 +131,7 @@ namespace MPCOM
                     case Mission.Harvest: //EggMice
                         {
                             //to do verification
-                            battleData.missionScore = (short)Math.Round((missionRate * harvest),0);
+                            battleData.missionScore = (Int16)Math.Round((missionRate * harvest),0);
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;

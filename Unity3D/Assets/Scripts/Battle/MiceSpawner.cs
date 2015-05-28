@@ -135,7 +135,7 @@ public class MiceSpawner : MonoBehaviour
     /// <returns></returns>
     public IEnumerator SpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
-        Debug.Log("IN SPAWN2D: " + intervalTime);
+       // Debug.Log("IN SPAWN2D: " + intervalTime);
         // < = > test OK
         int _tmpCount = 0;
         for (int i = 0; i < holeArray.GetLength(0); i++)    // 1D陣列
@@ -179,7 +179,7 @@ public class MiceSpawner : MonoBehaviour
             }
 
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            Debug.Log("intervalTime : "+intervalTime);
+            //Debug.Log("intervalTime : "+intervalTime);
             yield return new WaitForSeconds(intervalTime);
         }
     Finish: ;

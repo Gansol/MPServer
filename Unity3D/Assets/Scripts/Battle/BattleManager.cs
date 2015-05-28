@@ -57,6 +57,7 @@ public class BattleManager : MonoBehaviour
 
         Global.photonService.ExitRoomEvent += OnExitRoomEvent;
         Global.photonService.OtherScoreEvent += OnOtherScoreEvent;
+        Global.photonService.MissionCompleteEvent += MissionCompleteEvent;
 
         _isCombo = false;
         _combo = 0;
@@ -216,4 +217,8 @@ public class BattleManager : MonoBehaviour
 
     }
 
+    void MissionCompleteEvent(Int16 missionScore)
+    {
+        _score += missionScore;
+    }
 }

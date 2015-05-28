@@ -125,7 +125,7 @@ public class SpawnController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("STATUS:" + spawnStatus + "byte:" + (byte)spawnStatus);
+        //Debug.Log("STATUS:" + spawnStatus + "byte:" + (byte)spawnStatus);
         #region Select SpawnMode
         if (battleManager.score < 50)
         {
@@ -149,6 +149,7 @@ public class SpawnController : MonoBehaviour
         if (poolManager.mergeFlag && poolManager.poolingFlag && Global.spawnFlag)          // 如果 物件池初始化完成 且 可以產生
         {
             Global.spawnFlag = false;
+            Global.isGameStart = true;
             if ((byte)spawnStatus > 0 && (byte)spawnStatus < 200)
             {
                 Spawn(spawnStatus, 1, spawnTime, lerpTime, spawnCount);                 // 1D
@@ -232,7 +233,7 @@ public class SpawnController : MonoBehaviour
                 break;
         }
     }
-
+    
     /// <summary>
     /// 1D老鼠產生器 (產生方式,老鼠ID,速度,加速度,數量)
     /// 加速度0~1

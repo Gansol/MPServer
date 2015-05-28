@@ -42,12 +42,16 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ExitRoomHandler ExitRoomEvent;
 
     //委派事件 接收任務
-    public delegate void ApplyMissionHandler(Mission mission, float missionScore);
+    public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
     public event ApplyMissionHandler ApplyMissionEvent;
 
     //委派事件 接收對方任務完成分數
-    public delegate void ShowMissionScoreHandler(float missionScore);
+    public delegate void ShowMissionScoreHandler(Int16 missionScore);
     public event ShowMissionScoreHandler ShowMissionScoreEvent;
+
+    //委派事件 任務完成
+    public delegate void MissionCompleteHandler(Int16 missionScore);
+    public event MissionCompleteHandler MissionCompleteEvent;
 
     public bool ServerConnected
     {
@@ -169,13 +173,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 //取得任務
             case (byte)BattleResponseCode.Mission:
                 Mission mission = (Mission)eventData.Parameters[(byte)BattleParameterCode.Mission];
-                float missionScore = (float)eventData.Parameters[(byte)BattleParameterCode.missionScore];
+                Int16 missionScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.missionScore];
                 ApplyMissionEvent(mission, missionScore);
                 break;
 
             //取得對方任務分數
             case (byte)BattleResponseCode.GetMissionScore:
-                 float otherMissionScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.missionScore];
+                Int16 otherMissionScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.missionScore];
                  ShowMissionScoreEvent(otherMissionScore);
                 break;
         }
@@ -385,8 +389,29 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
                             Mission mission = (Mission)operationResponse.Parameters[(byte)BattleParameterCode.Mission];
-                            float missionScore = (float)operationResponse.Parameters[(byte)BattleParameterCode.missionScore];
+                            Int16 missionScore = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.missionScore];
                             ApplyMissionEvent(mission, missionScore);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region Send Mission 傳送任務
+
+            case (byte)BattleResponseCode.MissionCompleted://取得老鼠資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Int16 missionScore = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.missionScore];
+                            MissionCompleteEvent(missionScore);
                         }
                     }
                     catch (Exception e)
