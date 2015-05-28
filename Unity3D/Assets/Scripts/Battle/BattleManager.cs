@@ -2,6 +2,13 @@
 using System.Collections;
 using System;
 
+/*
+ * UpadateScore亂打的!!! 直接更新自己分數沒到Server驗證
+ * 
+ * 
+ * 
+ */
+
 public class BattleManager : MonoBehaviour
 {
     public GameObject BlueScore;            // 藍隊分數Label
@@ -26,21 +33,21 @@ public class BattleManager : MonoBehaviour
 
     private static bool _isCombo = false;   // 是否連擊
 
-    public class BattleData                 // 外部取用 戰鬥資料
-    {
-        public int combo { get { return _combo; } }
-        public int maxCombo { get { return _maxCombo; } }
-        public int tmpCombo { get { return _tmpCombo; } }
-        public int gameTime { get { return _gameTime; } }
-        public float score { get { return _score; } }
-        public float otherScore { get { return _otherScore; } }
-        public int maxScore { get { return _maxScore; } }
-        public int eggMiceUsage { get { return _eggMiceUsage; } }
-        public int energyUsage { get { return _energyUsage; } }
-        public int missMice { get { return _missMice; } }
-        public int hitMice { get { return _hitMice; } }
-        public int spawnCount { get { return _spawnCount; } }
-    }
+    // 外部取用 戰鬥資料
+
+    public int combo { get { return _combo; } }
+    public int maxCombo { get { return _maxCombo; } }
+    public int tmpCombo { get { return _tmpCombo; } }
+    public int gameTime { get { return _gameTime; } }
+    public float score { get { return _score; } }
+    public float otherScore { get { return _otherScore; } }
+    public int maxScore { get { return _maxScore; } }
+    public int eggMiceUsage { get { return _eggMiceUsage; } }
+    public int energyUsage { get { return _energyUsage; } }
+    public int missMice { get { return _missMice; } }
+    public int hitMice { get { return _hitMice; } }
+    public int spawnCount { get { return _spawnCount; } }
+
 
     // Use this for initialization
     void Start()
@@ -91,6 +98,7 @@ public class BattleManager : MonoBehaviour
         }
     }
     #endregion
+
 
     #region LostScore 失去分數 這裡根本亂打的
     /// <summary>
@@ -178,7 +186,7 @@ public class BattleManager : MonoBehaviour
             if (_beautyHP <= value)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (_score ==0 && _otherScore==0)
+        else if (_score == 0 && _otherScore == 0)
         {
             HPBar.GetComponent<UISlider>().value = _beautyHP;
             Debug.Log("KKKCCCCC" + _beautyHP);
@@ -188,14 +196,12 @@ public class BattleManager : MonoBehaviour
             }
 
             if (_beautyHP >= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value < 0.5f)
-                _beautyHP += 0.01f; 
+                _beautyHP += 0.01f;
         }
 
         ComboLabel.GetComponent<UILabel>().text = _combo.ToString();        // 畫出Combo值
 
     }
-
-
 
     void OnExitRoomEvent()                  // 離開房間時
     {

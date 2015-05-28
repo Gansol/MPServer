@@ -23,6 +23,7 @@ namespace MPCOM
         public string ReturnMessage;        // 回傳說明文字<30全形字
 
         public Int16 score;                 // 分數
+        public Int16 missionScore;          // 任務目標
 
     }
 }

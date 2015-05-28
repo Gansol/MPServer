@@ -13,6 +13,7 @@ public class TEST : MonoBehaviour
 
     void Start()
     {
+        
         flag = true;
         onUpdateCall = false;
         num = 1;
@@ -21,7 +22,7 @@ public class TEST : MonoBehaviour
 
     public IEnumerator A()
     {
-        Debug.Log("A");
+        Debug.Log(Random.Range(0,2));
         yield return new WaitForSeconds(1);
         if (onUpdateCall)
         {
@@ -30,13 +31,13 @@ public class TEST : MonoBehaviour
     }
     public IEnumerator B()
     {
-        Debug.Log("B");
+        Debug.Log(Random.Range(0, 2));
         yield return new WaitForSeconds(1);
         flag = true;
     }
     public IEnumerator C()
     {
-        Debug.Log("C");
+        Debug.Log(Random.Range(0, 2));
         yield return new WaitForSeconds(1);
         flag = true;
     }

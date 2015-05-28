@@ -5,7 +5,7 @@ using MiniJSON;
 
 
 /*
- * 這腳本只負責生東西 時間和控制器要另外寫在SpawnController
+ * 這腳本只負責生東西 時間和控制器要另外寫在Global
  * 現在是測試版 完成後要把Intantiate改成poolManager.ActiveObject()
  * 
  * 
@@ -33,17 +33,18 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime, float lerpTime, int spawnCount)
+    public IEnumerator SpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime, float lerpTime, int spawnCount,int randomPos)
     {
         // < = > test OK
-        for (int item = 0; item < spawnCount; item++)
+        int _tmpCount = 0;
+        for (int item = randomPos; item < spawnCount; item++)
         {
             if (item / holeArray.Length == 1)   // =13 = 歸零
             {
                 spawnCount -= item;
                 item = 0;
             }
-
+            yield return new WaitForSeconds(spawnTime);
             if (hole[holeArray[item] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
                 GameObject clone = poolManger.ActiveObject(miceID);
@@ -55,21 +56,27 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.localScale = hole[holeArray[item] - 1].transform.localScale / 1.8f;
                     clone.transform.GetChild(0).SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
+                    _tmpCount++;
 
-                    if (spawnCount == 0)
+                    if (_tmpCount - spawnCount == 0)
                     {
                         goto Finish;
                     }
-                    yield return new WaitForSeconds(spawnTime);
                 }
                 else
                 {
                     Debug.Log("Object Pool hasn't Object");
                 }
             }
+            else
+            {
+                Debug.Log("Closed!");
+            }
+
 
         }
     Finish: ;
+        Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -84,6 +91,7 @@ public class MiceSpawner : MonoBehaviour
         int _tmpCount = 0;
         for (int item = holeArray.Length; spawnCount > 0; item--)
         {
+            yield return new WaitForSeconds(spawnTime);
             if (hole[item - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
                 GameObject clone = poolManger.ActiveObject(miceID);
@@ -96,7 +104,6 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.GetChild(0).SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
-                    yield return new WaitForSeconds(spawnTime);
                 }
                 else
                 {
@@ -114,9 +121,9 @@ public class MiceSpawner : MonoBehaviour
                 spawnCount -= holeArray.Length;
                 item = holeArray.Length + 1;    // +1是因為迴圈結束時 item-- 會少1 
             }
-
         }
     Finish: ;
+        Global.spawnFlag = true;
     }
 
 
@@ -128,14 +135,16 @@ public class MiceSpawner : MonoBehaviour
     /// <returns></returns>
     public IEnumerator SpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
+        Debug.Log("IN SPAWN2D: " + intervalTime);
         // < = > test OK
         int _tmpCount = 0;
         for (int i = 0; i < holeArray.GetLength(0); i++)    // 1D陣列
         {
             for (int j = 0; j < holeArray.GetLength(1); j++)    // 2D陣列
             {
-                if (spawnCount != 0)
+                if (spawnCount > 0)
                 {
+                    yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
                         GameObject clone = poolManger.ActiveObject(miceID);
@@ -148,6 +157,7 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
+
                             if ((_tmpCount - spawnCount) == 0)
                             {
                                 goto Finish;
@@ -158,7 +168,7 @@ public class MiceSpawner : MonoBehaviour
                                 j = -1;                         // 因為 j++是迴圈跑完才會+1 所以在跑一次會變 0+1=1不是0 所以要=-1+1=0
                                 spawnCount -= holeArray.Length;
                             }
-                            yield return new WaitForSeconds(spawnTime);
+
                         }
                         else
                         {
@@ -167,10 +177,13 @@ public class MiceSpawner : MonoBehaviour
                     }
                 }
             }
+
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
+            Debug.Log("intervalTime : "+intervalTime);
             yield return new WaitForSeconds(intervalTime);
         }
     Finish: ;
+        Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -187,10 +200,12 @@ public class MiceSpawner : MonoBehaviour
         {
             for (int j = holeArray.GetLength(1); j > 0; j--)    // 2D陣列
             {
+                yield return new WaitForSeconds(spawnTime);
                 if (hole[holeArray[i - 1, j - 1] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                 {
-                    if (spawnCount != 0)
+                    if (spawnCount > 0)
                     {
+
                         GameObject clone = poolManger.ActiveObject(miceID);
                         if (clone != null)
                         {
@@ -201,8 +216,10 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
+
                             if ((_tmpCount - spawnCount) == 0)
                             {
+
                                 goto Finish;
                             }
                             else if (_tmpCount == holeArray.Length)
@@ -212,7 +229,7 @@ public class MiceSpawner : MonoBehaviour
                                 j = holeArray.GetLength(1) + 1;   // 因為 j--是迴圈跑完才會-1 所以在跑一次會變 holeArray.GetLength(1)-1 不是 holeArray.GetLength(1) 0 所以要+1
                                 spawnCount -= holeArray.Length;
                             }
-                            yield return new WaitForSeconds(spawnTime);
+
                         }
                         else
                         {
@@ -225,6 +242,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime);
         }
     Finish: ;
+        Global.spawnFlag = true;
     }
 
 
@@ -250,11 +268,13 @@ public class MiceSpawner : MonoBehaviour
         {
             for (int j = 0; j < holeArray[i].Length; j++)    // 2D陣列
             {
-                if (spawnCount != 0)
+                if (spawnCount > 0)
                 {
+                    yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
                         GameObject clone = poolManger.ActiveObject(miceID);
+
                         if (clone != null)
                         {
                             hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
@@ -266,6 +286,7 @@ public class MiceSpawner : MonoBehaviour
 
                             if ((_tmpCount - spawnCount) == 0)
                             {
+
                                 goto Finish;
                             }
                             else if (_tmpCount == _tmpArrayLength)
@@ -274,8 +295,6 @@ public class MiceSpawner : MonoBehaviour
                                 _tmpCount = i = 0;
                                 j = -1;
                             }
-
-                            yield return new WaitForSeconds(spawnTime);
                         }
                         else
                         {
@@ -288,6 +307,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime);
         }
     Finish: ;   // When amount = 0 spawn Finish !
+        Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -312,6 +332,7 @@ public class MiceSpawner : MonoBehaviour
         {
             for (int j = holeArray[i - 1].Length; j > 0; j--)    // 2D陣列      holeArray[i-1]是因為起始值0
             {
+                yield return new WaitForSeconds(spawnTime);
                 if (hole[holeArray[i - 1][j - 1] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                 {
                     GameObject clone = poolManger.ActiveObject(miceID);
@@ -335,7 +356,6 @@ public class MiceSpawner : MonoBehaviour
                             i = holeArray.GetLength(0);
                             j = holeArray[i - 1].Length + 1;
                         }
-                        yield return new WaitForSeconds(spawnTime);
                     }
                     else
                     {
@@ -347,5 +367,6 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime);
         }
     Finish: ;
+        Global.spawnFlag = true;
     }
 }

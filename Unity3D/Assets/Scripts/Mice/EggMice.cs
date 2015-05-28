@@ -73,7 +73,7 @@ public class EggMice : MonoBehaviour
            // Debug.Log("(D)animTime = " + animTime);
             if (!dieFlag)       // 限制執行一次
             {
-                if (animTime > 3)   // 動畫撥放完畢時
+                if (animTime > 0.5)   // 動畫撥放完畢時
                 {
 
                     OnDied(aliveTime);

@@ -6,6 +6,11 @@ using ExitGames.Client.Photon;
 using MPProtocol;
 using MiniJSON;
 
+/*
+ * 分數驗證目前有問題 目前只把自己的分數傳給對方並更新，沒有驗證自己的分數(兩個更新分數都是)
+ *
+ * 
+*/
 public class PhotonService : MonoBehaviour, IPhotonPeerListener
 {
     protected PhotonPeer peer;		    // 連線用
@@ -13,28 +18,36 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     protected string DebugMessage;	    // 錯誤訊息
 
     //委派事件 連接伺服器
-    public delegate void ConnectEventHandler(bool ConnectStatus);
-    public event ConnectEventHandler ConnectEvent;
+    public delegate void ConnectHandler(bool ConnectStatus);
+    public event ConnectHandler ConnectEvent;
 
     //委派事件 加入會員
-    public delegate void JoinMemberEventHandler(bool joinStatus,string returnCode, string message);
-    public event JoinMemberEventHandler JoinMemberEvent;
+    public delegate void JoinMemberHandler(bool joinStatus,string returnCode, string message);
+    public event JoinMemberHandler JoinMemberEvent;
 
     //委派事件 登入
-    public delegate void LoginEventHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age);
-    public event LoginEventHandler LoginEvent;
+    public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age);
+    public event LoginHandler LoginEvent;
 
     //委派事件 接收技能傷害
-    public delegate void ApplyDamageEventHandler(int miceID);
-    public event ApplyDamageEventHandler ApplyDamageEvent;
+    public delegate void ApplyDamageHandler(int miceID);
+    public event ApplyDamageHandler ApplyDamageEvent;
 
     //委派事件 接收分數
-    public delegate void OtherScoreEventHandler(Int16 Score);
-    public event OtherScoreEventHandler OtherScoreEvent;
+    public delegate void OtherScoreHandler(Int16 Score);
+    public event OtherScoreHandler OtherScoreEvent;
 
     //委派事件 離開房間
-    public delegate void ExitRoomEventHandler();
-    public event ExitRoomEventHandler ExitRoomEvent;
+    public delegate void ExitRoomHandler();
+    public event ExitRoomHandler ExitRoomEvent;
+
+    //委派事件 接收任務
+    public delegate void ApplyMissionHandler(Mission mission, float missionScore);
+    public event ApplyMissionHandler ApplyMissionEvent;
+
+    //委派事件 接收對方任務完成分數
+    public delegate void ShowMissionScoreHandler(float missionScore);
+    public event ShowMissionScoreHandler ShowMissionScoreEvent;
 
     public bool ServerConnected
     {
@@ -81,10 +94,6 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
 
 
-    /// <summary>
-    /// Call on Update() 必須要一直呼叫才能持續連線
-    /// </summary>
- 
     public void Service()
     {
         try
@@ -126,6 +135,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.Nickname = (string)eventData.Parameters[(byte)MatchGameParameterCode.Nickname];
                 Global.OtherData.PrimaryID = (int)eventData.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                 Global.OtherData.Team = (string)eventData.Parameters[(byte)MatchGameParameterCode.Team];
+                Global.OtherData.RoomPlace = (string)eventData.Parameters[(byte)MatchGameParameterCode.RoomPlace];
                 Debug.Log(Global.OtherData.Team);
                 Global.BattleStatus = true;
                 break;
@@ -151,10 +161,22 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
                 //取得對方分數
             case (byte)BattleResponseCode.GetScore:
-
                 Int16 otherScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.OtherScore];
                 //Debug.Log(("Recive otherScore!"+otherScore);
                 OtherScoreEvent(otherScore);
+                break;
+
+                //取得任務
+            case (byte)BattleResponseCode.Mission:
+                Mission mission = (Mission)eventData.Parameters[(byte)BattleParameterCode.Mission];
+                float missionScore = (float)eventData.Parameters[(byte)BattleParameterCode.missionScore];
+                ApplyMissionEvent(mission, missionScore);
+                break;
+
+            //取得對方任務分數
+            case (byte)BattleResponseCode.GetMissionScore:
+                 float otherMissionScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.missionScore];
+                 ShowMissionScoreEvent(otherMissionScore);
                 break;
         }
 
@@ -343,6 +365,28 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         if (operationResponse.ReturnCode == (short)ErrorCode.InvalidParameter)
                         {
                             //to do  exit room
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region Send Mission 傳送任務
+
+            case (byte)BattleResponseCode.Mission://取得老鼠資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Mission mission = (Mission)operationResponse.Parameters[(byte)BattleParameterCode.Mission];
+                            float missionScore = (float)operationResponse.Parameters[(byte)BattleParameterCode.missionScore];
+                            ApplyMissionEvent(mission, missionScore);
                         }
                     }
                     catch (Exception e)
@@ -665,9 +709,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
-    #region UpdateScore 更新分數
+    #region UpdateScore 更新分數 地鼠用
     /// <summary>
-    /// 更新分數
+    /// 更新分數 地鼠用
     /// </summary>
     public void UpdateScore(float time,float eatingRate,Int16 score)
     {
@@ -682,4 +726,46 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         }
     }
     #endregion
+
+    #region MissionComplete 更新分數 任務用
+    /// <summary>
+    /// 更新分數 任務用
+    /// </summary>
+    public void MissionComplete(byte mission, float missionRate)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
+            { (byte)BattleParameterCode.Mission, mission }, { (byte)BattleParameterCode.MissionRate, missionRate } };
+            this.peer.OpCustom((byte)BattleOperationCode.MissionCompleted, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region SendMission 傳送任務
+    /// <summary>
+    /// 傳送技能攻擊 傳送資料到Server
+    /// </summary>
+    public void SendMission(byte mission, float missionRate) //攻擊測試
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                 { (byte)BattleParameterCode.Mission,mission } , { (byte)BattleParameterCode.MissionRate,missionRate } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
+            };
+
+            this.peer.OpCustom((byte)BattleOperationCode.Mission, parameter, true, 0, true);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
 }

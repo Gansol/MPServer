@@ -20,5 +20,6 @@
         RoomID,                     // 房間ID
         Nickname,                   // 暱稱
         Team,                       // 隊伍資料
+        RoomPlace,                  // 在房間中的位置(主機or客人)
     }
 }

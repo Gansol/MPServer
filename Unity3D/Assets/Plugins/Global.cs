@@ -53,6 +53,10 @@ public class Global : MonoBehaviour
     public static bool isExitingRoom = false;       // 是否離開房間
     public static bool isGameStart = false;         // 是否開始遊戲
     public static bool isApplySkill = false;        // 是否受到技能傷害
+    public static bool spawnFlag = false;           // 是否產生完成
+    public static bool isMissionCompleted = false;  // 是否任務完成
+    public static bool missionFlag = true;         // 是否執行任務
+
     public static string loadScene = "";            // 要被載入的場景
 
     public static string Ret = "";          // 回傳值
@@ -81,6 +85,7 @@ public class Global : MonoBehaviour
         public static string Nickname = "";     // 暱稱
         public static byte Sex = 0;              // 性別
         public static string Team = "";         // 隊伍老鼠 JSON資料
+        public static string RoomPlace = "";    // 另一位玩家的房間位置
     }
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData

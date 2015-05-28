@@ -21,7 +21,6 @@ public class SpawnController2 : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         miceSpawner = GetComponent<MiceSpawner>();
-        coroutine = miceSpawner.SpawnBy1D(1, SpawnData.aLineL, 0.5f, 0.025f,10);
         miceSpawner.StartCoroutine(coroutine);
 	}
 	

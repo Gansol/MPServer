@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using MPProtocol;
-using System;
 
 /* 產生方式
  *
@@ -59,6 +58,10 @@ using System;
 
         ByNum = 1,                        // 一次產生 多少數量
         Random = 2,                       // 隨機
+ * 
+ * 
+ * 現在一切都是亂數，要改成邏輯判斷
+ * 
  */
 
 public class SpawnController : MonoBehaviour
@@ -66,29 +69,31 @@ public class SpawnController : MonoBehaviour
     private PoolManager poolManager;        // 物件池
     private HoleState holeState;            // 地洞狀態
     private MiceSpawner miceSpawner;        // 老鼠產生器
+    private BattleManager battleManager;
     private IEnumerator coroutine;          // 存放協程用
     private IEnumerator lastCoroutine;      // 存放上一個協程用
 
     private string holeRoot;                // 地洞的路徑值
     private int holeIndex;                  // 地洞Index
 
-    public GameObject[] Hole;               // 存放場景每個地洞
+    //public GameObject[] Hole;               // 存放場景每個地洞
     public GameObject myPanel;              // Battle Panel
 
     public int holeLimit;                   // 地洞上限
     public int spawnCount;                  // 預設產生數量
     public float spawnTime;                 // 老鼠產生速度
-    public float intervalTime;              // 產生間隔速度
+
+    public float intervalTime = 1;              // 產生間隔速度
+    [Range(0.0F, 1.0F)]
     public float lerpTime;                  // 間隔加速度
 
     //public int NGUIDepth;                   // 物件深度
 
-    public bool spawnFlag;                  // 是否產生 基本鼠的Flag
-    public bool testFlag;                   // grandmonther know it
+    //public bool testFlag;                   // grandmonther know it
 
     public SpawnMode spawnMode = SpawnMode.EasyMode;        // 正式版 要改private
     public SpawnStatus spawnStatus = SpawnStatus.LineL;
-    public MissionMode missionMode = MissionMode.Closed;
+
 
     public enum SpawnMode : byte
     {
@@ -102,63 +107,127 @@ public class SpawnController : MonoBehaviour
         HelpMode = 7,
     }
 
-    public enum MissionMode : byte
-    {
-        Closed = 0,
-        Open = 1,
-    }
+
 
     void Start()
     {
         poolManager = GetComponent<PoolManager>();
         miceSpawner = GetComponent<MiceSpawner>();
+        battleManager = GetComponent<BattleManager>();
 
         Global.photonService.ApplyDamageEvent += OnApplyDamageEvent;
-        spawnFlag = true;
+        Global.spawnFlag = true;
 
         holeIndex = 0;
         Global.MiceCount = 0;
-        intervalTime = 1;
         holeRoot = "GameUI/Camera/Battle(Panel)/Hole";
     }
 
     void Update()
     {
-        if (poolManager.mergeFlag && poolManager.poolingFlag && spawnFlag)          // 如果 物件池初始化完成 且 可以產生
+        Debug.Log("STATUS:" + spawnStatus + "byte:" + (byte)spawnStatus);
+        #region Select SpawnMode
+        if (battleManager.score < 50)
         {
-            spawnFlag = false;
+            ChangeSpawnMode(SpawnMode.EasyMode);
+        }
+        else if (battleManager.score > 200 && battleManager.combo > 100)
+        {
+            ChangeSpawnMode(SpawnMode.CarzyMode);
+        }
+        else if (battleManager.score > 100 && battleManager.combo > 50)
+        {
+            ChangeSpawnMode(SpawnMode.HardMode);
+        }
+        else if (battleManager.score > 50 && battleManager.combo > 25)
+        {
+            ChangeSpawnMode(SpawnMode.NormalMode);
+        }
+        #endregion
+
+
+        if (poolManager.mergeFlag && poolManager.poolingFlag && Global.spawnFlag)          // 如果 物件池初始化完成 且 可以產生
+        {
+            Global.spawnFlag = false;
             if ((byte)spawnStatus > 0 && (byte)spawnStatus < 200)
             {
                 Spawn(spawnStatus, 1, spawnTime, lerpTime, spawnCount);                 // 1D
             }
             else if ((byte)spawnStatus > 200 && (byte)spawnStatus <= 255)
             {
-                Spawn(spawnStatus, 1, spawnTime, lerpTime, spawnCount);                 // 2D                
+                Spawn(spawnStatus, 1, spawnTime, intervalTime, lerpTime, spawnCount);                 // 2D                
             }
-            spawnStatus = (byte)spawnStatus + (SpawnStatus)1;                           // 執行完畢後+1下次換別的 或用Random >10 2D時候換 2D Spwan
-            
+
+            if ((byte)spawnStatus < 200)
+            {
+                switch (Random.Range(0, 2) + 1)
+                {
+                    case 1:
+                        spawnStatus = (byte)100 + (SpawnStatus)Random.Range(0, 6) + 1;   // 1~6                        // 執行完畢後+1下次換別的 或用Random >10 2D時候換 2D Spwan
+                        break;
+                    case 2:
+                        spawnStatus = (byte)150 + (SpawnStatus)Random.Range(0, 6) + 1;   // 1~6                        // 執行完畢後+1下次換別的 或用Random >10 2D時候換 2D Spwan
+                        break;
+                }
+            }
+            else if ((byte)spawnStatus > 200)
+            {
+                switch (Random.Range(0, 2) + 1)
+                {
+                    case 1:
+                        spawnStatus = (byte)200 + (SpawnStatus)Random.Range(0, 6) + 1;   // 1~6                        // 執行完畢後+1下次換別的 或用Random >10 2D時候換 2D Spwan
+                        break;
+                    case 2:
+                        spawnStatus = (byte)226 + (SpawnStatus)Random.Range(0, 6) + 1;   // 1~6                        // 執行完畢後+1下次換別的 或用Random >10 2D時候換 2D Spwan
+                        break;
+                }
+            }
         }
 
-        if (missionMode == MissionMode.Open)    // 要寫到別的
-        {
-            // 任務開始時
-        }
+
+
+
+
+
     }
 
 
-    private void ChangeSpawnMode(SpawnMode spawnMode)
+    private void ChangeSpawnMode(SpawnMode mode)
     {
-        switch (spawnMode)
+        switch (mode)
         {
             case SpawnMode.EasyMode:
-                // to do change speed etc ..
+                spawnMode = SpawnMode.EasyMode;
+                lerpTime = 0.01f;
+                spawnTime = 0.25f;
+                intervalTime = 1f;
+                spawnCount = 12;    // 6
                 break;
+
             case SpawnMode.NormalMode:
+                spawnMode = SpawnMode.NormalMode;
+                lerpTime = 0.02f;
+                spawnTime = 0.75f;
+                intervalTime = 0.75f;
+                spawnCount = 9;
                 break;
+
             case SpawnMode.HardMode:
+                spawnMode = SpawnMode.HardMode;
+                lerpTime = 0.05f;
+                spawnTime = 0.5f;
+                intervalTime = 0.5f;
+                spawnCount = 12;
                 break;
+
             case SpawnMode.CarzyMode:
+                spawnMode = SpawnMode.CarzyMode;
+                lerpTime = 0.075f;
+                spawnTime = 0.25f;
+                intervalTime = 0.5f;
+                spawnCount = 12;
                 break;
+
             case SpawnMode.EndTimeMode:
                 break;
         }
@@ -181,24 +250,273 @@ public class SpawnController : MonoBehaviour
     {
         switch (spawnStatus)              // 產生模式選擇
         {
+            #region Case 1D
             case SpawnStatus.LineL:
                 {
-                    //coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aLineL, spawnTime, lerpTime, amount);
-                    coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLineL, spawnTime, lerpTime, spawnCount);
-                    lastCoroutine = coroutine;
-                    StartCoroutine(coroutine);
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLineL, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aLineL.Length)));
                     break;
                 }
             case SpawnStatus.LineR:
                 {
-                    coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLineR, spawnTime, lerpTime, spawnCount);
-                    lastCoroutine = coroutine;
-                    StartCoroutine(coroutine);
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLineR, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aLineR.Length)));
                     break;
                 }
+            case SpawnStatus.LinkLineL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLinkLineL, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aLinkLineL.Length)));
+                    break;
+                }
+            case SpawnStatus.LinkLineR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLinkLineR, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aLinkLineR.Length)));
+                    break;
+                }
+            case SpawnStatus.CircleLD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aCircleLD, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aCircleLD.Length)));
+                    break;
+                }
+            case SpawnStatus.CircleRU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aCircleRU, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aCircleRU.Length)));
+                    break;
+                }
+            #endregion
+
+            #region Case Opposite 1D
+            case SpawnStatus.ReLineL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aLineL, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLineR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aLineR, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkLineL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aLinkLineL, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkLineR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aLinkLineR, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReCircleLD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aCircleLD, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReCircleRU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy1D(miceID, SpawnData.aCircleRU, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
+            #endregion
+
+            #region Case 2D
+            case SpawnStatus.VerticalL:
+                {
+                    Debug.Log("IN CASE : " + intervalTime);
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aVertL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.VerticalR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aVertR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkVertL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkVertL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkVertR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkVertR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.HorizontalD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aHorD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.HorizontalU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aHorU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkHorD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkHorD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkHorU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkHorU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.HorTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aHorTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.VertTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aVertTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkHorTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkHorTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.LinkVertTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aLinkVertTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            #endregion
+
+            #region Case Opposite 2D
+            case SpawnStatus.ReVerticalL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aVertL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReVerticalR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aVertR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkVertL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkVertL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkVertR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkVertR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReHorizontalD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aHorD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReHorizontalU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aHorU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkHorD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkHorD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkHorU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkHorU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReHorTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aHorTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReVertTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aVertTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkHorTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkHorTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReLinkVertTwin:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnBy2D(miceID, SpawnData.aLinkVertTwin2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            #endregion
+
+            #region Case Custom
+            case SpawnStatus.TriangleLD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaTriangleLD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.TriangleLU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaTriangleLU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.TriangleRD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaTriangleRD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.TriangleRU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaTriangleRU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.BevelL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaBevelL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.BevelR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByCustom(miceID, SpawnData.jaBevelR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            #endregion
+
+            #region Case Opposite Custom
+            case SpawnStatus.ReTriangleLD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaTriangleLD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReTriangleLU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaTriangleLU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReTriangleRD:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaTriangleRD2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReTriangleRU:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaTriangleRU2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReBevelL:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaBevelL2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            case SpawnStatus.ReBevelR:
+                {
+                    RunCoroutine(coroutine = miceSpawner.ReSpawnByCustom(miceID, SpawnData.jaBevelR2D, spawnTime, intervalTime, lerpTime, spawnCount));
+                    break;
+                }
+            #endregion
         }
     }
 
+
+    void RunCoroutine(IEnumerator coroutine)
+    {
+        lastCoroutine = coroutine;
+        StartCoroutine(coroutine);
+    }
 
     void OnApplyDamageEvent(int miceID)     // 收到技能攻擊 (目前是測試數值 扣分)
     {

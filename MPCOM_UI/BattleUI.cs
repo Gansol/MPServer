@@ -31,7 +31,15 @@ namespace MPCOM
             return true;
         }
 
-        #region ClacScore
+        #region ClacScore 計算老鼠命中分數
+        /// <summary>
+        /// 計算老鼠命中分數
+        /// </summary>
+        /// <param name="miceID"></param>
+        /// <param name="time"></param>
+        /// <param name="eatingRate"></param>
+        /// <param name="score"></param>
+        /// <returns></returns>
         public byte[] ClacScore(byte miceID, float time,float eatingRate, Int16 score)
         {
             BattleData battleData = new BattleData();
@@ -46,7 +54,61 @@ namespace MPCOM
             catch (Exception e)
             {
                 battleData.ReturnCode = "S599";
-                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message;
+                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message + " 於: " + e.StackTrace; ;
+            }
+            return TextUtility.SerializeToStream(battleData);
+        }
+        #endregion
+
+        #region ClacScore 計算任務完成的分數
+        /// <summary>
+        /// 計算任務完成的分數
+        /// </summary>
+        /// <param name="mission"></param>
+        /// <param name="missionRate"></param>
+        /// <returns></returns>
+        public byte[] ClacScore(byte mission , float missionRate)
+        {
+            BattleData battleData = new BattleData();
+            battleData.ReturnCode = "S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                BattleLogic battleLogic = new BattleLogic();
+                battleData = battleLogic.ClacScore(mission,missionRate);
+            }
+            catch (Exception e)
+            {
+                battleData.ReturnCode = "S599";
+                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message + " 於: "+e.StackTrace;
+            }
+            return TextUtility.SerializeToStream(battleData);
+        }
+        #endregion
+
+        #region SelectMission 選擇任務
+        /// <summary>
+        /// 計算任務完成的分數
+        /// </summary>
+        /// <param name="mission"></param>
+        /// <param name="missionRate"></param>
+        /// <returns></returns>
+        public byte[] SelectMission(byte mission, float missionRate)
+        {
+            BattleData battleData = new BattleData();
+            battleData.ReturnCode = "S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                BattleLogic battleLogic = new BattleLogic();
+                battleData = battleLogic.SelectMission(mission, missionRate);
+            }
+            catch (Exception e)
+            {
+                battleData.ReturnCode = "S599";
+                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message + " 於: " + e.StackTrace;
             }
             return TextUtility.SerializeToStream(battleData);
         }

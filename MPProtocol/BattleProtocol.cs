@@ -66,6 +66,27 @@
         Random = 2,                       // 隨機
     }
 
+    public enum MissionMode : byte
+    {
+        Closed = 0,
+        Open = 1,
+        Opening = 2,
+        Completing = 3,
+        Completed = 4,
+    }
+
+    public enum Mission : byte
+    {
+        None=0,                 // 沒任務
+        Harvest = 1,            // 達成XX收穫
+        Reduce = 2,             // 減少XX收穫
+        DrivingMice = 3,        // 驅趕XX老鼠
+        HarvestRate = 4,          // 收穫倍率
+        BadMice = 5,              // 壞老鼠(不能打)
+        Exchange = 6,             // 交換收穫
+        WorldBoss = 7,            // 區域王
+    }
+
     public enum BattleOperationCode
     {
         ExitRoom = 41,              // 戰鬥中途離開房間
@@ -73,6 +94,8 @@
         CheckStatus = 43,             // 檢查玩家遊戲狀態
         SendDamage = 44,            // 玩者A發動技能 攻擊 玩者B
         UpdateScore = 52,           // 更新分數
+        Mission = 53,                // 任務
+        MissionCompleted=54,        // 任務完成
     }
 
     public enum BattleParameterCode
@@ -88,18 +111,24 @@
         MiceID,                     // 老鼠ID
         MiceName,                   // 老鼠名稱
         EatingRate,                 // 咀嚼頻率
+        Mission,                    // 任務
+        MissionRate,                // 任務倍率
+        missionScore,                    // 任務目標
     }
 
     public enum BattleResponseCode
     {
-        ExitRoom = 41,               // 離開房間
-        KickOther = 42,               // 踢人
-        DebugMessage = 45,            // OnEvent除錯訊息
-        Online = 46,                  // 線上
-        Offline = 47,                 // 離線
-        Damage = 48,                  // 造成傷害
-        ApplyDamage = 49,             // 接收 技能攻擊
-        GetScore = 51,                // 取得另一位玩家分數
+        ExitRoom = 41,              // 離開房間
+        KickOther = 42,             // 踢人
+        DebugMessage = 45,          // OnEvent除錯訊息
+        Online = 46,                // 線上
+        Offline = 47,               // 離線
+        Damage = 48,                // 造成傷害
+        ApplyDamage = 49,           // 接收 技能攻擊
+        GetScore = 51,              // 取得另一位玩家分數
         UpdateScore = 52,           // 更新分數
+        Mission = 53,               // 任務
+        MissionCompleted = 54,      // 任務完成
+        GetMissionScore = 55,       // 取得對方任務分數
     }
 }

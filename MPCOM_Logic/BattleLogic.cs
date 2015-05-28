@@ -1,5 +1,6 @@
 ﻿using System;
 using System.EnterpriseServices;
+using MPProtocol;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -15,7 +16,7 @@ using System.EnterpriseServices;
  * 計算分數
  * >>try catch 要移除 使用AutoComplete就可 移除後刪除
  * >>邏輯都沒寫
- * 
+ * 任務部分的獎勵與條件要再考慮看看資料放哪
  * ***************************************************************/
 
 namespace MPCOM
@@ -35,7 +36,10 @@ namespace MPCOM
             return true;
         }
 
-        #region ClacScore 計算分數
+        private int harvest = 200;
+        private int harvestReward = 1000;
+
+        #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
         public BattleData ClacScore(byte miceID, float time, float eatingRate, Int16 score)
@@ -72,5 +76,77 @@ namespace MPCOM
 
         #endregion
 
+        #region ClacScore 計算任務完成分數
+
+        [AutoComplete]
+        public BattleData ClacScore(byte mission, float missionRate)
+        {
+            battleData.ReturnCode = "(Logic)S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                switch ((Mission)mission) // 判斷任務獎勵
+                {
+                    case Mission.Harvest: //EggMice
+                        {
+                            //to do verification
+                            if (missionRate <= 0 || missionRate > 10)
+                            {
+                                battleData.ReturnCode = "S504";
+                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
+                                return battleData;
+                            }
+                            else
+                            {
+                                battleData.missionScore = (short)Math.Round((missionRate * harvestReward), 0);
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                        }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return battleData;
+        }
+
+        #endregion
+
+        #region SelectMission 選擇任務
+
+        [AutoComplete]
+        public BattleData SelectMission(byte mission, float missionRate)
+        {
+            battleData.ReturnCode = "(Logic)S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                switch ((Mission)mission) // 判斷任務獎勵
+                {
+                    case Mission.Harvest: //EggMice
+                        {
+                            //to do verification
+                            battleData.missionScore = (short)Math.Round((missionRate * harvest),0);
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            battleData.ReturnCode = "S506";
+            battleData.ReturnMessage = "選擇任務失敗！";
+            return battleData;
+        }
+
+        #endregion
     }
 }
