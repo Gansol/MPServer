@@ -40,25 +40,42 @@ public class PoolManager : MonoBehaviour
     private static int miceAllCount;
 
     public GameObject Panel;
+
+    [Tooltip("物件池位置")]
     public GameObject ObjectPool;
+    [Tooltip("物件匣")]
     public GameObject[] ObjectDeck;
+
+
+
+    [Tooltip("產生數量")]
+    [Range(3, 5)]
     public int spawnCount = 5;
+
+    [Tooltip("物件池上限(各種類分開)")]
+    [Range(3, 10)]
     public int clearLimit = 5;
+
+    [Tooltip("物件池上限(各種類分開)")]
+    [Range(10, 20)]
     public int clearTime = 10;
+
+    [Tooltip("物件池保留量(各種類分開)")]
+    [Range(2, 5)]
     public int reserveCount = 2;
-    public int objHeight = 0;
-    public int objWidth = 0;
 
-    public bool mergeFlag = false;       // 合併老鼠完成
-    public bool poolingFlag = false;      // 初始化物件池
+    private bool _mergeFlag = false;          // 合併老鼠完成
+    private bool _poolingFlag = false;        // 初始化物件池
 
+    public bool mergeFlag { get { return _mergeFlag; } }
+    public bool poolingFlag { get { return _poolingFlag; } }
 
     void Awake()
     {
         lastTime = 0;
         currentTime = 0;
         clearTime = 10;
-        poolingFlag = false;      // 初始化物件池
+        _poolingFlag = false;      // 初始化物件池
         //Pool = new List<GameObject>();
         //dictObjectPool = new Dictionary<string, List<GameObject>>();
         dictMice = new Dictionary<int, string>();
@@ -90,15 +107,11 @@ public class PoolManager : MonoBehaviour
                 clone.name = item.Value;
                 clone.transform.parent = ObjectPool.transform.FindChild(item.Value).transform;
                 clone.transform.localScale = Vector3.one;
-                //clone.GetComponent<UISprite>().width = objWidth;    // ＊＊＊＊要改＊＊＊＊
-                //clone.GetComponent<UISprite>().height = objHeight;  // ＊＊＊＊要改＊＊＊＊
-                //clone.tag = "Mice";
-                //clone.GetComponent<UISprite>().enabled = false;
                 clone.transform.GetChild(0).gameObject.SetActive(false);    // 新版 子物件隱藏
             }
         }
-
-        poolingFlag = true;
+        Debug.Log("pooling Mice Completed ! ");
+        _poolingFlag = true;
     }
 
 
@@ -151,7 +164,7 @@ public class PoolManager : MonoBehaviour
     public void MergeMice()
     {
         _tmpDict = Json.Deserialize(Global.Team) as Dictionary<string, object>;
-        Debug.Log(_tmpDict.Count);
+        //Debug.Log(_tmpDict.Count);
         //_tmpDict.Add(1, "EggMice");
         //_tmpDict.Add(2, "BggMice");
         //把自己的老鼠存入HashSet中等待比較，再把老鼠存入合併好的老鼠Dict中
@@ -181,8 +194,8 @@ public class PoolManager : MonoBehaviour
                 dictMice.Add(item, miceName.ToString());
             }
         }
-        mergeFlag = true;
-        //Debug.Log("miceProperty.Count" + dictMice.Count);
+        _mergeFlag = true;
+        Debug.Log("Merge Mice Completed ! ");
     }
 
 

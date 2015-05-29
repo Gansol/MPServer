@@ -24,6 +24,5 @@ namespace MPCOM
 
         public Int16 score;                 // 分數
         public Int16 missionScore;          // 任務目標
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using MPProtocol;
 
 /*
  * UpadateScore亂打的!!! 直接更新自己分數沒到Server驗證
@@ -11,6 +12,7 @@ using System;
 
 public class BattleManager : MonoBehaviour
 {
+    MissionManager missionManager;          // 任務管理員
     public GameObject BlueScore;            // 藍隊分數Label
     public GameObject ComboLabel;           // COMBO   Label
     public GameObject RedScore;             // 紅隊分數Label
@@ -28,6 +30,11 @@ public class BattleManager : MonoBehaviour
     private static int _missMice = 0;       // 失誤數           統計用
     private static int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
+    private static float _myDPS = 0;        // 我的平均輸出
+    private static float _otherDPS = 0;     // 對手的平均輸出
+    private static float _scoreRate = 1;    // 分數倍率
+    private float _lastTime;                // 我的平均輸出
+
 
     private float _beautyHP;                // 美化血條用
 
@@ -47,17 +54,19 @@ public class BattleManager : MonoBehaviour
     public int missMice { get { return _missMice; } }
     public int hitMice { get { return _hitMice; } }
     public int spawnCount { get { return _spawnCount; } }
-
+    public float myDPS { get { return _myDPS; } }
+    public float otherDPS { get { return _myDPS; } }
 
     // Use this for initialization
     void Start()
     {
+        missionManager = GetComponent<MissionManager>();
         Global.isExitingRoom = false;
-
 
         Global.photonService.ExitRoomEvent += OnExitRoomEvent;
         Global.photonService.OtherScoreEvent += OnOtherScoreEvent;
-        Global.photonService.MissionCompleteEvent += MissionCompleteEvent;
+        Global.photonService.MissionCompleteEvent += OnMissionCompleteEvent;
+        Global.photonService.ApplyMissionEvent += OnApplyRateEvent;
 
         _isCombo = false;
         _combo = 0;
@@ -76,6 +85,21 @@ public class BattleManager : MonoBehaviour
         _beautyHP = 0.5f; // 0.5 是血調中間
     }
 
+    void FixedUpdate()
+    {
+        float _time = Time.time;
+        if (Global.isGameStart)
+        {
+            if (_time > _lastTime + 5)
+            {
+                _myDPS = _score / Time.timeSinceLevelLoad;
+                _otherDPS = _otherScore / Time.timeSinceLevelLoad;
+                _lastTime = _time;
+                //Debug.Log("_myDPS: " + _myDPS + "\n  _otherDPS: " + _otherDPS);
+            }
+        }
+    }
+
     #region UpadateScore 更新分數 這裡根本亂打的
     /// <summary>
     /// 更新分數 這裡根本亂打的
@@ -87,8 +111,16 @@ public class BattleManager : MonoBehaviour
         {
             case "EggMice":
                 {
+                    if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange)
+                    {
+                        _score += (int)(2 * _scoreRate);              // ＊＊＊＊＊＊分數這裡亂打的要改!!!＊＊＊＊＊＊＊＊＊
+                    }
+                    else
+                    {
+                        _score += (int)(2 * _scoreRate);              // ＊＊＊＊＊＊分數這裡亂打的要改!!!＊＊＊＊＊＊＊＊＊
+                    }
+
                     UpadateCombo();
-                    _score += 2;              // ＊＊＊＊＊＊分數這裡亂打的要改!!!＊＊＊＊＊＊＊＊＊
                     _spawnCount++;
                     _hitMice++;
                     Global.MiceCount--;
@@ -190,7 +222,7 @@ public class BattleManager : MonoBehaviour
         else if (_score == 0 && _otherScore == 0)
         {
             HPBar.GetComponent<UISlider>().value = _beautyHP;
-            Debug.Log("KKKCCCCC" + _beautyHP);
+            //Debug.Log("KKKCCCCC" + _beautyHP);
             if (_beautyHP <= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value > 0.5f)
             {
                 _beautyHP -= 0.01f;
@@ -215,10 +247,27 @@ public class BattleManager : MonoBehaviour
     {
         _otherScore += score;
 
+        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange)
+        {
+            _score += score;
+        }
     }
 
-    void MissionCompleteEvent(Int16 missionScore)
+    void OnMissionCompleteEvent(Int16 missionScore)
     {
-        _score += missionScore;
+        if (MissionManager.mission == Mission.HarvestRate)
+        {
+            _scoreRate = 1;
+        }
+        else
+        {
+            _score += missionScore;
+        }
+    }
+
+    void OnApplyRateEvent(Mission mission,Int16 scoreRate)
+    {
+        if (mission == Mission.HarvestRate)
+            _scoreRate = scoreRate;
     }
 }

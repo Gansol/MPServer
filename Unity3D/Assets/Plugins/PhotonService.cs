@@ -140,19 +140,21 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.PrimaryID = (int)eventData.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                 Global.OtherData.Team = (string)eventData.Parameters[(byte)MatchGameParameterCode.Team];
                 Global.OtherData.RoomPlace = (string)eventData.Parameters[(byte)MatchGameParameterCode.RoomPlace];
-                Debug.Log(Global.OtherData.Team);
+                //Debug.Log(Global.OtherData.Team);
                 Global.BattleStatus = true;
                 break;
 
                 // 被踢出房間了
             case (byte)BattleResponseCode.KickOther:
                 ExitRoomEvent();
+                Global.isGameStart = false;
                 Debug.Log("Recive Kick!" + (string)eventData.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 break;
 
                 // 他斷線 我也玩不了 離開房間
             case (byte)BattleResponseCode.Offline:
                 ExitRoomEvent();
+                Global.isGameStart = false;
                 Debug.Log("Recive Offline!" + (string)eventData.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 break;
 
@@ -402,7 +404,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region Send Mission 傳送任務
+            #region  Mission Completed傳送任務
 
             case (byte)BattleResponseCode.MissionCompleted://取得老鼠資料
                 {
@@ -412,6 +414,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Int16 missionScore = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.missionScore];
                             MissionCompleteEvent(missionScore);
+                            Debug.Log("RECIVE MissionCompleted !");
                         }
                     }
                     catch (Exception e)

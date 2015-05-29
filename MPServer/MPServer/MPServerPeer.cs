@@ -92,7 +92,7 @@ namespace MPServer
                 }
                 else
                 {
-                    Log.Debug("IN >9 :" + operationRequest.OperationCode.ToString());
+                    //Log.Debug("IN >9 :" + operationRequest.OperationCode.ToString());
 
                     switch (operationRequest.OperationCode)
                     {
@@ -653,7 +653,7 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    Log.Debug("IN UpdateScore");
+                                    //Log.Debug("IN UpdateScore");
 
                                     primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
@@ -664,16 +664,16 @@ namespace MPServer
                                     Int16 score = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Score];
 
                                     MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //初始化 UI 
-                                    Log.Debug("BattleUI OK");
+                                    //Log.Debug("BattleUI OK");
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceID, time, eatingRate, score)); //計算分數
-                                    Log.Debug("BattleData OK");
+                                    //Log.Debug("BattleData OK");
 
                                     score = battleData.score;
 
                                     if (battleData.ReturnCode == "S501")//計算分數成功 回傳玩家資料
                                     {
                                         //回傳給原玩家
-                                        Log.Debug("battleData.ReturnCode == S501");
+                                        //Log.Debug("battleData.ReturnCode == S501");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, score } 
                                     };
@@ -797,7 +797,7 @@ namespace MPServer
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(mission, missionRate)); //計算分數
                                     Log.Debug("BattleData OK");
                                     Int16 missionScore = battleData.missionScore;
-
+                                    Log.Debug("\n\nMISSION Score: " + missionScore+"  \n\n");
                                     if (battleData.ReturnCode == "S503")//計算分數成功 回傳玩家資料
                                     {
                                         //回傳給原玩家

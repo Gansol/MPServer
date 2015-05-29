@@ -15,29 +15,43 @@ using System;
 
 public class MissionManager : MonoBehaviour
 {
-
-    public MissionMode missionMode = MissionMode.Closed;        // 顯示目前任務模式狀態
-    public Mission mission = Mission.Harvest;                   // 顯是目前執行任務
     BattleManager battleManager;
 
-    public int missionInterval = 10;    // 目前還沒用到
+    public static MissionMode missionMode { get { return _missionMode;} }
+    public static Mission mission { get { return _mission; } }
+
+    public static MissionMode _missionMode = MissionMode.Closed;        // 顯示目前任務模式狀態  之後要改private
+    public static Mission _mission = Mission.Harvest;                   // 顯示目前執行任務
+    public int missionInterval = 10;                            // 任務再次啟動間隔時間
+    [Range(10, 25)]
+    public int lowerPercent = 25;                               // 較低的一方分數百分比
+    [Range(5, 10)]
+    public int lowestPercent = 10;                              // 較低的一方分數百分比
+    [Range(1, 4)]
+    public int balanceTimes = 2;                                // 平衡次數
+    public int bossActiveTime = 100;                            // Boss會出現的 時間條件
+    public int bossActiveScore = 1000;                          // Boss會出現的 分數條件
+    public int endlessTime = 1000;                              // 強制結束時間
 
     private int activeScore;                                    // grandmother know it!
     private int activeTime;                                     // 遊戲開始後 啟動任務時間
-    private int missionTime;                                  // 任務時間限制
+    private int missionTime;                                    // 任務時間限制
 
+    private float avgMissionTime;                               // 平均任務完成時間
     private float gameTime;                                     // 遊戲時間
     private float lastGameTime;                                 // 上一次完成任務的時間
     private Int16 missionScore;                                 // 任務所需分數
     private float lastScore;                                    // 任務開始前分數
-    private float missionRate;                                    // 任務倍率
+    private float missionRate;                                  // 任務倍率
 
-    // Use this for initialization
+    private bool missionFlag;                                   // 任務是否開啟
+    private bool seesawFlag;                                    // 任務蹺蹺板 (A啟動B不啟動..etc)
+
     void Start()
     {
-        Global.photonService.ApplyMissionEvent += OnApplyMissionEvent;
-        Global.photonService.ShowMissionScoreEvent += OnShowMissionScoreEvent;
-        Global.photonService.MissionCompleteEvent += MissionCompleteEvent;
+        Global.photonService.ApplyMissionEvent += OnApplyMissionEvent;          // 加入 接受任務 監聽事件
+        Global.photonService.ShowMissionScoreEvent += OnShowMissionScoreEvent;  // 加入 顯示任務 監聽事件
+        Global.photonService.MissionCompleteEvent += MissionCompleteEvent;      // 加入 完成任務 監聽事件
         battleManager = GetComponent<BattleManager>();
 
         activeScore = 1000;
@@ -45,83 +59,230 @@ public class MissionManager : MonoBehaviour
         missionTime = 60;
         missionRate = 1.0f;
         lastGameTime = 0;
+        missionFlag = false;
+        seesawFlag = true;
+        _mission = Mission.None;
+        _missionMode = MissionMode.Closed;
     }
 
-    // Update is called once per frame
+
     void Update()
     {
+        gameTime = Time.timeSinceLevelLoad;
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
-            gameTime = Time.timeSinceLevelLoad;   // 遊戲時間
-            //Debug.Log(gameTime);
-            //if (Global.missionFlag)
-            //{
-                if (missionMode == MissionMode.Closed)
+            if (missionMode == MissionMode.Closed)                                  // 任務關閉時，持續判斷是否觸發任務
+                MissionTrigger();
+
+            if (missionMode == MissionMode.Completed)                               // 任務完成時，關閉任務並儲存資訊，回到初始狀態
+            {
+                if (_mission == Mission.Reduce)
+                    activeScore -= missionScore;
+
+                missionScore = 0;
+                _missionMode = MissionMode.Closed;
+                _mission = Mission.None;
+                avgMissionTime = (lastGameTime + (gameTime - lastGameTime)) / 2;            // 平均任務完成時間
+                lastGameTime = gameTime;                                                    // 任務完成時時間
+            }
+
+            if (missionMode == MissionMode.Completing && Global.isMissionCompleted) // 任務完成中，發送完成訊息並等待Server完成資料判斷。
+            {
+                if (_mission == Mission.DrivingMice)
                 {
-                    // 任務結束 並判斷下次會觸發的任務
-                    if (Global.OtherData.RoomPlace != "Host")
+                    Global.photonService.MissionComplete((byte)_mission, battleManager.combo);
+                }
+                else
+                {
+                    Global.photonService.MissionComplete((byte)_mission, missionRate);
+                }
+
+                Global.isMissionCompleted = false;
+            }
+
+            if (missionMode == MissionMode.Opening)                                 // 任務開啟中，持續判斷 完成任務/任務失敗
+                MissionExecutor(_mission);
+
+            if (missionMode == MissionMode.Open && missionFlag)                     // 任務開始時，發送任務訊息並等待Server回傳任務
+            {
+                missionFlag = false;
+                lastScore = battleManager.score;        // 儲存任務開始前的分數
+                lastGameTime = gameTime;                // 任務開始時時間
+                Global.photonService.SendMission((byte)_mission, missionRate);
+            }
+        }
+    }
+
+    // 任務事件處發者
+    void MissionTrigger()
+    {
+        // UnityEngine.Random.seed = System.Guid.NewGuid().GetHashCode();
+        if (Global.OtherData.RoomPlace != "Host")       // 如果我是主機才會當任務事件判斷者
+        {
+            
+            float otherPercent = (battleManager.otherScore / (battleManager.score + battleManager.otherScore)) * 100;
+            float myPercent = 100 - otherPercent;
+            //Debug.Log("otherPercent :" + otherPercent + "\n myPercent :" + myPercent);
+            if ((gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
+            {
+                // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
+                if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed)
+                {
+                    Mission[] missionSelect = { Mission.Exchange, Mission.BadMice };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    _missionMode = MissionMode.Open;
+                    missionFlag = true;
+                    balanceTimes--;
+                    Debug.Log("我方或對方 分數<10%之間 啟動高平衡機制");
+
+                }// 如果 我方或對方 分數再10~25%之間 啟動低平衡機制，只觸發限制次數
+                else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent)
+                        && balanceTimes > 0 && missionMode == MissionMode.Closed)
+                {
+                    Mission[] missionSelect = { Mission.Exchange, Mission.BadMice };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    _missionMode = MissionMode.Open;
+                    missionFlag = true;
+                    balanceTimes--;
+                    Debug.Log("我方或對方 分數再10~25%之間 啟動低平衡機制");
+                }
+
+                // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
+                if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
+                {
+                    Mission[] missionSelect = { Mission.Harvest, Mission.DrivingMice };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    activeTime += activeTime+UnityEngine.Random.Range(0, (int)(activeTime / 2));
+                    _missionMode = MissionMode.Open;
+                    missionFlag = true;
+                }
+
+                // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
+                if ((battleManager.score > activeScore || battleManager.otherScore > activeScore)  && !seesawFlag && missionMode == MissionMode.Closed)
+                {
+                    Mission[] missionSelect = { Mission.Harvest, Mission.BadMice, Mission.DrivingMice };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    activeScore += activeScore+UnityEngine.Random.Range(0, (int)(activeScore / 2));
+                    _missionMode = MissionMode.Open;
+                    missionFlag = true;
+                }
+
+                // 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS
+                if (battleManager.score > bossActiveScore && battleManager.otherScore > bossActiveScore && gameTime > bossActiveTime && missionMode == MissionMode.Closed)
+                {
+                    _mission = Mission.WorldBoss;
+                    _missionMode = MissionMode.Open;
+                    missionFlag = true;
+                }
+            }
+
+        }
+    }
+
+    // 任務事件處理者
+    void MissionExecutor(Mission mission)
+    {
+        ShowMissionLabel(mission, missionScore);
+        switch (mission)
+        {
+            case Mission.None:
+                {
+                    break;
+                }
+            case Mission.Harvest:
+                {
+                    if ((battleManager.score - lastScore) >= missionScore)      // success
                     {
-                        if (gameTime > lastGameTime + activeTime)
+                        _missionMode = MissionMode.Completing;
+                        Global.isMissionCompleted = true;
+                    }
+                    else if (gameTime > missionTime)                            // failed
+                    {
+                        _missionMode = MissionMode.Completed;
+                        ShowFailedLabel();
+                    }
+                    break;
+                }
+            case Mission.Reduce:        // 完成後 activeScore要減少Reduce的量
+                {
+                    if ((gameTime - lastGameTime - missionTime) > -5) // 減少糧食 這比較特殊 需要顯示閃爍血調 還沒寫
+                    {
+                        ShingHPBar();
+                    }
+                    else if (gameTime - lastGameTime > missionTime)
+                    {
+                        _missionMode = MissionMode.Completing;
+                        Global.isMissionCompleted = true;
+                    }
+                    break;
+                }
+            case Mission.DrivingMice:   
+                {
+                    if (gameTime - lastGameTime > missionTime)
+                    {
+                        if (battleManager.combo == 0)
                         {
-                            mission = Mission.Harvest;
-                            missionMode = MissionMode.Open;
-                            activeTime += 900;
+                            _missionMode = MissionMode.Completed;
+                            ShowFailedLabel();
                         }
                     }
-                }
-                else if (missionMode == MissionMode.Completed)
-                {
-                    missionMode = MissionMode.Closed;
-                    mission = Mission.None;
-                    lastGameTime = gameTime;
-                    //Global.missionFlag = false;
-                }
-                else if (missionMode == MissionMode.Completing)
-                {
-                    if (Global.isMissionCompleted)
+                    else
                     {
-                        // clac
-                        Global.photonService.MissionComplete((byte)mission, missionRate);
-                        Global.isMissionCompleted = false;
+                       
+                        _missionMode = MissionMode.Completing;
+                        Global.isMissionCompleted = true;
                     }
+                    break;
                 }
-                else if (missionMode == MissionMode.Opening)
+            case Mission.HarvestRate:
                 {
-                    // 任務執行時
-                    switch (mission)
+                    if (gameTime - lastGameTime > missionTime)
                     {
-                        case Mission.None:
-                            {
-                                break;
-                            }
-                        case Mission.Harvest:
-                            {
-                                ShowMissionLabel(mission, missionScore);
-
-                                if ((battleManager.score - lastScore) >= (missionScore -190))      // success
-                                {
-                                    missionMode = MissionMode.Completing;
-                                    Global.isMissionCompleted = true;
-                                }
-                                else if (gameTime > missionTime)                            // failed
-                                {
-                                    missionMode = MissionMode.Completed;
-                                    ShowFailedLabel();
-                                }
-                                break;
-                            }
+                        HarvestRate();
+                        
+                        _missionMode = MissionMode.Completing;
+                        Global.isMissionCompleted = true;
                     }
+                    break;
                 }
-                else if (missionMode == MissionMode.Open)
+            case Mission.BadMice:// 還沒辦法寫 要把老鼠寫完
                 {
-                    // 任務開始時
-                    lastScore = battleManager.score;        // 儲存任務開始前的分數
-                    Global.photonService.SendMission((byte)mission,missionRate);        // 會一直傳
+                    break;
                 }
-
-            //}
+            case Mission.Exchange:
+                {
+                    if (gameTime - lastGameTime > missionTime)
+                    {
+                        _missionMode = MissionMode.Completing;
+                        Global.isMissionCompleted = true;
+                    }
+                    break;
+                }
+            case Mission.WorldBoss: // 要計算網路延遲... 還沒寫
+                if (gameTime - lastGameTime > missionTime)
+                {
+                    _missionMode = MissionMode.Completing;
+                    Global.isMissionCompleted = true;
+                }
+                break;
         }
+    }
+
+    void HarvestRate()
+    {
+        //if ((gameTime - lastGameTime - missionTime) > -5)
+        //{
+        //    // 慢慢變淡
+        //}
+        // 顯示 倍率圖樣 if flag
+        Debug.Log("HarvestRate : ");
+    }
+    void ShingHPBar()
+    {
+        Debug.Log("Shing....");
+        //gui amins;
+        //xxx.Play();
     }
 
     void ShowMissionLabel(Mission mission, Int16 missionScore)
@@ -132,7 +293,7 @@ public class MissionManager : MonoBehaviour
 
         //}
 
-        Debug.Log("MISSION STARTING...");
+        Debug.Log(mission + "MISSION STARTING...");
     }
 
     void ShowFailedLabel()
@@ -150,19 +311,32 @@ public class MissionManager : MonoBehaviour
         // recive server send event message
         Global.missionFlag = true;
         this.missionScore = missionScore;
-        this.mission = mission;
-        missionMode = MissionMode.Opening;
+        MissionManager._mission = mission;
+        _missionMode = MissionMode.Opening;
     }
 
     void MissionCompleteEvent(Int16 missionScore)
     {
         // to show message box
         Debug.Log(" Mission Completed !   Get +" + missionScore);
+        _missionMode = MissionMode.Completed;
     }
 
     void OnShowMissionScoreEvent(Int16 missionScore)
     {
         // to show message box
         Debug.Log("Other Player Completed Mission !   Get +" + missionScore);
+    }
+
+    void OnBossDiedEvent()
+    {
+        // to show message box
+        // 接收對方打死訊息
+        Debug.Log("Other Player Completed Mission !   Get +" + missionScore);
+    }
+
+    void OnAnsycTime()
+    {
+        // to recive Host Last GameTime;
     }
 }

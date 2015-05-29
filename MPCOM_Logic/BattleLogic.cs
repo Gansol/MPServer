@@ -37,7 +37,15 @@ namespace MPCOM
         }
 
         private int harvest = 200;
-        private int harvestReward = 1000;
+        private int drivingMice = 50;
+        private int harvestRate = 10;               // 分數倍率
+        private int reduce = 500;                   // 減少分數
+
+        private int harvestReward = 100;
+        private int drivingMiceReward = 200;
+        private int badMiceReward = 300;
+        private int harvestRateReward = 400;
+        private int worldBossReward = 10000;
 
         #region ClacScore 計算老鼠命中分數
 
@@ -88,7 +96,7 @@ namespace MPCOM
             {
                 switch ((Mission)mission) // 判斷任務獎勵
                 {
-                    case Mission.Harvest: //EggMice
+                    case Mission.Harvest:
                         {
                             //to do verification
                             if (missionRate <= 0 || missionRate > 10)
@@ -100,6 +108,23 @@ namespace MPCOM
                             else
                             {
                                 battleData.missionScore = (Int16)Math.Round((missionRate * harvestReward), 0);
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                        }
+                    case Mission.DrivingMice:
+                        {
+                            //to do verification
+                            if (missionRate <= 0) // 這裡 missionRate 是Combo
+                            {
+                                battleData.ReturnCode = "S504";
+                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
+                                return battleData;
+                            }
+                            else
+                            {
+                                battleData.missionScore = (Int16)Math.Round((missionRate * drivingMiceReward), 0);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
@@ -128,14 +153,58 @@ namespace MPCOM
             {
                 switch ((Mission)mission) // 判斷任務獎勵
                 {
-                    case Mission.Harvest: //EggMice
+                    case Mission.Harvest: // 收穫
                         {
                             //to do verification
-                            battleData.missionScore = (Int16)Math.Round((missionRate * harvest),0);
+                            battleData.missionScore = (Int16)Math.Round((missionRate * harvest), 0);
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
                         }
+                    case Mission.DrivingMice: // 趕老鼠
+                        {
+                            //to do verification
+                            battleData.missionScore = (Int16)Math.Round((missionRate * drivingMice), 0);
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                    case Mission.Exchange: // 交換分數
+                        {
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                    case Mission.HarvestRate: // 分數倍率
+                        {
+                            battleData.missionScore = (Int16)Math.Round((harvestRate * missionRate), 0);
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                    case Mission.Reduce: // 減少分數
+                        {
+                            battleData.missionScore = (Int16)Math.Round((missionRate * reduce), 0);
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                    case Mission.BadMice: // 壞老鼠
+                        {
+                            // missionRate 是老鼠ID
+                            battleData.missionScore = (Int16)missionRate;
+                            battleData.ReturnCode = "S505";
+                            battleData.ReturnMessage = "選擇任務成功！";
+                            return battleData;
+                        }
+                    //case Mission.WorldBoss: // 壞老鼠
+                    //    {
+                    //        // missionRate 是老鼠ID
+                    //        battleData.missionScore = (Int16)missionRate;
+                    //        battleData.ReturnCode = "S505";
+                    //        battleData.ReturnMessage = "選擇任務成功！";
+                    //        return battleData;
+                    //    }
                 }
             }
             catch (Exception e)
