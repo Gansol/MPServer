@@ -24,5 +24,7 @@ namespace MPCOM
 
         public Int16 score;                 // 分數
         public Int16 missionScore;          // 任務目標
+        public Int16 customVaule;           // 自訂參數1
+        public Int16 missionReward;         // 任務獎勵
     }
 }

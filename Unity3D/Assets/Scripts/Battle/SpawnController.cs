@@ -320,7 +320,6 @@ public class SpawnController : MonoBehaviour
             #region Case 2D
             case SpawnStatus.VerticalL:
                 {
-                    Debug.Log("IN CASE : " + intervalTime);
                     RunCoroutine(coroutine = miceSpawner.SpawnBy2D(miceID, SpawnData.aVertL2D, spawnTime, intervalTime, lerpTime, spawnCount));
                     break;
                 }

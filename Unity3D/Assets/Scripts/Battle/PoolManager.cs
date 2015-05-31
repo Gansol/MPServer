@@ -97,8 +97,10 @@ public class PoolManager : MonoBehaviour
         foreach (KeyValuePair<int, string> item in dictMice)
         {
             clone = new GameObject();
+            
             clone.name = item.Value;
             clone.transform.parent = ObjectPool.transform;
+            clone.layer = clone.transform.parent.gameObject.layer;
             clone.transform.localScale = Vector3.one;
 
             for (int i = 0; i < spawnCount; i++)

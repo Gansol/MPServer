@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LoadingMainGame : MonoBehaviour {
 
-    public string level;
+    public int level;
     AsyncOperation Loader;
 
     void Start()

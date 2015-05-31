@@ -63,10 +63,12 @@ public class BattleManager : MonoBehaviour
         missionManager = GetComponent<MissionManager>();
         Global.isExitingRoom = false;
 
-        Global.photonService.ExitRoomEvent += OnExitRoomEvent;
-        Global.photonService.OtherScoreEvent += OnOtherScoreEvent;
-        Global.photonService.MissionCompleteEvent += OnMissionCompleteEvent;
-        Global.photonService.ApplyMissionEvent += OnApplyRateEvent;
+        Global.photonService.ExitRoomEvent += OnExitRoom;
+        Global.photonService.OtherScoreEvent += OnOtherScore;
+        Global.photonService.MissionCompleteEvent += OnMissionComplete;
+        Global.photonService.ApplyMissionEvent += OnApplyRate;
+        Global.photonService.UpdateScoreEvent += OnUpdateScore;
+        Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
 
         _isCombo = false;
         _combo = 0;
@@ -111,14 +113,6 @@ public class BattleManager : MonoBehaviour
         {
             case "EggMice":
                 {
-                    if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange)
-                    {
-                        _score += (int)(2 * _scoreRate);              // ＊＊＊＊＊＊分數這裡亂打的要改!!!＊＊＊＊＊＊＊＊＊
-                    }
-                    else
-                    {
-                        _score += (int)(2 * _scoreRate);              // ＊＊＊＊＊＊分數這裡亂打的要改!!!＊＊＊＊＊＊＊＊＊
-                    }
 
                     UpadateCombo();
                     _spawnCount++;
@@ -236,24 +230,43 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    void OnExitRoomEvent()                  // 離開房間時
+    void OnUpdateScore(Int16 score)    // 更新分數時
+    {
+        // 如果再交換分數任務下，則不取得自己增加的分數
+        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
+        {
+
+        }// 如果再交換分數任務下，則取得自己減少的分數
+        else if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score < 0)
+        {
+            _score += (int)(score * _scoreRate);
+        }
+        else// 正常情況下照舊
+        {
+            _score += (int)(score * _scoreRate);
+        }
+
+    }
+
+    void OnExitRoom()                  // 離開房間時
     {
         Global.isExitingRoom = true;        // 離開房間了
         Global.isMatching = false;          // 無配對狀態
         Global.BattleStatus = false;        // 不在戰鬥中
     }
 
-    void OnOtherScoreEvent(Int16 score)     // 接收對手分數
+    void OnOtherScore(Int16 score)     // 接收對手分數
     {
         _otherScore += score;
 
-        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange)
+        // 如果再交換分數任務下，取得對方增加的分數
+        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
         {
-            _score += score;
+            _score += (int)(score * _scoreRate);
         }
     }
 
-    void OnMissionCompleteEvent(Int16 missionScore)
+    void OnMissionComplete(Int16 missionReward)
     {
         if (MissionManager.mission == Mission.HarvestRate)
         {
@@ -261,13 +274,34 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            _score += missionScore;
+            _score += missionReward;
         }
     }
 
-    void OnApplyRateEvent(Mission mission,Int16 scoreRate)
+    void OnOtherMissionComplete(Int16 otherMissionReward)
+    {
+        if (MissionManager.mission == Mission.HarvestRate)
+        {
+            _scoreRate = 1;
+        }
+        else
+        {
+            _otherScore+= otherMissionReward;
+        }
+    }
+
+    void OnApplyRate(Mission mission, Int16 scoreRate)
     {
         if (mission == Mission.HarvestRate)
-            _scoreRate = scoreRate;
+        {
+            if (_score > _otherScore)
+            {
+                _scoreRate -= (scoreRate / 10); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/10
+            }
+            else
+            {
+                _scoreRate += (scoreRate / 10); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/10
+            }
+        }
     }
 }

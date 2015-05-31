@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Global : MonoBehaviour 
+public class Global  
 {
     public static readonly string serverPath = "http://192.168.1.2:8080/MicePow/";//Server路徑
     //Android or iOS or Win 伺服器中的 檔案列表路徑
@@ -57,7 +57,7 @@ public class Global : MonoBehaviour
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
 
-    public static string loadScene = "";            // 要被載入的場景
+    public static int loadScene;            // 要被載入的場景
 
     public static string Ret = "";          // 回傳值
     public static  int PrimaryID = 0;       // 主索引

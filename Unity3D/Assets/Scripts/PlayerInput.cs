@@ -27,7 +27,7 @@ public class PlayerInput : MonoBehaviour {
 	void Update () {
         Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.zero);
-        if (hit != null && hit.collider != null)
+        if (hit && hit.collider != null)
         {
             if (Input.GetMouseButtonDown(0))
             {

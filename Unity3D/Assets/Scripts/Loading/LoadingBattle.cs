@@ -3,8 +3,13 @@ using System.Collections;
 
 public class LoadingBattle : MonoBehaviour
 {
-    public string level;
+    public int level;
     AsyncOperation Loader;
+
+    void Awake()
+    {
+        Global.loadScene = level;
+    }
 
     void Start()
     {

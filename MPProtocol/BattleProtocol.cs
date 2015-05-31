@@ -96,6 +96,7 @@
         UpdateScore = 52,           // 更新分數
         Mission = 53,                // 任務
         MissionCompleted=54,        // 任務完成
+
     }
 
     public enum BattleParameterCode
@@ -113,7 +114,12 @@
         EatingRate,                 // 咀嚼頻率
         Mission,                    // 任務
         MissionRate,                // 任務倍率
-        missionScore,                    // 任務目標
+        MissionScore,               // 任務目標
+        CustomValue,                // 自訂參數1
+        MissionReward,              // 任務獎勵
+        GoldReward,                 // 金幣獎勵
+        SliverReward,               // 銀幣獎勵(遊戲幣、糧食)
+        EXPReward,                  // 經驗獎勵(遊戲幣、糧食)
     }
 
     public enum BattleResponseCode
@@ -130,5 +136,6 @@
         Mission = 53,               // 任務
         MissionCompleted = 54,      // 任務完成
         GetMissionScore = 55,       // 取得對方任務分數
+        Reward = 56,                // 獎勵
     }
 }

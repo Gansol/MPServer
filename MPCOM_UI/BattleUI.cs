@@ -60,14 +60,15 @@ namespace MPCOM
         }
         #endregion
 
-        #region ClacScore 計算任務完成的分數
+        #region ClacMissionReward 計算任務完成的分數
         /// <summary>
-        /// 計算任務完成的分數
+        /// 計算任務完成的分數。
         /// </summary>
-        /// <param name="mission"></param>
-        /// <param name="missionRate"></param>
-        /// <returns></returns>
-        public byte[] ClacScore(byte mission , float missionRate)
+        /// <param name="mission">任務</param>
+        /// <param name="missionRate">任務倍率</param>
+        /// <param name="customVaule">自訂參數1</param>
+        /// <returns>回傳任務獎勵</returns>
+        public byte[] ClacMissionReward(byte mission, float missionRate,int customVaule)
         {
             BattleData battleData = new BattleData();
             battleData.ReturnCode = "S500";
@@ -76,7 +77,7 @@ namespace MPCOM
             try
             {
                 BattleLogic battleLogic = new BattleLogic();
-                battleData = battleLogic.ClacScore(mission,missionRate);
+                battleData = battleLogic.ClacMissionReward(mission, missionRate, customVaule);
             }
             catch (Exception e)
             {

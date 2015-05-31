@@ -84,10 +84,10 @@ namespace MPCOM
 
         #endregion
 
-        #region ClacScore 計算任務完成分數
+        #region ClacMissionReward 計算任務完成分數
 
         [AutoComplete]
-        public BattleData ClacScore(byte mission, float missionRate)
+        public BattleData ClacMissionReward(byte mission, float missionRate,int customValue)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -98,7 +98,6 @@ namespace MPCOM
                 {
                     case Mission.Harvest:
                         {
-                            //to do verification
                             if (missionRate <= 0 || missionRate > 10)
                             {
                                 battleData.ReturnCode = "S504";
@@ -107,7 +106,7 @@ namespace MPCOM
                             }
                             else
                             {
-                                battleData.missionScore = (Int16)Math.Round((missionRate * harvestReward), 0);
+                                battleData.missionReward = (Int16)Math.Round((missionRate * harvestReward), 0);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
@@ -115,8 +114,7 @@ namespace MPCOM
                         }
                     case Mission.DrivingMice:
                         {
-                            //to do verification
-                            if (missionRate <= 0) // 這裡 missionRate 是Combo
+                            if (missionRate <= 0) // 這裡自訂參數 customValue 是Combo
                             {
                                 battleData.ReturnCode = "S504";
                                 battleData.ReturnMessage = "驗證任務獎勵失敗！";
@@ -124,7 +122,7 @@ namespace MPCOM
                             }
                             else
                             {
-                                battleData.missionScore = (Int16)Math.Round((missionRate * drivingMiceReward), 0);
+                                battleData.missionReward = (Int16)(missionRate * drivingMiceReward);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
@@ -134,6 +132,7 @@ namespace MPCOM
             }
             catch (Exception e)
             {
+                
                 throw e;
             }
             return battleData;

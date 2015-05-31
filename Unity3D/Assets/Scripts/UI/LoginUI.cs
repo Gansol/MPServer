@@ -20,6 +20,7 @@ public class LoginUI : MonoBehaviour
     //private bool macthing = false;
     private float ckeckTime;
     private bool checkFlag = true;
+    private bool isLoginBtn = false;
 
     // 在Start裡建立好Login的回應事件
     IEnumerator Start()
@@ -87,8 +88,9 @@ public class LoginUI : MonoBehaviour
                     GUI.Label(new Rect(30, 150, 80, 20), "Passowrd:");
                     getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
 
-                    if (GUI.Button(new Rect(30, 230, 200, 50), "Login"))
+                    if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)
                     {
+                        isLoginBtn = true;
                         Global.photonService.Login(getAccount, getPassowrd); // 登入
                     }
 
@@ -202,6 +204,7 @@ public class LoginUI : MonoBehaviour
         }
         else // 若登入失敗，取得錯誤回傳字串
         {
+            isLoginBtn = false;
             Global.Ret = returnCode;
             Global.Account = "";
             Global.LoginStatus = false;

@@ -33,7 +33,7 @@ public class EggMice : MonoBehaviour
 
     void Awake()
     {
-        battleManager = new BattleManager();
+        battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
         upFlag = false;
         dieFlag = false;
         disappearFlag = false;
@@ -134,6 +134,7 @@ public class EggMice : MonoBehaviour
         try
         {
             battleManager.LostScore(transform.parent.name, aliveTime);  // 跑掉掉分
+            
         }
         catch (Exception e)
         {
@@ -163,7 +164,7 @@ public class EggMice : MonoBehaviour
 
     public void Play()
     {
-        battleManager = new BattleManager();
+        battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
         upFlag = false;
         dieFlag = false;
         disappearFlag = false;
