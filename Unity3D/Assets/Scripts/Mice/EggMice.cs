@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -29,7 +30,14 @@ public class EggMice : MonoBehaviour
     bool disappearFlag;
     bool eatingFlag;
     bool clickFlag;
-    Vector3 pos; // mouse pos
+
+    public float upDistance; // mouse pos
+    public float upSpeed;
+    [Range(0.01f,0.99f)]
+    public float lerpSpeed;
+
+    private float _lerpSpeed;
+    private float _upDistance;
 
     void Awake()
     {
@@ -41,6 +49,18 @@ public class EggMice : MonoBehaviour
         clickFlag = false;
     }
 
+    void Start()
+    {
+         _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+    }
+
+    void FixedUpdate()
+    {
+
+        if (transform.parent.localPosition.y < upDistance)
+            StartCoroutine(AnimationUp());
+
+    }
 
     void Update()
     {
@@ -53,7 +73,7 @@ public class EggMice : MonoBehaviour
         if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
         {
             animTime = currentState.normalizedTime;
-//            Debug.Log(this.transform.parent.parent.name + "   animTime:" + animTime);
+            //            Debug.Log(this.transform.parent.parent.name + "   animTime:" + animTime);
             // 目前播放的動畫 "總"時間
             if (!upFlag)        // 限制執行一次
             {
@@ -68,9 +88,9 @@ public class EggMice : MonoBehaviour
         }
         else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
         {
-           
+
             animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
-           // Debug.Log("(D)animTime = " + animTime);
+            // Debug.Log("(D)animTime = " + animTime);
             if (!dieFlag)       // 限制執行一次
             {
                 if (animTime > 0.5)   // 動畫撥放完畢時
@@ -114,27 +134,27 @@ public class EggMice : MonoBehaviour
         }
         #endregion
     }
-        void OnHit()
+    void OnHit()
+    {
+        Debug.Log("HIT!");
+        if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
         {
-            Debug.Log("HIT!");
-            if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
-            {
-                clickFlag = true;
-                collider2D.enabled = false;
-                GetComponent<Animator>().Play("Die");
-            }
+            clickFlag = true;
+            collider2D.enabled = false;
+            GetComponent<Animator>().Play("Die");
         }
+    }
 
     void OnDisappear(float aliveTime)
     {
         this.transform.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
-
-        GetComponent<UISprite>().enabled = false;
+        //transform.parent.GetComponent<Animator>().Play("Default");
+        gameObject.SetActive(false);
 
         try
         {
             battleManager.LostScore(transform.parent.name, aliveTime);  // 跑掉掉分
-            
+
         }
         catch (Exception e)
         {
@@ -148,6 +168,7 @@ public class EggMice : MonoBehaviour
     void OnDied(float aliveTime)
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
+        //transform.parent.GetComponent<Animator>().Play("Default");
         gameObject.SetActive(false);
 
         try
@@ -171,7 +192,26 @@ public class EggMice : MonoBehaviour
         eatingFlag = false;
         clickFlag = false;
         collider2D.enabled = true;
+
+        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        _lerpSpeed = upSpeed;
         GetComponent<Animator>().Play("Hello");
+        transform.parent.localPosition = new Vector3(0, 0);
+        //transform.parent.GetComponent<Animator>().Play("Up");
+    }
+
+    IEnumerator AnimationUp()
+    {
+        _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
+        if (transform.parent.localPosition.y + _lerpSpeed > _upDistance)
+        {
+            transform.parent.localPosition = new Vector3(0, _upDistance);
+        }
+        else
+        {
+            transform.parent.localPosition += new Vector3(0, _lerpSpeed);
+        }
+        yield return null;
     }
 }
 

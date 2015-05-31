@@ -17,14 +17,77 @@ public class MiceSpawner : MonoBehaviour
 {
     public GameObject[] hole;
     private PoolManager poolManger;
-    private HoleState holeState;            // 地洞狀態
-
-
+    [Range(2,5)]
+    public float miceSize;
+    private Vector3 _miceSize;
 
     void Start()
     {
         poolManger = GetComponent<PoolManager>();
         // StartCoroutine(SpawnBy1D(1, aLineL, 0.5f, 0.05f));
+    }
+
+
+    /// <summary>
+    /// 1D 隨機產生。
+    /// </summary>
+    /// <param name="holeArray">1D陣列產生方式</param>
+    /// <param name="spawnTime">產生間隔時間</param>
+    public IEnumerator SpawnByRandom(int miceID, sbyte[] holeArray, float spawnTime, float lerpTime, int spawnCount)
+    {
+        // < = > test OK
+        int _tmpCount = 0;
+        int[] _rndPos = new int[spawnCount];
+        List<sbyte> _holeList = new List<sbyte>(holeArray);
+
+        for (int i = 0; i < spawnCount; i++)
+        {
+            int rndNum = Random.Range(0, _holeList.Count);
+            _rndPos[i] = _holeList[rndNum];
+            _holeList.RemoveAt(rndNum);
+        }
+
+        for (int item = 0; item < spawnCount; item++)
+        {
+            if (item / _rndPos.Length == 1)   // =13 = 歸零
+            {
+                spawnCount -= item;
+                item = 0;
+            }
+            yield return new WaitForSeconds(spawnTime);
+            if (hole[_rndPos[item] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
+            {
+                GameObject clone = poolManger.ActiveObject(miceID);
+                if (clone != null)
+                {
+                    _miceSize = hole[_rndPos[item] - 1].transform.localScale / 10 * miceSize * hole[_rndPos[item] - 1].transform.localScale.x;
+                    hole[_rndPos[item] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
+                    clone.transform.parent = hole[_rndPos[item] - 1].transform;              // hole[-1]是因為起始值是0 
+                    clone.transform.localPosition = Vector2.zero;
+                    clone.transform.localScale = hole[_rndPos[item] - 1].transform.localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
+                    clone.transform.GetChild(0).SendMessage("Play");
+                    spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
+                    _tmpCount++;
+
+                    if (_tmpCount - spawnCount == 0)
+                    {
+                        goto Finish;
+                    }
+                }
+                else
+                {
+                    Debug.Log("Object Pool hasn't Object");
+                }
+            }
+            else
+            {
+                Debug.Log("Closed!");
+            }
+
+
+        }
+    Finish: ;
+        Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -33,7 +96,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime, float lerpTime, int spawnCount,int randomPos)
+    public IEnumerator SpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime, float lerpTime, int spawnCount, int randomPos)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -50,10 +113,11 @@ public class MiceSpawner : MonoBehaviour
                 GameObject clone = poolManger.ActiveObject(miceID);
                 if (clone != null)
                 {
+                    _miceSize = hole[holeArray[item] - 1].transform.localScale / 10 * miceSize * hole[holeArray[item] - 1].transform.localScale.x;
                     hole[holeArray[item] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                     clone.transform.parent = hole[holeArray[item] - 1].transform;              // hole[-1]是因為起始值是0 
                     clone.transform.localPosition = Vector2.zero;
-                    clone.transform.localScale = hole[holeArray[item] - 1].transform.localScale / 1.8f;
+                    clone.transform.localScale = hole[holeArray[item] - 1].transform.localScale - _miceSize;
                     clone.transform.GetChild(0).SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
@@ -97,10 +161,11 @@ public class MiceSpawner : MonoBehaviour
                 GameObject clone = poolManger.ActiveObject(miceID);
                 if (clone != null)
                 {
+                    _miceSize = hole[item - 1].transform.localScale / 10 * miceSize * hole[item - 1].transform.localScale.x;
                     hole[item - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                     clone.transform.parent = hole[item - 1].transform;                      // hole[-1] 是因為起始值是0 hole[-1]
                     clone.transform.localPosition = Vector2.zero;
-                    clone.transform.localScale = hole[item - 1].transform.localScale / 1.8f;
+                    clone.transform.localScale = hole[item - 1].transform.localScale - _miceSize;
                     clone.transform.GetChild(0).SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
@@ -135,7 +200,7 @@ public class MiceSpawner : MonoBehaviour
     /// <returns></returns>
     public IEnumerator SpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
-       // Debug.Log("IN SPAWN2D: " + intervalTime);
+        // Debug.Log("IN SPAWN2D: " + intervalTime);
         // < = > test OK
         int _tmpCount = 0;
         for (int i = 0; i < holeArray.GetLength(0); i++)    // 1D陣列
@@ -150,10 +215,11 @@ public class MiceSpawner : MonoBehaviour
                         GameObject clone = poolManger.ActiveObject(miceID);
                         if (clone != null)
                         {
+                            _miceSize = hole[holeArray[i, j] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i, j] - 1].transform.localScale.x;
                             hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                             clone.transform.parent = hole[holeArray[i, j] - 1].transform;                           //hole[-1] 是因為起始值是0
                             clone.transform.localPosition = Vector2.zero;
-                            clone.transform.localScale = hole[holeArray[i, j] - 1].transform.localScale / 1.8f;
+                            clone.transform.localScale = hole[holeArray[i, j] - 1].transform.localScale - _miceSize;
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
@@ -209,10 +275,11 @@ public class MiceSpawner : MonoBehaviour
                         GameObject clone = poolManger.ActiveObject(miceID);
                         if (clone != null)
                         {
+                            _miceSize = hole[holeArray[i - 1, j - 1] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i - 1, j - 1] - 1].transform.localScale.x;
                             hole[holeArray[i - 1, j - 1] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                             clone.transform.parent = hole[holeArray[i - 1, j - 1] - 1].transform;                       // hole[-1] 和 holeArray[-1,-1]是因為起始值是0 
                             clone.transform.localPosition = Vector2.zero;
-                            clone.transform.localScale = hole[holeArray[i - 1, j - 1] - 1].transform.localScale / 1.8f;
+                            clone.transform.localScale = hole[holeArray[i - 1, j - 1] - 1].transform.localScale - _miceSize;
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
@@ -277,10 +344,11 @@ public class MiceSpawner : MonoBehaviour
 
                         if (clone != null)
                         {
+                            _miceSize = hole[holeArray[i][j] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i][j] - 1].transform.localScale.x;
                             hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                             clone.transform.parent = hole[holeArray[i][j] - 1].transform;                           //hole[-1] 是因為起始值是0
                             clone.transform.localPosition = Vector2.zero;
-                            clone.transform.localScale = hole[holeArray[i][j] - 1].transform.localScale / 1.8f;
+                            clone.transform.localScale = hole[holeArray[i][j] - 1].transform.localScale - _miceSize;
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
@@ -338,10 +406,11 @@ public class MiceSpawner : MonoBehaviour
                     GameObject clone = poolManger.ActiveObject(miceID);
                     if (clone != null)
                     {
+                        _miceSize = hole[holeArray[i - 1][j - 1] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i - 1][j - 1] - 1].transform.localScale.x;
                         hole[holeArray[i - 1][j - 1] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                         clone.transform.parent = hole[holeArray[i - 1][j - 1] - 1].transform;                       // hole[-1] 和 holeArray[-1][-1]是因為起始值是0 
                         clone.transform.localPosition = Vector2.zero;
-                        clone.transform.localScale = hole[holeArray[i - 1][j - 1] - 1].transform.localScale / 1.8f;
+                        clone.transform.localScale = hole[holeArray[i - 1][j - 1] - 1].transform.localScale - _miceSize;
                         clone.transform.GetChild(0).SendMessage("Play");
                         _tmpCount++;
 

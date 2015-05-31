@@ -61,7 +61,7 @@ using MPProtocol;
  * 
  * 
  * 現在一切都是亂數，要改成邏輯判斷
- * 
+ * 全都亂寫的 沒AI
  */
 
 public class SpawnController : MonoBehaviour
@@ -126,7 +126,7 @@ public class SpawnController : MonoBehaviour
     void Update()
     {
         //Debug.Log("STATUS:" + spawnStatus + "byte:" + (byte)spawnStatus);
-        #region Select SpawnMode
+        #region Select SpawnMode 亂寫
         if (battleManager.score < 50)
         {
             ChangeSpawnMode(SpawnMode.EasyMode);
@@ -202,7 +202,7 @@ public class SpawnController : MonoBehaviour
                 lerpTime = 0.01f;
                 spawnTime = 0.25f;
                 intervalTime = 1f;
-                spawnCount = 12;    // 6
+                spawnCount = 6;    // 6
                 break;
 
             case SpawnMode.NormalMode:
@@ -252,6 +252,11 @@ public class SpawnController : MonoBehaviour
         switch (spawnStatus)              // 產生模式選擇
         {
             #region Case 1D
+            case SpawnStatus.Random:
+                {
+                    RunCoroutine(coroutine = miceSpawner.SpawnByRandom(miceID, SpawnData.aLineL, spawnTime, lerpTime, spawnCount));
+                    break;
+                }
             case SpawnStatus.LineL:
                 {
                     RunCoroutine(coroutine = miceSpawner.SpawnBy1D(miceID, SpawnData.aLineL, spawnTime, lerpTime, spawnCount, Random.Range(0, SpawnData.aLineL.Length)));
