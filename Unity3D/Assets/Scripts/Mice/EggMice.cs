@@ -15,7 +15,7 @@ using System.Collections;
  * 蛋殼鼠專用腳本
  * 被點到時、跑掉時、播放動畫
  * 這裡可能出現S級BUG 卡洞!!!
- * 
+ * 如果會出現 老鼠不會消失 檢查 UpAnim和DownAnim
  * ***************************************************************/
 
 public class EggMice : MonoBehaviour
@@ -26,46 +26,48 @@ public class EggMice : MonoBehaviour
     float animTime;
 
     bool upFlag;
+
     bool dieFlag;
-    bool disappearFlag;
+    bool isDisappear;
     bool eatingFlag;
     bool clickFlag;
 
     public float upDistance; // mouse pos
     public float upSpeed;
-    [Range(0.01f,0.99f)]
+    [Range(0.01f, 0.99f)]
     public float lerpSpeed;
 
     private float _lerpSpeed;
     private float _upDistance;
 
+
     void Awake()
     {
         battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
-        upFlag = false;
+        upFlag = true;
         dieFlag = false;
-        disappearFlag = false;
+        isDisappear = false;
         eatingFlag = false;
         clickFlag = false;
+
     }
 
     void Start()
     {
-         _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        collider2D.enabled = true;
+        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
     }
 
     void FixedUpdate()
     {
+        #region Amination
 
-        if (transform.parent.localPosition.y < upDistance)
+        if (upFlag && transform.parent.localPosition.y < upDistance)        // AnimationUp
             StartCoroutine(AnimationUp());
 
-    }
+        if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
+            StartCoroutine(AnimationDown());
 
-    void Update()
-    {
-        #region Amination
-        // Debug.Log(" DieFlag: " + dieFlag + " upFlag: " + upFlag + " disappearFlag: " + disappearFlag + " eatingFlag : " + eatingFlag);
         aliveTime = Time.time;                                                              // 老鼠存活時間 
         Animator anims = GetComponent("Animator") as Animator;   // 播放 死亡動畫                  
         AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
@@ -73,33 +75,24 @@ public class EggMice : MonoBehaviour
         if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
         {
             animTime = currentState.normalizedTime;
-            //            Debug.Log(this.transform.parent.parent.name + "   animTime:" + animTime);
             // 目前播放的動畫 "總"時間
-            if (!upFlag)        // 限制執行一次
+            if (animTime > 1)   // 動畫撥放完畢時
             {
-                if (animTime > 1)   // 動畫撥放完畢時
-                {
 
-                    anims.Play("Eat");   // 老鼠開始吃東西
-                    upFlag = true;
-                }
-
+                anims.Play("Eat");   // 老鼠開始吃東西
+                upFlag = true;
             }
         }
         else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
         {
-
             animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
-            // Debug.Log("(D)animTime = " + animTime);
             if (!dieFlag)       // 限制執行一次
             {
                 if (animTime > 0.5)   // 動畫撥放完畢時
                 {
-
                     OnDied(aliveTime);
                     dieFlag = true;
                 }
-
             }
         }
         else if (currentState.nameHash == Animator.StringToHash("Layer1.Eat"))
@@ -109,25 +102,8 @@ public class EggMice : MonoBehaviour
             {
                 if (animTime > 5)                       // 動畫撥放完畢時
                 {
-                    anims.Play("Die");     // 老鼠消失了  ＊＊＊＊＊暫時用ＤＩＥ取代要改回Ｄｉｓｐｐｅａｒ＊＊＊＊＊
+                    isDisappear = true;
                     eatingFlag = true;
-                    clickFlag = false;                          // ＊＊＊＊＊改回DISPPEAR時去掉＊＊＊＊＊
-                }
-
-            }
-        }
-        else if (currentState.nameHash == Animator.StringToHash("Layer1.Disppear")) //disppear 現在暫時用DIE
-        {
-            animTime = currentState.normalizedTime; // 目前播放的動畫 "總"時間
-            //Debug.Log("(D)animTime = " + animTime);
-            if (!disappearFlag)     // 限制執行一次
-            {
-                if (animTime > 0.1)                      // 動畫撥放完畢時
-                {
-
-                    anims.Play("Idle");      // 老鼠消失了 回到初始狀態
-                    OnDisappear(aliveTime);
-                    disappearFlag = true;
                 }
 
             }
@@ -147,28 +123,24 @@ public class EggMice : MonoBehaviour
 
     void OnDisappear(float aliveTime)
     {
-        this.transform.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
-        //transform.parent.GetComponent<Animator>().Play("Default");
+        this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
 
         try
         {
             battleManager.LostScore(transform.parent.name, aliveTime);  // 跑掉掉分
-
         }
         catch (Exception e)
         {
             Debug.Log("失去連線，重新連線中‧‧‧  你想太多了");
             throw e;
         }
-        collider2D.enabled = false;
         Global.MiceCount--;
     }
 
     void OnDied(float aliveTime)
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
-        //transform.parent.GetComponent<Animator>().Play("Default");
         gameObject.SetActive(false);
 
         try
@@ -186,9 +158,9 @@ public class EggMice : MonoBehaviour
     public void Play()
     {
         battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
-        upFlag = false;
+        upFlag = true;
         dieFlag = false;
-        disappearFlag = false;
+        isDisappear = false;
         eatingFlag = false;
         clickFlag = false;
         collider2D.enabled = true;
@@ -202,14 +174,34 @@ public class EggMice : MonoBehaviour
 
     IEnumerator AnimationUp()
     {
+        collider2D.enabled = true;
         _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
         if (transform.parent.localPosition.y + _lerpSpeed > _upDistance)
         {
-            transform.parent.localPosition = new Vector3(0, _upDistance);
+            transform.parent.localPosition = new Vector3(0, _upDistance, 0);
+            upFlag = false;
         }
         else
         {
-            transform.parent.localPosition += new Vector3(0, _lerpSpeed);
+            transform.parent.localPosition += new Vector3(0, _lerpSpeed, 0);
+        }
+        yield return null;
+    }
+
+    IEnumerator AnimationDown() // 2   = 2 ~ 1
+    {
+        _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
+        if (transform.parent.localPosition.y - 10 <= -_upDistance)
+        {
+            Vector3 _tmp;
+            _tmp = new Vector3(0, -_upDistance * 2, 0);
+            transform.parent.localPosition = _tmp;
+            OnDisappear(aliveTime);
+            isDisappear = false;
+        }
+        else
+        {
+            transform.parent.localPosition = Vector3.Slerp(transform.parent.localPosition, new Vector3(0, -_upDistance * 2, 0), Time.deltaTime * 5);
         }
         yield return null;
     }

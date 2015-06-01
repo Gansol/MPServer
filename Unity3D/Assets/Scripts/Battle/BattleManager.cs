@@ -24,7 +24,7 @@ public class BattleManager : MonoBehaviour
     private static int _gameTime = 0;       // 遊戲時間
     private static float _score = 0;        // 分數
     private static float _otherScore = 0;   // 對手分數
-    private static int _maxScore = 0;       // 最高得分
+    private static float _maxScore = 0;       // 最高得分
     private static int _eggMiceUsage = 0;   // 老鼠使用量
     private static int _energyUsage = 0;    // 能量使用量
     private static int _missMice = 0;       // 失誤數           統計用
@@ -48,7 +48,7 @@ public class BattleManager : MonoBehaviour
     public int gameTime { get { return _gameTime; } }
     public float score { get { return _score; } }
     public float otherScore { get { return _otherScore; } }
-    public int maxScore { get { return _maxScore; } }
+    public float maxScore { get { return _maxScore; } }
     public int eggMiceUsage { get { return _eggMiceUsage; } }
     public int energyUsage { get { return _energyUsage; } }
     public int missMice { get { return _missMice; } }
@@ -99,6 +99,14 @@ public class BattleManager : MonoBehaviour
                 _lastTime = _time;
                 //Debug.Log("_myDPS: " + _myDPS + "\n  _otherDPS: " + _otherDPS);
             }
+        }
+    }
+
+    void Update()
+    {
+        if (_score > _maxScore)
+        {
+            _maxScore = _score;
         }
     }
 
@@ -263,6 +271,7 @@ public class BattleManager : MonoBehaviour
         if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
         {
             _score += (int)(score * _scoreRate);
+            
         }
     }
 
