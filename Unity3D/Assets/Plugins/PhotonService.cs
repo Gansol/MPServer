@@ -30,8 +30,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event LoginHandler LoginEvent;
 
     //委派事件 接收技能傷害
-    public delegate void ApplyDamageHandler(int miceID);
-    public event ApplyDamageHandler ApplyDamageEvent;
+    public delegate void ApplySkillHandler(string miceName);
+    public event ApplySkillHandler ApplySkillEvent;
 
     //委派事件 接收分數、對手分數
     public delegate void UpdateScoreHandler(Int16 Score);
@@ -164,10 +164,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 break;
 
             // 接收 技能傷害
-            case (byte)BattleResponseCode.ApplyDamage:
-                int miceID = (int)eventData.Parameters[(byte)BattleParameterCode.MiceID];
-                ApplyDamageEvent(miceID);
-                Debug.Log("Recive Damage!" + (string)eventData.Parameters[(byte)BattleResponseCode.DebugMessage]);
+            case (byte)BattleResponseCode.ApplySkill:
+                string miceName = (string)eventData.Parameters[(byte)BattleParameterCode.MiceName];
+                ApplySkillEvent(miceName);
+                Debug.Log("Recive Skill!" + (string)eventData.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 break;
 
             //取得對方分數
@@ -575,12 +575,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 開始配對遊戲
     /// </summary>
-    public void MatchGame(int PrimaryID)
+    public void MatchGame(int PrimaryID,string team)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 { (byte)MatchGameParameterCode.PrimaryID,PrimaryID}
+                 { (byte)MatchGameParameterCode.PrimaryID,PrimaryID},{ (byte)MatchGameParameterCode.Team,team}
             };
 
             this.peer.OpCustom((byte)MatchGameOperationCode.MatchGame, parameter, true, 0, true);
@@ -596,15 +596,16 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
     /// </summary>
-    public void SendDamage(int miceID) //攻擊測試
+    public void SendSkill(string miceName) //攻擊測試
     {
+        Debug.Log("IN Services SendSkill:" + miceName);
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 { (byte)BattleParameterCode.MiceID,miceID } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
+                 { (byte)BattleParameterCode.MiceName,miceName } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
             };
 
-            this.peer.OpCustom((byte)BattleOperationCode.SendDamage, parameter, true, 0, true);
+            this.peer.OpCustom((byte)BattleOperationCode.SendSkill, parameter, true, 0, true);
         }
         catch (Exception e)
         {
@@ -754,7 +755,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
-            { (byte)BattleParameterCode.MiceID, miceName }, { (byte)BattleParameterCode.Time, time }
+            { (byte)BattleParameterCode.MiceName, miceName }, { (byte)BattleParameterCode.Time, time }
             };
 
             this.peer.OpCustom((byte)BattleOperationCode.UpdateScore, parameter, true, 0, false); // operationCode is RoomSpeak

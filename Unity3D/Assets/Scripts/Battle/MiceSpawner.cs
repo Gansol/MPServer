@@ -33,7 +33,7 @@ public class MiceSpawner : MonoBehaviour
     /// </summary>
     /// <param name="holeArray">1D陣列產生方式</param>
     /// <param name="spawnTime">產生間隔時間</param>
-    public IEnumerator SpawnByRandom(int miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator SpawnByRandom(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -57,7 +57,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[_rndPos[item] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceID);
+                GameObject clone = poolManger.ActiveObject(miceName);
                 if (clone != null)
                 {
                     _miceSize = hole[_rndPos[item] - 1].transform.localScale / 10 * miceSize * hole[_rndPos[item] - 1].transform.localScale.x;
@@ -97,7 +97,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime,float intervalTime, float lerpTime, int spawnCount, int randomPos)
+    public IEnumerator SpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime,float intervalTime, float lerpTime, int spawnCount, int randomPos)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -111,7 +111,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[holeArray[randomPos] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceID);
+                GameObject clone = poolManger.ActiveObject(miceName);
                 if (clone != null)
                 {
                     _miceSize = hole[holeArray[randomPos] - 1].transform.localScale / 10 * miceSize * hole[holeArray[randomPos] - 1].transform.localScale.x;
@@ -152,7 +152,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator ReSpawnBy1D(int miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount,int randomPos)
+    public IEnumerator ReSpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount,int randomPos)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -161,7 +161,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[randomPos - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceID);
+                GameObject clone = poolManger.ActiveObject(miceName);
                 if (clone != null)
                 {
                     _miceSize = hole[randomPos - 1].transform.localScale / 10 * miceSize * hole[randomPos - 1].transform.localScale.x;
@@ -202,7 +202,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
+    public IEnumerator SpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
     {
         if (holeArray.GetLength(0) > 4)
             intervalTime /= 2;
@@ -216,7 +216,7 @@ public class MiceSpawner : MonoBehaviour
                     yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
-                        GameObject clone = poolManger.ActiveObject(miceID);
+                        GameObject clone = poolManger.ActiveObject(miceName);
                         if (clone != null)
                         {
                             _miceSize = hole[holeArray[i, j] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i, j] - 1].transform.localScale.x;
@@ -260,7 +260,7 @@ public class MiceSpawner : MonoBehaviour
 /// <summary>
 /// 反向產生。holeArray[,]=2D陣列產生方式,spawnTime=老鼠間隔時間,intervalTime=產生間隔
 /// </summary>
-/// <param name="miceID">老鼠ID</param>
+/// <param name="miceName">老鼠ID</param>
 /// <param name="holeArray">產生陣列</param>
     /// <param name="spawnTime">產生老鼠間隔</param>
 /// <param name="intervalTime">間隔時間</param>
@@ -269,7 +269,7 @@ public class MiceSpawner : MonoBehaviour
 /// <param name="randomPos1">1D陣列隨機值</param>
 /// <param name="randomPos2">2D陣列隨機值</param>
 /// <returns></returns>
-    public IEnumerator ReSpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
+    public IEnumerator ReSpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -286,7 +286,7 @@ public class MiceSpawner : MonoBehaviour
                     if (spawnCount > 0)
                     {
 
-                        GameObject clone = poolManger.ActiveObject(miceID);
+                        GameObject clone = poolManger.ActiveObject(miceName);
                         if (clone != null)
                         {
                             _miceSize = hole[holeArray[i - 1, j - 1] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i - 1, j - 1] - 1].transform.localScale.x;
@@ -332,7 +332,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnByCustom(int miceID, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator SpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -355,7 +355,7 @@ public class MiceSpawner : MonoBehaviour
                     yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
-                        GameObject clone = poolManger.ActiveObject(miceID);
+                        GameObject clone = poolManger.ActiveObject(miceName);
 
                         if (clone != null)
                         {
@@ -398,7 +398,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator ReSpawnByCustom(int miceID, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator ReSpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
     {
         // < = > test ok
         int _tmpCount = 0;
@@ -420,7 +420,7 @@ public class MiceSpawner : MonoBehaviour
                 yield return new WaitForSeconds(spawnTime);
                 if (hole[holeArray[i - 1][j - 1] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                 {
-                    GameObject clone = poolManger.ActiveObject(miceID);
+                    GameObject clone = poolManger.ActiveObject(miceName);
                     if (clone != null)
                     {
                         _miceSize = hole[holeArray[i - 1][j - 1] - 1].transform.localScale / 10 * miceSize * hole[holeArray[i - 1][j - 1] - 1].transform.localScale.x;

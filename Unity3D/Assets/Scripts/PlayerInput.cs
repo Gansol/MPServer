@@ -28,6 +28,11 @@ public class PlayerInput : MonoBehaviour
                 {
                     hit.transform.SendMessage("OnHit");
                 }
+
+                if (hit.transform.name == "Skill")
+                {
+                    hit.transform.SendMessage("OnHit");
+                }
             }
         }
 
@@ -42,6 +47,11 @@ public class PlayerInput : MonoBehaviour
             if (hit && hit.collider != null)
             {
                 if (hit.transform.name == "anims")
+                {
+                    hit.transform.SendMessage("OnHit");
+                }
+
+                if (hit.transform.name == "Skill")
                 {
                     hit.transform.SendMessage("OnHit");
                 }

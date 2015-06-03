@@ -238,6 +238,7 @@ namespace MPServer
                         case (byte)MatchGameOperationCode.MatchGame:
                             Log.Debug("Match Game");
                             primaryID = (int)operationRequest.Parameters[(byte)MatchGameParameterCode.PrimaryID];
+                            string myTeam = (string)operationRequest.Parameters[(byte)MatchGameParameterCode.Team];
 
                             actor = _server.Actors.GetActorFromPrimary(primaryID);  // 用primaryID取得角色資料
                             Log.Debug("waitingList Count:" + _server.room.waitingList.Count);
@@ -262,12 +263,12 @@ namespace MPServer
                                         MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI();
                                         MPCOM.PlayerData otherPlayerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherActor.Account));
 
-                                        Dictionary<byte, object> matchMyParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, otherActor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, otherActor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, otherPlayerData.Team }, { (byte)MatchGameParameterCode.RoomPlace, "Guest" } };
-                                        Dictionary<byte, object> matchOtherParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, actor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, actor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, otherPlayerData.Team }, { (byte)MatchGameParameterCode.RoomPlace, "Host" } };
+                                        Dictionary<byte, object> myParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, otherActor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, otherActor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, myTeam }, { (byte)MatchGameParameterCode.RoomPlace, "Guest" } };
+                                        Dictionary<byte, object> otherParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, actor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, actor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, otherPlayerData.Team }, { (byte)MatchGameParameterCode.RoomPlace, "Host" } };
 
                                         // 玩家2加入房間成功後 發送配對成功事件給房間內兩位玩家
-                                        EventData matchMyEventData = new EventData((byte)MatchGameResponseCode.Match, matchMyParameter);
-                                        EventData matchOthertEventData = new EventData((byte)MatchGameResponseCode.Match, matchOtherParameter);
+                                        EventData matchMyEventData = new EventData((byte)MatchGameResponseCode.Match, myParameter);
+                                        EventData matchOthertEventData = new EventData((byte)MatchGameResponseCode.Match, otherParameter);
                                         MPServerPeer peerMe;
 
                                         //取得雙方玩家的peer
@@ -277,8 +278,8 @@ namespace MPServer
                                         Log.Debug("Me Peer:" + this.peerGuid + "  " + actor.Nickname);
                                         Log.Debug("Other Peer:" + otherActor.guid + "  " + otherActor.Nickname);
 
-                                        peerMe.SendEvent(matchOthertEventData, new SendParameters());      // (RoomActor2)Gueest會收到(RoomActor1)Host資料
-                                        peerOther.SendEvent(matchMyEventData, new SendParameters());        // (RoomActor1)Host會收到(RoomActor2)Gueest資料
+                                        peerMe.SendEvent(matchOthertEventData, new SendParameters());           // 要送給相反的人資料 (RoomActor2)Gueest會收到(RoomActor1)Host資料
+                                        peerOther.SendEvent(matchMyEventData, new SendParameters());            // 要送給相反的人資料 (RoomActor1)Host會收到(RoomActor2)Gueest資料
 
                                         // 移除等待列表房間
                                         _server.room.RemoveWatingRoom();
@@ -430,12 +431,12 @@ namespace MPServer
 
                         #endregion
 
-                        #region SendDamage 發動技能傷害
-                        case (byte)BattleOperationCode.SendDamage:
+                        #region SendSkill 發動技能傷害
+                        case (byte)BattleOperationCode.SendSkill:
                             {
-                                Log.Debug("IN SendDamage");
+                                Log.Debug("IN SendSkill");
 
-                                int miceID = (int)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
+                                string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceName];
                                 roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
                                 primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
 
@@ -444,9 +445,9 @@ namespace MPServer
                                 peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);    // 對手GUID找Peer
 
                                 // 送給對手 技能傷害
-                                Dictionary<byte, object> damageParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MiceID, miceID }, { (byte)BattleResponseCode.DebugMessage, "" } };
-                                EventData damageEventData = new EventData((byte)BattleResponseCode.ApplyDamage, damageParameter);
-                                peerOther.SendEvent(damageEventData, new SendParameters());
+                                Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MiceName, miceName }, { (byte)BattleResponseCode.DebugMessage, "" } };
+                                EventData skillEventData = new EventData((byte)BattleResponseCode.ApplySkill, skillParameter);
+                                peerOther.SendEvent(skillEventData, new SendParameters());
                             }
                             break;
                         #endregion
@@ -657,9 +658,9 @@ namespace MPServer
                                     primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
 
-                                    string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
+                                    string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceName];
                                     float aliveTime = (float)operationRequest.Parameters[(byte)BattleParameterCode.Time];
-                                    
+
                                     MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //初始化 UI 
                                     //Log.Debug("BattleUI OK");
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數

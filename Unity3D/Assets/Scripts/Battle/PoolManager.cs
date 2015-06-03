@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using MiniJSON;
 using System;
+using System.Linq;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -31,13 +32,15 @@ public class PoolManager : MonoBehaviour
     private GameObject clone;
     //private int _miceCount;
     private byte miceID;
-    private string miceName;
+    private string objectName;
     private int[] _miceIDArray;
     private float lastTime;
     private float currentTime;
     //private GameObject[] _dynamicPoolName;
     private int index;      // _dynamicPoolName index
     private static int miceAllCount;
+
+    Dictionary<string, object> _skillMice;
 
     public GameObject Panel;
 
@@ -46,7 +49,10 @@ public class PoolManager : MonoBehaviour
     [Tooltip("物件匣")]
     public GameObject[] ObjectDeck;
 
-
+    [Tooltip("技能位置")]
+    public GameObject Skill;
+    [Tooltip("技能鼠物件匣")]
+    public GameObject[] SkillDeck;
 
     [Tooltip("產生數量")]
     [Range(3, 5)]
@@ -76,13 +82,11 @@ public class PoolManager : MonoBehaviour
         currentTime = 0;
         clearTime = 10;
         _poolingFlag = false;      // 初始化物件池
-        //Pool = new List<GameObject>();
-        //dictObjectPool = new Dictionary<string, List<GameObject>>();
         dictMice = new Dictionary<int, string>();
-        //_miceCount = 0;
         _myMice = new HashSet<int>();
         _otherMice = new HashSet<int>();
         _tmpDict = new Dictionary<string, object>();
+        _skillMice = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
         /*
         clone = new GameObject();
@@ -93,11 +97,13 @@ public class PoolManager : MonoBehaviour
         ObjectPool = clone;                         // 物件池位置
         */
 
+
+
         // 生出 預設數量的物件
         foreach (KeyValuePair<int, string> item in dictMice)
         {
             clone = new GameObject();
-            
+
             clone.name = item.Value;
             clone.transform.parent = ObjectPool.transform;
             clone.layer = clone.transform.parent.gameObject.layer;
@@ -112,72 +118,131 @@ public class PoolManager : MonoBehaviour
                 clone.transform.GetChild(0).gameObject.SetActive(false);    // 新版 子物件隱藏
             }
         }
+
+        SkillMice();
+
+        
+
         Debug.Log("pooling Mice Completed ! ");
         _poolingFlag = true;
     }
 
 
     /// <summary>
-    /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。回傳 ( GameObject / null )
+    /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
     /// </summary>
-    /// <param name="miceID"></param>
-    /// <returns></returns>
+    /// <param name="miceID">使用ID找Object</param>
+    /// <returns>回傳 ( GameObject / null )</returns>
     public GameObject ActiveObject(int miceID)
     {
-        dictMice.TryGetValue(miceID, out miceName);//等傳老鼠ID名稱近來這要改miceName
+        dictMice.TryGetValue(miceID, out objectName);//等傳老鼠ID名稱近來這要改miceName
 
-        if (ObjectPool.transform.FindChild(miceName).childCount == 0)
+        if (ObjectPool.transform.FindChild(objectName).childCount == 0)
         {
             clone = (GameObject)Instantiate(ObjectDeck[miceID - 1], Vector3.zero, Quaternion.identity);
-            clone.name = miceName;
-            clone.transform.parent = ObjectPool.transform.FindChild(miceName).transform;
+            clone.name = objectName;
+            clone.transform.parent = ObjectPool.transform.FindChild(objectName).transform;
             clone.transform.localScale = Vector3.one;
-            //clone.GetComponent<UISprite>().width = 260;
-            //clone.GetComponent<UISprite>().height = 290;
-
             return clone;
         }
 
-        for (int i = 0; i < ObjectPool.transform.FindChild(miceName).childCount; i++)
+        for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
         {
             GameObject mice;
 
-            mice = ObjectPool.transform.FindChild(miceName).GetChild(i).gameObject;
+            mice = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-            if (mice.name == miceName && !mice.transform.GetChild(0).gameObject.activeSelf)//等傳老鼠ID名稱近來這要改 nicename
+            if (mice.name == objectName && !mice.transform.GetChild(0).gameObject.activeSelf)
             {
                 mice.transform.GetChild(0).gameObject.SetActive(true);
                 return mice;
             }
 
         }
-
-        //Debug.Log("miceAllCount : "+miceAllCount+"miceName : " + miceName + " acitveCount : " + acitveCount + "FindGameObjectsWithTag(miceName).Length : " + GameObject.FindGameObjectsWithTag(miceName).Length);
-
-
-
-
-
-        //Debug.Log("_miceCount "+_miceCount);
         return null;
     }
 
+    /// <summary>
+    /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
+    /// </summary>
+    /// <param name="objectName">使用Name找Object</param>
+    /// <returns>回傳 ( GameObject / null )</returns>
+    public GameObject ActiveObject(string objectName)
+    {
+        int miceID = dictMice.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
+        /*
+        foreach (KeyValuePair<int, string> item in dictMice)
+        {
+            Debug.Log("In Dict: "+ item.Value);
+        }
+         * */
+        if (ObjectPool.transform.FindChild(objectName).childCount == 0)
+        {
+            clone = (GameObject)Instantiate(ObjectDeck[miceID - 1], Vector3.zero, Quaternion.identity);
+            clone.name = objectName;
+            clone.transform.parent = ObjectPool.transform.FindChild(objectName).transform;
+            clone.transform.localScale = Vector3.one;
+            return clone;
+        }
+
+        for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
+        {
+            GameObject mice;
+
+            mice = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
+
+            if (mice.name == objectName && !mice.transform.GetChild(0).gameObject.activeSelf)
+            {
+                mice.transform.GetChild(0).gameObject.SetActive(true);
+                return mice;
+            }
+        }
+        return null;
+    }
+
+    public void SkillMice()
+    {
+        _skillMice = Json.Deserialize(Global.Team) as Dictionary<string, object>;
+
+        Debug.Log(Global.Team);
+        Debug.Log(_skillMice.Count);
+        int i = 0;
+        // 產生 技能老鼠
+        foreach (KeyValuePair<string, object> item in _skillMice)
+        {
+            clone = (GameObject)Instantiate(SkillDeck[Convert.ToInt16(item.Key) - 1]);   //　等傳老鼠ID名稱近來這要改
+            clone.name = item.Value.ToString();
+            clone.transform.parent = Skill.transform.GetChild(i);
+            clone.layer = clone.transform.parent.gameObject.layer;
+
+            if (i == 4)
+            {
+                clone.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f); 
+            }
+            else
+            {
+                clone.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f); 
+            }
+
+            clone.transform.localPosition = Vector3.zero;
+
+            i++;
+        }
+    }
 
     public void MergeMice()
     {
         _tmpDict = Json.Deserialize(Global.Team) as Dictionary<string, object>;
-        //Debug.Log(_tmpDict.Count);
-        //_tmpDict.Add(1, "EggMice");
-        //_tmpDict.Add(2, "BggMice");
+
         //把自己的老鼠存入HashSet中等待比較，再把老鼠存入合併好的老鼠Dict中
         foreach (KeyValuePair<string, object> item in _tmpDict)
         {
             _myMice.Add(Int16.Parse(item.Key));
             dictMice.Add(Int16.Parse(item.Key), item.Value.ToString());
         }
-
+        _tmpDict.Clear();
         _tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<string, object>;
-        //_tmpDict.Add(2, "BlackMice");
+
         //把對手的老鼠存入HashSet中等待比較
         foreach (KeyValuePair<string, object> item in _tmpDict)
         {

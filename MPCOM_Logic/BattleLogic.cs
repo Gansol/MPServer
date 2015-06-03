@@ -35,7 +35,7 @@ namespace MPCOM
         {
             return true;
         }
-#region variable 變數區
+        #region variable 變數區
         private int harvest = 200;
         private int drivingMice = 50;
         private int harvestRate = 10;               // 分數倍率
@@ -47,19 +47,46 @@ namespace MPCOM
         private int harvestRateReward = 400;
         private int worldBossReward = 10000;
 
-         private struct EggMice
+        private struct EggMice
         {
-             public static int eatFull = 10;
-             public static float perEat = 1;
-             public static float eatingRate = 0.25f;
+            public static int eatFull = 10;    // 2.5s = 4
+            public static float perEat = 1;
+            public static float eatingRate = 0.25f;
         }
 
-#endregion 
+        private struct BlackMice
+        {
+            public static int eatFull = 20;    // 2s = 10
+            public static float perEat = 5;
+            public static float eatingRate = 0.5f;
+        }
+
+        private struct CandyMice
+        {
+            public static int eatFull = 32;    // 3s = 10.667
+            public static float perEat = 8;
+            public static float eatingRate = 0.75f;
+        }
+
+        private struct RabbitMice
+        {
+            public static int eatFull = 24;    // 2.64s = 9.091
+            public static float perEat = 3;
+            public static float eatingRate = 0.33f;
+        }
+
+        private struct NinjaMice
+        {
+            public static int eatFull = 28;    // 2.86s = 9.79
+            public static float perEat = 7;
+            public static float eatingRate = 0.67f;
+        }
+        #endregion
 
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-         public BattleData ClacScore(string miceName, float aliveTime)
+        public BattleData ClacScore(string miceName, float aliveTime)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -71,17 +98,72 @@ namespace MPCOM
                 {
                     case "EggMice": //EggMice
                         {
-                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime/EggMice.eatingRate));
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / EggMice.eatingRate));
 
-                            if (EggMice.perEat * ateTimes>=EggMice.eatFull )
+                            if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
-                                score = Convert.ToInt16(EggMice.eatFull*-1);
+                                score = Convert.ToInt16(EggMice.eatFull * -1);
                             }
                             else
                             {
                                 score = Convert.ToInt16(EggMice.eatFull - EggMice.perEat * ateTimes);
                             }
+                            break;
+                        }
+                    case "BlackMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / BlackMice.eatingRate));
 
+                            if (BlackMice.perEat * ateTimes >= BlackMice.eatFull)
+                            {
+                                score = Convert.ToInt16(BlackMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(BlackMice.eatFull - BlackMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "CandyMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / CandyMice.eatingRate));
+
+                            if (CandyMice.perEat * ateTimes >= CandyMice.eatFull)
+                            {
+                                score = Convert.ToInt16(CandyMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(CandyMice.eatFull - CandyMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "RabbitMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / RabbitMice.eatingRate));
+
+                            if (RabbitMice.perEat * ateTimes >= RabbitMice.eatFull)
+                            {
+                                score = Convert.ToInt16(RabbitMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(RabbitMice.eatFull - RabbitMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "NinjaMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / NinjaMice.eatingRate));
+
+                            if (NinjaMice.perEat * ateTimes >= NinjaMice.eatFull)
+                            {
+                                score = Convert.ToInt16(NinjaMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(NinjaMice.eatFull - NinjaMice.perEat * ateTimes);
+                            }
                             break;
                         }
                 }
@@ -101,7 +183,7 @@ namespace MPCOM
         #region ClacMissionReward 計算任務完成分數
 
         [AutoComplete]
-        public BattleData ClacMissionReward(byte mission, float missionRate,int customValue)
+        public BattleData ClacMissionReward(byte mission, float missionRate, int customValue)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -146,7 +228,7 @@ namespace MPCOM
             }
             catch (Exception e)
             {
-                
+
                 throw e;
             }
             return battleData;

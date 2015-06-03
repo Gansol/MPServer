@@ -133,7 +133,7 @@ public class EggMice : MonoBehaviour
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-        Debug.Log("OnDisappear : "+ aliveTime);
+        //Debug.Log("OnDisappear : "+ aliveTime);
         try
         {
             _lastTime = aliveTime;

@@ -92,7 +92,7 @@
         ExitRoom = 41,              // 戰鬥中途離開房間
         KickOther = 42,               // 踢人
         CheckStatus = 43,             // 檢查玩家遊戲狀態
-        SendDamage = 44,            // 玩者A發動技能 攻擊 玩者B
+        SendSkill = 44,            // 玩者A發動技能 攻擊 玩者B
         UpdateScore = 52,           // 更新分數
         Mission = 53,                // 任務
         MissionCompleted=54,        // 任務完成
@@ -130,7 +130,7 @@
         Online = 46,                // 線上
         Offline = 47,               // 離線
         Damage = 48,                // 造成傷害
-        ApplyDamage = 49,           // 接收 技能攻擊
+        ApplySkill = 49,            // 接收 技能攻擊
         GetScore = 51,              // 取得另一位玩家分數
         UpdateScore = 52,           // 更新分數
         Mission = 53,               // 任務
