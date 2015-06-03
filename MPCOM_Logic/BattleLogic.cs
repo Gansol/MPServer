@@ -35,7 +35,7 @@ namespace MPCOM
         {
             return true;
         }
-
+#region variable 變數區
         private int harvest = 200;
         private int drivingMice = 50;
         private int harvestRate = 10;               // 分數倍率
@@ -47,27 +47,41 @@ namespace MPCOM
         private int harvestRateReward = 400;
         private int worldBossReward = 10000;
 
+         private struct EggMice
+        {
+             public static int eatFull = 10;
+             public static float perEat = 1;
+             public static float eatingRate = 0.25f;
+        }
+
+#endregion 
+
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-        public BattleData ClacScore(byte miceID, float time, float eatingRate, Int16 score)
+         public BattleData ClacScore(string miceName, float aliveTime)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
+            Int16 score = 0;
 
             try
             {
-                switch (miceID) //用老鼠ID來判斷 取得的分數是否異常
+                switch (miceName) //用老鼠ID來判斷 取得的分數是否異常
                 {
-                    case 1: //EggMice
+                    case "EggMice": //EggMice
                         {
-                            //to do verification
-                            if (score > 100) //這裡亂寫的 要想驗證方法
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime/EggMice.eatingRate));
+
+                            if (EggMice.perEat * ateTimes>=EggMice.eatFull )
                             {
-                                battleData.ReturnCode = "S502";
-                                battleData.ReturnMessage = "驗證分數失敗！";
-                                return battleData;
+                                score = Convert.ToInt16(EggMice.eatFull*-1);
                             }
+                            else
+                            {
+                                score = Convert.ToInt16(EggMice.eatFull - EggMice.perEat * ateTimes);
+                            }
+
                             break;
                         }
                 }

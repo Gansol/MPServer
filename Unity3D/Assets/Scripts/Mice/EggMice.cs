@@ -39,7 +39,8 @@ public class EggMice : MonoBehaviour
 
     private float _lerpSpeed;
     private float _upDistance;
-
+    private float _lastTime;
+    private bool _timeFlag;
 
     void Awake()
     {
@@ -49,11 +50,12 @@ public class EggMice : MonoBehaviour
         isDisappear = false;
         eatingFlag = false;
         clickFlag = false;
-
+        _timeFlag = true;
     }
 
     void Start()
     {
+        _lastTime = 0;
         collider2D.enabled = true;
         _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
     }
@@ -68,7 +70,13 @@ public class EggMice : MonoBehaviour
         if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
             StartCoroutine(AnimationDown());
 
-        aliveTime = Time.time;                                                              // 老鼠存活時間 
+        if(transform.gameObject.activeSelf==true && _timeFlag)  // 如果被Spawn儲存現在時間 注意 DisActive時Time還是會一直跑 所以要存起來減掉
+        {
+            _timeFlag = false;
+            _lastTime = Time.time;
+        }
+
+        aliveTime = Time.time - _lastTime;                                                              // 老鼠存活時間 
         Animator anims = GetComponent("Animator") as Animator;   // 播放 死亡動畫                  
         AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
         //Debug.Log("currentState : " + currentState.nameHash);
@@ -105,11 +113,11 @@ public class EggMice : MonoBehaviour
                     isDisappear = true;
                     eatingFlag = true;
                 }
-
             }
         }
         #endregion
     }
+
     void OnHit()
     {
         Debug.Log("HIT!");
@@ -125,9 +133,10 @@ public class EggMice : MonoBehaviour
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-
+        Debug.Log("OnDisappear : "+ aliveTime);
         try
         {
+            _lastTime = aliveTime;
             battleManager.LostScore(transform.parent.name, aliveTime);  // 跑掉掉分
         }
         catch (Exception e)
@@ -142,10 +151,11 @@ public class EggMice : MonoBehaviour
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-
+        
         try
         {
-            battleManager.UpadateScore(transform.parent.name);  // 增加分數
+            _lastTime = aliveTime;
+            battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
         }
         catch (Exception e)
         {
@@ -164,6 +174,7 @@ public class EggMice : MonoBehaviour
         eatingFlag = false;
         clickFlag = false;
         collider2D.enabled = true;
+        _timeFlag = true;
 
         _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
         _lerpSpeed = upSpeed;

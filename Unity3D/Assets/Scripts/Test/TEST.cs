@@ -6,16 +6,27 @@ using MiniJSON;
 public class TEST : MonoBehaviour
 {
     float a = 50;
+    bool _timeFlag;
+    static float _lastTime;
 
     void Start()
     {
-        Debug.Log("A: " + a);
-        Debug.Log("B: " + -a*2);
-        float tmp;
-        tmp = a;
-        Debug.Log("C: " + tmp);
-        Debug.Log("D: " + -tmp*2);
+        _timeFlag = true;
+        _lastTime = 0;
     }
 
+    void Update()
+    {
+        if (transform.gameObject.activeSelf == true && _timeFlag)  // 如果被Spawn儲存現在時間
+        {
+            _timeFlag = false;
+            _lastTime = Time.time;
+        }
+        Debug.Log(Time.time - _lastTime);
+    }
+
+    public void Play(){
+        _timeFlag = true;
+    }
  
 }

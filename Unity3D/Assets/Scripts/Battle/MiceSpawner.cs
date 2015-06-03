@@ -204,8 +204,8 @@ public class MiceSpawner : MonoBehaviour
     /// <returns></returns>
     public IEnumerator SpawnBy2D(int miceID, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
     {
-        // Debug.Log("IN SPAWN2D: " + intervalTime);
-        // < = > test OK
+        if (holeArray.GetLength(0) > 4)
+            intervalTime /= 2;
         int _tmpCount = 0;
         for (int i = randomPos1; i < holeArray.GetLength(0); i++)    // 1D陣列
         {
@@ -273,6 +273,9 @@ public class MiceSpawner : MonoBehaviour
     {
         // < = > test OK
         int _tmpCount = 0;
+
+        if (holeArray.GetLength(0) > 4)
+            intervalTime /= 2;
         for (int i = randomPos1; i > 0; i--)    // 1D陣列
         {
             for (int j = randomPos2; j > 0; j--)    // 2D陣列
@@ -306,7 +309,6 @@ public class MiceSpawner : MonoBehaviour
                                 i = holeArray.GetLength(0);
                                 j = holeArray.GetLength(1) + 1;   // 因為 j--是迴圈跑完才會-1 所以在跑一次會變 holeArray.GetLength(1)-1 不是 holeArray.GetLength(1) 0 所以要+1
                             }
-
                         }
                         else
                         {
@@ -336,6 +338,9 @@ public class MiceSpawner : MonoBehaviour
         int _tmpCount = 0;
         int _tmpArrayLength = 0;
 
+        if (holeArray.GetLength(0) > 4)
+            intervalTime /= 2;
+
         foreach (sbyte[] item in holeArray)
         {
             _tmpArrayLength += item.Length;
@@ -364,7 +369,6 @@ public class MiceSpawner : MonoBehaviour
 
                             if ((_tmpCount - spawnCount) == 0)
                             {
-
                                 goto Finish;
                             }
                             else if (_tmpCount == _tmpArrayLength)
@@ -382,7 +386,7 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            yield return new WaitForSeconds(intervalTime);
+            yield return new WaitForSeconds(intervalTime/5);
         }
     Finish: ;   // When amount = 0 spawn Finish !
         Global.spawnFlag = true;
@@ -399,6 +403,9 @@ public class MiceSpawner : MonoBehaviour
         // < = > test ok
         int _tmpCount = 0;
         int _tmpArrayLength = 0;
+
+        if (holeArray.GetLength(0) > 4)
+            intervalTime /= 2;
 
         foreach (sbyte[] item in holeArray)
         {
@@ -443,7 +450,7 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            yield return new WaitForSeconds(intervalTime);
+            yield return new WaitForSeconds(intervalTime/5);
         }
     Finish: ;
         Global.spawnFlag = true;

@@ -6,6 +6,9 @@ using System.IO;
 
 public class LoginUI : MonoBehaviour
 {
+    private string _defaultAccout = "請輸入帳號(8~16英文數字)";
+    private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
+
 
     private string getAccount = "";
     private string getPassowrd = "";
@@ -20,14 +23,13 @@ public class LoginUI : MonoBehaviour
     //private bool macthing = false;
     private float ckeckTime;
     private bool checkFlag = true;
-    private bool isLoginBtn = false;
+    private static bool isLoginBtn = false;
 
     // 在Start裡建立好Login的回應事件
     IEnumerator Start()
     {
         Global.photonService.LoginEvent += doLoginEvent;
         Global.photonService.JoinMemberEvent += doJoinMemberEvent;
-        //Global.photonService.KickMeEvent += doKickMeEvent;
         //Global.photonService.TestEvent += doTestEvent;
         yield return null;
     }
@@ -51,6 +53,29 @@ public class LoginUI : MonoBehaviour
     }
     void OnGUI()
     {
+        # region Draw Default 預設值
+        if (UnityEngine.Event.current.type == EventType.Repaint)
+        {
+            if (GUI.GetNameOfFocusedControl() == "Account")
+            {
+                if (getAccount == _defaultAccout) getAccount = "";
+            }
+            else
+            {
+                if (getAccount == "") getAccount = _defaultAccout;
+            }
+
+            if (GUI.GetNameOfFocusedControl() == "Password")
+            {
+                if (getPassowrd == _defaultPassowrd) getPassowrd = "";
+            }
+            else
+            {
+                if (getPassowrd == "") getPassowrd = _defaultPassowrd;
+            }
+        }
+        #endregion
+
         try
         {
             GUI.Label(new Rect(30, 10, 100, 20), "MicePow Test");
@@ -78,14 +103,19 @@ public class LoginUI : MonoBehaviour
                 }
                 else if (Global.isJoinMember)
                 {
-                    //Debug.Log(Global.isJoinMember);
+
+
+    
                     // 顯示登入視窗
                     GUI.Label(new Rect(30, 40, 200, 20), "Please Login");
 
+                    
                     GUI.Label(new Rect(30, 70, 80, 20), "Account:");
-                    getAccount = GUI.TextField(new Rect(110, 70, 400, 50), getAccount, 16);
+                    GUI.SetNextControlName("Account");
+                    getAccount = GUI.TextField(new Rect(110, 70, 400, 50), getAccount);
 
                     GUI.Label(new Rect(30, 150, 80, 20), "Passowrd:");
+                    GUI.SetNextControlName("Password");
                     getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
 
                     if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)

@@ -145,7 +145,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.PrimaryID = (int)eventData.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                 Global.OtherData.Team = (string)eventData.Parameters[(byte)MatchGameParameterCode.Team];
                 Global.OtherData.RoomPlace = (string)eventData.Parameters[(byte)MatchGameParameterCode.RoomPlace];
-                //Debug.Log(Global.OtherData.Team);
+                
                 LoadSceneEvent();
                 break;
 
@@ -735,7 +735,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-            this.peer.OpCustom((byte)MiceOperationCode.LoadMice, parameter, true, 0, true); // operationCode is RoomSpeak
+            this.peer.OpCustom((byte)MiceOperationCode.LoadMice, parameter, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {
@@ -748,12 +748,16 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 更新分數 地鼠用
     /// </summary>
-    public void UpdateScore(float time, float eatingRate, Int16 score)
+    public void UpdateScore(string miceName ,float time)
     {
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID }, { (byte)BattleParameterCode.MiceID, (byte)1 }, { (byte)BattleParameterCode.Time, time }, { (byte)BattleParameterCode.EatingRate, eatingRate }, { (byte)BattleParameterCode.Score, score } };
-            this.peer.OpCustom((byte)BattleOperationCode.UpdateScore, parameter, true, 0, true); // operationCode is RoomSpeak
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
+            { (byte)BattleParameterCode.MiceID, miceName }, { (byte)BattleParameterCode.Time, time }
+            };
+
+            this.peer.OpCustom((byte)BattleOperationCode.UpdateScore, parameter, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {
@@ -775,7 +779,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                  { (byte)BattleParameterCode.Mission,mission } , { (byte)BattleParameterCode.MissionRate,missionRate } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
             };
 
-            this.peer.OpCustom((byte)BattleOperationCode.Mission, parameter, true, 0, true);
+            this.peer.OpCustom((byte)BattleOperationCode.Mission, parameter, true, 0, false);
         }
         catch (Exception e)
         {
@@ -798,7 +802,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
             { (byte)BattleParameterCode.Mission, mission }, { (byte)BattleParameterCode.MissionRate, missionRate } , { (byte)BattleParameterCode.CustomValue, customValue }};
-            this.peer.OpCustom((byte)BattleOperationCode.MissionCompleted, parameter, true, 0, true); // operationCode is RoomSpeak
+            this.peer.OpCustom((byte)BattleOperationCode.MissionCompleted, parameter, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {
@@ -806,7 +810,5 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         }
     }
     #endregion
-
-
 
 }

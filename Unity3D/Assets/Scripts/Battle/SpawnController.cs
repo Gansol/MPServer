@@ -110,6 +110,7 @@ public class SpawnController : MonoBehaviour
         battleManager = GetComponent<BattleManager>();
 
         Global.photonService.ApplyDamageEvent += OnApplySkill;
+        Global.photonService.ExitRoomEvent += OnExitRoom;
         Global.spawnFlag = true;
 
         Global.MiceCount = 0;
@@ -583,5 +584,11 @@ public class SpawnController : MonoBehaviour
         // StopAllCoroutines();
         // Spawn((byte)SpawnStatus.Circle, miceID, speed, 10); 要改
 
+    }
+
+    void OnExitRoom()
+    {
+        Global.photonService.ApplyDamageEvent -= OnApplySkill;
+        Global.photonService.ExitRoomEvent -= OnExitRoom;
     }
 }

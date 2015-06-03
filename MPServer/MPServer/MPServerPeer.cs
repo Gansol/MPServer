@@ -657,34 +657,34 @@ namespace MPServer
                                     primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
 
-                                    byte miceID = (byte)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
-                                    float time = (float)operationRequest.Parameters[(byte)BattleParameterCode.Time];
-                                    float eatingRate = (float)operationRequest.Parameters[(byte)BattleParameterCode.EatingRate];
-                                    Int16 score = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Score];
-
+                                    string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
+                                    float aliveTime = (float)operationRequest.Parameters[(byte)BattleParameterCode.Time];
+                                    
                                     MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //初始化 UI 
                                     //Log.Debug("BattleUI OK");
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceID, time, eatingRate, score)); //計算分數
+                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數
                                     //Log.Debug("BattleData OK");
+                                    
 
-                                    score = battleData.score;
-
+                                    // score = battleData.score;
+                                    
                                     if (battleData.ReturnCode == "S501")//計算分數成功 回傳玩家資料
                                     {
                                         //回傳給原玩家
                                         //Log.Debug("battleData.ReturnCode == S501");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, score } 
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } 
                                     };
+                                    
 
-                                        OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdateScore, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
+                                        OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdateScore, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() }; // 改過 battleData.ReturnMessage.ToString()
                                         SendOperationResponse(response, new SendParameters());
 
                                         //回傳給另外一位玩家
                                         Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
                                         otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                         peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
-                                        Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.OtherScore, score }, { (byte)BattleResponseCode.DebugMessage, "取得對方分數資料" } };
+                                        Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.OtherScore, battleData.score }, { (byte)BattleResponseCode.DebugMessage, "取得對方分數資料" } };
                                         EventData getScoreEventData = new EventData((byte)BattleResponseCode.GetScore, parameter2);
 
                                         peerOther.SendEvent(getScoreEventData, new SendParameters());

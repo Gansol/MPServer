@@ -4,6 +4,8 @@ using log4net.Config;
 using Photon.SocketServer;
 using System;
 using System.IO;
+using System.Collections.Generic;
+
 /*
 using MPCOM;
 using System.Runtime.Serialization;
@@ -32,6 +34,8 @@ namespace MPServer
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         public ActorCollection Actors = new ActorCollection();
         public Room room = new Room();
+        public Dictionary<int,object> MiceData = new Dictionary<int,object>();      // 待測試
+
         /*
         public Dictionary<string, object> dictMiceProperty = new Dictionary<string,object>();
         MiceData miceData = new MiceData();

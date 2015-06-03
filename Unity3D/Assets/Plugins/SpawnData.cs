@@ -28,7 +28,7 @@ public static class SpawnData
     public static readonly sbyte[,] aVertTwin2D = { { 1, 2 }, { 2, 3 }, { 4, 5 }, { 5, 6 }, { 7, 8 }, { 8, 9 }, { 10, 11 }, { 11, 12 } };
 
     public static readonly sbyte[,] aLinkHorTwin2D = { { 1, 4 }, { 5, 2 }, { 3, 6 }, { 9, 9 }, { 8, 5 }, { 4, 7 }, { 7, 10 }, { 11, 8 }, { 9, 12 } };
-    public static readonly sbyte[,] aLinkVertTwin2D = { { 1, 2 }, { 3, 6 }, { 5, 4 }, { 7, 8 }, { 9, 12 }, { 11, 10 }};
+    public static readonly sbyte[,] aLinkVertTwin2D = { { 1, 2 }, { 3, 6 }, { 5, 4 }, { 7, 8 }, { 9, 12 }, { 11, 10 } };
 
     /// <summary>
     /// 左下3角型
@@ -36,7 +36,8 @@ public static class SpawnData
     public static readonly sbyte[][] jaTriangleLD2D = new sbyte[][]{
         new sbyte[] {1,4,7},
         new sbyte[] {2,5},
-        new sbyte[] {3}
+        new sbyte[] {3},
+        new sbyte[] {11,12,9}
     };
 
     /// <summary>
@@ -45,7 +46,8 @@ public static class SpawnData
     public static readonly sbyte[][] jaTriangleRD2D = new sbyte[][]{
         new sbyte[] {3,6,9},
         new sbyte[] {2,5},
-        new sbyte[] {1}
+        new sbyte[] {1},
+         new sbyte[] {7,10,11}
     };
 
     /// <summary>
@@ -54,7 +56,8 @@ public static class SpawnData
     public static readonly sbyte[][] jaTriangleLU2D = new sbyte[][]{
         new sbyte[] {10,7,4},
         new sbyte[] {11,8},
-        new sbyte[] {12}
+        new sbyte[] {12},
+        new sbyte[] {2,3,6}
     };
 
     /// <summary>
@@ -63,7 +66,8 @@ public static class SpawnData
     public static readonly sbyte[][] jaTriangleRU2D = new sbyte[][]{
         new sbyte[] {12,9,6},
         new sbyte[] {11,8},
-        new sbyte[] {10}
+        new sbyte[] {10},
+        new sbyte[] {1,2,4}
     };
 
     /// <summary>

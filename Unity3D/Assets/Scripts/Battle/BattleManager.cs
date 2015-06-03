@@ -18,11 +18,11 @@ public class BattleManager : MonoBehaviour
     public GameObject RedScore;             // 紅隊分數Label
     public GameObject HPBar;                // 藍色HPBar
 
-    private static int _combo = 0;          // 連擊數
+
     private static int _maxCombo = 0;       // 最大連擊數
     private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
     private static int _gameTime = 0;       // 遊戲時間
-    private static float _score = 0;        // 分數
+
     private static float _otherScore = 0;   // 對手分數
     private static float _maxScore = 0;       // 最高得分
     private static int _eggMiceUsage = 0;   // 老鼠使用量
@@ -30,11 +30,13 @@ public class BattleManager : MonoBehaviour
     private static int _missMice = 0;       // 失誤數           統計用
     private static int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
-    private static float _myDPS = 0;        // 我的平均輸出
-    private static float _otherDPS = 0;     // 對手的平均輸出
-    private static float _scoreRate = 1;    // 分數倍率
-    private float _lastTime;                // 我的平均輸出
 
+    private float _myDPS = 0;               // 我的平均輸出
+    private float _otherDPS = 0;            // 對手的平均輸出
+    private float _scoreRate = 1;           // 分數倍率
+    private float _lastTime;                // 我的平均輸出
+    private float _score = 0;               // 分數
+    private int _combo = 0;                 // 連擊數
 
     private float _beautyHP;                // 美化血條用
 
@@ -60,6 +62,7 @@ public class BattleManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Debug.Log("Start");
         missionManager = GetComponent<MissionManager>();
         Global.isExitingRoom = false;
 
@@ -85,6 +88,8 @@ public class BattleManager : MonoBehaviour
         _spawnCount = 0;
 
         _beautyHP = 0.5f; // 0.5 是血調中間
+
+        Debug.Log("IN Start:" + _score);
     }
 
     void FixedUpdate()
@@ -104,6 +109,7 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
+//        Debug.Log("_score" + _score);
         if (_score > _maxScore)
         {
             _maxScore = _score;
@@ -115,11 +121,31 @@ public class BattleManager : MonoBehaviour
     /// 更新分數 這裡根本亂打的
     /// </summary>
     /// <param name="name"></param>
-    public void UpadateScore(string name)
+    public void UpadateScore(string name,float aliveTime)
     {
         switch (name)
         {
             case "EggMice":
+                {
+                    UpadateCombo();
+                    _spawnCount++;
+                    _hitMice++;
+                    Global.MiceCount--;
+                    //Global.photonService.SendDamage(1);  //＊＊＊＊ 攻擊值亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    break;
+                }
+            case "BlackMice":
+                {
+                    UpadateCombo();
+                    _spawnCount++;
+                    _hitMice++;
+                    Global.MiceCount--;
+                    //Global.photonService.SendDamage(1);  //＊＊＊＊ 攻擊值亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    break;
+                }
+            case "CandyMice":
                 {
 
                     UpadateCombo();
@@ -127,7 +153,29 @@ public class BattleManager : MonoBehaviour
                     _hitMice++;
                     Global.MiceCount--;
                     //Global.photonService.SendDamage(1);  //＊＊＊＊ 攻擊值亂打的要改
-                    Global.photonService.UpdateScore(10, 1, 2);//＊＊＊＊ 分數亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    break;
+                }
+            case "RabbitMice":
+                {
+
+                    UpadateCombo();
+                    _spawnCount++;
+                    _hitMice++;
+                    Global.MiceCount--;
+                    //Global.photonService.SendDamage(1);  //＊＊＊＊ 攻擊值亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    break;
+                }
+            case "NinjaMice":
+                {
+
+                    UpadateCombo();
+                    _spawnCount++;
+                    _hitMice++;
+                    Global.MiceCount--;
+                    //Global.photonService.SendDamage(1);  //＊＊＊＊ 攻擊值亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
                     break;
                 }
         }
@@ -150,8 +198,47 @@ public class BattleManager : MonoBehaviour
                 {
                     BreakCombo();
                     //_score = (int)(Math.Round(aliveTime, 2) / (micePty.eggMiceAppetite / micePty.eggMiceBiteSpeed));
-                    _score -= 2;
-                    Global.photonService.UpdateScore(10, 1, -2);//＊＊＊＊ 分數亂打的要改
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    _spawnCount++;
+                    _missMice++;
+                    Global.MiceCount--;
+                    break;
+                }
+            case "BlackMice":
+                {
+                    BreakCombo();
+                    _score -= 3;
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    _spawnCount++;
+                    _missMice++;
+                    Global.MiceCount--;
+                    break;
+                }
+            case "CandyMice":
+                {
+                    BreakCombo();
+                    _score -= 4;
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    _spawnCount++;
+                    _missMice++;
+                    Global.MiceCount--;
+                    break;
+                }
+            case "RabbitMice":
+                {
+                    BreakCombo();
+                    _score -= 5;
+                    Global.photonService.UpdateScore(name, aliveTime);
+                    _spawnCount++;
+                    _missMice++;
+                    Global.MiceCount--;
+                    break;
+                }
+            case "NinjaMice":
+                {
+                    BreakCombo();
+                    _score -= 6;
+                    Global.photonService.UpdateScore(name, aliveTime);
                     _spawnCount++;
                     _missMice++;
                     Global.MiceCount--;
@@ -240,6 +327,7 @@ public class BattleManager : MonoBehaviour
 
     void OnUpdateScore(Int16 score)    // 更新分數時
     {
+        // Debug.Log("GET SCORE: " + score);
         // 如果再交換分數任務下，則不取得自己增加的分數
         if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
         {
@@ -247,13 +335,14 @@ public class BattleManager : MonoBehaviour
         }// 如果再交換分數任務下，則取得自己減少的分數
         else if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score < 0)
         {
+           
             _score += (int)(score * _scoreRate);
         }
-        else// 正常情況下照舊
+        else if (_score + score >= 0)
         {
+           // Debug.Log("IN CLAC _Score:" + _score + "   score:" + score);
             _score += (int)(score * _scoreRate);
         }
-
     }
 
     void OnExitRoom()                  // 離開房間時
@@ -261,17 +350,26 @@ public class BattleManager : MonoBehaviour
         Global.isExitingRoom = true;        // 離開房間了
         Global.isMatching = false;          // 無配對狀態
         Global.BattleStatus = false;        // 不在戰鬥中
+
+        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.OtherScoreEvent -= OnOtherScore;
+        Global.photonService.MissionCompleteEvent -= OnMissionComplete;
+        Global.photonService.ApplyMissionEvent -= OnApplyRate;
+        Global.photonService.UpdateScoreEvent -= OnUpdateScore;
+        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
     }
 
     void OnOtherScore(Int16 score)     // 接收對手分數
     {
-        _otherScore += score;
+        // Debug.Log("GET Other SCORE: " + score);
+
+        if (_otherScore + score >= 0)
+            _otherScore += score;
 
         // 如果再交換分數任務下，取得對方增加的分數
         if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
         {
             _score += (int)(score * _scoreRate);
-            
         }
     }
 
@@ -295,7 +393,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            _otherScore+= otherMissionReward;
+            _otherScore += otherMissionReward;
         }
     }
 
