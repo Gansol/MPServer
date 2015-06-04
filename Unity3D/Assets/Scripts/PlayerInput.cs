@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MPProtocol;
 
 public class PlayerInput : MonoBehaviour
 {
     RaycastHit2D hit;
     Vector3 pos;
+    MissionManager missionManager;
+
     // Use this for initialization
     void Start()
     {
-
+        missionManager = GetComponent<MissionManager>();
     }
 
     // Update is called once per frame

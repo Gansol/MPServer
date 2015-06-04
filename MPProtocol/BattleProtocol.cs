@@ -115,7 +115,8 @@
         Mission,                    // 任務
         MissionRate,                // 任務倍率
         MissionScore,               // 任務目標
-        CustomValue,                // 自訂參數1
+        CustomValue,                // 自訂參數1(整數)
+        CustomString,                // 自訂參數2(字串)
         MissionReward,              // 任務獎勵
         GoldReward,                 // 金幣獎勵
         SliverReward,               // 銀幣獎勵(遊戲幣、糧食)

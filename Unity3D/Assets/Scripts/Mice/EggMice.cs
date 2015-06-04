@@ -120,7 +120,7 @@ public class EggMice : MonoBehaviour
 
     void OnHit()
     {
-        Debug.Log("HIT!");
+//        Debug.Log("HIT!");
         if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
         {
             clickFlag = true;

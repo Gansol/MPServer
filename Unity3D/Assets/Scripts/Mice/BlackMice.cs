@@ -108,7 +108,7 @@ public class BlackMice : MonoBehaviour
         {
             animTime = currentState.normalizedTime;
 
-            Debug.Log(animTime);
+//            Debug.Log(animTime);
             if (!eatingFlag)        // 限制執行一次
             {
                 if (animTime > 5)                       // 動畫撥放完畢時

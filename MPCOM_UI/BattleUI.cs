@@ -22,6 +22,8 @@ namespace MPCOM
     public interface IBattleUI  // 使用介面 可以提供給不同程式語言繼承使用        
     {
         byte[] ClacScore(string miceName, float aliveTime);
+        byte[] ClacMissionReward(byte mission, float missionRate, int customVaule);
+        byte[] SelectMission(byte mission, float missionRate);
     }
 
     public class BattleUI : ServicedComponent, IBattleUI

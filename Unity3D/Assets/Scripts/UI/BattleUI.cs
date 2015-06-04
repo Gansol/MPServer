@@ -33,6 +33,5 @@ public class BattleUI : MonoBehaviour
             Global.photonService.KickOther();
             Global.photonService.ExitRoom();
         }
-
     }
 }

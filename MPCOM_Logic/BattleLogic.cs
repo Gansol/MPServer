@@ -36,16 +36,15 @@ namespace MPCOM
             return true;
         }
         #region variable 變數區
-        private int harvest = 200;
-        private int drivingMice = 50;
-        private int harvestRate = 10;               // 分數倍率
-        private int reduce = 500;                   // 減少分數
+        private Int16 harvest = 200;
+        private Int16 drivingMice = 50;
+        private Int16 harvestRate = 10;               // 分數倍率
+        private Int16 reduce = -500;                  // 減少分數
 
-        private int harvestReward = 100;
-        private int drivingMiceReward = 200;
-        private int badMiceReward = 300;
-        private int harvestRateReward = 400;
-        private int worldBossReward = 10000;
+        private Int16 harvestReward = 100;
+        private Int16 drivingMiceReward = 200;
+        private Int16 harvestRateReward = 400;
+        private Int16 worldBossReward = 10000;
 
         private struct EggMice
         {
@@ -194,35 +193,69 @@ namespace MPCOM
                 {
                     case Mission.Harvest:
                         {
-                            if (missionRate <= 0 || missionRate > 10)
-                            {
-                                battleData.ReturnCode = "S504";
-                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
-                                return battleData;
-                            }
-                            else
+                            if (missionRate > 0 || missionRate < 10)
                             {
                                 battleData.missionReward = (Int16)Math.Round((missionRate * harvestReward), 0);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
                             }
+                            break;
                         }
                     case Mission.DrivingMice:
                         {
-                            if (missionRate <= 0) // 這裡自訂參數 customValue 是Combo
+                            if (missionRate > 0 && customValue >= drivingMice) // 這裡自訂參數 customValue 是Combo
                             {
-                                battleData.ReturnCode = "S504";
-                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
-                                return battleData;
-                            }
-                            else
-                            {
-                                battleData.missionReward = (Int16)(missionRate * drivingMiceReward);
+                                battleData.missionReward = (Int16)Math.Round(missionRate * drivingMiceReward);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
                             }
+                            break;
+                        }
+                    case Mission.Reduce:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = (Int16)Math.Round(missionRate * reduce);
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.HarvestRate:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = 0;
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.Exchange:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = 0;
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.WorldBoss:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = worldBossReward;
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
                         }
                 }
             }
@@ -231,6 +264,9 @@ namespace MPCOM
 
                 throw e;
             }
+
+            battleData.ReturnCode = "S504";
+            battleData.ReturnMessage = "驗證任務獎勵失敗！";
             return battleData;
         }
 
@@ -284,7 +320,7 @@ namespace MPCOM
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
                         }
-                    case Mission.BadMice: // 壞老鼠
+                    case Mission.WorldBoss: // BOSS
                         {
                             // missionRate 是老鼠ID
                             battleData.missionScore = (Int16)missionRate;
@@ -292,14 +328,6 @@ namespace MPCOM
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
                         }
-                    //case Mission.WorldBoss: // 壞老鼠
-                    //    {
-                    //        // missionRate 是老鼠ID
-                    //        battleData.missionScore = (Int16)missionRate;
-                    //        battleData.ReturnCode = "S505";
-                    //        battleData.ReturnMessage = "選擇任務成功！";
-                    //        return battleData;
-                    //    }
                 }
             }
             catch (Exception e)

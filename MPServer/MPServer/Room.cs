@@ -25,7 +25,7 @@ namespace MPServer
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
-        private Dictionary<int, Dictionary<string, RoomActor>> _playingRoomList;               // 等待房間中的會員列表
+        private Dictionary<int, Dictionary<string, RoomActor>> _playingRoomList;               // 遊戲中的會員列表
         private Dictionary<int, Dictionary<string, RoomActor>> _waitingList;               // 等待房間中的會員列表
         private Dictionary<Guid, int> _guidGetRoom;
         private List<int> _EmptyRoom;
@@ -33,6 +33,7 @@ namespace MPServer
         private static int _roomIndex;                              // ＊＊＊＊＊因為是房間起始值為1
         private static int _limit;
         private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
+        private Dictionary<int, int> _loadedPlayer;
 
         //public Dictionary<string, RoomActor> gameRoom;
         public Dictionary<int, Dictionary<string, RoomActor>> waitingList { get { return _waitingList; } }
@@ -40,17 +41,21 @@ namespace MPServer
         public int myRoom { get { return _myRoom; } }
         public int limit { get { return _limit; } }
         public string roomName { get; set; }
+        public Dictionary<int, int> loadedPlayer { get { return _loadedPlayer; } }
 
         public Room() //init
         {
             _waitingList = new Dictionary<int, Dictionary<string, RoomActor>>();
             _playingRoomList = new Dictionary<int, Dictionary<string, RoomActor>>();
+            _loadedPlayer = new Dictionary<int, int>();
             _guidGetRoom = new Dictionary<Guid, int>();
             _EmptyRoom = new List<int>();
+
             _waitIndex = 1;
             _myRoom = 1;
             _limit = 2;
             _roomIndex = 1;
+
         }
 
         #region CreateRoom 建立房間
@@ -108,13 +113,13 @@ namespace MPServer
                         if (item.Value.Count < limit)   //假如房間沒有滿 加入玩家
                         {
                             item.Value.Add("RoomActor2", new RoomActor(guid, primaryID, account, nickname, age, sex, IP));
-                            
+
                             // 假如 清空房間的數量 > 0  這裡看不懂再寫啥
                             if (_EmptyRoom.Count > 0)
                             {
                                 Log.Debug("EmptyRoom : " + _EmptyRoom[0]);
                                 _playingRoomList.Add(_EmptyRoom[0], item.Value);
-                                
+
                                 _myRoom = _EmptyRoom[0];
                                 _EmptyRoom.RemoveAt(0);
                             }
@@ -188,7 +193,7 @@ namespace MPServer
                     Log.Debug("Game Room " + roomID + " been removed!");
                     _roomIndex--;                                           // 房間移除後 index--
                 }
-                                         
+
                 Log.Debug("Found Room ? " + _playingRoomList.TryGetValue(roomID, out gameRoom));
             }
 
@@ -223,12 +228,37 @@ namespace MPServer
         }
         #endregion
 
+        #region 同步開始遊戲
+        public void GameLoaded(int roomID, int primaryID)
+        {
+            _loadedPlayer.Add(roomID, primaryID);
+        }
+        #endregion
+
+        /// <summary>
+        /// 取得載入遊戲的玩家
+        /// </summary>
+        /// <param name="roomID"></param>
+        /// <returns>回傳是否載入</returns>
+        public bool GetLoadedFromRoom(int roomID)
+        {
+            int primaryID;
+            bool result;
+
+            result = _loadedPlayer.TryGetValue(roomID, out primaryID);
+            if (result)
+            {
+                _loadedPlayer.Remove(roomID);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// 用GUID找房間
         /// </summary>
         /// <param name="guid"></param>
-        /// <returns></returns>
-
+        /// <returns>RoomID</returns>
         public int GetRoomFromGuid(Guid guid)
         {
             if (_guidGetRoom.Count > 0)
@@ -244,8 +274,7 @@ namespace MPServer
         /// 用GUID找遊戲中 房間中玩家
         /// </summary>
         /// <param name="guid"></param>
-        /// <returns></returns>
-
+        /// <returns>RoomActor</returns>
         public RoomActor GetActorFromGuid(Guid guid)
         {
             if (_guidGetRoom.Count > 0 && _playingRoomList.Count > 0)
@@ -264,8 +293,7 @@ namespace MPServer
         /// 用GUID 找 等待列表中的玩家
         /// </summary>
         /// <param name="guid"></param>
-        /// <returns></returns>
-
+        /// <returns>RoomActor</returns>
         public RoomActor GetWaitActorFromGuid(Guid guid) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
         {
             if (_waitingList.Count > 0)
@@ -282,8 +310,7 @@ namespace MPServer
         /// 用GUID 找 等待列表中的玩家 返回Bool 是否找到
         /// </summary>
         /// <param name="guid"></param>
-        /// <returns></returns>
-
+        /// <returns>bool</returns>
         public bool bGetWaitActorFromGuid(Guid guid) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
         {
             if (_waitingList.Count > 0)

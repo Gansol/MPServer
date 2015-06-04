@@ -33,7 +33,7 @@ public class MiceSpawner : MonoBehaviour
     /// </summary>
     /// <param name="holeArray">1D陣列產生方式</param>
     /// <param name="spawnTime">產生間隔時間</param>
-    public IEnumerator SpawnByRandom(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator SpawnByRandom(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount,bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -84,11 +84,9 @@ public class MiceSpawner : MonoBehaviour
             {
                 Debug.Log("Closed!");
             }
-
-
         }
     Finish: ;
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -97,7 +95,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime,float intervalTime, float lerpTime, int spawnCount, int randomPos)
+    public IEnumerator SpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime,float intervalTime, float lerpTime, int spawnCount, int randomPos , bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -142,7 +140,7 @@ public class MiceSpawner : MonoBehaviour
 
         }
     Finish: ;
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
         
     }
 
@@ -152,7 +150,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator ReSpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount,int randomPos)
+    public IEnumerator ReSpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos , bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -191,7 +189,7 @@ public class MiceSpawner : MonoBehaviour
             }
         }
     Finish: ;
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
         
     }
 
@@ -202,7 +200,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
+    public IEnumerator SpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2 , bool isSkill)
     {
         if (holeArray.GetLength(0) > 4)
             intervalTime /= 2;
@@ -254,7 +252,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime/3);
         }
     Finish: ;
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
     }
 
 /// <summary>
@@ -269,7 +267,7 @@ public class MiceSpawner : MonoBehaviour
 /// <param name="randomPos1">1D陣列隨機值</param>
 /// <param name="randomPos2">2D陣列隨機值</param>
 /// <returns></returns>
-    public IEnumerator ReSpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2)
+    public IEnumerator ReSpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2 , bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -321,7 +319,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime/3);
         }
     Finish: ;
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
     }
 
 
@@ -332,7 +330,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator SpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount , bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -389,7 +387,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime/5);
         }
     Finish: ;   // When amount = 0 spawn Finish !
-        Global.spawnFlag = true;
+       if(!isSkill)  Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -398,7 +396,7 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator ReSpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount)
+    public IEnumerator ReSpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount , bool isSkill)
     {
         // < = > test ok
         int _tmpCount = 0;
@@ -453,6 +451,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(intervalTime/5);
         }
     Finish: ;
-        Global.spawnFlag = true;
+        if(!isSkill)  Global.spawnFlag = true;
+       
     }
 }

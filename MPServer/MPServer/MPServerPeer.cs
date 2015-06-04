@@ -53,7 +53,7 @@ namespace MPServer
         //當斷線時
         protected override void OnDisconnect(PhotonHostRuntimeInterfaces.DisconnectReason reasonCode, string reasonDetail)
         {
-            Log.Debug("peer:" + peerGuid+"\n已登出玩家：" + _server.Actors.GetAccountFromGuid(peerGuid) + "  時間:" + DateTime.Now);
+            Log.Debug("peer:" + peerGuid + "\n已登出玩家：" + _server.Actors.GetAccountFromGuid(peerGuid) + "  時間:" + DateTime.Now);
 
             Actor existPlayer = _server.Actors.GetActorFromGuid(peerGuid);                                      // 用GUID找到離線的玩家
             try
@@ -297,6 +297,40 @@ namespace MPServer
                             }
                             break;
 
+                        #endregion
+
+                        #region SyncGameStart 同步開始遊戲
+                        case (byte)MatchGameOperationCode.SyncGameStart:
+                            {
+                                int roomID = (int)operationRequest.Parameters[(byte)MatchGameParameterCode.RoomID];
+                                primaryID = (int)operationRequest.Parameters[(byte)MatchGameParameterCode.PrimaryID];
+                                bool isloaded;
+
+                                try
+                                {
+                                    isloaded = _server.room.GetLoadedFromRoom(roomID);
+
+                                    if (!isloaded)
+                                    {
+                                        _server.room.GameLoaded(roomID, primaryID);
+                                    }
+                                    else
+                                    {
+                                        Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
+                                        otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
+                                        peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
+                                        EventData missionEventData = new EventData((byte)MatchGameResponseCode.SyncGameStart);
+                                        peerOther.SendEvent(missionEventData, new SendParameters());    // 回傳給另外一位玩家
+                                        this.SendEvent(missionEventData, new SendParameters());         // 回傳給自己
+                                    }
+
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error("發生例外情況！" + e.Message + "於：" + e.StackTrace);
+                                }
+                                break;
+                            }
                         #endregion
 
                         #region ExitRoom 離開房間
@@ -665,10 +699,10 @@ namespace MPServer
                                     //Log.Debug("BattleUI OK");
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數
                                     //Log.Debug("BattleData OK");
-                                    
+
 
                                     // score = battleData.score;
-                                    
+
                                     if (battleData.ReturnCode == "S501")//計算分數成功 回傳玩家資料
                                     {
                                         //回傳給原玩家
@@ -676,7 +710,7 @@ namespace MPServer
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } 
                                     };
-                                    
+
 
                                         OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdateScore, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() }; // 改過 battleData.ReturnMessage.ToString()
                                         SendOperationResponse(response, new SendParameters());
@@ -757,7 +791,7 @@ namespace MPServer
                                     float missionRate = (float)operationRequest.Parameters[(byte)BattleParameterCode.MissionRate];
 
                                     MPCOM.BattleUI battleUI = new MPCOM.BattleUI();
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission,missionRate));
+                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission, missionRate));
                                     Int16 missionScore = battleData.missionScore;
 
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)BattleParameterCode.Mission, mission }, { (byte)BattleParameterCode.MissionScore, missionScore } };
@@ -780,7 +814,7 @@ namespace MPServer
                             }
                         #endregion
 
-                        #region MissionCompleted 任務完成 更新分數
+                        #region MissionCompleted 任務完成 回傳獎勵
                         case (byte)BattleOperationCode.MissionCompleted:
                             {
                                 try

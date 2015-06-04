@@ -249,7 +249,7 @@ public class PoolManager : MonoBehaviour
             _otherMice.Add(Int16.Parse(item.Key));
         }
 
-        _otherMice.ExceptWith(_myMice); // 把對手重複的老鼠丟掉
+       _otherMice.ExceptWith(_myMice); // 把對手重複的老鼠丟掉
 
         if (_otherMice.Count != 0)      // 如果對手老鼠有不重複的話
         {

@@ -21,8 +21,8 @@ public class MissionManager : MonoBehaviour
     public static MissionMode missionMode { get { return _missionMode; } }
     public static Mission mission { get { return _mission; } }
 
-    public static MissionMode _missionMode = MissionMode.Closed;        // 顯示目前任務模式狀態  之後要改private
-    public static Mission _mission = Mission.Harvest;                   // 顯示目前執行任務
+    public static MissionMode _missionMode = MissionMode.Closed;// 顯示目前任務模式狀態  之後要改private
+    public static Mission _mission = Mission.Harvest;           // 顯示目前執行任務
     public int missionInterval = 10;                            // 任務再次啟動間隔時間
     [Range(10, 25)]
     public int lowerPercent = 25;                               // 較低的一方分數百分比
@@ -47,6 +47,8 @@ public class MissionManager : MonoBehaviour
 
     private bool missionFlag;                                   // 任務是否開啟
     private bool seesawFlag;                                    // 任務蹺蹺板 (A啟動B不啟動..etc)
+    private bool _isBadMice;                                    // 是否打到壞老鼠
+
     #endregion
 
     void Start()
@@ -61,8 +63,11 @@ public class MissionManager : MonoBehaviour
         missionTime = 60;
         missionRate = 1.0f;
         lastGameTime = 0;
+
         missionFlag = false;
         seesawFlag = true;
+        _isBadMice = false;
+
         _mission = Mission.None;
         _missionMode = MissionMode.Closed;
     }
@@ -79,8 +84,7 @@ public class MissionManager : MonoBehaviour
 
             if (missionMode == MissionMode.Completed)                               // 任務完成時，關閉任務並儲存資訊，回到初始狀態
             {
-                if (_mission == Mission.Reduce)
-                    activeScore -= missionScore;
+                if (_mission == Mission.Reduce) activeScore -= missionScore;
 
                 missionScore = 0;
                 _missionMode = MissionMode.Closed;
@@ -93,11 +97,11 @@ public class MissionManager : MonoBehaviour
             {
                 if (_mission == Mission.DrivingMice)
                 {
-                    Global.photonService.MissionComplete((byte)_mission, missionRate, (Int16)battleManager.combo);
+                    Global.photonService.MissionCompleted((byte)_mission, missionRate, (Int16)battleManager.combo,"");
                 }
                 else
                 {
-                    Global.photonService.MissionComplete((byte)_mission, missionRate, 0);
+                    Global.photonService.MissionCompleted((byte)_mission, missionRate, 0,"");
                 }
 
                 Global.isMissionCompleted = false;
@@ -119,20 +123,18 @@ public class MissionManager : MonoBehaviour
     // 任務事件處發者
     void MissionTrigger()
     {
-        // UnityEngine.Random.seed = System.Guid.NewGuid().GetHashCode();
         if (Global.OtherData.RoomPlace != "Host")       // 如果我是主機才會當任務事件判斷者
         {
-
             float otherPercent = (battleManager.otherScore / (battleManager.score + battleManager.otherScore)) * 100;
             float myPercent = 100 - otherPercent;
-            //Debug.Log("otherPercent :" + otherPercent + "\n myPercent :" + myPercent);
+
             if ((gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
             {
                 // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
                 if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange, Mission.BadMice };
-                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    Mission[] missionSelect = { Mission.Exchange };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 0)];
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     balanceTimes--;
@@ -142,7 +144,7 @@ public class MissionManager : MonoBehaviour
                 else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent)
                         && balanceTimes > 0 && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange, Mission.BadMice };
+                    Mission[] missionSelect = { Mission.Exchange};
                     _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
@@ -153,8 +155,8 @@ public class MissionManager : MonoBehaviour
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
                 if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = {/* Mission.Harvest,*/ Mission.DrivingMice/*, Mission.Reduce */};
-                    _mission = missionSelect[UnityEngine.Random.Range(0, 1)];
+                    Mission[] missionSelect = { Mission.Exchange, Mission.Harvest, Mission.DrivingMice, Mission.Reduce };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 5)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
@@ -163,8 +165,8 @@ public class MissionManager : MonoBehaviour
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
                 if ((battleManager.score > activeScore || battleManager.otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = {/* Mission.Harvest, Mission.BadMice,*/ Mission.DrivingMice };
-                    _mission = missionSelect[UnityEngine.Random.Range(0, 1)];
+                    Mission[] missionSelect = { Mission.Exchange,Mission.Harvest, Mission.DrivingMice };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
@@ -192,7 +194,7 @@ public class MissionManager : MonoBehaviour
                 {
                     break;
                 }
-            case Mission.Harvest:
+            case Mission.Harvest:   // 達成XX收穫
                 {
                     if ((battleManager.score - lastScore) >= missionScore)      // success
                     {
@@ -246,10 +248,6 @@ public class MissionManager : MonoBehaviour
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
                     }
-                    break;
-                }
-            case Mission.BadMice:// 還沒辦法寫 要把老鼠寫完
-                {
                     break;
                 }
             case Mission.Exchange:

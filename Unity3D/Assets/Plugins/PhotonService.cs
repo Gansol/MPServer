@@ -43,9 +43,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event OtherScoreHandler OtherScoreEvent;
 
     //委派事件 離開房間、載入關卡
-    public delegate void ExitRoomHandler();
-    public event ExitRoomHandler ExitRoomEvent;
-    public event ExitRoomHandler LoadSceneEvent;
+    public delegate void RoomHandler();
+    public event RoomHandler ExitRoomEvent;
+    public event RoomHandler LoadSceneEvent;
+    public event RoomHandler GameStartEvent;
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -147,6 +148,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.RoomPlace = (string)eventData.Parameters[(byte)MatchGameParameterCode.RoomPlace];
                 
                 LoadSceneEvent();
+                break;
+
+            //同步開始遊戲
+            case (byte)MatchGameResponseCode.SyncGameStart:
+                GameStartEvent();
                 break;
 
             // 被踢出房間了
@@ -389,7 +395,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region Send Mission 傳送任務
+            #region Recive Mission 接收任務
 
             case (byte)BattleResponseCode.Mission://取得老鼠資料
                 {
@@ -411,7 +417,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region  Mission Completed 任務完成
+            #region  Mission Completed 任務完成 接收獎勵
 
             case (byte)BattleResponseCode.MissionCompleted://取得老鼠資料
                 {
@@ -789,20 +795,20 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
-    #region MissionComplete 任務完成 接收獎勵
+    #region MissionCompleted 任務完成 要求獎勵
 /// <summary>
 /// 任務完成 接收獎勵
 /// </summary>
 /// <param name="mission">任務名稱</param>
 /// <param name="missionRate">任務倍率</param>
 /// <param name="customValue">自訂參數 無填0</param>
-    public void MissionComplete(byte mission, float missionRate, Int16 customValue)
+    public void MissionCompleted(byte mission, float missionRate, Int16 customValue, string customString)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
-            { (byte)BattleParameterCode.Mission, mission }, { (byte)BattleParameterCode.MissionRate, missionRate } , { (byte)BattleParameterCode.CustomValue, customValue }};
+            { (byte)BattleParameterCode.Mission, mission }, { (byte)BattleParameterCode.MissionRate, missionRate } , { (byte)BattleParameterCode.CustomValue, customValue }, { (byte)BattleParameterCode.CustomString, customString }};
             this.peer.OpCustom((byte)BattleOperationCode.MissionCompleted, parameter, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
@@ -812,4 +818,26 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
+    #region SyncGameStart 同步開始遊戲
+    /// <summary>
+    /// 同步開始遊戲
+    /// </summary>
+    /// <param name="roomID">房間ID</param>
+    /// <param name="primaryID">主索引</param>
+    public void SyncGameStart()
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)MatchGameParameterCode.PrimaryID, Global.PrimaryID }, { (byte)MatchGameParameterCode.RoomID, Global.RoomID },
+            };
+
+            this.peer.OpCustom((byte)MatchGameOperationCode.SyncGameStart, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
 }
