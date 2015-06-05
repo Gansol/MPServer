@@ -73,17 +73,17 @@ public class RabbitMice : MonoBehaviour
         if (transform.gameObject.activeSelf == true && _timeFlag)  // 如果被Spawn儲存現在時間 注意 DisActive時Time還是會一直跑 所以要存起來減掉
         {
             _timeFlag = false;
-            _lastTime = Time.time;
+            _lastTime = Time.fixedTime;
         }
 
-        aliveTime = Time.time - _lastTime;                                                              // 老鼠存活時間 
+        aliveTime = Time.fixedTime - _lastTime;                                                              // 老鼠存活時間 
         Animator anims = GetComponent("Animator") as Animator;   // 播放 死亡動畫                  
         AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
         //Debug.Log("currentState : " + currentState.nameHash);
         if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
         {
             animTime = currentState.normalizedTime;
-            Debug.Log(animTime);
+//            Debug.Log(animTime);
             // 目前播放的動畫 "總"時間
             if (animTime > 1)   // 動畫撥放完畢時
             {
@@ -108,7 +108,6 @@ public class RabbitMice : MonoBehaviour
         {
             animTime = currentState.normalizedTime;
 
-            Debug.Log(animTime);
             if (!eatingFlag)        // 限制執行一次
             {
                 if (animTime > 5)                       // 動畫撥放完畢時
@@ -136,7 +135,7 @@ public class RabbitMice : MonoBehaviour
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-        Debug.Log("OnDisappear : " + aliveTime);
+        //Debug.Log("OnDisappear : " + aliveTime);
         try
         {
             _lastTime = aliveTime;

@@ -212,6 +212,7 @@ public class PoolManager : MonoBehaviour
         {
             clone = (GameObject)Instantiate(SkillDeck[Convert.ToInt16(item.Key) - 1]);   //　等傳老鼠ID名稱近來這要改
             clone.name = item.Value.ToString();
+            Skill.transform.GetChild(i).transform.gameObject.SetActive(true);
             clone.transform.parent = Skill.transform.GetChild(i);
             clone.layer = clone.transform.parent.gameObject.layer;
 

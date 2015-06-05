@@ -83,7 +83,7 @@ public class NinjaMice : MonoBehaviour
         if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
         {
             animTime = currentState.normalizedTime;
-            Debug.Log(animTime);
+
             // 目前播放的動畫 "總"時間
             if (animTime > 1)   // 動畫撥放完畢時
             {
@@ -108,7 +108,7 @@ public class NinjaMice : MonoBehaviour
         {
             animTime = currentState.normalizedTime;
 
-            Debug.Log(animTime);
+            //Debug.Log(animTime);
             if (!eatingFlag)        // 限制執行一次
             {
                 if (animTime > 5)                       // 動畫撥放完畢時
@@ -136,7 +136,7 @@ public class NinjaMice : MonoBehaviour
     {
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-        Debug.Log("OnDisappear : " + aliveTime);
+        //Debug.Log("OnDisappear : " + aliveTime);
         try
         {
             _lastTime = aliveTime;

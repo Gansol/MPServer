@@ -13,18 +13,14 @@ using MPProtocol;
 public class BattleManager : MonoBehaviour
 {
     MissionManager missionManager;          // 任務管理員
-    public GameObject BlueScore;            // 藍隊分數Label
-    public GameObject ComboLabel;           // COMBO   Label
-    public GameObject RedScore;             // 紅隊分數Label
-    public GameObject HPBar;                // 藍色HPBar
-
+    BattleHUD battleHUD;                    // HUD
 
     private static int _maxCombo = 0;       // 最大連擊數
     private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
-    private static int _gameTime = 0;       // 遊戲時間
+    private float _gameTime = 0;            // 遊戲時間
 
     private static float _otherScore = 0;   // 對手分數
-    private static float _maxScore = 0;       // 最高得分
+    private static float _maxScore = 0;     // 最高得分
     private static int _eggMiceUsage = 0;   // 老鼠使用量
     private static int _energyUsage = 0;    // 能量使用量
     private static int _missMice = 0;       // 失誤數           統計用
@@ -34,9 +30,9 @@ public class BattleManager : MonoBehaviour
     private float _myDPS = 0;               // 我的平均輸出
     private float _otherDPS = 0;            // 對手的平均輸出
     private float _scoreRate = 1;           // 分數倍率
+    private float _otherRate = 1;           // 對手分數倍率
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
-    private float _beautyHP;                // 美化血條用
 
     private int _combo = 0;                 // 連擊數
 
@@ -50,7 +46,7 @@ public class BattleManager : MonoBehaviour
     public int combo { get { return _combo; } }
     public int maxCombo { get { return _maxCombo; } }
     public int tmpCombo { get { return _tmpCombo; } }
-    public int gameTime { get { return _gameTime; } }
+    public float gameTime { get { return _gameTime; } }
     public float score { get { return _score; } }
     public float otherScore { get { return _otherScore; } }
     public float maxScore { get { return _maxScore; } }
@@ -68,6 +64,7 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("Start");
         missionManager = GetComponent<MissionManager>();
+        battleHUD = GetComponent<BattleHUD>();
         Global.isExitingRoom = false;
 
         Global.photonService.ExitRoomEvent += OnExitRoom;
@@ -91,17 +88,23 @@ public class BattleManager : MonoBehaviour
         _missMice = 0;
         _hitMice = 0;
         _spawnCount = 0;
+    }
 
-        _beautyHP = 0.5f; // 0.5 是血調中間
-
-        Debug.Log("IN Start:" + _score);
+    void Update()
+    {
+        if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
+        if (_score > _maxScore) _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
     }
 
     void FixedUpdate()
     {
-        float _time = Time.time;
+        if (!Global.isGameStart)
+            _lastTime = Time.fixedTime;
+
         if (Global.isGameStart)
         {
+            _gameTime = Time.fixedTime - _lastTime;
+            float _time = Time.fixedTime - _lastTime;
             if (_time > _lastTime + 5)
             {
                 _myDPS = _score / Time.timeSinceLevelLoad;
@@ -112,135 +115,32 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        //        Debug.Log("_score" + _score);
-        if (_score > _maxScore)
-        {
-            _maxScore = _score;
-        }
-    }
 
-    #region UpadateScore 更新分數 這裡根本亂打的
-    /// <summary>
-    /// 更新分數 這裡根本亂打的
-    /// </summary>
-    /// <param name="name"></param>
+    #region UpadateScore 更新分數
     public void UpadateScore(string name, float aliveTime)
     {
-        switch (name)
+        if (name != null)
         {
-            case "EggMice":
-                {
-                    UpadateCombo();
-                    _spawnCount++;
-                    _hitMice++;
-                    Global.MiceCount--;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    break;
-                }
-            case "BlackMice":
-                {
-                    UpadateCombo();
-                    _spawnCount++;
-                    _hitMice++;
-                    Global.MiceCount--;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    break;
-                }
-            case "CandyMice":
-                {
-                    UpadateCombo();
-                    _spawnCount++;
-                    _hitMice++;
-                    Global.MiceCount--;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    break;
-                }
-            case "RabbitMice":
-                {
-                    UpadateCombo();
-                    _spawnCount++;
-                    _hitMice++;
-                    Global.MiceCount--;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    break;
-                }
-            case "NinjaMice":
-                {
-                    UpadateCombo();
-                    _spawnCount++;
-                    _hitMice++;
-                    Global.MiceCount--;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    break;
-                }
+            UpadateCombo();
+            _spawnCount++;
+            _hitMice++;
+            Global.MiceCount--;
+            Global.photonService.UpdateScore(name, aliveTime);
         }
     }
     #endregion
 
-
-    #region LostScore 失去分數 這裡根本亂打的
-    /// <summary>
-    /// 失去分數 這裡根本亂打的
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="aliveTime"></param>
+    #region LostScore 失去分數
     public void LostScore(string name, float aliveTime)
     {
         //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
-        switch (name)
+        if (name != null)
         {
-            case "EggMice":
-                {
-                    BreakCombo();
-                    //_score = (int)(Math.Round(aliveTime, 2) / (micePty.eggMiceAppetite / micePty.eggMiceBiteSpeed));
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    _spawnCount++;
-                    _missMice++;
-                    Global.MiceCount--;
-                    break;
-                }
-            case "BlackMice":
-                {
-                    BreakCombo();
-                    _score -= 3;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    _spawnCount++;
-                    _missMice++;
-                    Global.MiceCount--;
-                    break;
-                }
-            case "CandyMice":
-                {
-                    BreakCombo();
-                    _score -= 4;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    _spawnCount++;
-                    _missMice++;
-                    Global.MiceCount--;
-                    break;
-                }
-            case "RabbitMice":
-                {
-                    BreakCombo();
-                    _score -= 5;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    _spawnCount++;
-                    _missMice++;
-                    Global.MiceCount--;
-                    break;
-                }
-            case "NinjaMice":
-                {
-                    BreakCombo();
-                    _score -= 6;
-                    Global.photonService.UpdateScore(name, aliveTime);
-                    _spawnCount++;
-                    _missMice++;
-                    Global.MiceCount--;
-                    break;
-                }
+            BreakCombo();
+            Global.photonService.UpdateScore(name, aliveTime);
+            _spawnCount++;
+            _missMice++;
+            Global.MiceCount--;
         }
     }
     #endregion
@@ -249,144 +149,69 @@ public class BattleManager : MonoBehaviour
     {
         _tmpCombo++;
 
+        if (_isCombo) _combo++; //如果還在連擊 增加連擊數
+
         if (_tmpCombo == 5 && !_isCombo)
         {
             _isCombo = true;
-            _combo = 4; //下面會多+1=5
+            _combo = 5;
             _tmpCombo = 0;
-        }
-
-        if (_isCombo)   //如果還在連擊
-        {
-            _combo++;   //增加連擊數
         }
     }
 
     private void BreakCombo()
     {
-        if (_isCombo)
-        {
-            if (_combo > _maxCombo)     // 假如目前連擊數 大於 maxCombo 
-            {
-                _maxCombo = _combo;     // 更新 maxCombo
-            }
-            _isCombo = false;           // 結束 連擊
-            _combo = 0;                 // 恢復0
-            _tmpCombo = 0;
-        }
-    }
-
-    void OnGUI()
-    {
-        //Debug.Log(_score);
-        BlueScore.GetComponent<UILabel>().text = _score.ToString();         // 畫出分數值
-        RedScore.GetComponent<UILabel>().text = _otherScore.ToString();     // 畫出分數值
-
-        if (_score < 0) _score = 0;                                         // 假如-分 顯示0分
-        if (_otherScore < 0) _otherScore = 0;                               // 假如-分 顯示0分
-
-        float value = _score / (_score + _otherScore);                      // 得分百分比 兩邊都是0會 NaN
-
-        if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
-        {
-            HPBar.GetComponent<UISlider>().value = value;
-        }
-        else if (_beautyHP > value)                                         // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
-        {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;               // 先等於目前值，然後慢慢減少
-
-            if (_beautyHP >= value)
-                _beautyHP -= 0.01f;                                         // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else if (_beautyHP < value)                                         // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
-        {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;               // 先等於目前值，然後慢慢增加
-
-            if (_beautyHP <= value)
-                _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else if (_score == 0 && _otherScore == 0)
-        {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;
-            //Debug.Log("KKKCCCCC" + _beautyHP);
-            if (_beautyHP <= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value > 0.5f)
-            {
-                _beautyHP -= 0.01f;
-            }
-
-            if (_beautyHP >= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value < 0.5f)
-                _beautyHP += 0.01f;
-        }
-
-        ComboLabel.GetComponent<UILabel>().text = _combo.ToString();        // 畫出Combo值
-
+        _isCombo = false;           // 結束 連擊
+        _combo = 0;                 // 恢復0
+        _tmpCombo = 0;
     }
 
     void OnUpdateScore(Int16 score)    // 更新分數時
     {
-        if (_score + score == 1)
-        {
-            Debug.Log("GET SCORE: " + score + "   Score:" + _score);
-        }
-        
+        Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+
         // 如果再交換分數任務下，則不取得自己增加的分數
-        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
+        if (missionManager.missionMode == MissionMode.Opening)
         {
-            _otherScore += score;
-        }// 如果再交換分數任務下，則取得自己減少的分數
-        else if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score < 0)
-        {
-            _score += (int)(score * _scoreRate);
+            if (missionManager.mission == Mission.Exchange && score > 0) _otherScore += _tmpScore;
+
+            if (missionManager.mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
+                _score = (_score + _tmpScore > 0) ? (_score += _tmpScore) : 0;
         }
 
-        if (MissionManager.mission != Mission.Exchange)
-        {
-            _score = (_score + (int)(score * _scoreRate) < 0) ? 0 : (_score += (int)(score * _scoreRate));
-        }
-
-
-
+        if (missionManager.mission != Mission.Exchange)
+            _score = (_score + _tmpScore < 0) ? 0 : _score += _tmpScore;
     }
 
-    void OnExitRoom()                  // 離開房間時
-    {
-        Global.isExitingRoom = true;        // 離開房間了
-        Global.isMatching = false;          // 無配對狀態
-        Global.BattleStatus = false;        // 不在戰鬥中
 
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
-        Global.photonService.OtherScoreEvent -= OnOtherScore;
-        Global.photonService.MissionCompleteEvent -= OnMissionComplete;
-        Global.photonService.ApplyMissionEvent -= OnApplyRate;
-        Global.photonService.UpdateScoreEvent -= OnUpdateScore;
-        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
-        Global.photonService.GameStartEvent -= OnGameStart;
-    }
 
-    void OnOtherScore(Int16 score)     // 接收對手分數
+    void OnOtherScore(Int16 score)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
     {
+        Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+
         // 如果再交換分數任務下，取得對方增加的分數
-        if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score > 0)
+        if (missionManager.missionMode == MissionMode.Opening)
         {
-            _score += (int)(score * _scoreRate);
-        }
-        else if (MissionManager.missionMode == MissionMode.Opening && MissionManager.mission == Mission.Exchange && score < 0)
-        {
-             _otherScore = (_otherScore + score > 0) ? (_otherScore += (int)(score * _scoreRate)) : 0;
-        }
-        
-        if (MissionManager.mission != Mission.Exchange)
-        {
-            _otherScore = ((_otherScore + score) < 0) ? 0 : (_otherScore += (int)(score * _scoreRate));
+            if (missionManager.mission == Mission.Exchange && score > 0) _score += _tmpScore;
+
+            if (missionManager.mission == Mission.Exchange && score < 0)
+                _otherScore = (_otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;
+
+            if (missionManager.mission == Mission.HarvestRate)
+            {
+                Int16 otherScore = (Int16)(score * _otherRate);
+                _otherScore = (_otherScore + otherScore > 0) ? _otherScore += otherScore : 0;
+            }
         }
 
-
-
+        if (missionManager.mission != Mission.Exchange && missionManager.mission != Mission.HarvestRate)
+            _otherScore = (_otherScore + _tmpScore) < 0 ? 0 : (_otherScore += _tmpScore);
     }
 
     void OnMissionComplete(Int16 missionReward)
     {
-        if (MissionManager.mission == Mission.HarvestRate)
+        Debug.Log("On BattleManager missionReward: " + missionReward);
+        if (missionManager.mission == Mission.HarvestRate)
         {
             _scoreRate = 1;
         }
@@ -398,9 +223,7 @@ public class BattleManager : MonoBehaviour
 
     void OnOtherMissionComplete(Int16 otherMissionReward)
     {
-        Debug.Log("Other Mission Completed! +" + otherMissionReward);
-
-        if (MissionManager.mission == Mission.HarvestRate)
+        if (missionManager.mission == Mission.HarvestRate)
         {
             _scoreRate = 1;
         }
@@ -412,21 +235,43 @@ public class BattleManager : MonoBehaviour
 
     void OnApplyRate(Mission mission, Int16 scoreRate)
     {
+        Debug.Log("Rate:" + scoreRate);
+
         if (mission == Mission.HarvestRate)
         {
             if (_score > _otherScore)
             {
-                _scoreRate -= (scoreRate / 10); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/10
+                _scoreRate -= ((float)scoreRate / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
             }
             else
             {
-                _scoreRate += (scoreRate / 10); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/10
+                _scoreRate += ((float)scoreRate / 100); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/100
             }
+
+            battleHUD.MissionMsg(mission, _scoreRate);
+            _otherRate = 1 - _scoreRate;
+            _otherRate = (_otherRate == 0) ? 1 : _otherRate = 1 + _otherRate;                       // 如果 1(原始) - 1(我) = 0 代表倍率相同不調整倍率 ; 如果1 - 0.9(我) = 0.1 代表他多出0.1 ;  如果1 - 1.1(我) = -0.1 代表他少0.1 。最後 1+(+-0.1)就是答案
         }
     }
 
     void OnGameStart()
     {
         Global.isGameStart = true;
+    }
+
+    void OnExitRoom()                       // 離開房間時
+    {
+        Global.isExitingRoom = true;        // 離開房間了
+        Global.isMatching = false;          // 無配對狀態
+        Global.BattleStatus = false;        // 不在戰鬥中
+
+        // 取消委派
+        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.OtherScoreEvent -= OnOtherScore;
+        Global.photonService.MissionCompleteEvent -= OnMissionComplete;
+        Global.photonService.ApplyMissionEvent -= OnApplyRate;
+        Global.photonService.UpdateScoreEvent -= OnUpdateScore;
+        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
+        Global.photonService.GameStartEvent -= OnGameStart;
     }
 }

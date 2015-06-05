@@ -3,7 +3,8 @@ using System.Collections;
 using MPProtocol;
 using System;
 
-/*
+/* 如果發現任務不同步 重啟伺服器
+ * seesawFlag 這裡怪怪的 會同時開啟
  * 1.當任意一方達成XXX收穫時
  * 2.老鼠們將吃掉XX糧食 / XX %
  * 3.完美的趕走XX老鼠，增加XX糧食
@@ -17,12 +18,12 @@ public class MissionManager : MonoBehaviour
 {
     #region variables
     BattleManager battleManager;
+    BattleHUD battleHUD;
+    public MissionMode missionMode { get { return _missionMode; } }
+    public Mission mission { get { return _mission; } }
 
-    public static MissionMode missionMode { get { return _missionMode; } }
-    public static Mission mission { get { return _mission; } }
-
-    public static MissionMode _missionMode = MissionMode.Closed;// 顯示目前任務模式狀態  之後要改private
-    public static Mission _mission = Mission.Harvest;           // 顯示目前執行任務
+    public MissionMode _missionMode = MissionMode.Closed;       // 顯示目前任務模式狀態  之後要改private
+    public Mission _mission = Mission.Harvest;                  // 顯示目前執行任務
     public int missionInterval = 10;                            // 任務再次啟動間隔時間
     [Range(10, 25)]
     public int lowerPercent = 25;                               // 較低的一方分數百分比
@@ -41,7 +42,7 @@ public class MissionManager : MonoBehaviour
     private float avgMissionTime;                               // 平均任務完成時間
     private float gameTime;                                     // 遊戲時間
     private float lastGameTime;                                 // 上一次完成任務的時間
-    private Int16 missionScore;                                 // 任務所需分數
+    private Int16 _missionScore;                                // 任務所需分數
     private float lastScore;                                    // 任務開始前分數
     private float missionRate;                                  // 任務倍率
 
@@ -56,11 +57,13 @@ public class MissionManager : MonoBehaviour
         Global.photonService.ApplyMissionEvent += OnApplyMission;               // 加入 接受任務 監聽事件
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;  // 加入 顯示對方 完成任務 監聽事件
         Global.photonService.MissionCompleteEvent += OnMissionComplete;         // 加入 完成任務 監聽事件
+        Global.photonService.ExitRoomEvent += OnExitRoom;                       // 移除 離開房間 監聽事件
         battleManager = GetComponent<BattleManager>();
+        battleHUD = GetComponent<BattleHUD>();
 
         activeScore = 1000;
         activeTime = 15;
-        missionTime = 60;
+        missionTime = 10;
         missionRate = 1.0f;
         lastGameTime = 0;
 
@@ -75,18 +78,21 @@ public class MissionManager : MonoBehaviour
 
     void Update()
     {
-        gameTime = Time.timeSinceLevelLoad;
+
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
+            gameTime = battleManager.gameTime;
+
+            //Debug.Log("lastGameTime"+lastGameTime);
             if (missionMode == MissionMode.Closed)                                  // 任務關閉時，持續判斷是否觸發任務
                 MissionTrigger();
 
             if (missionMode == MissionMode.Completed)                               // 任務完成時，關閉任務並儲存資訊，回到初始狀態
             {
-                if (_mission == Mission.Reduce) activeScore -= missionScore;
+                if (_mission == Mission.Reduce) activeScore -= _missionScore;
 
-                missionScore = 0;
+                _missionScore = 0;
                 _missionMode = MissionMode.Closed;
                 _mission = Mission.None;
                 avgMissionTime = (lastGameTime + (gameTime - lastGameTime)) / 2;            // 平均任務完成時間
@@ -97,11 +103,11 @@ public class MissionManager : MonoBehaviour
             {
                 if (_mission == Mission.DrivingMice)
                 {
-                    Global.photonService.MissionCompleted((byte)_mission, missionRate, (Int16)battleManager.combo,"");
+                    Global.photonService.MissionCompleted((byte)_mission, missionRate, (Int16)battleManager.combo, "");
                 }
                 else
                 {
-                    Global.photonService.MissionCompleted((byte)_mission, missionRate, 0,"");
+                    Global.photonService.MissionCompleted((byte)_mission, missionRate, 0, "");
                 }
 
                 Global.isMissionCompleted = false;
@@ -114,7 +120,6 @@ public class MissionManager : MonoBehaviour
             {
                 missionFlag = false;
                 lastScore = battleManager.score;        // 儲存任務開始前的分數
-                lastGameTime = gameTime;                // 任務開始時時間
                 Global.photonService.SendMission((byte)_mission, missionRate);
             }
         }
@@ -133,7 +138,7 @@ public class MissionManager : MonoBehaviour
                 // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
                 if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange };
+                    Mission[] missionSelect = { Mission.HarvestRate };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 0)];
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
@@ -144,8 +149,8 @@ public class MissionManager : MonoBehaviour
                 else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent)
                         && balanceTimes > 0 && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange};
-                    _mission = missionSelect[UnityEngine.Random.Range(0, 2)];
+                    Mission[] missionSelect = { Mission.HarvestRate };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 0)];
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     balanceTimes--;
@@ -155,21 +160,25 @@ public class MissionManager : MonoBehaviour
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
                 if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange, Mission.Harvest, Mission.DrivingMice, Mission.Reduce };
-                    _mission = missionSelect[UnityEngine.Random.Range(0, 5)];
+                    Mission[] missionSelect = { Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate };
+                    _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
+                    seesawFlag = false;
+                    Debug.Log("如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)");
                 }
 
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
                 if ((battleManager.score > activeScore || battleManager.otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.Exchange,Mission.Harvest, Mission.DrivingMice };
+                    Mission[] missionSelect = { Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
+                    seesawFlag = true;
+                    Debug.Log("// 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)");
                 }
 
                 // 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS
@@ -178,6 +187,7 @@ public class MissionManager : MonoBehaviour
                     _mission = Mission.WorldBoss;
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
+                    Debug.Log("// 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS");
                 }
             }
 
@@ -187,16 +197,11 @@ public class MissionManager : MonoBehaviour
     // 任務事件處理者
     void MissionExecutor(Mission mission)
     {
-        ShowMissionLabel(mission, missionScore);
         switch (mission)
         {
-            case Mission.None:
-                {
-                    break;
-                }
             case Mission.Harvest:   // 達成XX收穫
                 {
-                    if ((battleManager.score - lastScore) >= missionScore)      // success
+                    if ((battleManager.score - lastScore) >= _missionScore)      // success
                     {
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
@@ -204,7 +209,7 @@ public class MissionManager : MonoBehaviour
                     else if (gameTime - lastGameTime > missionTime)                            // failed
                     {
                         _missionMode = MissionMode.Completed;
-                        ShowFailedLabel();
+                        battleHUD.MissionFailedMsg();
                     }
                     break;
                 }
@@ -213,7 +218,7 @@ public class MissionManager : MonoBehaviour
                     float endTime = gameTime - lastGameTime - missionTime;
                     if (endTime > -5 && endTime < 0) // 減少糧食 這比較特殊 需要顯示閃爍血調 還沒寫
                     {
-                        ShingHPBar();
+                        battleHUD.HPBar_Shing();
                     }
                     else if (gameTime - lastGameTime > missionTime)
                     {
@@ -224,18 +229,18 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.DrivingMice:
                 {
-                    if (gameTime - lastGameTime > missionTime)
+                    if (gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
                     {
-                        if (battleManager.combo == 0)
+                        if (battleManager.combo < _missionScore)
                         {
                             _missionMode = MissionMode.Completed;
-                            ShowFailedLabel();
+                            battleHUD.MissionFailedMsg();
                         }
-                    }
-                    else
-                    {
-                        _missionMode = MissionMode.Completing;
-                        Global.isMissionCompleted = true;
+                        else
+                        {
+                            _missionMode = MissionMode.Completing;
+                            Global.isMissionCompleted = true;
+                        }
                     }
                     break;
                 }
@@ -243,8 +248,6 @@ public class MissionManager : MonoBehaviour
                 {
                     if (gameTime - lastGameTime > missionTime)
                     {
-                        HarvestRate();
-
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
                     }
@@ -259,7 +262,7 @@ public class MissionManager : MonoBehaviour
                     }
                     break;
                 }
-            case Mission.WorldBoss: // 要計算網路延遲... 還沒寫
+            case Mission.WorldBoss: // 要計算網路延遲... ＊＊＊＊＊＊＊＊＊＊還沒寫＊＊＊＊＊＊＊＊＊＊＊＊＊
                 if (gameTime - lastGameTime > missionTime)
                 {
                     _missionMode = MissionMode.Completing;
@@ -269,82 +272,39 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    void HarvestRate()
-    {
-        //if ((gameTime - lastGameTime - missionTime) > -5)
-        //{
-        //    // 慢慢變淡
-        //}
-        // 顯示 倍率圖樣 if flag
-        Debug.Log("HarvestRate : ");
-    }
-
-    void ReduceHPBar()
-    {
-        Debug.Log("Shing....");
-        //gui amins;
-        //xxx.Play();
-    }
-
-    void ShingHPBar()
-    {
-        Debug.Log("Shing....");
-        //gui amins;
-        //xxx.Play();
-    }
-
-    void ShowMissionLabel(Mission mission, Int16 missionScore)
-    {
-        // show message box
-        //if (flag)
-        //{
-
-        //}
-
-        Debug.Log(mission + "MISSION STARTING...");
-    }
-
-    void ShowFailedLabel()
-    {
-        // show message box
-        //if (flag)
-        //{
-
-        //}
-        Debug.Log("MISSION Failed...");
-    }
-
     void OnApplyMission(Mission mission, Int16 missionScore)
     {
-        // recive server send event message
-        Global.missionFlag = true;
-        this.missionScore = missionScore;
-        MissionManager._mission = mission;
+        if (mission != Mission.HarvestRate) battleHUD.MissionMsg(mission, missionScore);
+            
+        _missionScore = missionScore;
+        _mission = mission;
+        lastGameTime = gameTime;                // 任務開始時時間
         _missionMode = MissionMode.Opening;
+
     }
 
     void OnMissionComplete(Int16 missionReward)
     {
-        // to show message box
-        Debug.Log(" Mission Completed !   Get +" + missionReward);
+        Debug.Log("OnMissionManager:" + missionReward);
+        battleHUD.MissionCompletedMsg(mission, missionReward);
         _missionMode = MissionMode.Completed;
     }
 
     void OnOtherMissionComplete(Int16 otherMissioReward)
     {
-        // to show message box
-        Debug.Log("Other Player Mission Completed ! +" + otherMissioReward + "Score.");
-    }
-
-    void OnBossDied()
-    {
-        // to show message box
-        // 接收對方打死訊息
-       // Debug.Log("Other Player Completed Mission !   Get +" + missionReward);
+        battleHUD.OtherScoreMsg(otherMissioReward);
     }
 
     void OnAnsycTime()
     {
         // to recive Host Last GameTime;
+    }
+
+    void OnExitRoom()
+    {
+        Global.photonService.ApplyMissionEvent -= OnApplyMission;               // 移除 接受任務 監聽事件
+        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;  // 移除 顯示對方 完成任務 監聽事件
+        Global.photonService.MissionCompleteEvent -= OnMissionComplete;         // 移除 完成任務 監聽事件
+        Global.photonService.ExitRoomEvent -= OnExitRoom;                       // 移除 離開房間 監聽事件
     }
 }

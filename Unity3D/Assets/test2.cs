@@ -4,19 +4,15 @@ using MiniJSON;
 
 public class test2 : MonoBehaviour
 {
-    public Rigidbody projectile;
-    bool flag = true;
-    void LaunchProjectile()
+    void Start()
     {
-        Rigidbody instance = (Rigidbody)Instantiate(projectile);
-        instance.velocity = Random.insideUnitSphere * 5;
+        int a =-1;
+        a = (a + 1 > 0) ? 5 : 10;
+        Debug.Log(a);
     }
+
     void Update()
     {
-        if (flag)
-        {
-            flag = false;
-            InvokeRepeating("LaunchProjectile", 0, 1F);
-        }
+
     }
 }

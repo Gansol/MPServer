@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 
-
 /*
  * 這腳本只負責生東西 時間和控制器要另外寫在Global
  * 現在是測試版 完成後要把Intantiate改成poolManager.ActiveObject()
@@ -17,14 +16,13 @@ public class MiceSpawner : MonoBehaviour
 {
     public GameObject[] hole;
     private PoolManager poolManger;
-    [Range(2,5)]
+    [Range(2, 5)]
     public float miceSize;
     private Vector3 _miceSize;
 
     void Start()
     {
         poolManger = GetComponent<PoolManager>();
-        // StartCoroutine(SpawnBy1D(1, aLineL, 0.5f, 0.05f));
     }
 
 
@@ -33,7 +31,7 @@ public class MiceSpawner : MonoBehaviour
     /// </summary>
     /// <param name="holeArray">1D陣列產生方式</param>
     /// <param name="spawnTime">產生間隔時間</param>
-    public IEnumerator SpawnByRandom(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount,bool isSkill)
+    public IEnumerator SpawnByRandom(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool isSkill)
     {
         // < = > test OK
         int _tmpCount = 0;
@@ -86,7 +84,7 @@ public class MiceSpawner : MonoBehaviour
             }
         }
     Finish: ;
-       if(!isSkill)  Global.spawnFlag = true;
+        if (!isSkill) Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -95,16 +93,12 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime,float intervalTime, float lerpTime, int spawnCount, int randomPos , bool isSkill)
+    public IEnumerator SpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill)
     {
-        // < = > test OK
         int _tmpCount = 0;
         for (int item = 0; item < spawnCount; randomPos++)
         {
-            if (randomPos / holeArray.Length == 1)   // =13 = 歸零
-            {
-                randomPos = 0;
-            }
+            if (randomPos / holeArray.Length == 1) randomPos = 0; // =12= 歸零
 
             yield return new WaitForSeconds(spawnTime);
             if (hole[holeArray[randomPos] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
@@ -140,33 +134,39 @@ public class MiceSpawner : MonoBehaviour
 
         }
     Finish: ;
-       if(!isSkill)  Global.spawnFlag = true;
-        
+        if (!isSkill) Global.spawnFlag = true;
+
     }
 
     /// <summary>
-    /// 反向產生。holeArray[]=1D陣列產生方式,spawnTime=產生間隔時間
+    /// 反向產生。1D陣列產生方式
     /// </summary>
-    /// <param name="holeArray"></param>
-    /// <param name="spawnTime"></param>
+    /// <param name="miceName"></param>
+    /// <param name="holeArray">1D陣列</param>
+    /// <param name="spawnTime">產生間隔時間</param>
+    /// <param name="intervalTime"></param>
+    /// <param name="lerpTime"></param>
+    /// <param name="spawnCount"></param>
+    /// <param name="randomPos">隨機位置(最大值為陣列長度)</param>
+    /// <param name="isSkill">是否為技能</param>
     /// <returns></returns>
-    public IEnumerator ReSpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos , bool isSkill)
+    public IEnumerator ReSpawnBy1D(string miceName, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill)
     {
-        // < = > test OK
         int _tmpCount = 0;
-        for (int item = holeArray.Length; spawnCount > 0; randomPos--)  //1~11
+
+        for (int item = randomPos; spawnCount > 0; item--)  //1~11
         {
             yield return new WaitForSeconds(spawnTime);
-            if (hole[randomPos - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
+            if (hole[item - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
                 GameObject clone = poolManger.ActiveObject(miceName);
                 if (clone != null)
                 {
-                    _miceSize = hole[randomPos - 1].transform.localScale / 10 * miceSize * hole[randomPos - 1].transform.localScale.x;
-                    hole[randomPos - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
-                    clone.transform.parent = hole[randomPos - 1].transform;                      // hole[-1] 是因為起始值是0 hole[-1]
+                    _miceSize = hole[item - 1].transform.localScale / 10 * miceSize * hole[item - 1].transform.localScale.x;
+                    hole[item - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
+                    clone.transform.parent = hole[item - 1].transform;                      // hole[-1] 是因為起始值是0 hole[-1]
                     clone.transform.localPosition = Vector2.zero;
-                    clone.transform.localScale = hole[randomPos - 1].transform.localScale - _miceSize;
+                    clone.transform.localScale = hole[item - 1].transform.localScale - _miceSize;
                     clone.transform.GetChild(0).SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
@@ -177,20 +177,17 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
 
-            if (randomPos == 1)   // =13 = 歸零
-            {
-                randomPos = holeArray.Length;
-            }
+            if (item == 1) item = holeArray.Length; // =12 = 歸零
 
-            if ((_tmpCount - spawnCount) == 0)
+            if (_tmpCount - spawnCount == 0)
             {
                 yield return new WaitForSeconds(intervalTime);
                 goto Finish;
             }
         }
     Finish: ;
-       if(!isSkill)  Global.spawnFlag = true;
-        
+        if (!isSkill) Global.spawnFlag = true;
+
     }
 
 
@@ -200,11 +197,17 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2 , bool isSkill)
+    public IEnumerator SpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2, bool isSkill)
     {
-        if (holeArray.GetLength(0) > 4)
-            intervalTime /= 2;
         int _tmpCount = 0;
+
+        if (holeArray.GetLength(0) >= 4)
+        {
+            intervalTime /= 3;
+            lerpTime *= 2;
+            spawnTime /= 2;
+        }
+
         for (int i = randomPos1; i < holeArray.GetLength(0); i++)    // 1D陣列
         {
             for (int j = randomPos2; j < holeArray.GetLength(1); j++)    // 2D陣列
@@ -225,19 +228,14 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
+                            if (_tmpCount - spawnCount == 0) goto Finish;
 
-                            if ((_tmpCount - spawnCount) == 0)
-                            {
-                                goto Finish;
-                            }
-                            if (_tmpCount == holeArray.Length || i == holeArray.GetLength(0) - 1 && j == holeArray.GetLength(1)-1)
+                            if (_tmpCount == holeArray.Length || i == holeArray.GetLength(0) - 1 && j == holeArray.GetLength(1) - 1)
                             {
                                 spawnCount -= _tmpCount;
                                 _tmpCount = i = 0;
                                 j = -1;                         // 因為 j++是迴圈跑完才會+1 所以在跑一次會變 0+1=1不是0 所以要=-1+1=0
-                               
                             }
-
                         }
                         else
                         {
@@ -246,34 +244,36 @@ public class MiceSpawner : MonoBehaviour
                     }
                 }
             }
-
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            //Debug.Log("intervalTime : "+intervalTime);
-            yield return new WaitForSeconds(intervalTime/3);
+            yield return new WaitForSeconds(intervalTime / 3);
         }
     Finish: ;
-       if(!isSkill)  Global.spawnFlag = true;
+        if (!isSkill) Global.spawnFlag = true;
     }
 
-/// <summary>
-/// 反向產生。holeArray[,]=2D陣列產生方式,spawnTime=老鼠間隔時間,intervalTime=產生間隔
-/// </summary>
-/// <param name="miceName">老鼠ID</param>
-/// <param name="holeArray">產生陣列</param>
+    /// <summary>
+    /// 反向產生。holeArray[,]=2D陣列產生方式,spawnTime=老鼠間隔時間,intervalTime=產生間隔
+    /// </summary>
+    /// <param name="miceName">老鼠ID</param>
+    /// <param name="holeArray">產生陣列</param>
     /// <param name="spawnTime">產生老鼠間隔</param>
-/// <param name="intervalTime">間隔時間</param>
-/// <param name="lerpTime">加速度</param>
-/// <param name="spawnCount">產生數量</param>
-/// <param name="randomPos1">1D陣列隨機值</param>
-/// <param name="randomPos2">2D陣列隨機值</param>
-/// <returns></returns>
-    public IEnumerator ReSpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2 , bool isSkill)
+    /// <param name="intervalTime">間隔時間</param>
+    /// <param name="lerpTime">加速度</param>
+    /// <param name="spawnCount">產生數量</param>
+    /// <param name="randomPos1">1D陣列隨機值</param>
+    /// <param name="randomPos2">2D陣列隨機值</param>
+    /// <returns></returns>
+    public IEnumerator ReSpawnBy2D(string miceName, sbyte[,] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos1, int randomPos2, bool isSkill)
     {
-        // < = > test OK
         int _tmpCount = 0;
 
-        if (holeArray.GetLength(0) > 4)
-            intervalTime /= 2;
+        if (holeArray.GetLength(0) >= 4)
+        {
+            intervalTime /= 3;
+            lerpTime *= 2;
+            spawnTime /= 2;
+        }
+
         for (int i = randomPos1; i > 0; i--)    // 1D陣列
         {
             for (int j = randomPos2; j > 0; j--)    // 2D陣列
@@ -283,7 +283,6 @@ public class MiceSpawner : MonoBehaviour
                 {
                     if (spawnCount > 0)
                     {
-
                         GameObject clone = poolManger.ActiveObject(miceName);
                         if (clone != null)
                         {
@@ -295,12 +294,11 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.GetChild(0).SendMessage("Play");
                             _tmpCount++;
 
-
-                            if ((_tmpCount - spawnCount) == 0)
+                            if (_tmpCount - spawnCount == 0)
                             {
                                 goto Finish;
                             }
-                            else if (_tmpCount == holeArray.Length || i==1 && j==1)
+                            else if (_tmpCount == holeArray.Length || i == 1 && j == 1)
                             {
                                 spawnCount -= _tmpCount;
                                 _tmpCount = 0;
@@ -316,10 +314,10 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            yield return new WaitForSeconds(intervalTime/3);
+            yield return new WaitForSeconds(intervalTime / 3);
         }
     Finish: ;
-       if(!isSkill)  Global.spawnFlag = true;
+        if (!isSkill) Global.spawnFlag = true;
     }
 
 
@@ -330,14 +328,17 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator SpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount , bool isSkill)
+    public IEnumerator SpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool isSkill)
     {
-        // < = > test OK
         int _tmpCount = 0;
         int _tmpArrayLength = 0;
 
-        if (holeArray.GetLength(0) > 4)
+        if (holeArray.GetLength(0) >= 4)
+        {
             intervalTime /= 2;
+            lerpTime *= 2;
+            spawnTime /= 3;
+        }
 
         foreach (sbyte[] item in holeArray)
         {
@@ -384,10 +385,10 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            yield return new WaitForSeconds(intervalTime/5);
+            yield return new WaitForSeconds(intervalTime / 5);
         }
     Finish: ;   // When amount = 0 spawn Finish !
-       if(!isSkill)  Global.spawnFlag = true;
+        if (!isSkill) Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -396,14 +397,17 @@ public class MiceSpawner : MonoBehaviour
     /// <param name="holeArray"></param>
     /// <param name="spawnTime"></param>
     /// <returns></returns>
-    public IEnumerator ReSpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount , bool isSkill)
+    public IEnumerator ReSpawnByCustom(string miceName, sbyte[][] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool isSkill)
     {
-        // < = > test ok
         int _tmpCount = 0;
         int _tmpArrayLength = 0;
 
-        if (holeArray.GetLength(0) > 4)
+        if (holeArray.GetLength(0) >= 4)
+        {
             intervalTime /= 2;
+            lerpTime *= 2;
+            spawnTime /= 3;
+        }
 
         foreach (sbyte[] item in holeArray)
         {
@@ -448,10 +452,9 @@ public class MiceSpawner : MonoBehaviour
                 }
             }
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
-            yield return new WaitForSeconds(intervalTime/5);
+            yield return new WaitForSeconds(intervalTime / 5);
         }
     Finish: ;
-        if(!isSkill)  Global.spawnFlag = true;
-       
+        if (!isSkill) Global.spawnFlag = true;
     }
 }

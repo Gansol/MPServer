@@ -313,6 +313,10 @@ namespace MPServer
                                     if (!isloaded)
                                     {
                                         _server.room.GameLoaded(roomID, primaryID);
+
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object>();
+                                        OperationResponse response = new OperationResponse((byte)MatchGameResponseCode.WaitingGameStart, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "WaitingPlayer" };
+
                                     }
                                     else
                                     {
@@ -848,7 +852,7 @@ namespace MPServer
                                         Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
                                         otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                         peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
-                                        Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, missionReward }, { (byte)BattleResponseCode.DebugMessage, "取得對方任務分數資料" } };
+                                        Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, missionReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
                                         EventData getMissionScoreEventData = new EventData((byte)BattleResponseCode.GetMissionScore, parameter2);
 
                                         peerOther.SendEvent(getMissionScoreEventData, new SendParameters());
@@ -856,7 +860,7 @@ namespace MPServer
                                     else
                                     {
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-                                        OperationResponse actorResponse = new OperationResponse((byte)BattleResponseCode.UpdateScore, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = battleData.ReturnMessage.ToString() };
+                                        OperationResponse actorResponse = new OperationResponse((byte)BattleResponseCode.MissionCompleted, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = battleData.ReturnMessage.ToString() };
                                         SendOperationResponse(actorResponse, new SendParameters());
                                     }
                                 }

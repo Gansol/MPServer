@@ -81,10 +81,9 @@ public class SpawnController : MonoBehaviour
         if (Global.isGameStart)
         {
             #region   -- 隨機產生老鼠 --
-            if (spawnMode != SpawnMode.EasyMode && randSpawn)
+            if (spawnMode != SpawnMode.EasyMode && Global.spawnFlag)
             {
-                randSpawn = false;
-                randCoroutine = Spawn(spawnStatus, "EggMice", spawnTime, intervalTime, lerpTime, Random.Range(1, 4), true, 5);
+                randCoroutine = Spawn(SpawnStatus.Random, "RabbitMice", spawnTime, intervalTime, lerpTime, Random.Range(1, 4), true, 1);
                 StartCoroutine(randCoroutine);
             }
             #endregion
@@ -123,7 +122,7 @@ public class SpawnController : MonoBehaviour
         if (Global.isGameStart)
         {
             #region Select SpawnMode 亂寫
-            if (battleManager.score < 200)                                       // 簡單模式
+            if (battleManager.score < 200 && battleManager.maxScore<500)        // 簡單模式     
             {
                 ChangeSpawnMode(SpawnMode.EasyMode);
                 level = 1;
@@ -137,7 +136,7 @@ public class SpawnController : MonoBehaviour
                 ChangeSpawnMode(SpawnMode.HardMode);
                 level = 3;
             }
-            else if (battleManager.maxScore > 1200 && battleManager.combo < 25) // 如果已經到瘋狂模式過 但是斷康了
+            else if (battleManager.maxScore > 1200 && battleManager.combo < 25 && battleManager.maxScore<1500) // 如果已經到瘋狂模式過 但是斷康了
             {                                                                   // Combo<25時回到 普通模式
                 ChangeSpawnMode(SpawnMode.NormalMode);
                 level = 2;

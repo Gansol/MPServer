@@ -28,9 +28,10 @@ public class LoginUI : MonoBehaviour
     // 在Start裡建立好Login的回應事件
     IEnumerator Start()
     {
-        Global.photonService.LoginEvent += doLoginEvent;
-        Global.photonService.JoinMemberEvent += doJoinMemberEvent;
-        //Global.photonService.TestEvent += doTestEvent;
+        Global.photonService.LoginEvent += OnLogin;
+        Global.photonService.JoinMemberEvent += OnJoinMember;
+        Global.photonService.LoadSceneEvent += OnExitMainGame;
+        Global.photonService.ReLoginEvent += OnReLogin;
         yield return null;
     }
 
@@ -213,14 +214,14 @@ public class LoginUI : MonoBehaviour
         getIP = ip.ToString();
     }
     // Login Event
-    private void doJoinMemberEvent(bool joinStatus, string returnCode, string message)
+    private void OnJoinMember(bool joinStatus, string returnCode, string message)
     {
         joinResult = message;
         Global.isJoinMember = joinStatus;
         Global.Ret = returnCode;
     }
 
-    private void doLoginEvent(bool loginStatus, string message, string returnCode, int primaryID, string account, string nickname, byte sex, byte age)
+    private void OnLogin(bool loginStatus, string message, string returnCode, int primaryID, string account, string nickname, byte sex, byte age)
     {
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
@@ -240,5 +241,20 @@ public class LoginUI : MonoBehaviour
             Global.LoginStatus = false;
             loginResult = message;
         }
+    }
+
+    void OnExitMainGame()
+    {
+        Global.photonService.LoginEvent -= OnLogin;
+        Global.photonService.JoinMemberEvent -= OnJoinMember;
+        Global.photonService.LoadSceneEvent -= OnExitMainGame;
+        Global.photonService.ReLoginEvent -= OnReLogin;
+
+    }
+    void OnReLogin()
+    {
+        Global.LoginStatus = false;
+        Global.isMatching = false;
+        isLoginBtn = false;
     }
 }

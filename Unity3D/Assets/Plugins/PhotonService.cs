@@ -28,6 +28,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     //委派事件 登入
     public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age);
     public event LoginHandler LoginEvent;
+    
+    //委派事件 重複登入
+    public delegate void ReLoginHandler();
+    public event ReLoginHandler ReLoginEvent;
 
     //委派事件 接收技能傷害
     public delegate void ApplySkillHandler(string miceName);
@@ -47,6 +51,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event RoomHandler ExitRoomEvent;
     public event RoomHandler LoadSceneEvent;
     public event RoomHandler GameStartEvent;
+    public event RoomHandler WaitingPlayerEvent;
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -135,8 +140,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         {
             // 重複登入
             case (byte)LoginOperationCode.ReLogin:
-                Global.LoginStatus = false;
-                Global.isMatching = false;
+                ReLoginEvent();
                 break;
 
             // 配對成功 傳入 房間ID、對手資料、老鼠資料
@@ -298,6 +302,23 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
+            #region ExitRoom 離開房間
+
+            case (byte)MatchGameResponseCode.WaitingGameStart:    // 等待開始
+                {
+                    try
+                    {
+                        WaitingPlayerEvent();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
             #region LoadPlayerData 載入玩家資料
 
             case (byte)PlayerDataResponseCode.Loaded:   // 載入玩家資料
@@ -428,6 +449,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Int16 missionReward = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.MissionReward];
                             MissionCompleteEvent(missionReward);
                             Debug.Log("RECIVE MissionCompleted !");
+                        }
+                        else
+                        {
+                            Debug.Log("RECIVE MissionCompleted ERROR !");
                         }
                     }
                     catch (Exception e)
