@@ -33,7 +33,6 @@ public class BattleManager : MonoBehaviour
     private float _otherRate = 1;           // 對手分數倍率
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
-    private double _energy = 0;              // 能量
 
     private int _combo = 0;                 // 連擊數
 
@@ -58,7 +57,7 @@ public class BattleManager : MonoBehaviour
     public int spawnCount { get { return _spawnCount; } }
     public float myDPS { get { return _myDPS; } }
     public float otherDPS { get { return _myDPS; } }
-    public double energy { get { return _energy; } }
+
 
     // Use this for initialization
     void Start()
@@ -146,23 +145,6 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
-    #region UpadateEnergy 更新能量
-    public void UpadateEnergy(double value)
-    {
-        if (_energy + value > 1)
-        {
-            _energy = 1.0d;
-        }else if (_energy + value < 0)
-        {
-            _energy = 0.0d;
-        }
-        else
-        {
-            _energy = Math.Round(_energy += Math.Round(value, 2), 3);
-        }
-    }
-    #endregion
-
     private void UpadateCombo()
     {
         _tmpCombo++;
@@ -191,22 +173,14 @@ public class BattleManager : MonoBehaviour
         // 如果再交換分數任務下，則不取得自己增加的分數
         if (missionManager.missionMode == MissionMode.Opening)
         {
-            if (missionManager.mission == Mission.Exchange && score > 0)
-            {
-                _otherScore += _tmpScore;
-                if (_combo >= 5) UpadateEnergy(0.01d);
-                    
-            }
+            if (missionManager.mission == Mission.Exchange && score > 0) _otherScore += _tmpScore;
 
             if (missionManager.mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
                 _score = (_score + _tmpScore > 0) ? (_score += _tmpScore) : 0;
         }
 
         if (missionManager.mission != Mission.Exchange)
-        {
             _score = (_score + _tmpScore < 0) ? 0 : _score += _tmpScore;
-            if (_combo >= 5) UpadateEnergy(0.01d);
-        }
     }
 
 

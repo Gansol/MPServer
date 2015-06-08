@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using MPProtocol;
-using System;
 
 public class BattleHUD : MonoBehaviour
 {
@@ -11,13 +10,10 @@ public class BattleHUD : MonoBehaviour
     public GameObject ComboLabel;
     public GameObject BlueScore;
     public GameObject RedScore;
-    public GameObject EnergyBar;
 
     [Range(0.1f,1.0f)]
     public float _beautyHP;                // 美化血條用
 
-    private double _beautyEnergy;
-    private double _energy;
     private BattleManager battleManager;
 
     void Start()
@@ -26,13 +22,10 @@ public class BattleHUD : MonoBehaviour
 
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.ExitRoomEvent += OnExitRoom;
-
-        _beautyEnergy = 0d;
-        _energy = 0d;
     }
 
     void Update()
-    {
+    {  
         if (ckeckTime > 15)
         {
             Global.photonService.CheckStatus();
@@ -55,8 +48,6 @@ public class BattleHUD : MonoBehaviour
         BlueScore.GetComponent<UILabel>().text = battleManager.score.ToString();         // 畫出分數值
         RedScore.GetComponent<UILabel>().text = battleManager.otherScore.ToString();     // 畫出分數值
 
-
-        #region Score Bar動畫
         float value = battleManager.score / (battleManager.score + battleManager.otherScore);                      // 得分百分比 兩邊都是0會 NaN
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
@@ -88,35 +79,9 @@ public class BattleHUD : MonoBehaviour
             if (_beautyHP >= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value < 0.5f)
                 _beautyHP += 0.01f;
         }
-        #endregion
 
-        #region Energy Bar動畫
-
-        if (battleManager.energy ==Math.Round( _beautyEnergy,6))
-        {
-            EnergyBar.GetComponent<UISlider>().value=(float)(_beautyEnergy = battleManager.energy);
-        }
-
-        if (battleManager.energy > _beautyEnergy)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢減少
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)battleManager.energy, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else if (battleManager.energy < _beautyEnergy)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢增加
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)battleManager.energy, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)battleManager.energy;  
-        }
-
-        #endregion
         ComboLabel.GetComponent<UILabel>().text = battleManager.combo.ToString();        // 畫出Combo值
 
-        Debug.Log("_beautyEnergy: " + _beautyEnergy);
-        Debug.Log("battleManager.energy: " + battleManager.energy);
     }
 
 
@@ -186,10 +151,6 @@ public class BattleHUD : MonoBehaviour
     }
 
 
-    public void EnergySilder(float value)
-    {
-        EnergyBar.GetComponent<UISlider>().value = (float)battleManager.energy;
-    }
 
     void OnWaitingPlayer()
     {
