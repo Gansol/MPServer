@@ -32,7 +32,7 @@ public class PlayerInput : MonoBehaviour
                     hit.transform.SendMessage("OnHit");
                 }
 
-                if (hit.transform.name == "Skill")
+                if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
                 {
                     hit.transform.SendMessage("OnHit");
                 }
