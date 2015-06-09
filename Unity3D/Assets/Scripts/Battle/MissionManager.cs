@@ -130,13 +130,15 @@ public class MissionManager : MonoBehaviour
     {
         if (Global.OtherData.RoomPlace != "Host")       // 如果我是主機才會當任務事件判斷者
         {
-            float otherPercent = (battleManager.otherScore / (battleManager.score + battleManager.otherScore)) * 100;
+            float _otherScore = battleManager.otherScore;
+            float _score = battleManager.score;
+            float otherPercent = (_otherScore / (_score + _otherScore)) * 100;
             float myPercent = 100 - otherPercent;
 
             if ((gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
             {
                 // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
-                if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed)
+                if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed && _otherScore != 0 && _score!=0)
                 {
                     Mission[] missionSelect = { Mission.HarvestRate };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 0)];
@@ -146,7 +148,7 @@ public class MissionManager : MonoBehaviour
                     Debug.Log("我方或對方 分數<10%之間 啟動高平衡機制");
 
                 }// 如果 我方或對方 分數再10~25%之間 啟動低平衡機制，只觸發限制次數
-                else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent)
+                else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent && _otherScore != 0 && _score != 0)
                         && balanceTimes > 0 && missionMode == MissionMode.Closed)
                 {
                     Mission[] missionSelect = { Mission.HarvestRate };
@@ -160,7 +162,7 @@ public class MissionManager : MonoBehaviour
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
                 if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate };
+                    Mission[] missionSelect = { Mission.DrivingMice, Mission.Reduce, Mission.Harvest, Mission.Exchange };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
                     _missionMode = MissionMode.Open;
@@ -170,9 +172,9 @@ public class MissionManager : MonoBehaviour
                 }
 
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
-                if ((battleManager.score > activeScore || battleManager.otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
+                if ((_score > activeScore || _otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate, Mission.HarvestRate };
+                    Mission[] missionSelect = { Mission.DrivingMice, Mission.Reduce, Mission.Harvest, Mission.Exchange };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
                     _missionMode = MissionMode.Open;
@@ -182,7 +184,7 @@ public class MissionManager : MonoBehaviour
                 }
 
                 // 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS
-                if (battleManager.score > bossActiveScore && battleManager.otherScore > bossActiveScore && gameTime > bossActiveTime && missionMode == MissionMode.Closed)
+                if (_score > bossActiveScore && _otherScore > bossActiveScore && gameTime > bossActiveTime && missionMode == MissionMode.Closed)
                 {
                     _mission = Mission.WorldBoss;
                     _missionMode = MissionMode.Open;
