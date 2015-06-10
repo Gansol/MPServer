@@ -77,7 +77,7 @@ public class SpawnController : MonoBehaviour
             isSyncStart = false;
             Global.photonService.SyncGameStart();
         }
-
+        /*
         if (Global.isGameStart)
         {
             #region   -- 隨機產生老鼠 --
@@ -114,7 +114,9 @@ public class SpawnController : MonoBehaviour
                 }
             }
             #endregion
+         
         }
+         * * */
     }
 
     void Update()

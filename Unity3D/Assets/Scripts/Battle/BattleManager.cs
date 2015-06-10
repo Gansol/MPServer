@@ -19,12 +19,12 @@ public class BattleManager : MonoBehaviour
     private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
     private float _gameTime = 0;            // 遊戲時間
 
-    private static float _otherScore = 0;   // 對手分數
-    private static float _maxScore = 0;     // 最高得分
+
+    private float _maxScore = 0;     // 最高得分
     private static int _eggMiceUsage = 0;   // 老鼠使用量
     private static int _energyUsage = 0;    // 能量使用量
     private static int _missMice = 0;       // 失誤數           統計用
-    private static int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
+    private int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
 
     private float _myDPS = 0;               // 我的平均輸出
@@ -33,7 +33,8 @@ public class BattleManager : MonoBehaviour
     private float _otherRate = 1;           // 對手分數倍率
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
-    private double _energy = 0;              // 能量
+    private float _otherScore = 0;          // 對手分數
+    private double _energy = 0;             // 能量
 
     private int _combo = 0;                 // 連擊數
 
@@ -93,8 +94,17 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
-        if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
-        if (_score > _maxScore) _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
+        if (Global.isGameStart)
+        {
+            if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
+            if (_score > _maxScore) _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
+
+            if (_gameTime > 10000 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            {
+                Global.isGameStart = false;
+                battleHUD.GoodGameMsg(Convert.ToInt16(_score), Convert.ToInt16(_maxScore), _maxCombo, _hitMice, _missMice);
+            }
+        }
     }
 
     void FixedUpdate()
@@ -152,7 +162,8 @@ public class BattleManager : MonoBehaviour
         if (_energy + value > 1)
         {
             _energy = 1.0d;
-        }else if (_energy + value < 0)
+        }
+        else if (_energy + value < 0)
         {
             _energy = 0.0d;
         }
@@ -166,8 +177,10 @@ public class BattleManager : MonoBehaviour
     private void UpadateCombo()
     {
         _tmpCombo++;
+        //如果還在連擊 增加連擊數
 
-        if (_isCombo) _combo++; //如果還在連擊 增加連擊數
+        if (_isCombo)
+            _combo++;
 
         if (_tmpCombo == 5 && !_isCombo)
         {
@@ -175,6 +188,9 @@ public class BattleManager : MonoBehaviour
             _combo = 5;
             _tmpCombo = 0;
         }
+
+        if (_isCombo)
+            battleHUD.ComboMsg(_combo);
     }
 
     private void BreakCombo()
@@ -182,101 +198,113 @@ public class BattleManager : MonoBehaviour
         _isCombo = false;           // 結束 連擊
         _combo = 0;                 // 恢復0
         _tmpCombo = 0;
+        battleHUD.ComboMsg(_combo);
     }
 
-    void OnUpdateScore(Int16 score)    // 更新分數時
+    void OnUpdateScore(Int16 value)    // 更新分數時
     {
-        Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
-
-        // 如果再交換分數任務下，則不取得自己增加的分數
-        if (missionManager.missionMode == MissionMode.Opening)
+        if (Global.isGameStart)
         {
-            if (missionManager.mission == Mission.Exchange && score > 0)
+            Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+            // 如果再交換分數任務下，則不取得自己增加的分數
+            if (missionManager.missionMode == MissionMode.Opening)
             {
-                _otherScore += _tmpScore;
-                if (_combo >= 5) UpadateEnergy(0.01d);
-                    
+                if (missionManager.mission == Mission.Exchange && value > 0)
+                {
+                    _otherScore += _tmpScore;
+                    if (_combo >= 5) UpadateEnergy(0.01d);
+                }
+
+                if (missionManager.mission == Mission.Exchange && value < 0)    // 如果再交換分數任務下，則取得自己減少的分數
+                    _score = (this.score + _tmpScore > 0) ? (_score += _tmpScore) : 0;
             }
 
-            if (missionManager.mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
-                _score = (_score + _tmpScore > 0) ? (_score += _tmpScore) : 0;
-        }
+            if (missionManager.mission != Mission.Exchange)
+                _score = (this.score + _tmpScore < 0) ? 0 : _score += _tmpScore;
 
-        if (missionManager.mission != Mission.Exchange)
-        {
-            _score = (_score + _tmpScore < 0) ? 0 : _score += _tmpScore;
             if (_combo >= 5) UpadateEnergy(0.01d);
         }
     }
 
 
 
-    void OnOtherScore(Int16 score)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
+    void OnOtherScore(Int16 value)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
     {
-        Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
-
-        // 如果再交換分數任務下，取得對方增加的分數
-        if (missionManager.missionMode == MissionMode.Opening)
+        if (Global.isGameStart)
         {
-            if (missionManager.mission == Mission.Exchange && score > 0) _score += _tmpScore;
-
-            if (missionManager.mission == Mission.Exchange && score < 0)
-                _otherScore = (_otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;
-
-            if (missionManager.mission == Mission.HarvestRate)
+            Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+            // 如果再交換分數任務下，取得對方增加的分數
+            if (missionManager.missionMode == MissionMode.Opening)
             {
-                Int16 otherScore = (Int16)(score * _otherRate);
-                _otherScore = (_otherScore + otherScore > 0) ? _otherScore += otherScore : 0;
-            }
-        }
+                if (missionManager.mission == Mission.Exchange && value > 0) _score += _tmpScore;
 
-        if (missionManager.mission != Mission.Exchange && missionManager.mission != Mission.HarvestRate)
-            _otherScore = (_otherScore + _tmpScore) < 0 ? 0 : (_otherScore += _tmpScore);
+                if (missionManager.mission == Mission.Exchange && value < 0)
+                    _otherScore = (this.otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;
+
+                if (missionManager.mission == Mission.HarvestRate)
+                {
+                    Int16 otherScore = (Int16)(value * _otherRate);
+                    _otherScore = (this.otherScore + otherScore > 0) ? _otherScore += otherScore : 0;
+                }
+            }
+
+            if (missionManager.mission != Mission.Exchange && missionManager.mission != Mission.HarvestRate)
+                _otherScore = (this.otherScore + _tmpScore < 0) ? 0 : _otherScore += _tmpScore;
+        }
     }
 
     void OnMissionComplete(Int16 missionReward)
     {
         Debug.Log("On BattleManager missionReward: " + missionReward);
-        if (missionManager.mission == Mission.HarvestRate)
+        if (Global.isGameStart)
         {
-            _scoreRate = 1;
-        }
-        else
-        {
-            _score += missionReward;
+            if (missionManager.mission == Mission.HarvestRate)
+            {
+                _scoreRate = 1;
+            }
+            else
+            {
+                _score = (this.score + missionReward < 0) ? 0 : _score += missionReward;
+            }
         }
     }
 
     void OnOtherMissionComplete(Int16 otherMissionReward)
     {
-        if (missionManager.mission == Mission.HarvestRate)
+        if (Global.isGameStart)
         {
-            _scoreRate = 1;
-        }
-        else
-        {
-            _otherScore += otherMissionReward;
-        }
-    }
-
-    void OnApplyRate(Mission mission, Int16 scoreRate)
-    {
-        Debug.Log("Rate:" + scoreRate);
-
-        if (mission == Mission.HarvestRate)
-        {
-            if (_score > _otherScore)
+            if (missionManager.mission == Mission.HarvestRate)
             {
-                _scoreRate -= ((float)scoreRate / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
+                _scoreRate = 1;
             }
             else
             {
-                _scoreRate += ((float)scoreRate / 100); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/100
+                _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
             }
+        }
+    }
 
-            battleHUD.MissionMsg(mission, _scoreRate);
-            _otherRate = 1 - _scoreRate;
-            _otherRate = (_otherRate == 0) ? 1 : _otherRate = 1 + _otherRate;                       // 如果 1(原始) - 1(我) = 0 代表倍率相同不調整倍率 ; 如果1 - 0.9(我) = 0.1 代表他多出0.1 ;  如果1 - 1.1(我) = -0.1 代表他少0.1 。最後 1+(+-0.1)就是答案
+
+    void OnApplyRate(Mission mission, Int16 scoreRate)
+    {
+        if (Global.isGameStart)
+        {
+            if (mission == Mission.HarvestRate)
+            {
+                Debug.Log("Rate:" + scoreRate);
+                if (_score > _otherScore)
+                {
+                    _scoreRate -= ((float)scoreRate / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
+                }
+                else
+                {
+                    _scoreRate += ((float)scoreRate / 100); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/100
+                }
+
+                battleHUD.MissionMsg(mission, _scoreRate);
+                _otherRate = 1 - _scoreRate;
+                _otherRate = (_otherRate == 0) ? 1 : _otherRate = 1 + _otherRate;                       // 如果 1(原始) - 1(我) = 0 代表倍率相同不調整倍率 ; 如果1 - 0.9(我) = 0.1 代表他多出0.1 ;  如果1 - 1.1(我) = -0.1 代表他少0.1 。最後 1+(+-0.1)就是答案
+            }
         }
     }
 

@@ -51,6 +51,8 @@ namespace MPCOM
             public static int eatFull = 10;    // 2.5s = 4
             public static float perEat = 1;
             public static float eatingRate = 0.25f;
+            public static float hp = 25f;
+            public static int skill = 1;
         }
 
         private struct BlackMice
@@ -323,7 +325,7 @@ namespace MPCOM
                     case Mission.WorldBoss: // BOSS
                         {
                             // missionRate 是老鼠ID
-                            battleData.missionScore = (Int16)missionRate;
+                            battleData.missionScore = (Int16)EggMice.hp;
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;

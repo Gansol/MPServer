@@ -64,7 +64,7 @@ public class RabbitMice : MonoBehaviour
     {
         #region Amination
 
-        if (upFlag && transform.parent.localPosition.y < upDistance)        // AnimationUp
+        if (upFlag && transform.parent.localPosition.y < _upDistance)        // AnimationUp
             StartCoroutine(AnimationUp());
 
         if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown

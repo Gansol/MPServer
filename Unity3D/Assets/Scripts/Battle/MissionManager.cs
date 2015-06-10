@@ -62,8 +62,8 @@ public class MissionManager : MonoBehaviour
         battleHUD = GetComponent<BattleHUD>();
 
         activeScore = 1000;
-        activeTime = 15;
-        missionTime = 10;
+        activeTime = 15;//15
+        missionTime = 10;//10
         missionRate = 1.0f;
         lastGameTime = 0;
 
@@ -78,7 +78,7 @@ public class MissionManager : MonoBehaviour
 
     void Update()
     {
-
+        
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
@@ -162,19 +162,21 @@ public class MissionManager : MonoBehaviour
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
                 if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.DrivingMice, Mission.Reduce, Mission.Harvest, Mission.Exchange };
+                    Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     seesawFlag = false;
                     Debug.Log("如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)");
+
+                    Debug.Log("gameTime" + gameTime + "lastGameTime" + lastGameTime + "activeTime" + activeTime);
                 }
 
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
                 if ((_score > activeScore || _otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.DrivingMice, Mission.Reduce, Mission.Harvest, Mission.Exchange };
+                    Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
                     _missionMode = MissionMode.Open;
@@ -276,25 +278,29 @@ public class MissionManager : MonoBehaviour
 
     void OnApplyMission(Mission mission, Int16 missionScore)
     {
-        if (mission != Mission.HarvestRate) battleHUD.MissionMsg(mission, missionScore);
-            
-        _missionScore = missionScore;
-        _mission = mission;
-        lastGameTime = gameTime;                // 任務開始時時間
-        _missionMode = MissionMode.Opening;
+        if (Global.isGameStart)
+        {
+            if (mission != Mission.HarvestRate) battleHUD.MissionMsg(mission, missionScore);
+            _missionScore = missionScore;
+            _mission = mission;
+            lastGameTime = gameTime;                // 任務開始時時間
+            _missionMode = MissionMode.Opening;
+        }
 
     }
 
     void OnMissionComplete(Int16 missionReward)
     {
         Debug.Log("OnMissionManager:" + missionReward);
-        battleHUD.MissionCompletedMsg(mission, missionReward);
+        if(Global.isGameStart)
+            battleHUD.MissionCompletedMsg(mission, missionReward);
         _missionMode = MissionMode.Completed;
     }
 
     void OnOtherMissionComplete(Int16 otherMissioReward)
     {
-        battleHUD.OtherScoreMsg(otherMissioReward);
+        if (Global.isGameStart)
+            battleHUD.OtherScoreMsg(otherMissioReward);
     }
 
     void OnAnsycTime()

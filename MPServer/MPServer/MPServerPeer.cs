@@ -316,7 +316,7 @@ namespace MPServer
 
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object>();
                                         OperationResponse response = new OperationResponse((byte)MatchGameResponseCode.WaitingGameStart, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "WaitingPlayer" };
-
+                                        SendOperationResponse(response, new SendParameters());
                                     }
                                     else
                                     {

@@ -302,7 +302,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region ExitRoom 離開房間
+            #region WaitingGameStart 等待開始
 
             case (byte)MatchGameResponseCode.WaitingGameStart:    // 等待開始
                 {

@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
+using MPProtocol;
+using System;
 
 /*
  * 這腳本只負責生東西 時間和控制器要另外寫在Global
@@ -23,6 +25,8 @@ public class MiceSpawner : MonoBehaviour
     void Start()
     {
         poolManger = GetComponent<PoolManager>();
+        Global.photonService.ApplyMissionEvent += OnApplyMission;
+        Global.photonService.ExitRoomEvent += OnExitRoom;
     }
 
 
@@ -40,7 +44,7 @@ public class MiceSpawner : MonoBehaviour
 
         for (int i = 0; i < spawnCount; i++)
         {
-            int rndNum = Random.Range(0, _holeList.Count);
+            int rndNum = UnityEngine.Random.Range(0, _holeList.Count);
             _rndPos[i] = _holeList[rndNum];
             _holeList.RemoveAt(rndNum);
         }
@@ -456,5 +460,56 @@ public class MiceSpawner : MonoBehaviour
         }
     Finish: ;
         if (!isSkill) Global.spawnFlag = true;
+    }
+
+    void Update()
+    {
+        /*
+        Animator anims = hole[4].GetComponent<Animator>() as Animator;
+        AnimatorStateInfo animState = anims.GetCurrentAnimatorStateInfo(0);
+        if (animState.nameHash == Animator.StringToHash("Layer1.HoleScale"))
+        {
+            if (animState.normalizedTime > 1)
+            {
+
+            }
+            }
+         * */
+    }
+
+    public void SpawnBoss(string miceName,float hp){
+
+        if (hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
+        {
+            hole[4].transform.GetChild(2).GetChild(0).SendMessage("OnDied", 0.0f);
+        }
+        hole[4].GetComponent<Animator>().enabled = true;
+        hole[4].GetComponent<Animator>().Play("HoleScale");
+        
+        // 要等待 動畫結速再出現
+        GameObject clone = poolManger.ActiveObject(miceName);
+        clone.transform.parent = hole[4].transform;
+        clone.transform.localScale = new Vector3(1.2f, 1.2f, 0f);
+        clone.transform.localPosition = new Vector3(0,0,0);
+        clone.transform.GetChild(0).SendMessage("AsBoss", true);
+        clone.transform.GetChild(0).transform.gameObject.AddMissingComponent<BossPorperty>();
+        
+        clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hp = hp;
+        clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hpMax = hp;
+    }
+
+
+    void OnApplyMission(Mission mission, Int16 missionScore)
+    {
+        if (mission == Mission.WorldBoss)
+        {
+            SpawnBoss("EggMice", missionScore);    //missionScore這裡是HP
+        }
+    }
+
+    void OnExitRoom()
+    {
+        Global.photonService.ApplyMissionEvent -= OnApplyMission;
+        Global.photonService.ExitRoomEvent -= OnExitRoom;
     }
 }

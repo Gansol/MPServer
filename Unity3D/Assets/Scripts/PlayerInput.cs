@@ -25,17 +25,17 @@ public class PlayerInput : MonoBehaviour
         hit = Physics2D.Raycast(pos, Vector2.zero);
         if (hit && hit.collider != null)
         {
+
             if (Input.GetMouseButtonDown(0))
             {
-                if (hit.transform.name == "anims")
-                {
-                    hit.transform.SendMessage("OnHit");
-                }
+                //            Debug.Log(hit.transform.name);
+                if (hit.transform.name == "anims") hit.transform.SendMessage("OnHit");
 
                 if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
-                {
                     hit.transform.SendMessage("OnHit");
-                }
+
+                if (hit.transform.name == "Exit_Btn") Global.photonService.ExitRoom();
+                    
             }
         }
 
@@ -50,14 +50,13 @@ public class PlayerInput : MonoBehaviour
             if (hit && hit.collider != null)
             {
                 if (hit.transform.name == "anims")
-                {
                     hit.transform.SendMessage("OnHit");
-                }
 
                 if (hit.transform.name == "Skill")
-                {
                     hit.transform.SendMessage("OnHit");
-                }
+
+                if (hit.transform.name == "Exit_Btn")
+                    Global.photonService.ExitRoom();
             }
         }
     }
