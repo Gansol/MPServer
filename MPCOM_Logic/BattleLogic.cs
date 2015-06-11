@@ -184,7 +184,7 @@ namespace MPCOM
         #region ClacMissionReward 計算任務完成分數
 
         [AutoComplete]
-        public BattleData ClacMissionReward(byte mission, float missionRate, int customValue)
+        public BattleData ClacMissionReward(byte mission, float missionRate, Int16 customValue)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -252,10 +252,35 @@ namespace MPCOM
                         {
                             if (missionRate > 0) // 時間倒扣分
                             {
-                                battleData.missionReward = worldBossReward;
-                                battleData.ReturnCode = "S503";
-                                battleData.ReturnMessage = "驗證任務獎勵成功！";
-                                return battleData;
+                                float percent = (float)customValue / 100;
+                                            
+                                if (customValue == 50)  // 平手 獎勵/2
+                                {
+                                    battleData.missionReward = (Int16)(worldBossReward / 2);
+                                    battleData.customValue = (Int16)(worldBossReward / 2);
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
+                                if (customValue > 50)   // (Host)勝利 獲得獎勵X貢獻百分比
+                                {
+                                    Int16 reward = (Int16)Math.Round((float)worldBossReward * percent);     // worldBossReward x 獲得百分比
+                                    battleData.missionReward = reward;
+                                    battleData.customValue = (Int16)(reward / -10);                         // customValue 對手獎勵
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
+                                else if (customValue < 50)  // (Host)失敗 獲得懲罰 
+                                {
+                                    float otherPercent = 1 - percent;
+                                    Int16 reward = (Int16)Math.Round((float)worldBossReward * otherPercent);// worldBossReward x 獲得百分比
+                                    battleData.missionReward = (Int16)(reward / -10);
+                                    battleData.customValue = reward;                                        // customValue 對手獎勵
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
                             }
                             break;
                         }

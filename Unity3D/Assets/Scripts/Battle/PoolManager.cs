@@ -123,7 +123,7 @@ public class PoolManager : MonoBehaviour
 
         
 
-        Debug.Log("pooling Mice Completed ! ");
+//        Debug.Log("pooling Mice Completed ! ");
         _poolingFlag = true;
     }
 
@@ -204,8 +204,8 @@ public class PoolManager : MonoBehaviour
     {
         _skillMice = Json.Deserialize(Global.Team) as Dictionary<string, object>;
 
-        Debug.Log(Global.Team);
-        Debug.Log(_skillMice.Count);
+//        Debug.Log(Global.Team);
+//        Debug.Log(_skillMice.Count);
         int i = 0;
         // 產生 技能老鼠
         foreach (KeyValuePair<string, object> item in _skillMice)
@@ -263,7 +263,7 @@ public class PoolManager : MonoBehaviour
             }
         }
         _mergeFlag = true;
-        Debug.Log("Merge Mice Completed ! ");
+//        Debug.Log("Merge Mice Completed ! ");
     }
 
 

@@ -22,7 +22,7 @@ namespace MPCOM
     public interface IBattleUI  // 使用介面 可以提供給不同程式語言繼承使用        
     {
         byte[] ClacScore(string miceName, float aliveTime);
-        byte[] ClacMissionReward(byte mission, float missionRate, int customVaule);
+        byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
     }
 
@@ -70,7 +70,7 @@ namespace MPCOM
         /// <param name="missionRate">任務倍率</param>
         /// <param name="customVaule">自訂參數1</param>
         /// <returns>回傳任務獎勵</returns>
-        public byte[] ClacMissionReward(byte mission, float missionRate,int customVaule)
+        public byte[] ClacMissionReward(byte mission, float missionRate,Int16 customVaule)
         {
             BattleData battleData = new BattleData();
             battleData.ReturnCode = "S500";

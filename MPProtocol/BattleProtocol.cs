@@ -96,7 +96,7 @@
         UpdateScore = 52,           // 更新分數
         Mission = 53,                // 任務
         MissionCompleted=54,        // 任務完成
-
+        BossDamage=57,              // BOSS傷害
     }
 
     public enum BattleParameterCode
@@ -138,5 +138,6 @@
         MissionCompleted = 54,      // 任務完成
         GetMissionScore = 55,       // 取得對方任務分數
         Reward = 56,                // 獎勵
+        BossDamage = 57,            // BOSS傷害
     }
 }

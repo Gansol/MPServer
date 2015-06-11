@@ -42,9 +42,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event UpdateScoreHandler UpdateScoreEvent;
 
 
-    //委派事件 接收對手分數
-    public delegate void OtherScoreHandler(Int16 Score);
-    public event OtherScoreHandler OtherScoreEvent;
+    //委派事件 接收對手分數、接收BOSS受傷
+    public delegate void ScoreHandler(Int16 Score);
+    public event ScoreHandler OtherScoreEvent;
+    public event ScoreHandler BossDamageEvent;
+    public event ScoreHandler OtherDamageEvent;
 
     //委派事件 離開房間、載入關卡
     public delegate void RoomHandler();
@@ -183,7 +185,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             //取得對方分數
             case (byte)BattleResponseCode.GetScore:
                 Int16 otherScore = (Int16)eventData.Parameters[(byte)BattleParameterCode.OtherScore];
-                //Debug.Log(("Recive otherScore!"+otherScore);
+                //Debug.Log("Recive otherScore!"+otherScore);
                 OtherScoreEvent(otherScore);
                 break;
 
@@ -198,6 +200,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.GetMissionScore:
                 Int16 otherMissionReward = (Int16)eventData.Parameters[(byte)BattleParameterCode.MissionReward];
                 OtherMissionScoreEvent(otherMissionReward);
+                Debug.Log("Recive Get Other MissionReward!" + otherMissionReward);
+                break;
+
+            //取得對方對BOSS傷害
+            case (byte)BattleResponseCode.BossDamage:
+                Int16 damage = (Int16)eventData.Parameters[(byte)BattleParameterCode.Damage];
+                OtherDamageEvent(damage);
+                Debug.Log("GET OTHER:" + damage);
                 break;
         }
 
@@ -448,11 +458,38 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Int16 missionReward = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.MissionReward];
                             MissionCompleteEvent(missionReward);
-                            Debug.Log("RECIVE MissionCompleted !");
+                            Debug.Log("RECIVE MissionCompleted ! missionReward:" + missionReward);
                         }
                         else
                         {
                             Debug.Log("RECIVE MissionCompleted ERROR !");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region  BossDamage 接收BOSS受傷
+
+            case (byte)BattleResponseCode.BossDamage:// 接收BOSS受傷
+                {
+                    Debug.Log("GET!");
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Int16 damage = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Damage];
+                            BossDamageEvent(damage);
+                            Debug.Log("RECIVE BossDamage !");
+                        }
+                        else
+                        {
+                            Debug.Log("RECIVE BossDamage ERROR !");
                         }
                     }
                     catch (Exception e)
@@ -858,6 +895,29 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             };
 
             this.peer.OpCustom((byte)MatchGameOperationCode.SyncGameStart, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region BossDamage 對BOSS造成傷害
+    /// <summary>
+    /// 對BOSS造成傷害
+    /// </summary>
+    /// <param name="roomID">房間ID</param>
+    /// <param name="primaryID">主索引</param>
+    public void BossDamage(Int16 damage)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },{ (byte)BattleParameterCode.Damage,damage },
+            };
+
+            this.peer.OpCustom((byte)BattleOperationCode.BossDamage, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {

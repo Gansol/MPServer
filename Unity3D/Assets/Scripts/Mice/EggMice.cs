@@ -60,15 +60,16 @@ public class EggMice : MonoBehaviour
     {
         _lastTime = 0;
         collider2D.enabled = true;
-        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        _upDistance = upDistance;   // 60
+        //_upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
     }
 
     void FixedUpdate()
     {
-        Debug.Log(_isBoss);
+
         #region Amination
 
-        if (upFlag && transform.parent.localPosition.y < _upDistance)        // AnimationUp
+        if (upFlag && transform.parent.localPosition.y < _upDistance)        // AnimationUp     //  ＊＊＊＊＊＊upDistance這裡是沒有Ｘ　ＳＣＡＬＥ的＊＊＊＊＊
             StartCoroutine(AnimationUp());
 
         if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
@@ -138,7 +139,7 @@ public class EggMice : MonoBehaviour
         else
         {
             if (GetComponent<BossPorperty>().hp != 0)
-                GetComponent<BossPorperty>().hp -= 1;
+                Global.photonService.BossDamage(1);
         }
     }
 
@@ -162,16 +163,14 @@ public class EggMice : MonoBehaviour
 
     void OnDied(float aliveTime)
     {
+        if (_isBoss) Destroy(GetComponent<BossPorperty>());
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
-
-        if (_isBoss)
-            Destroy(GetComponent<BossPorperty>());
-
         try
         {
             _lastTime = aliveTime;
-            battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            if(!_isBoss)
+                battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
         }
         catch (Exception e)
         {
@@ -180,10 +179,7 @@ public class EggMice : MonoBehaviour
         }
         Global.MiceCount--;
     }
-    public void Play(bool b)
-    {
-        Debug.Log("RPLAY:" + b);
-    }
+
     public void Play()
     {
         battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
@@ -195,7 +191,8 @@ public class EggMice : MonoBehaviour
         collider2D.enabled = true;
         _timeFlag = true;
         _isBoss = false;
-        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        _upDistance = upDistance;
+        // _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
         _lerpSpeed = upSpeed;
         GetComponent<Animator>().Play("Hello");
         transform.parent.localPosition = new Vector3(0, 0);
@@ -205,13 +202,12 @@ public class EggMice : MonoBehaviour
     {
         Play();
         _isBoss = true;
-        
-        Debug.Log(_upDistance);
     }
 
     IEnumerator AnimationUp()
     {
-        _upDistance = GetComponent<BoxCollider2D>().size.x *2/3;    // ＊＊＊＊會影響原本老鼠
+        if (_isBoss)
+            _upDistance = GetComponent<BoxCollider2D>().size.x *0.4f;    // ＊＊＊＊會影響原本老鼠
         collider2D.enabled = true;
         _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
         if (transform.parent.localPosition.y + _lerpSpeed > _upDistance)

@@ -114,9 +114,8 @@ public class SpawnController : MonoBehaviour
                 }
             }
             #endregion
-         
         }
-         * * */
+         * */
     }
 
     void Update()
@@ -124,7 +123,7 @@ public class SpawnController : MonoBehaviour
         if (Global.isGameStart)
         {
             #region Select SpawnMode 亂寫
-            if (battleManager.score < 200 && battleManager.maxScore<500)        // 簡單模式     
+            if (battleManager.score < 200 && battleManager.maxScore < 500)        // 簡單模式     
             {
                 ChangeSpawnMode(SpawnMode.EasyMode);
                 level = 1;
@@ -138,7 +137,7 @@ public class SpawnController : MonoBehaviour
                 ChangeSpawnMode(SpawnMode.HardMode);
                 level = 3;
             }
-            else if (battleManager.maxScore > 1200 && battleManager.combo < 25 && battleManager.maxScore<1500) // 如果已經到瘋狂模式過 但是斷康了
+            else if (battleManager.maxScore > 1200 && battleManager.combo < 25 && battleManager.maxScore < 1500) // 如果已經到瘋狂模式過 但是斷康了
             {                                                                   // Combo<25時回到 普通模式
                 ChangeSpawnMode(SpawnMode.NormalMode);
                 level = 2;

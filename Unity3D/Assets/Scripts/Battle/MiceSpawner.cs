@@ -492,7 +492,7 @@ public class MiceSpawner : MonoBehaviour
         clone.transform.localScale = new Vector3(1.2f, 1.2f, 0f);
         clone.transform.localPosition = new Vector3(0,0,0);
         clone.transform.GetChild(0).SendMessage("AsBoss", true);
-        clone.transform.GetChild(0).transform.gameObject.AddMissingComponent<BossPorperty>();
+        clone.transform.GetChild(0).transform.gameObject.AddComponent<BossPorperty>();
         
         clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hp = hp;
         clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hpMax = hp;

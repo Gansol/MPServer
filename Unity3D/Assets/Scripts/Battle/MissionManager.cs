@@ -78,7 +78,7 @@ public class MissionManager : MonoBehaviour
 
     void Update()
     {
-        
+
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
@@ -138,7 +138,7 @@ public class MissionManager : MonoBehaviour
             if ((gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
             {
                 // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
-                if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed && _otherScore != 0 && _score!=0)
+                if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed && _otherScore != 0 && _score != 0)
                 {
                     Mission[] missionSelect = { Mission.HarvestRate };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 0)];
@@ -213,7 +213,7 @@ public class MissionManager : MonoBehaviour
                     else if (gameTime - lastGameTime > missionTime)                            // failed
                     {
                         _missionMode = MissionMode.Completed;
-                        battleHUD.MissionFailedMsg();
+                        battleHUD.MissionFailedMsg(mission,0);
                     }
                     break;
                 }
@@ -238,7 +238,7 @@ public class MissionManager : MonoBehaviour
                         if (battleManager.combo < _missionScore)
                         {
                             _missionMode = MissionMode.Completed;
-                            battleHUD.MissionFailedMsg();
+                            battleHUD.MissionFailedMsg(mission,0);
                         }
                         else
                         {
@@ -267,11 +267,7 @@ public class MissionManager : MonoBehaviour
                     break;
                 }
             case Mission.WorldBoss: // 要計算網路延遲... ＊＊＊＊＊＊＊＊＊＊還沒寫＊＊＊＊＊＊＊＊＊＊＊＊＊
-                if (gameTime - lastGameTime > missionTime)
-                {
-                    _missionMode = MissionMode.Completing;
-                    Global.isMissionCompleted = true;
-                }
+                // 在 BossPorperty在邏輯判斷
                 break;
         }
     }
@@ -291,10 +287,21 @@ public class MissionManager : MonoBehaviour
 
     void OnMissionComplete(Int16 missionReward)
     {
-        Debug.Log("OnMissionManager:" + missionReward);
-        if(Global.isGameStart)
-            battleHUD.MissionCompletedMsg(mission, missionReward);
-        _missionMode = MissionMode.Completed;
+        
+        if (Global.isGameStart)
+        {
+            Debug.Log("OnMissionManager:" + missionReward);
+            if (mission == Mission.WorldBoss && missionReward < 0)
+            {
+                battleHUD.MissionFailedMsg(mission,0);
+            }
+            else
+            {
+                battleHUD.MissionCompletedMsg(mission, missionReward);
+            }
+            Global.isMissionCompleted = false;
+            _missionMode = MissionMode.Completed;
+        }
     }
 
     void OnOtherMissionComplete(Int16 otherMissioReward)

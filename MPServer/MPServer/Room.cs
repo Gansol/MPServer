@@ -27,14 +27,16 @@ namespace MPServer
 
         private Dictionary<int, Dictionary<string, RoomActor>> _playingRoomList;               // 遊戲中的會員列表
         private Dictionary<int, Dictionary<string, RoomActor>> _waitingList;               // 等待房間中的會員列表
+        private Dictionary<int, int> _loadedPlayer;                                         // 在房間中，已載入遊戲的玩家數量
+        private Dictionary<int, int> _worldBossHP;                                          // 自己房間中的BOSSHP
         private Dictionary<Guid, int> _guidGetRoom;
         private List<int> _EmptyRoom;
         private static int _waitIndex;
         private static int _roomIndex;                              // ＊＊＊＊＊因為是房間起始值為1
         private static int _limit;
         private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
-        private Dictionary<int, int> _loadedPlayer;
-
+        
+        
         //public Dictionary<string, RoomActor> gameRoom;
         public Dictionary<int, Dictionary<string, RoomActor>> waitingList { get { return _waitingList; } }
         public Dictionary<int, Dictionary<string, RoomActor>> playingRoomList { get { return _playingRoomList; } }
@@ -48,6 +50,7 @@ namespace MPServer
             _waitingList = new Dictionary<int, Dictionary<string, RoomActor>>();
             _playingRoomList = new Dictionary<int, Dictionary<string, RoomActor>>();
             _loadedPlayer = new Dictionary<int, int>();
+            _worldBossHP = new Dictionary<int, int>();
             _guidGetRoom = new Dictionary<Guid, int>();
             _EmptyRoom = new List<int>();
 
@@ -228,13 +231,14 @@ namespace MPServer
         }
         #endregion
 
-        #region 同步開始遊戲
+        #region GameLoaded 同步開始遊戲
         public void GameLoaded(int roomID, int primaryID)
         {
             _loadedPlayer.Add(roomID, primaryID);
         }
         #endregion
 
+        #region GetLoadedFromRoom 取得載入遊戲的玩家
         /// <summary>
         /// 取得載入遊戲的玩家
         /// </summary>
@@ -253,6 +257,7 @@ namespace MPServer
             }
             return false;
         }
+        #endregion
 
         /// <summary>
         /// 用GUID找房間
@@ -347,7 +352,42 @@ namespace MPServer
             return null;
         }
 
+        public void SpawnBoss(int roomID,int hp)
+        {
+            _worldBossHP.Add(roomID, hp);
+        }
 
+        public int UpLoadBossHP(int roomID,int damage)
+        {
+            int hp;
+            _worldBossHP.TryGetValue(roomID, out hp);
+            hp = hp - damage;
+            _worldBossHP[roomID] = hp;
+            return hp;
+        }
+
+
+        public void KillBoss(int roomID)
+        {
+            int tmp;
+            bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
+            if (hasBoss)
+                _worldBossHP.Remove(roomID);
+        }
+
+        /// <summary>
+        /// 移除BOSS 使用GUID
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns>是否有BOSS</returns>
+        public void KillBossFromGuid(Guid guid)
+        {
+            int roomID= GetRoomFromGuid(guid);
+            int tmp;
+            bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
+            if (hasBoss)
+                _worldBossHP.Remove(roomID);
+        }
 
         /*        public RoomActor GetOtherPlayer(int roomID, int primaryID)
         {

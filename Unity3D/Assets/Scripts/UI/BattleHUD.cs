@@ -322,11 +322,24 @@ public class BattleHUD : MonoBehaviour
         Debug.Log("Other MissionCompleted! + " + missionReward);
     }
 
-    public void MissionFailedMsg()
+    /// <summary>
+    /// 任務失敗訊息
+    /// </summary>
+    /// <param name="mission">目前任務</param>
+    /// <param name="value">值(不需要填0)</param>
+    public void MissionFailedMsg(Mission mission,int value)
     {
         MissionObject.SetActive(true);
-        MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗";
-        MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
+        if (mission == Mission.WorldBoss)
+        {
+            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗       糧食";
+            MissionObject.transform.GetChild(1).GetComponent<UILabel>().text ="    "+value.ToString();
+        }
+        else
+        {
+            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗";
+            MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
+        }
         MissionObject.transform.GetChild(2).GetComponent<UILabel>().text = "Mission Failed!";
         MissionObject.GetComponent<Animator>().Play("Completed");
         Debug.Log("Mission Failed!");

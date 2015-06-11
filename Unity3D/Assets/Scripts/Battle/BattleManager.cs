@@ -64,7 +64,6 @@ public class BattleManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Debug.Log("Start");
         missionManager = GetComponent<MissionManager>();
         battleHUD = GetComponent<BattleHUD>();
         Global.isExitingRoom = false;
@@ -109,6 +108,7 @@ public class BattleManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        Debug.Log("(Update)_score"+_score);
         if (!Global.isGameStart)
             _lastTime = Time.fixedTime;
 
@@ -203,6 +203,7 @@ public class BattleManager : MonoBehaviour
 
     void OnUpdateScore(Int16 value)    // 更新分數時
     {
+        Debug.Log("(Update)OnUpdateScore" + value);
         if (Global.isGameStart)
         {
             Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
@@ -266,6 +267,8 @@ public class BattleManager : MonoBehaviour
             {
                 _score = (this.score + missionReward < 0) ? 0 : _score += missionReward;
             }
+
+            Debug.Log("(Battle)_score:" + _score);
         }
     }
 
@@ -281,6 +284,7 @@ public class BattleManager : MonoBehaviour
             {
                 _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
             }
+            Debug.Log("(Battle)_otherScore:" + _otherScore);
         }
     }
 

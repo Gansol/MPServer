@@ -26,7 +26,7 @@ public class SceneLoader : MonoBehaviour
             return;
 
         
-        Debug.Log(async.progress * 100);
+//        Debug.Log(async.progress * 100);
         if (async.progress < 0.9f)  // 會卡在90% else = 100%
         {
             _process = (uint)(async.progress * 100);
