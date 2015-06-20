@@ -28,7 +28,7 @@ public class BossPorperty : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("(TURE)Global.isMissionCompleted:" + Global.isMissionCompleted + "   @@@@@@@@@@@@@@@@@@@@@@@isDead:" + isDead + "HPMAX:" + hpMax + "HP:" + hp + "HITS:" + myHits);
+//        Debug.Log("(TURE)Global.isMissionCompleted:" + Global.isMissionCompleted + "   @@@@@@@@@@@@@@@@@@@@@@@isDead:" + isDead + "HPMAX:" + hpMax + "HP:" + hp + "HITS:" + myHits);
         if (!isDead)
         {
             if (hp <= 0)
@@ -69,7 +69,7 @@ public class BossPorperty : MonoBehaviour
     {
         hp -= damage;
         otherHits++;
-        Debug.Log("otherHits" + otherHits);
+//        Debug.Log("otherHits" + otherHits);
     }
 
     void OnDestory()

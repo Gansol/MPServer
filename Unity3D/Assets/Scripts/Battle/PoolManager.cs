@@ -17,35 +17,29 @@ using System.Linq;
  * 
  * 物件池 提供一個高效率的物件生成、回收方式
  * 
- * 使用方法 須配合使用NGUI
- * 否則需要改寫transfrom.SetActive() + 儲存GameObject索引列
- * 
  * ***************************************************************/
 
 public class PoolManager : MonoBehaviour
 {
-    Dictionary<string, object> _tmpDict;
-    private Dictionary<int, string> dictMice;
+    private Dictionary<string, object> _tmpDict;
+    private Dictionary<int, string> _dictObject;
+
     private HashSet<int> _myMice;
     private HashSet<int> _otherMice;
-    //private List<GameObject> Pool;
+
     private GameObject clone;
-    //private int _miceCount;
-    private byte miceID;
-    private string objectName;
-    private int[] _miceIDArray;
-    private float lastTime;
-    private float currentTime;
-    //private GameObject[] _dynamicPoolName;
-    private int index;      // _dynamicPoolName index
-    private static int miceAllCount;
+    private byte objectID;          // 取得的ID 須自行改寫
+    private string objectName;      // 取得的 物件名稱
+
+    private float _lastTime;
+    private float _currentTime;
 
     Dictionary<string, object> _skillMice;
 
     public GameObject Panel;
 
     [Tooltip("物件池位置")]
-    public GameObject ObjectPool;
+    public GameObject ObjectPool;   
     [Tooltip("物件匣")]
     public GameObject[] ObjectDeck;
 
@@ -78,29 +72,20 @@ public class PoolManager : MonoBehaviour
 
     void Awake()
     {
-        lastTime = 0;
-        currentTime = 0;
+        _lastTime = 0;
+        _currentTime = 0;
         clearTime = 10;
         _poolingFlag = false;      // 初始化物件池
-        dictMice = new Dictionary<int, string>();
+        _dictObject = new Dictionary<int, string>();
         _myMice = new HashSet<int>();
         _otherMice = new HashSet<int>();
         _tmpDict = new Dictionary<string, object>();
         _skillMice = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
-        /*
-        clone = new GameObject();
-        clone.name = "ObjectPool";
-        clone.transform.parent = Panel.transform;   // 預設位置
-        clone.transform.localScale = Vector3.one;   // 預設大小
-        clone.layer = 31;                           // 去火星吧！    大家都看不見
-        ObjectPool = clone;                         // 物件池位置
-        */
-
 
 
         // 生出 預設數量的物件
-        foreach (KeyValuePair<int, string> item in dictMice)
+        foreach (KeyValuePair<int, string> item in _dictObject)
         {
             clone = new GameObject();
 
@@ -135,7 +120,7 @@ public class PoolManager : MonoBehaviour
     /// <returns>回傳 ( GameObject / null )</returns>
     public GameObject ActiveObject(int miceID)
     {
-        dictMice.TryGetValue(miceID, out objectName);//等傳老鼠ID名稱近來這要改miceName
+        _dictObject.TryGetValue(miceID, out objectName);//等傳老鼠ID名稱近來這要改miceName
 
         if (ObjectPool.transform.FindChild(objectName).childCount == 0)
         {
@@ -169,7 +154,7 @@ public class PoolManager : MonoBehaviour
     /// <returns>回傳 ( GameObject / null )</returns>
     public GameObject ActiveObject(string objectName)
     {
-        int miceID = dictMice.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
+        int miceID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
         /*
         foreach (KeyValuePair<int, string> item in dictMice)
         {
@@ -239,7 +224,7 @@ public class PoolManager : MonoBehaviour
         foreach (KeyValuePair<string, object> item in _tmpDict)
         {
             _myMice.Add(Int16.Parse(item.Key));
-            dictMice.Add(Int16.Parse(item.Key), item.Value.ToString());
+            _dictObject.Add(Int16.Parse(item.Key), item.Value.ToString());
         }
         _tmpDict.Clear();
         _tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<string, object>;
@@ -259,7 +244,7 @@ public class PoolManager : MonoBehaviour
                 object miceName;
                 _tmpDict.TryGetValue(item.ToString(), out miceName);
 
-                dictMice.Add(item, miceName.ToString());
+                _dictObject.Add(item, miceName.ToString());
             }
         }
         _mergeFlag = true;
@@ -269,9 +254,9 @@ public class PoolManager : MonoBehaviour
 
     void Update()
     {
-        currentTime = Time.time;
+        _currentTime = Time.time;
 
-        if (currentTime - lastTime > clearTime)     // 達到清除時間時
+        if (_currentTime - _lastTime > clearTime)     // 達到清除時間時
         {
             for (int i = 0; i < ObjectPool.transform.childCount; i++)       // 跑遍動態池
             {
@@ -283,7 +268,7 @@ public class PoolManager : MonoBehaviour
                     }
                 }
             }
-            lastTime = currentTime;
+            _lastTime = _currentTime;
         }
     }
 }

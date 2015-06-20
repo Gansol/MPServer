@@ -41,6 +41,7 @@ public class CandyMice : MonoBehaviour
     private float _upDistance;
     private float _lastTime;
     private bool _timeFlag;
+    private bool _isBoss;
 
     void Awake()
     {
@@ -51,16 +52,18 @@ public class CandyMice : MonoBehaviour
         eatingFlag = false;
         clickFlag = false;
         _timeFlag = true;
+        _isBoss = false;
     }
 
     void Start()
     {
         _lastTime = 0;
         collider2D.enabled = true;
-        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        _upDistance = upDistance;   // 60
+        //_upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
     }
 
-    void FixedUpdate()
+    void Update()
     {
         #region Amination
 
@@ -108,10 +111,10 @@ public class CandyMice : MonoBehaviour
         {
             animTime = currentState.normalizedTime;
 
-//            Debug.Log(animTime);
+            //            Debug.Log(animTime);
             if (!eatingFlag)        // 限制執行一次
             {
-                if (animTime > 5)                       // 動畫撥放完畢時
+                if (animTime > 3 && !_isBoss)                       // 動畫撥放完畢時
                 {
                     isDisappear = true;
                     eatingFlag = true;
@@ -123,24 +126,32 @@ public class CandyMice : MonoBehaviour
 
     void OnHit()
     {
-        Debug.Log("HIT!");
-        if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
+        if (!_isBoss)
         {
-            clickFlag = true;
-            collider2D.enabled = false;
-            GetComponent<Animator>().Play("Die");
+            if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
+            {
+                clickFlag = true;
+                collider2D.enabled = false;
+                GetComponent<Animator>().Play("Die");
+            }
+        }
+        else
+        {
+            if (GetComponent<BossPorperty>().hp != 0)
+                Global.photonService.BossDamage(1);
         }
     }
 
     void OnDisappear(float aliveTime)
     {
+        if (_isBoss) Destroy(GetComponent<BossPorperty>());
         this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
         gameObject.SetActive(false);
         //Debug.Log("OnDisappear : " + aliveTime);
         try
         {
             _lastTime = aliveTime;
-            battleManager.LostScore(transform.parent.name, aliveTime);  // 跑掉掉分
+            if (!_isBoss) battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
         }
         catch (Exception e)
         {
@@ -178,12 +189,20 @@ public class CandyMice : MonoBehaviour
         clickFlag = false;
         collider2D.enabled = true;
         _timeFlag = true;
+        _isBoss = false;
 
-        _upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
+        _upDistance = upDistance;   // 60
+        //_upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
         _lerpSpeed = upSpeed;
         GetComponent<Animator>().Play("Hello");
         transform.parent.localPosition = new Vector3(0, 0);
         //transform.parent.GetComponent<Animator>().Play("Up");
+    }
+
+    public void AsBoss(bool isBoss)
+    {
+        Play();
+        _isBoss = true;
     }
 
     IEnumerator AnimationUp()

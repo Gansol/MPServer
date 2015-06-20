@@ -111,9 +111,20 @@ namespace MPServer
                                 string IP = LocalIP;
                                 string email = "example@example.com";
                                 string joinTime = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.JoinDate];
+                                MemberType memberType = (MemberType)operationRequest.Parameters[(byte)JoinMemberParameterCode.MemberType];
 
                                 MPCOM.MemberUI memberUI = new MPCOM.MemberUI();
-                                MPCOM.MemberData memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, password, nickname, age, sex, IP, email, joinTime));
+                                MPCOM.MemberData memberData;
+
+                                if ((byte)memberType == 1)
+                                {
+                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, password, nickname, age, sex, IP, email, joinTime, (byte)memberType));
+                                }
+                                else
+                                {
+                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, nickname, IP, joinTime, (byte)memberType));
+                                }
+
                                 if (memberData.ReturnCode == "S101")
                                 {
                                     Log.Debug("Join Member Successd ! ");

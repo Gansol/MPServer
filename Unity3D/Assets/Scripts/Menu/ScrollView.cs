@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 
 /*
@@ -22,6 +23,9 @@ public class ScrollView : MonoBehaviour
     public float panOffset = 0;       // 邊界偏移量
     public int denominator = 10;     // Screen.width / denominator 回彈邊界
     //public GameObject label;        // 測試用Label(NGUI)
+//#if UNITY_EDITOR
+//#elif UNITY_ANDROID || UNITY_IPHONE
+
 
     void Start()
     {
@@ -158,4 +162,5 @@ public class ScrollView : MonoBehaviour
         }
 
     }
+//#endif
 }

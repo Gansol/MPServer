@@ -22,5 +22,6 @@
         Sex,                        // 性別
         Age,                        // 年齡
         IP,                         // IP
+        MemberType,                 // 會員類型
     }
 }

@@ -207,7 +207,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.BossDamage:
                 Int16 damage = (Int16)eventData.Parameters[(byte)BattleParameterCode.Damage];
                 OtherDamageEvent(damage);
-                Debug.Log("GET OTHER:" + damage);
+                //Debug.Log("GET OTHER:" + damage);
                 break;
         }
 
@@ -254,6 +254,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             byte getSex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
                             byte getAge = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
                             int getPirmaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
+                            //MemberType memberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
 
                             LoginEvent(true, "", getReturn, getPirmaryID, getMemberID, getNickname, getSex, getAge); // send member data to loginEvent
 
@@ -551,7 +552,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 加入會員 
     /// </summary>
-    public void JoinMember(string Account, string Password, string Nickname, byte Age, byte Sex)
+    public void JoinMember(string Account, string Password, string Nickname, byte Age, byte Sex,MemberType memberType)
     {
         try
         {
@@ -561,7 +562,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
                              { (byte)JoinMemberParameterCode.Account,Account },   { (byte)JoinMemberParameterCode.Password, Password }  ,{ (byte)JoinMemberParameterCode.Nickname, Nickname }  ,
-                             { (byte)JoinMemberParameterCode.Age, age }  ,{ (byte)JoinMemberParameterCode.Sex, sex }  , { (byte)JoinMemberParameterCode.JoinDate, DateTime.Now.ToString() }  
+                             { (byte)JoinMemberParameterCode.Age, age }  ,{ (byte)JoinMemberParameterCode.Sex, sex }  , { (byte)JoinMemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)JoinMemberParameterCode.MemberType, memberType }  
                         };
 
             this.peer.OpCustom((byte)JoinMemberOperationCode.JoinMember, parameter, true, 0, true); // operationCode is 21

@@ -3,6 +3,9 @@ using System;
 using System.Collections;
 using System.Net;
 using System.IO;
+using MPProtocol;
+using GooglePlayGames;
+using UnityEngine.SocialPlatforms;
 
 public class LoginUI : MonoBehaviour
 {
@@ -26,13 +29,14 @@ public class LoginUI : MonoBehaviour
     private static bool isLoginBtn = false;
 
     // 在Start裡建立好Login的回應事件
-    IEnumerator Start()
+    void Start()
     {
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;
         Global.photonService.ReLoginEvent += OnReLogin;
-        yield return null;
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
     }
 
     void Update()
@@ -119,6 +123,7 @@ public class LoginUI : MonoBehaviour
                     GUI.SetNextControlName("Password");
                     getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
 
+
                     if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)
                     {
                         isLoginBtn = true;
@@ -158,7 +163,7 @@ public class LoginUI : MonoBehaviour
                         byte age = Convert.ToByte (getAge);
                         byte sex = Convert.ToByte(getSex);
                         Debug.Log(getPassowrd);
-                        Global.photonService.JoinMember(getAccount, getPassowrd, getNickname,age,sex );
+                        Global.photonService.JoinMember(getAccount, getPassowrd, getNickname,age,sex,MemberType.Gansol);
                     }
                 }
 
@@ -240,6 +245,30 @@ public class LoginUI : MonoBehaviour
             Global.Account = "";
             Global.LoginStatus = false;
             loginResult = message;
+        }
+    }
+    public void GoogleLogin()
+    {
+        if (!isLoginBtn)
+        {
+            Debug.Log("Google Logining...");
+            isLoginBtn = true;
+            Social.localUser.Authenticate((bool success) =>
+            {
+                if (success)
+                {
+                    Debug.Log("You've successfully logged in" + Social.localUser.id);
+                    
+                    Global.Account = Social.localUser.id;
+                    Global.Nickname = Social.localUser.userName;
+
+                    Global.photonService.Login(Global.Account, getPassowrd); // 登入
+                }
+                else
+                {
+                    Debug.Log("Login failed for some reason");
+                }
+            });
         }
     }
 

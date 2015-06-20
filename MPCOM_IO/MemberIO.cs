@@ -46,10 +46,13 @@ namespace MPCOM
             return true;
         }
 
-        #region JoinMember 加入會員
-
+        #region JoinMember(Gansol) 加入會員
+        /// <summary>
+        /// Gansol 加入會員
+        /// </summary>
+        /// <returns></returns>
         [AutoComplete]
-        public MemberData JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime)
+        public MemberData JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime,string memberType)
         {
             MemberData memberData = default(MemberData);
             memberData.ReturnCode = "(IO)S100";
@@ -76,7 +79,7 @@ namespace MPCOM
                     if (DS.Tables[0].Rows.Count == 0)
                     {
                         //插入 會員資料
-                        string query = "INSERT INTO GansolMember (Account,Password,Nickname,Age,Sex,IP,Email,JoinTime) VALUES(@account, @password, @nickname, @age, @sex, @IP, @email, @joinTime)";
+                        string query = "INSERT INTO GansolMember (Account,Password,Nickname,Age,Sex,IP,Email,JoinTime,MemberType) VALUES(@account, @password, @nickname, @age, @sex, @IP, @email, @joinTime, @memberType)";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@password", password);
@@ -86,6 +89,97 @@ namespace MPCOM
                         command.Parameters.AddWithValue("@IP", IP);
                         command.Parameters.AddWithValue("@email", email);
                         command.Parameters.AddWithValue("@joinTime", joinTime);
+                        command.Parameters.AddWithValue("@memberType", memberType);
+                        int ExecuteNonQuery = command.ExecuteNonQuery();
+
+                        memberData.ReturnCode = "S101";
+                        memberData.ReturnMessage = "加入會員成功！";
+                    }
+                    else if (DS.Tables[0].Rows.Count > 0)
+                    {
+                        memberData.ReturnCode = "S108";
+                        memberData.ReturnMessage = "已有相同的會員帳號！";
+                    }
+
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //假如玩家資料中沒有資料 建立一份新玩家資料
+                    if (DS.Tables[0].Rows.Count == 0)
+                    {
+                        string query = "INSERT INTO PlayerData (Account) VALUES (@account) ";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.AddWithValue("@account", account);
+                        int ExecuteNonQuery = command.ExecuteNonQuery();
+                    }
+
+
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //假如玩家貨幣資料中沒有資料 建立一份新玩家貨幣資料
+                    if (DS.Tables[0].Rows.Count == 0)
+                    {
+                        string query = "INSERT INTO GameCurrency (Account) VALUES (@account) ";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.AddWithValue("@account", account);
+                        int ExecuteNonQuery = command.ExecuteNonQuery();
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                memberData.ReturnCode = "S199";
+                memberData.ReturnMessage = "加入會員失敗，未知例外情況！";
+                Log.Debug("(IO)JoinMember failed!" + e.Message + " Track: " + e.StackTrace);
+                throw e;
+            }
+            return memberData;
+        }
+        #endregion
+
+        #region JoinMember(SNS) 加入會員
+        /// <summary>
+        /// SNS加入會員
+        /// </summary>
+        /// <returns></returns>
+        [AutoComplete]
+        public MemberData JoinMember(string account,string password, string nickname,string IP,string joinTime, string memberType)
+        {
+            MemberData memberData = default(MemberData);
+            memberData.ReturnCode = "(IO)S100";
+            memberData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GansolMember WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+                    Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
+
+
+                    //假如資料表中找不到資料 尚未加入會員
+                    if (DS.Tables[0].Rows.Count == 0)
+                    {
+                        //插入 會員資料
+                        string query = "INSERT INTO GansolMember (Account,Nickname,) VALUES(@account,@password,@nickname, @IP, @joinTime,@memberType)";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@password", password);
+                        command.Parameters.AddWithValue("@nickname", nickname);
+                        command.Parameters.AddWithValue("@IP", IP);
+                        command.Parameters.AddWithValue("@joinTime", joinTime);
+                        command.Parameters.AddWithValue("@memberType", memberType);
                         int ExecuteNonQuery = command.ExecuteNonQuery();
 
                         memberData.ReturnCode = "S101";

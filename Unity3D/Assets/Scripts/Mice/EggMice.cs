@@ -53,7 +53,6 @@ public class EggMice : MonoBehaviour
         clickFlag = false;
         _timeFlag = true;
         _isBoss = false;
-        Debug.Log("Start");
     }
 
     void Start()
@@ -64,15 +63,14 @@ public class EggMice : MonoBehaviour
         //_upDistance = upDistance * transform.parent.parent.localScale.x;     // 放到Update很好玩
     }
 
-    void FixedUpdate()
+    void Update()
     {
-
         #region Amination
 
         if (upFlag && transform.parent.localPosition.y < _upDistance)        // AnimationUp     //  ＊＊＊＊＊＊upDistance這裡是沒有Ｘ　ＳＣＡＬＥ的＊＊＊＊＊
             StartCoroutine(AnimationUp());
 
-        if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
+        if (isDisappear && transform.parent.localPosition.y >= -_upDistance) // AnimationDown
             StartCoroutine(AnimationDown());
 
         if (transform.gameObject.activeSelf == true && _timeFlag)  // 如果被Spawn儲存現在時間 注意 DisActive時Time還是會一直跑 所以要存起來減掉
@@ -89,7 +87,7 @@ public class EggMice : MonoBehaviour
         {
             animTime = currentState.normalizedTime;
             // 目前播放的動畫 "總"時間
-            if (animTime > 1)   // 動畫撥放完畢時
+            if (animTime > 1.2f)   // 動畫撥放完畢時
             {
                 anims.Play("Eat");   // 老鼠開始吃東西
                 upFlag = true;
@@ -97,7 +95,7 @@ public class EggMice : MonoBehaviour
         }
         else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
         {
-            Debug.Log("AminState=Die");
+//            Debug.Log("AminState=Die");
             animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
             if (!dieFlag)       // 限制執行一次
             {
@@ -113,9 +111,8 @@ public class EggMice : MonoBehaviour
             animTime = currentState.normalizedTime;
             if (!eatingFlag)        // 限制執行一次
             {
-                if (animTime > 5 && !_isBoss)                       // 動畫撥放完畢時
+                if (animTime > 2.5f && !_isBoss)                       // 動畫撥放完畢時
                 {
-                    Debug.Log(_isBoss);
                     isDisappear = true;
                     eatingFlag = true;
                 }
@@ -169,8 +166,7 @@ public class EggMice : MonoBehaviour
         try
         {
             _lastTime = aliveTime;
-            if(!_isBoss)
-                battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            if (!_isBoss) battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
         }
         catch (Exception e)
         {
@@ -206,8 +202,8 @@ public class EggMice : MonoBehaviour
 
     IEnumerator AnimationUp()
     {
-        if (_isBoss)
-            _upDistance = GetComponent<BoxCollider2D>().size.x *0.4f;    // ＊＊＊＊會影響原本老鼠
+
+        if (_isBoss) _upDistance = GetComponent<BoxCollider2D>().size.x * 0.4f;    // ＊＊＊＊會影響原本老鼠
         collider2D.enabled = true;
         _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
         if (transform.parent.localPosition.y + _lerpSpeed > _upDistance)
@@ -220,14 +216,14 @@ public class EggMice : MonoBehaviour
             transform.parent.localPosition += new Vector3(0, _lerpSpeed, 0);
         }
 
-        Debug.Log("Scale:" + this.transform.parent.localScale.x + "   _upDistance:" + _upDistance + "  _upDistance:" + upDistance);
+//        Debug.Log("Scale:" + this.transform.parent.localScale.x + "   _upDistance:" + _upDistance + "  _upDistance:" + upDistance);
         yield return null;
     }
 
     IEnumerator AnimationDown() // 2   = 2 ~ 1
     {
         _lerpSpeed = Mathf.Lerp(_lerpSpeed, 1, lerpSpeed);
-        if (transform.parent.localPosition.y - 10 <= -_upDistance)
+        if (transform.parent.localPosition.y - 10 < -_upDistance)
         {
             Vector3 _tmp;
             _tmp = new Vector3(0, -_upDistance * 2, 0);
@@ -238,6 +234,7 @@ public class EggMice : MonoBehaviour
         else
         {
             transform.parent.localPosition = Vector3.Slerp(transform.parent.localPosition, new Vector3(0, -_upDistance * 2, 0), Time.deltaTime * 5);
+            
         }
         yield return null;
     }

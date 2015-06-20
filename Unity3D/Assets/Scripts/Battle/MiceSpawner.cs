@@ -132,7 +132,7 @@ public class MiceSpawner : MonoBehaviour
             }
             else
             {
-                Debug.Log("Closed!");
+//                Debug.Log("Closed!");
             }
 
 

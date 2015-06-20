@@ -39,24 +39,29 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
+
+
 #elif UNITY_ANDROID || UNITY_IPHONE
 
     if(Input.touchCount>0){
+
         for(int i=0; i<Input.touchCount; i++)
         {
-            pos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
-            hit = Physics2D.Raycast(pos, Vector2.zero);
+            if(Input.GetTouch(0).phase == TouchPhase.Ended){
+                pos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
+                hit = Physics2D.Raycast(pos, Vector2.zero);
 
-            if (hit && hit.collider != null)
-            {
-                if (hit.transform.name == "anims")
-                    hit.transform.SendMessage("OnHit");
+                if (hit && hit.collider != null)
+                {
+                    if (hit.transform.name == "anims")
+                        hit.transform.SendMessage("OnHit");
 
-                if (hit.transform.name == "Skill")
-                    hit.transform.SendMessage("OnHit");
+                    if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
+                        hit.transform.SendMessage("OnHit");
 
-                if (hit.transform.name == "Exit_Btn")
-                    Global.photonService.ExitRoom();
+                    if (hit.transform.name == "Exit_Btn")
+                     Global.photonService.ExitRoom();
+                }
             }
         }
     }

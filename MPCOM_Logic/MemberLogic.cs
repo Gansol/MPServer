@@ -34,7 +34,7 @@ namespace MPCOM
             return true;
         }
 
-        #region JoinMember 加入會員
+        #region JoinMember(Gansol) 加入會員
 
         [AutoComplete]
         public MemberData JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime)
@@ -121,7 +121,46 @@ namespace MPCOM
 
                 // 驗證成功後再進行IO寫入 寫入後存入 memberData
                MemberIO memberIO = new MemberIO();
-               memberData = memberIO.JoinMember(account, password, nickname, age, sex, IP, email, joinTime);
+               memberData = memberIO.JoinMember(account, password, nickname, age, sex, IP, email, joinTime,"Gansol");
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return memberData; //回傳資料
+        }
+
+        #endregion
+
+        #region JoinMember(SNS) 加入會員
+
+        [AutoComplete]
+        public MemberData JoinMember(string account, string nickname,string IP,string joinTime, byte memberType)
+        {
+            MemberData memberData = new MemberData();
+            memberData.ReturnCode = "(Logic)S100";
+            memberData.ReturnMessage = "";
+            string SNSType = "";
+            try
+            {
+                switch (memberType)
+                {
+                    case 2: //Google
+                        SNSType = "Google";
+                        break;
+                    case 3: //Facebook
+                        SNSType = "Facebook";
+                        break;
+                    case 4: // Twitter
+                        SNSType = "Twitter";
+                        break;
+                }
+
+                // 驗證成功後再進行IO寫入 寫入後存入 memberData
+                MemberIO memberIO = new MemberIO();
+                memberData = memberIO.JoinMember(account,"25d55ad283aa400af464c76d713c07ad", nickname,IP,joinTime, SNSType);
 
             }
             catch (Exception e)
