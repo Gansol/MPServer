@@ -26,7 +26,7 @@ namespace MPCOM
     public interface IMemberUI  // 使用介面 可以提供給不同程式語言繼承使用      
     {
         byte[] JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime,byte memberType);
-        byte[] JoinMember(string account, string nickname, string IP, string joinTime, byte memberType);
+        byte[] JoinMember(string account, string nickname, string IP, string email, string joinTime, byte memberType);
         byte[] MemberLogin(string account,string password);
     }
 
@@ -59,7 +59,7 @@ namespace MPCOM
         #endregion
 
         #region JoinMember(SNS) 加入會員
-        public byte[] JoinMember(string account, string nickname, string IP, string joinTime, byte memberType)
+        public byte[] JoinMember(string account, string nickname, string IP,string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "S100";
@@ -68,7 +68,7 @@ namespace MPCOM
             try
             {
                 MemberLogic memberLogic = new MemberLogic();
-                memberData = memberLogic.JoinMember(account, nickname, IP, joinTime, memberType);
+                memberData = memberLogic.JoinMember(account, nickname, IP,email, joinTime, memberType);
             }
             catch (Exception e)
             {

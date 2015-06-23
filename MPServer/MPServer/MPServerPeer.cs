@@ -103,6 +103,7 @@ namespace MPServer
                         case (byte)JoinMemberOperationCode.JoinMember:
                             try
                             {
+                                Log.Debug("IN Join Member");
                                 string account = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Account];
                                 string password = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Password];
                                 string nickname = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.Nickname];
@@ -122,7 +123,7 @@ namespace MPServer
                                 }
                                 else
                                 {
-                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, nickname, IP, joinTime, (byte)memberType));
+                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, nickname, IP,email, joinTime, (byte)memberType));
                                 }
 
                                 if (memberData.ReturnCode == "S101")
@@ -162,82 +163,164 @@ namespace MPServer
                             {
                                 string account = (string)operationRequest.Parameters[(byte)LoginParameterCode.Account];
                                 string passowrd = (string)operationRequest.Parameters[(byte)LoginParameterCode.Password];
-
+                                MemberType memberType = (MemberType)operationRequest.Parameters[(byte)LoginParameterCode.MemberType];
+                                Log.Debug("Account:" + account + "Password:" + passowrd);
                                 MPCOM.MemberUI memberUI = new MPCOM.MemberUI(); //實體化 UI (連結資料庫拿資料)
-                                Log.Debug("IO OK");
+                                Log.Debug("Login IO OK");
                                 MPCOM.MemberData memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                Log.Debug("Data OK");
+                                Log.Debug("Login Data OK");
                                 Log.Debug("memberData.Account: " + memberData.Account);
                                 //＊＊＊＊＊這有問題 如果重複登入 不能去拿伺服器資料 會偷資料＊＊＊＊＊　
                                 switch (memberData.ReturnCode)　//取得資料庫資料成功
                                 {
                                     case "S200":
-                                        Log.Debug("會員資料內部程式錯誤！");
-                                        break;
-                                    case "S201":
-                                        Log.Debug("memberData.ReturnCode == S201");
-                                        primaryID = memberData.PrimaryID; //將資料傳入變數
-                                        string nickname = memberData.Nickname;
-                                        byte sex = memberData.Sex;
-                                        byte age = memberData.Age;
-                                        string IP = memberData.IP;
-
-                                        //加入線上玩家列表
-                                        ActorCollection.ActorReturn actorReturn = _server.Actors.ActorOnline(peerGuid, primaryID, account, nickname, age, sex, IP, this);
-                                        Log.Debug("ReturnCode :" + actorReturn.ReturnCode);
-                                        Log.Debug("ReturnMessage :" + actorReturn.DebugMessage);
-
-                                        if (actorReturn.ReturnCode == "S301")// 加入線上會員資料成功 回傳資料
                                         {
-                                            Log.Debug("actorReturn.ReturnCode == S301");
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, primaryID }, { (byte)LoginParameterCode.Account, account }, { (byte)LoginParameterCode.Nickname, nickname }, { (byte)LoginParameterCode.Age, age }, { (byte)LoginParameterCode.Sex, sex } 
-                                    };
-
-                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
-                                            SendOperationResponse(actorResponse, new SendParameters());
-                                        }
-                                        else if (actorReturn.ReturnCode == "S302") //登入錯誤 重複登入
-                                        {
-                                            Log.Debug("重複區(3) PK:" + primaryID);
-
-                                            // 用這個peer guid的PrimaryUD來找guid 踢掉線上玩家
-                                            MPServerPeer peer;
-                                            peer = _server.Actors.GetPeerFromPrimary(primaryID); //primaryID取得登入peer
-
-
-                                            // 送出 重複登入事件 叫另外一個他斷線
-                                            EventData eventData = new EventData((byte)LoginOperationCode.ReLogin);
-                                            peer.SendEvent(eventData, new SendParameters());
-
-
-                                            // 回傳給登入者 通知重複登入
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object>{
-                                        { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } 
-                                    };
-
-                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
-                                            SendOperationResponse(actorResponse, new SendParameters());
-
-                                            peer.OnDisconnect(new DisconnectReason(), "重複登入");
-                                            Log.Debug("重複登入了!");
-                                        }
-                                        else // 登入錯誤 回傳空值
-                                        {
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object>{
-                                        { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } 
-                                    };
-
-                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
-                                            SendOperationResponse(actorResponse, new SendParameters());
+                                            Log.Debug("會員資料內部程式錯誤！");
                                             break;
                                         }
-                                        break;
+                                    #region 登入成功
+                                    case "S201":
+                                        {
+                                            Log.Debug("memberData.ReturnCode == S201");
+                                            primaryID = memberData.PrimaryID; //將資料傳入變數
+                                            string nickname = memberData.Nickname;
+                                            byte sex = memberData.Sex;
+                                            byte age = memberData.Age;
+                                            string IP = memberData.IP;
+
+                                            //加入線上玩家列表
+                                            ActorCollection.ActorReturn actorReturn = _server.Actors.ActorOnline(peerGuid, primaryID, account, nickname, age, sex, IP, this);
+                                            Log.Debug("ReturnCode :" + actorReturn.ReturnCode);
+                                            Log.Debug("ReturnMessage :" + actorReturn.DebugMessage);
+
+                                            if (actorReturn.ReturnCode == "S301")// 加入線上會員資料成功 回傳資料
+                                            {
+                                                Log.Debug("actorReturn.ReturnCode == S301");
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, primaryID }, { (byte)LoginParameterCode.Account, account },
+                                                    { (byte)LoginParameterCode.Nickname, nickname }, { (byte)LoginParameterCode.Age, age }, { (byte)LoginParameterCode.Sex, sex } , { (byte)LoginParameterCode.MemberType, memberType } 
+                                                };
+
+                                                OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+                                            }
+                                            else if (actorReturn.ReturnCode == "S302") //登入錯誤 重複登入
+                                            {
+                                                Log.Debug("重複區(3) PK:" + primaryID);
+
+                                                // 用這個peer guid的PrimaryUD來找guid 踢掉線上玩家
+                                                MPServerPeer peer;
+                                                peer = _server.Actors.GetPeerFromPrimary(primaryID); //primaryID取得登入peer
+
+
+                                                // 送出 重複登入事件 叫另外一個他斷線
+                                                EventData eventData = new EventData((byte)LoginOperationCode.ReLogin);
+                                                peer.SendEvent(eventData, new SendParameters());
+
+
+                                                // 回傳給登入者 通知重複登入
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object>{
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, 
+                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberType } 
+                                                };
+
+                                                OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+
+                                                peer.OnDisconnect(new DisconnectReason(), "重複登入");
+                                                Log.Debug("重複登入了!");
+                                            }
+                                            else // 登入錯誤 回傳空值
+                                            {
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object>{
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, 
+                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberType } 
+                                                };
+
+                                                OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+                                                break;
+                                            }
+                                            break;
+                                        }
+                                    #endregion
+
+                                    #region 登入失敗(判斷哪種方式登入) 如果是SNS 加入會員
+                                    case "S204":
+                                        {
+                                            Log.Debug("memberData.ReturnCode == S204");
+
+                                            if (memberType == MemberType.Gansol)    // 如果是基本會員登入 回傳 帳密錯誤
+                                            {
+                                                Log.Debug("Code:" + memberData.ReturnCode + "Message:" + memberData.ReturnMessage);
+                                                OperationResponse response = new OperationResponse(operationRequest.OperationCode) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = memberData.ReturnMessage.ToString() };
+                                                SendOperationResponse(response, new SendParameters());
+                                                break;
+                                            }
+                                            else if (memberType == MemberType.Google)  // SNS登入失敗 加入會員
+                                            {
+                                                memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, "DefaultName", LocalIP,"example@example.com", DateTime.Now.ToString(), (byte)memberType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                                if (memberData.ReturnCode == "S101")
+                                                {
+                                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                                    if (memberData.ReturnCode == "S201")
+                                                    {
+                                                        Log.Debug("memberData.ReturnCode == S201");
+                                                        primaryID = memberData.PrimaryID; //將資料傳入變數
+                                                        string nickname = memberData.Nickname;
+                                                        byte sex = memberData.Sex;
+                                                        byte age = memberData.Age;
+                                                        string IP = memberData.IP;
+
+                                                        //加入線上玩家列表
+                                                        ActorCollection.ActorReturn actorReturn = _server.Actors.ActorOnline(peerGuid, primaryID, account, nickname, age, sex, IP, this);
+                                                        Log.Debug("ReturnCode :" + actorReturn.ReturnCode);
+                                                        Log.Debug("ReturnMessage :" + actorReturn.DebugMessage);
+
+                                                        if (actorReturn.ReturnCode == "S301")// 加入線上會員資料成功 回傳資料
+                                                        {
+                                                            Log.Debug("actorReturn.ReturnCode == S301");
+                                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, primaryID }, { (byte)LoginParameterCode.Account, account },
+                                                    { (byte)LoginParameterCode.Nickname, nickname }, { (byte)LoginParameterCode.Age, age }, { (byte)LoginParameterCode.Sex, sex } , { (byte)LoginParameterCode.MemberType, memberType } 
+                                                };
+
+                                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
+                                                            SendOperationResponse(actorResponse, new SendParameters());
+                                                        }
+                                                        else // 登入錯誤 回傳空值
+                                                        {
+                                                            Log.Debug("SNS加入會員未知錯誤!!");
+                                                            Dictionary<byte, object> parameter = new Dictionary<byte, object>{
+                                                                { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, 
+                                                                { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberType } 
+                                                            };
+
+                                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
+                                                            SendOperationResponse(actorResponse, new SendParameters());
+                                                            break;
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            else if (memberType == MemberType.Facebook)  // SNS登入失敗 加入會員
+                                            {
+                                                Log.Debug("MemberType.Facebook");
+                                                OperationResponse actorResponse = new OperationResponse((byte)LoginOperationCode.GetProfile) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+                                            }
+                                            break;
+                                        }
+                                        #endregion
+
                                     default: // 無效的登入資訊 無法取得伺服器資料
-                                        Log.Debug("無效的登入資訊 無法取得伺服器資料!");
-                                        OperationResponse response = new OperationResponse(operationRequest.OperationCode) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = memberData.ReturnMessage.ToString() };
-                                        SendOperationResponse(response, new SendParameters());
-                                        break;
+                                        {
+                                            Log.Debug("Code:" + memberData.ReturnCode + "Message:" + memberData.ReturnMessage + "  無效的登入資訊 無法取得伺服器資料!");
+                                            OperationResponse response = new OperationResponse(operationRequest.OperationCode) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = memberData.ReturnMessage.ToString() };
+                                            SendOperationResponse(response, new SendParameters());
+                                            break;
+                                        }
                                 }
                             }
                             catch (Exception e)
@@ -355,7 +438,7 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    
+
                                     Log.Debug("IN ExitRoom");
 
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
@@ -416,6 +499,23 @@ namespace MPServer
 
                         #endregion
 
+
+                        #region Logout 登出
+                        case (byte)LoginOperationCode.Logout:
+                            {
+                                try
+                                {
+                                    OnDisconnect(new DisconnectReason(), "Logout");
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("ExitRoom Error: " + e.Message + "  Track: " + e.StackTrace);
+                                }
+
+                                break;
+                            }
+
+                        #endregion
 
                         #region KickOther 踢人
                         case (byte)BattleOperationCode.KickOther:
@@ -858,13 +958,13 @@ namespace MPServer
                                     MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacMissionReward(mission, missionRate, customValue)); //計算分數
                                     Log.Debug("BattleData OK");
                                     Int16 missionReward = battleData.missionReward;
-                                    
+
                                     Log.Debug("\n\nMissionReward: " + missionReward + "  \n\n");
                                     if (battleData.ReturnCode == "S503")//計算分數成功 回傳玩家資料
                                     {
                                         Log.Debug("battleData.ReturnCode == S503");
 
-                                     
+
                                         if (mission == (byte)Mission.WorldBoss) // 如果是 世界王任務 回傳給雙方任務完成
                                         {
                                             Int16 otherReward = battleData.customValue;
@@ -881,7 +981,7 @@ namespace MPServer
                                             // EventData
                                             Dictionary<byte, object> myEventParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, otherReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
                                             EventData myScoreEventData = new EventData((byte)BattleResponseCode.GetMissionScore, myEventParameter);
-                                        #endregion
+                                            #endregion
 
                                             #region 對方
                                             // 回傳給另外一位玩家
@@ -975,7 +1075,7 @@ namespace MPServer
 
                                         peerOther.SendEvent(bossEventData, new SendParameters());
                                     }
-                                    else if (bossHP==0)
+                                    else if (bossHP == 0)
                                     {
                                         _server.room.KillBoss(roomID);
                                         Log.Debug("bossHP == 0");
@@ -992,7 +1092,7 @@ namespace MPServer
                                         EventData bossEventData = new EventData((byte)BattleResponseCode.BossDamage, parameter2);
 
                                         peerOther.SendEvent(bossEventData, new SendParameters());
-                                        
+
                                     }
                                 }
                                 catch (Exception e)

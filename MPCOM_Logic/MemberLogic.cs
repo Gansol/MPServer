@@ -137,7 +137,7 @@ namespace MPCOM
         #region JoinMember(SNS) 加入會員
 
         [AutoComplete]
-        public MemberData JoinMember(string account, string nickname,string IP,string joinTime, byte memberType)
+        public MemberData JoinMember(string account, string nickname, string IP,string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "(Logic)S100";
@@ -160,7 +160,8 @@ namespace MPCOM
 
                 // 驗證成功後再進行IO寫入 寫入後存入 memberData
                 MemberIO memberIO = new MemberIO();
-                memberData = memberIO.JoinMember(account,"25d55ad283aa400af464c76d713c07ad", nickname,IP,joinTime, SNSType);
+                // memberData = memberIO.JoinMember(account,"25d55ad283aa400af464c76d713c07ad", nickname,IP,joinTime, SNSType); //MD5
+                memberData = memberIO.JoinMember(account,"12345678", nickname,IP,email,joinTime, SNSType);
 
             }
             catch (Exception e)

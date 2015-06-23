@@ -26,12 +26,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event JoinMemberHandler JoinMemberEvent;
 
     //委派事件 登入
-    public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age);
+    public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age,MemberType memberType);
     public event LoginHandler LoginEvent;
     
-    //委派事件 重複登入
+    //委派事件 重複登入、取得個人資料
     public delegate void ReLoginHandler();
     public event ReLoginHandler ReLoginEvent;
+    public event ReLoginHandler GetProfileEvent;
 
     //委派事件 接收技能傷害
     public delegate void ApplySkillHandler(string miceName);
@@ -245,6 +246,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 {
                     try
                     {
+                        MemberType memberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
+
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                         {
                             Debug.Log("login");
@@ -254,18 +257,37 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             byte getSex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
                             byte getAge = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
                             int getPirmaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
-                            //MemberType memberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
 
-                            LoginEvent(true, "", getReturn, getPirmaryID, getMemberID, getNickname, getSex, getAge); // send member data to loginEvent
+
+                            LoginEvent(true, "", getReturn, getPirmaryID, getMemberID, getNickname, getSex, getAge, memberType); // send member data to loginEvent
 
                         }
                         else//假如登入失敗 傳空值
                         {
                             Debug.Log("login fail :" + operationResponse.OperationCode);
                             DebugReturn(0, operationResponse.DebugMessage.ToString());
-                            LoginEvent(false, operationResponse.DebugMessage.ToString(), operationResponse.ReturnCode.ToString(), 0, "", "", 0, 0); // send error message to loginEvent
+                            LoginEvent(false, operationResponse.DebugMessage.ToString(), operationResponse.ReturnCode.ToString(), 0, "", "", 0, 0, memberType); // send error message to loginEvent
                         }
 
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region GetProfile 取得SNS個人資料
+
+            case (byte)LoginOperationCode.GetProfile://登入
+                {
+                    try
+                    {
+                        Debug.Log("LoginOperationCode.GetProfile1");
+                        GetProfileEvent();
+                        Debug.Log("LoginOperationCode.GetProfile2");
                     }
                     catch (Exception e)
                     {
@@ -501,6 +523,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 break;
 
             #endregion
+
+            default:
+                Debug.Log("the given key not found" + operationResponse.OperationCode);
+                break;
         }
 
 
@@ -530,12 +556,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 登入會員 傳送資料到Server
     /// </summary>
-    public void Login(string Account, string Password)
+    public void Login(string Account, string Password,MemberType memberType)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
-                             { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password }
+                             { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.MemberType, memberType }
                         };
 
             this.peer.OpCustom((byte)LoginOperationCode.Login, parameter, true, 0, true);

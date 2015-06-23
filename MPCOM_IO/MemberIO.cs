@@ -19,7 +19,7 @@ using System.EnterpriseServices;
  * >>IO須加強SQL安全性 加強後刪除
  * >>try catch 要移除 使用AutoComplete就可 移除後刪除
  * >>ILogger似乎沒用 要移除 移除後刪除
- * 
+ * >>SNS登入有給預設值 性別:3 秘密(未設定) 年齡:99
  * ***************************************************************/
 
 [assembly: ApplicationName("MPCOM"), ApplicationAccessControl(true)] //可以對MPCOM之間組件有存取控制權限
@@ -145,7 +145,7 @@ namespace MPCOM
         /// </summary>
         /// <returns></returns>
         [AutoComplete]
-        public MemberData JoinMember(string account,string password, string nickname,string IP,string joinTime, string memberType)
+        public MemberData JoinMember(string account,string password, string nickname,string IP,string email,string joinTime, string memberType)
         {
             MemberData memberData = default(MemberData);
             memberData.ReturnCode = "(IO)S100";
@@ -172,12 +172,15 @@ namespace MPCOM
                     if (DS.Tables[0].Rows.Count == 0)
                     {
                         //插入 會員資料
-                        string query = "INSERT INTO GansolMember (Account,Nickname,) VALUES(@account,@password,@nickname, @IP, @joinTime,@memberType)";
+                        string query = "INSERT INTO GansolMember (Account,Password,Nickname,Age,Sex,IP,Email,JoinTime,MemberType) VALUES(@account, @password, @nickname, @age, @sex, @IP, @email, @joinTime, @memberType)";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@password", password);
                         command.Parameters.AddWithValue("@nickname", nickname);
+                        command.Parameters.AddWithValue("@age", 99);    // 99歲
+                        command.Parameters.AddWithValue("@sex", 3);     // 秘密(未設定)
                         command.Parameters.AddWithValue("@IP", IP);
+                        command.Parameters.AddWithValue("@email", email);
                         command.Parameters.AddWithValue("@joinTime", joinTime);
                         command.Parameters.AddWithValue("@memberType", memberType);
                         int ExecuteNonQuery = command.ExecuteNonQuery();

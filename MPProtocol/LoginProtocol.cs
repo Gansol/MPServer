@@ -1,10 +1,11 @@
 ﻿namespace MPProtocol
 {
-
     public enum LoginOperationCode
     {
-        Login = 11,                  // 登入
-        ReLogin = 12,                // 重複登入
+        Login = 11,                 // 登入
+        ReLogin = 12,               // 重複登入
+        Logout = 13,                // 登出
+        GetProfile = 14,            // 取得SNS基本資料
     }
 
     public enum LoginResponseCode  //Peer那邊使用 和上面一樣的參數所以不打了

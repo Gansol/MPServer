@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using MPProtocol;
 
 public class Global  
 {
@@ -66,6 +67,7 @@ public class Global
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
     public static byte Age = 0;              // 年齡
+    public static MemberType MemberType;     // 年齡
     public static int Rice = 0;             // 遊戲幣
     public static Int16 Gold = 0;           // 金幣
 
