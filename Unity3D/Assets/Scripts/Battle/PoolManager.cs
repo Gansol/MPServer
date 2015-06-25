@@ -45,8 +45,6 @@ public class PoolManager : MonoBehaviour
 
     [Tooltip("技能位置")]
     public GameObject Skill;
-    [Tooltip("技能鼠物件匣")]
-    public GameObject[] SkillDeck;
 
     [Tooltip("產生數量")]
     [Range(3, 5)]
@@ -195,7 +193,10 @@ public class PoolManager : MonoBehaviour
         // 產生 技能老鼠
         foreach (KeyValuePair<string, object> item in _skillMice)
         {
-            clone = (GameObject)Instantiate(SkillDeck[Convert.ToInt16(item.Key) - 1]);   //　等傳老鼠ID名稱近來這要改
+            clone = (GameObject)Instantiate(ObjectDeck[Convert.ToInt16(item.Key) - 1]);   //　等傳老鼠ID名稱近來這要改
+            clone.transform.GetChild(0).GetComponent<Animator>().enabled = false;
+            clone.transform.GetChild(0).GetComponent<BoxCollider2D>().enabled = false;
+            clone.transform.GetChild(0).GetComponent<MonoBehaviour>().enabled = false;
             clone.name = item.Value.ToString();
             Skill.transform.GetChild(i).transform.gameObject.SetActive(true);
             clone.transform.parent = Skill.transform.GetChild(i);

@@ -20,10 +20,11 @@ public class BattleManager : MonoBehaviour
     private float _gameTime = 0;            // 遊戲時間
 
 
-    private float _maxScore = 0;     // 最高得分
+    private float _maxScore = 0;            // 最高得分
+    private float _gameScore = 0;           // 遊戲進行時所得到的分數
     private static int _eggMiceUsage = 0;   // 老鼠使用量
     private static int _energyUsage = 0;    // 能量使用量
-    private static int _missMice = 0;       // 失誤數           統計用
+    private static int _lostMice = 0;       // 失誤數           統計用
     private int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
 
@@ -50,11 +51,12 @@ public class BattleManager : MonoBehaviour
     public int tmpCombo { get { return _tmpCombo; } }
     public float gameTime { get { return _gameTime; } }
     public float score { get { return _score; } }
+    public float gameScore { get { return _gameScore; } }
     public float otherScore { get { return _otherScore; } }
     public float maxScore { get { return _maxScore; } }
     public int eggMiceUsage { get { return _eggMiceUsage; } }
     public int energyUsage { get { return _energyUsage; } }
-    public int missMice { get { return _missMice; } }
+    public int lostMice { get { return _lostMice; } }
     public int hitMice { get { return _hitMice; } }
     public int spawnCount { get { return _spawnCount; } }
     public float myDPS { get { return _myDPS; } }
@@ -82,11 +84,12 @@ public class BattleManager : MonoBehaviour
         _tmpCombo = 0;
         _gameTime = 0;
         _score = 0;
+        _gameScore = 0;
         _otherScore = 0;
         _maxScore = 0;
         _eggMiceUsage = 0;
         _energyUsage = 0;
-        _missMice = 0;
+        _lostMice = 0;
         _hitMice = 0;
         _spawnCount = 0;
     }
@@ -98,10 +101,10 @@ public class BattleManager : MonoBehaviour
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
             if (_score > _maxScore) _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
 
-            if (_gameTime > 10000 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_gameTime > 60 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
-                battleHUD.GoodGameMsg(Convert.ToInt16(_score), Convert.ToInt16(_maxScore), _maxCombo, _hitMice, _missMice);
+                battleHUD.GoodGameMsg(Convert.ToInt16(_gameScore), _maxCombo, _hitMice, _lostMice);
             }
         }
     }
@@ -150,7 +153,7 @@ public class BattleManager : MonoBehaviour
             BreakCombo();
             Global.photonService.UpdateScore(name, aliveTime);
             _spawnCount++;
-            _missMice++;
+            _lostMice++;
             Global.MiceCount--;
         }
     }
@@ -221,7 +224,10 @@ public class BattleManager : MonoBehaviour
             }
 
             if (missionManager.mission != Mission.Exchange)
+            {
                 _score = (this.score + _tmpScore < 0) ? 0 : _score += _tmpScore;
+                if(_tmpScore>0) _gameScore += _tmpScore;
+            }
 
             if (_combo >= 5) UpadateEnergy(0.01d);
         }
@@ -237,7 +243,11 @@ public class BattleManager : MonoBehaviour
             // 如果再交換分數任務下，取得對方增加的分數
             if (missionManager.missionMode == MissionMode.Opening)
             {
-                if (missionManager.mission == Mission.Exchange && value > 0) _score += _tmpScore;
+                if (missionManager.mission == Mission.Exchange && value > 0)
+                {
+                    _score += _tmpScore;
+                    _gameScore += _tmpScore;
+                }
 
                 if (missionManager.mission == Mission.Exchange && value < 0)
                     _otherScore = (this.otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;

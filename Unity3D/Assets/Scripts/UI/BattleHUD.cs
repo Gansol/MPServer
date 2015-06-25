@@ -375,20 +375,21 @@ public class BattleHUD : MonoBehaviour
 /// <param name="combo"></param>
 /// <param name="kill"></param>
 /// <param name="lost"></param>
-   public void GoodGameMsg(int score,int maxScore,int combo,int kill,int lost)
+   public void GoodGameMsg(int score,int combo,int kill,int lost)
     {
         if (score <= 0)
         {
-            GGObject.transform.GetChild(0).GetComponent<UILabel>().text = "Good Game!";
+            GGObject.transform.GetChild(1).gameObject.SetActive(true);
         }
         else
         {
-            GGObject.transform.GetChild(0).GetComponent<UILabel>().text = "Win!";
+            GGObject.transform.GetChild(2).gameObject.SetActive(true);
         }
-        GGObject.transform.GetChild(1).GetComponent<UILabel>().text = maxScore.ToString();
-        GGObject.transform.GetChild(2).GetComponent<UILabel>().text = combo.ToString();
-        GGObject.transform.GetChild(3).GetComponent<UILabel>().text = kill.ToString();
-        GGObject.transform.GetChild(4).GetComponent<UILabel>().text = lost.ToString();
+
+        GGObject.transform.Find("Result").GetChild(0).GetComponent<UILabel>().text = score.ToString();
+        GGObject.transform.Find("Result").GetChild(1).GetComponent<UILabel>().text = combo.ToString();
+        GGObject.transform.Find("Result").GetChild(2).GetComponent<UILabel>().text = kill.ToString();
+        GGObject.transform.Find("Result").GetChild(3).GetComponent<UILabel>().text = lost.ToString();
 
         GGObject.SetActive(true);
     }
