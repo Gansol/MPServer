@@ -22,7 +22,8 @@ namespace MPCOM
     public interface IPlayerDataUI  // 使用介面 可以提供給不同程式語言繼承使用  
     {
         byte[] LoadPlayerData(string account);
-        byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, string miceAll, string team, string miceAmount, string friend);
+        byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend);
+        byte[] UpdatePlayerData(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, string item, string miceAmount);
     }
 
     public class PlayerDataUI : ServicedComponent, IPlayerDataUI    // 使用介面 可以提供給不同程式語言繼承使用  
@@ -54,8 +55,11 @@ namespace MPCOM
         }
         #endregion
 
-        #region UpdatePlayerData 更新玩家資料
-        public byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, string miceAll, string team, string miceAmount, string friend)
+        #region UpdatePlayerData 更新玩家(全部)資料
+        /// <summary>
+        /// 更新 玩家全部資料
+        /// </summary>
+        public byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -64,7 +68,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, miceAll, team, miceAmount, friend);
+                playerData = playerDataLogic.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore,sumLost,sumKill,item, miceAll, team, miceAmount, friend);
             }
             catch (Exception e)
             {
@@ -76,5 +80,29 @@ namespace MPCOM
         }
         #endregion
 
+        #region UpdatePlayerData 更新玩家(GameOver時)資料
+        /// <summary>
+        /// 更新 玩家(GameOver時)資料
+        /// </summary>
+        public byte[] UpdatePlayerData(string account,Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, string item, string miceAmount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerData(account, score, exp, maxCombo, maxScore, lostMice, killMice, item, miceAmount);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
     }
 }

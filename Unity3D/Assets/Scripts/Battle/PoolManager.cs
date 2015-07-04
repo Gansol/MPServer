@@ -81,7 +81,10 @@ public class PoolManager : MonoBehaviour
         _skillMice = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
 
+    }
 
+    void Start()
+    {
         // 生出 預設數量的物件
         foreach (KeyValuePair<int, string> item in _dictObject)
         {
@@ -104,25 +107,24 @@ public class PoolManager : MonoBehaviour
 
         SkillMice();
 
-        
 
-//        Debug.Log("pooling Mice Completed ! ");
+
+        Debug.Log("pooling Mice Completed ! ");
         _poolingFlag = true;
     }
-
 
     /// <summary>
     /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
     /// </summary>
-    /// <param name="miceID">使用ID找Object</param>
+    /// <param name="objectID">使用ID找Object</param>
     /// <returns>回傳 ( GameObject / null )</returns>
-    public GameObject ActiveObject(int miceID)
+    public GameObject ActiveObject(int objectID)
     {
-        _dictObject.TryGetValue(miceID, out objectName);//等傳老鼠ID名稱近來這要改miceName
+        _dictObject.TryGetValue(objectID, out objectName);
 
         if (ObjectPool.transform.FindChild(objectName).childCount == 0)
         {
-            clone = (GameObject)Instantiate(ObjectDeck[miceID - 1], Vector3.zero, Quaternion.identity);
+            clone = (GameObject)Instantiate(ObjectDeck[objectID - 1], Vector3.zero, Quaternion.identity);
             clone.name = objectName;
             clone.transform.parent = ObjectPool.transform.FindChild(objectName).transform;
             clone.transform.localScale = Vector3.one;
@@ -131,14 +133,14 @@ public class PoolManager : MonoBehaviour
 
         for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
         {
-            GameObject mice;
+            GameObject clone;
 
-            mice = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
+            clone = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-            if (mice.name == objectName && !mice.transform.GetChild(0).gameObject.activeSelf)
+            if (clone.name == objectName && !clone.transform.GetChild(0).gameObject.activeSelf)
             {
-                mice.transform.GetChild(0).gameObject.SetActive(true);
-                return mice;
+                clone.transform.GetChild(0).gameObject.SetActive(true);
+                return clone;
             }
 
         }
@@ -152,16 +154,12 @@ public class PoolManager : MonoBehaviour
     /// <returns>回傳 ( GameObject / null )</returns>
     public GameObject ActiveObject(string objectName)
     {
-        int miceID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
-        /*
-        foreach (KeyValuePair<int, string> item in dictMice)
-        {
-            Debug.Log("In Dict: "+ item.Value);
-        }
-         * */
+        Debug.Log("_dictObject.Count:"+_dictObject.Count);
+        int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
+
         if (ObjectPool.transform.FindChild(objectName).childCount == 0)
         {
-            clone = (GameObject)Instantiate(ObjectDeck[miceID - 1], Vector3.zero, Quaternion.identity);
+            clone = (GameObject)Instantiate(ObjectDeck[objectID - 1], Vector3.zero, Quaternion.identity);
             clone.name = objectName;
             clone.transform.parent = ObjectPool.transform.FindChild(objectName).transform;
             clone.transform.localScale = Vector3.one;
@@ -170,14 +168,14 @@ public class PoolManager : MonoBehaviour
 
         for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
         {
-            GameObject mice;
+            GameObject clone;
 
-            mice = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
+            clone = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-            if (mice.name == objectName && !mice.transform.GetChild(0).gameObject.activeSelf)
+            if (clone.name == objectName && !clone.transform.GetChild(0).gameObject.activeSelf)
             {
-                mice.transform.GetChild(0).gameObject.SetActive(true);
-                return mice;
+                clone.transform.GetChild(0).gameObject.SetActive(true);
+                return clone;
             }
         }
         return null;
@@ -219,6 +217,8 @@ public class PoolManager : MonoBehaviour
 
     public void MergeMice()
     {
+        Debug.Log("Team:"+Global.Team);
+        Debug.Log("ITEM2:" + Global.Item);
         _tmpDict = Json.Deserialize(Global.Team) as Dictionary<string, object>;
 
         //把自己的老鼠存入HashSet中等待比較，再把老鼠存入合併好的老鼠Dict中
@@ -249,7 +249,7 @@ public class PoolManager : MonoBehaviour
             }
         }
         _mergeFlag = true;
-//        Debug.Log("Merge Mice Completed ! ");
+        Debug.Log("Merge Mice Completed ! ");
     }
 
 

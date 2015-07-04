@@ -22,9 +22,6 @@ public class ScrollView : MonoBehaviour
     public float lerpSpeed = 0.1f;    // 平滑移動速度 (0~1f)
     public float panOffset = 0;       // 邊界偏移量
     public int denominator = 10;     // Screen.width / denominator 回彈邊界
-    //public GameObject label;        // 測試用Label(NGUI)
-//#if UNITY_EDITOR
-//#elif UNITY_ANDROID || UNITY_IPHONE
 
 
     void Start()
@@ -35,6 +32,7 @@ public class ScrollView : MonoBehaviour
 
     void Update()
     {
+#if UNITY_ANDROID || UNITY_IOS
         Touch touch = Input.GetTouch(0);
         currentCameraX = Camera.main.transform.localPosition.x;
 
@@ -103,6 +101,7 @@ public class ScrollView : MonoBehaviour
             endFlag = false;
             StartCoroutine(GoEnd());
         }
+#endif
     }
 
     IEnumerator GoStart() // 緩慢的移動至開始位置

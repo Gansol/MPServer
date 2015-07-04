@@ -69,17 +69,17 @@ public class SpawnController : MonoBehaviour
         isSyncStart = true;
     }
 
-
-    void FixedUpdate()      // SpawnCheck
+    void Update()
     {
         if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart)
         {
             isSyncStart = false;
             Global.photonService.SyncGameStart();
         }
-        
+
         if (Global.isGameStart)
         {
+            Debug.Log("Game Start!");
             #region   -- 隨機產生老鼠 --
             if (spawnMode != SpawnMode.EasyMode && Global.spawnFlag)
             {
@@ -114,14 +114,7 @@ public class SpawnController : MonoBehaviour
                 }
             }
             #endregion
-        }
-        
-    }
 
-    void Update()
-    {
-        if (Global.isGameStart)
-        {
             #region Select SpawnMode 亂寫
             if (battleManager.score < 200 && battleManager.maxScore < 500)        // 簡單模式     
             {

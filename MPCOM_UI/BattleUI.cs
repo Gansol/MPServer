@@ -24,6 +24,7 @@ namespace MPCOM
         byte[] ClacScore(string miceName, float aliveTime);
         byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
+        byte[] GameOver(Int16 score,Int16 otherScore, Int16 gameTime, Int16 lostMice);
     }
 
     public class BattleUI : ServicedComponent, IBattleUI
@@ -116,5 +117,27 @@ namespace MPCOM
             return TextUtility.SerializeToStream(battleData);
         }
         #endregion
+
+
+
+
+        public byte[] GameOver(short score,short otherScore, short gameTime, short lostMice)
+        {
+            BattleData battleData = new BattleData();
+            battleData.ReturnCode = "S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                BattleLogic battleLogic = new BattleLogic();
+                battleData = battleLogic.GameOver(score,otherScore, gameTime,lostMice);
+            }
+            catch (Exception e)
+            {
+                battleData.ReturnCode = "S599";
+                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message + " 於: " + e.StackTrace;
+            }
+            return TextUtility.SerializeToStream(battleData);
+        }
     }
 }

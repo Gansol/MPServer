@@ -1,8 +1,0 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class MiceProperty : MonoBehaviour
-{
-    public readonly float eggMiceAppetite = 1;
-    public readonly float eggMiceBiteSpeed = 0.5f;
-}

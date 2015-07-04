@@ -28,6 +28,10 @@ namespace MPCOM
         public Int16 MaxCombo;		// 最大Combo數
         public int MaxScore;		// 最高分數
         public int SumScore;		// 總分數
+        public Int16 SumLost;		// 總跑掉老鼠
+        public int SumKill;		    // 總清除老鼠
+
+        public string Item;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string Team;			// 隊伍			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAmount;	// 老鼠數量		＊＊＊類型ＪＳＯＮ＊＊＊＊

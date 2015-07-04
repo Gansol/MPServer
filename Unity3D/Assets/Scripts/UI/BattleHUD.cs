@@ -174,6 +174,11 @@ public class BattleHUD : MonoBehaviour
         }
 
         #endregion
+
+        #region EXP動畫
+
+        #endregion
+
         ComboLabel.GetComponent<UILabel>().text = battleManager.combo.ToString();        // 畫出Combo值
 
         //        Debug.Log("_beautyEnergy: " + _beautyEnergy);
@@ -347,17 +352,24 @@ public class BattleHUD : MonoBehaviour
 
     public void ComboMsg(int value)
     {
-        Combo.SetActive(true);
-        if (value > 0)
+        if (Global.isGameStart)
         {
-            Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
-            Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Combo";
-            Combo.GetComponent<Animator>().Play("ComboFadeIn", 0, 0);
+            Combo.SetActive(true);
+            if (value > 0)
+            {
+                Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
+                Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Combo";
+                Combo.GetComponent<Animator>().Play("ComboFadeIn", 0, 0);
+            }
+            else
+            {
+                Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
+                Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Break";
+                Combo.GetComponent<Animator>().Play("ComboFadeOut");
+            }
         }
         else
         {
-            Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
-            Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Break";
             Combo.GetComponent<Animator>().Play("ComboFadeOut");
         }
     }
@@ -375,9 +387,11 @@ public class BattleHUD : MonoBehaviour
 /// <param name="combo"></param>
 /// <param name="kill"></param>
 /// <param name="lost"></param>
-   public void GoodGameMsg(int score,int combo,int kill,int lost)
+    public void GoodGameMsg(int score,bool result, int exp, int sliverReward, int combo, int killMice, int lostMice, bool isHighScore, bool isHighCombo)
     {
-        if (score <= 0)
+        int maxExp = 100;
+        
+        if (result)
         {
             GGObject.transform.GetChild(1).gameObject.SetActive(true);
         }
@@ -388,8 +402,24 @@ public class BattleHUD : MonoBehaviour
 
         GGObject.transform.Find("Result").GetChild(0).GetComponent<UILabel>().text = score.ToString();
         GGObject.transform.Find("Result").GetChild(1).GetComponent<UILabel>().text = combo.ToString();
-        GGObject.transform.Find("Result").GetChild(2).GetComponent<UILabel>().text = kill.ToString();
-        GGObject.transform.Find("Result").GetChild(3).GetComponent<UILabel>().text = lost.ToString();
+        GGObject.transform.Find("Result").GetChild(2).GetComponent<UILabel>().text = killMice.ToString();
+        GGObject.transform.Find("Result").GetChild(3).GetComponent<UILabel>().text = lostMice.ToString();
+        GGObject.transform.Find("Result").GetChild(4).GetComponent<UILabel>().text = sliverReward.ToString();
+
+       int _exp = Global.EXP + exp;
+
+
+       // EXP動畫還沒寫
+       if (_exp > 0 && _exp < maxExp)
+        {
+            GGObject.transform.Find("Result").GetChild(6).GetChild(0).GetComponent<UISlider>().value = (float)(_exp/100);
+        }
+       else if (_exp > maxExp)
+       {
+           Debug.Log("LEVEL UP!");
+           _exp -= maxExp;
+           GGObject.transform.Find("Result").GetChild(6).GetChild(0).GetComponent<UISlider>().value = (float)(_exp / 100);
+       }
 
         GGObject.SetActive(true);
     }

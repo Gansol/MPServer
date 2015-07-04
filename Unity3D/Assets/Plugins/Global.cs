@@ -76,8 +76,12 @@ public class Global
     public static Int16 MaxCombo = 0;       // 最大連擊
     public static int MaxScore = 0;         // 最高分
     public static int SumScore = 0;         // 總分
+    public static Int16 SumLost = 0;          // 總漏掉的老鼠
+    public static int SumKill = 0;          // 總除掉的老鼠
+
+    public static string Item = "";         // 漏掉的老鼠
     public static string MiceAll = "";      // 全部老鼠 JSON資料
-    public static string Team = "{\"1\":\"HAHA\"}";         // 隊伍老鼠 JSON資料
+    public static string Team = "";         // 隊伍老鼠 JSON資料
     public static string MiceAmount = "";   // 老鼠數量 JSON資料
     public static string Friend = "";       // 好友列表 JSON資料
 

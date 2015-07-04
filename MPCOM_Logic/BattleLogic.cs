@@ -253,7 +253,7 @@ namespace MPCOM
                             if (missionRate > 0) // 時間倒扣分
                             {
                                 float percent = (float)customValue / 100;
-                                            
+
                                 if (customValue == 50)  // 平手 獎勵/2
                                 {
                                     battleData.missionReward = (Int16)(worldBossReward / 2);
@@ -367,5 +367,62 @@ namespace MPCOM
         }
 
         #endregion
+
+        #region GameOver 遊戲結束
+        [AutoComplete]
+        public BattleData GameOver(short score,short otherScore, short gameTime, short lostMice)
+        {
+            battleData.ReturnCode = "(Logic)S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                if (score >= 0)
+                {
+                    battleData.score = score;
+                    
+                    float reward = 0;
+                    float exp = 0;
+
+                    if (gameTime >= 0)
+                    {
+                        reward = (score / 10 * 1.0f);
+                        exp = 1;
+                    }
+                    else if (gameTime >= 120)
+                    {
+                        reward = (score / 10 * 1.05f);
+                        exp = 2;
+                    }
+                    else if (gameTime >= 300)
+                    {
+                        reward = (score / 10 * 1.1f);
+                        exp = 5;
+                    }
+
+                    if (lostMice == 0) reward *= 1.5f;
+                    if (score > otherScore) exp *= 2f;
+
+                    battleData.sliverReward = (Int16)reward;
+                    battleData.expReward = (byte)exp;
+                    battleData.ReturnCode = "S501";
+                    battleData.ReturnMessage = "計算獎勵成功！";
+                    return battleData;
+                }
+                else
+                {
+                    battleData.ReturnCode = "S507";
+                    battleData.ReturnMessage = "計算獎勵失敗！";
+                    return battleData;
+                }
+            }
+            catch (Exception e)
+            {
+               
+                throw e;
+            }
+        }
+        #endregion
+
     }
 }

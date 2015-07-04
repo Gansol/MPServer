@@ -19,6 +19,7 @@ public class MissionManager : MonoBehaviour
     #region variables
     BattleManager battleManager;
     BattleHUD battleHUD;
+    
     public MissionMode missionMode { get { return _missionMode; } }
     public Mission mission { get { return _mission; } }
 
@@ -34,14 +35,15 @@ public class MissionManager : MonoBehaviour
     public int bossActiveTime = 100;                            // Boss會出現的 時間條件
     public int bossActiveScore = 1000;                          // Boss會出現的 分數條件
     public int endlessTime = 1000;                              // 強制結束時間
+    public GameObject[] missionICON;                            // 任務圖示
 
     private int activeScore;                                    // grandmother know it!
     private int activeTime;                                     // 遊戲開始後 啟動任務時間
     private int missionTime;                                    // 任務時間限制
 
-    private float avgMissionTime;                               // 平均任務完成時間
-    private float gameTime;                                     // 遊戲時間
-    private float lastGameTime;                                 // 上一次完成任務的時間
+    private double avgMissionTime;                               // 平均任務完成時間
+    private double gameTime;                                     // 遊戲時間
+    private double lastGameTime;                                 // 上一次完成任務的時間
     private Int16 _missionScore;                                // 任務所需分數
     private float lastScore;                                    // 任務開始前分數
     private float missionRate;                                  // 任務倍率
@@ -219,7 +221,7 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.Reduce:        // 完成後 activeScore要減少Reduce的量
                 {
-                    float endTime = gameTime - lastGameTime - missionTime;
+                    double endTime = gameTime - lastGameTime - missionTime;
                     if (endTime > -5 && endTime < 0) // 減少糧食 這比較特殊 需要顯示閃爍血調 還沒寫
                     {
                         battleHUD.HPBar_Shing();

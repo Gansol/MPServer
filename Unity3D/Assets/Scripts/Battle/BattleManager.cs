@@ -15,17 +15,17 @@ public class BattleManager : MonoBehaviour
     MissionManager missionManager;          // 任務管理員
     BattleHUD battleHUD;                    // HUD
 
-    private static int _maxCombo = 0;       // 最大連擊數
+    private static Int16 _maxCombo = 0;       // 最大連擊數
     private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
-    private float _gameTime = 0;            // 遊戲時間
+    private double _gameTime = 0;            // 遊戲時間
 
 
     private float _maxScore = 0;            // 最高得分
     private float _gameScore = 0;           // 遊戲進行時所得到的分數
     private static int _eggMiceUsage = 0;   // 老鼠使用量
     private static int _energyUsage = 0;    // 能量使用量
-    private static int _lostMice = 0;       // 失誤數           統計用
-    private int _hitMice = 0;        // 計算打了幾隻老鼠 統計用
+    private static Int16 _lostMice = 0;       // 失誤數           統計用
+    private int _killMice = 0;              // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
 
     private float _myDPS = 0;               // 我的平均輸出
@@ -37,27 +37,28 @@ public class BattleManager : MonoBehaviour
     private float _otherScore = 0;          // 對手分數
     private double _energy = 0;             // 能量
 
-    private int _combo = 0;                 // 連擊數
+    private Int16 _combo = 0;               // 連擊數
 
 
 
     private bool _isCombo;                  // 是否連擊
-
+    private bool _isHighScore;              // 是否破分數紀錄
+    private bool _isHighCombo;              // 是否破Combo紀錄
 
     // 外部取用 戰鬥資料
 
-    public int combo { get { return _combo; } }
-    public int maxCombo { get { return _maxCombo; } }
+    public Int16 combo { get { return _combo; } }
+    public Int16 maxCombo { get { return _maxCombo; } }
     public int tmpCombo { get { return _tmpCombo; } }
-    public float gameTime { get { return _gameTime; } }
+    public double gameTime { get { return _gameTime; } }
     public float score { get { return _score; } }
     public float gameScore { get { return _gameScore; } }
     public float otherScore { get { return _otherScore; } }
     public float maxScore { get { return _maxScore; } }
     public int eggMiceUsage { get { return _eggMiceUsage; } }
     public int energyUsage { get { return _energyUsage; } }
-    public int lostMice { get { return _lostMice; } }
-    public int hitMice { get { return _hitMice; } }
+    public Int16 lostMice { get { return _lostMice; } }
+    public int hitMice { get { return _killMice; } }
     public int spawnCount { get { return _spawnCount; } }
     public float myDPS { get { return _myDPS; } }
     public float otherDPS { get { return _myDPS; } }
@@ -66,6 +67,7 @@ public class BattleManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Debug.Log("Battle Start");
         missionManager = GetComponent<MissionManager>();
         battleHUD = GetComponent<BattleHUD>();
         Global.isExitingRoom = false;
@@ -77,6 +79,7 @@ public class BattleManager : MonoBehaviour
         Global.photonService.UpdateScoreEvent += OnUpdateScore;
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
         Global.photonService.GameStartEvent += OnGameStart;
+        Global.photonService.GameOverEvent += OnGameOver;
 
         _isCombo = false;
         _combo = 0;
@@ -90,7 +93,7 @@ public class BattleManager : MonoBehaviour
         _eggMiceUsage = 0;
         _energyUsage = 0;
         _lostMice = 0;
-        _hitMice = 0;
+        _killMice = 0;
         _spawnCount = 0;
     }
 
@@ -99,31 +102,39 @@ public class BattleManager : MonoBehaviour
         if (Global.isGameStart)
         {
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
-            if (_score > _maxScore) _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
+            if (_score > _maxScore)
+            {
+                _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
+                _isHighScore = true;
+            }
 
-            if (_gameTime > 60 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_gameTime > 180 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
-                battleHUD.GoodGameMsg(Convert.ToInt16(_gameScore), _maxCombo, _hitMice, _lostMice);
+                Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_gameTime, _maxCombo, _killMice, _lostMice);
+                Debug.Log("GameOver!" + _gameTime);
             }
+        }
+        else
+        {
+            _gameTime = 0;
         }
     }
 
     void FixedUpdate()
     {
-       // Debug.Log("(Update)_score"+_score);
+        // Debug.Log("(Update)_score"+_score);
         if (!Global.isGameStart)
             _lastTime = Time.fixedTime;
 
         if (Global.isGameStart)
         {
-            _gameTime = Time.fixedTime - _lastTime;
-            float _time = Time.fixedTime - _lastTime;
-            if (_time > _lastTime + 5)
+            _gameTime += Time.fixedDeltaTime;
+
+            if (_gameTime % 5==0)
             {
                 _myDPS = _score / Time.timeSinceLevelLoad;
                 _otherDPS = _otherScore / Time.timeSinceLevelLoad;
-                _lastTime = _time;
                 //Debug.Log("_myDPS: " + _myDPS + "\n  _otherDPS: " + _otherDPS);
             }
         }
@@ -137,7 +148,7 @@ public class BattleManager : MonoBehaviour
         {
             UpadateCombo();
             _spawnCount++;
-            _hitMice++;
+            _killMice++;
             Global.MiceCount--;
             Global.photonService.UpdateScore(name, aliveTime);
         }
@@ -206,7 +217,7 @@ public class BattleManager : MonoBehaviour
 
     void OnUpdateScore(Int16 value)    // 更新分數時
     {
-//        Debug.Log("(Update)OnUpdateScore" + value);
+        //        Debug.Log("(Update)OnUpdateScore" + value);
         if (Global.isGameStart)
         {
             Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
@@ -226,7 +237,7 @@ public class BattleManager : MonoBehaviour
             if (missionManager.mission != Mission.Exchange)
             {
                 _score = (this.score + _tmpScore < 0) ? 0 : _score += _tmpScore;
-                if(_tmpScore>0) _gameScore += _tmpScore;
+                if (_tmpScore > 0) _gameScore += _tmpScore;
             }
 
             if (_combo >= 5) UpadateEnergy(0.01d);
@@ -322,6 +333,13 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    void OnGameOver(Int16 score, byte exp, Int16 sliverReward)
+    {
+        bool result;
+        result = (_score > _otherScore) ? true : false;
+        battleHUD.GoodGameMsg(score, result, exp, sliverReward, _combo, _killMice, _lostMice, _isHighScore, _isHighCombo);
+    }
+
     void OnGameStart()
     {
         Global.isGameStart = true;
@@ -341,5 +359,6 @@ public class BattleManager : MonoBehaviour
         Global.photonService.UpdateScoreEvent -= OnUpdateScore;
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
         Global.photonService.GameStartEvent -= OnGameStart;
+        Global.photonService.GameOverEvent -= OnGameOver;
     }
 }

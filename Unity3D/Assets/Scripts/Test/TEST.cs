@@ -6,7 +6,12 @@ using System;
 
 public class TEST : MonoBehaviour
 {
+    public GameObject[] aa;
+
+    void Start()
+    {
 
 
 
+    }
 }

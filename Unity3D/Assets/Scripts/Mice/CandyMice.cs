@@ -65,118 +65,134 @@ public class CandyMice : MonoBehaviour
 
     void Update()
     {
-        #region Amination
-
-        if (upFlag && transform.parent.localPosition.y < upDistance)        // AnimationUp
-            StartCoroutine(AnimationUp());
-
-        if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
-            StartCoroutine(AnimationDown());
-
-        if (transform.gameObject.activeSelf == true && _timeFlag)  // 如果被Spawn儲存現在時間 注意 DisActive時Time還是會一直跑 所以要存起來減掉
+        if (Global.isGameStart)
         {
-            _timeFlag = false;
-            _lastTime = Time.time;
-        }
+            #region Amination
 
-        aliveTime = Time.time - _lastTime;                                                              // 老鼠存活時間 
-        Animator anims = GetComponent("Animator") as Animator;   // 播放 死亡動畫                  
-        AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
-        //Debug.Log("currentState : " + currentState.nameHash);
-        if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
-        {
-            animTime = currentState.normalizedTime;
+            if (upFlag && transform.parent.localPosition.y < upDistance)        // AnimationUp
+                StartCoroutine(AnimationUp());
 
-            // 目前播放的動畫 "總"時間
-            if (animTime > 1)   // 動畫撥放完畢時
+            if (isDisappear && transform.parent.localPosition.y > -_upDistance) // AnimationDown
+                StartCoroutine(AnimationDown());
+
+            if (transform.gameObject.activeSelf == true && _timeFlag)  // 如果被Spawn儲存現在時間 注意 DisActive時Time還是會一直跑 所以要存起來減掉
             {
-
-                anims.Play("Idle");   // 老鼠開始吃東西
-                upFlag = true;
+                _timeFlag = false;
+                _lastTime = Time.time;
             }
-        }
-        else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
-        {
-            animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
-            if (!dieFlag)       // 限制執行一次
+
+            aliveTime = Time.time - _lastTime;                                                              // 老鼠存活時間 
+            Animator anims = GetComponent("Animator") as Animator;   // 播放 死亡動畫                  
+            AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
+            //Debug.Log("currentState : " + currentState.nameHash);
+            if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))                    // 如果 目前 動化狀態 是 up
             {
-                if (animTime > 0.5)   // 動畫撥放完畢時
+                animTime = currentState.normalizedTime;
+
+                // 目前播放的動畫 "總"時間
+                if (animTime > 1)   // 動畫撥放完畢時
                 {
-                    OnDied(aliveTime);
-                    dieFlag = true;
+
+                    anims.Play("Idle");   // 老鼠開始吃東西
+                    upFlag = true;
                 }
             }
-        }
-        else if (currentState.nameHash == Animator.StringToHash("Layer1.Idle"))
-        {
-            animTime = currentState.normalizedTime;
-
-            //            Debug.Log(animTime);
-            if (!eatingFlag)        // 限制執行一次
+            else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
             {
-                if (animTime > 3 && !_isBoss)                       // 動畫撥放完畢時
+                animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
+                if (!dieFlag)       // 限制執行一次
                 {
-                    isDisappear = true;
-                    eatingFlag = true;
+                    if (animTime > 0.5)   // 動畫撥放完畢時
+                    {
+                        OnDied(aliveTime);
+                        dieFlag = true;
+                    }
                 }
             }
+            else if (currentState.nameHash == Animator.StringToHash("Layer1.Idle"))
+            {
+                animTime = currentState.normalizedTime;
+
+                //            Debug.Log(animTime);
+                if (!eatingFlag)        // 限制執行一次
+                {
+                    if (animTime > 3 && !_isBoss)                       // 動畫撥放完畢時
+                    {
+                        isDisappear = true;
+                        eatingFlag = true;
+                    }
+                }
+            }
+            #endregion
         }
-        #endregion
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     void OnHit()
     {
-        if (!_isBoss)
+        if (Global.isGameStart)
         {
-            if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
+            if (!_isBoss)
             {
-                clickFlag = true;
-                collider2D.enabled = false;
-                GetComponent<Animator>().Play("Die");
+                if (!clickFlag)  //＊＊＊＊＊＊＊超快還是會combo ＊＊＊＊＊　有時間在改
+                {
+                    clickFlag = true;
+                    collider2D.enabled = false;
+                    GetComponent<Animator>().Play("Die");
+                }
             }
-        }
-        else
-        {
-            if (GetComponent<BossPorperty>().hp != 0)
-                Global.photonService.BossDamage(1);
+            else
+            {
+                if (GetComponent<BossPorperty>().hp != 0)
+                    Global.photonService.BossDamage(1);
+            }
         }
     }
 
     void OnDisappear(float aliveTime)
     {
-        if (_isBoss) Destroy(GetComponent<BossPorperty>());
-        this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
-        gameObject.SetActive(false);
-        //Debug.Log("OnDisappear : " + aliveTime);
-        try
+        if (Global.isGameStart)
         {
-            _lastTime = aliveTime;
-            if (!_isBoss) battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            if (_isBoss) Destroy(GetComponent<BossPorperty>());
+            this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
+            gameObject.SetActive(false);
+            //Debug.Log("OnDisappear : " + aliveTime);
+            try
+            {
+                _lastTime = aliveTime;
+                if (!_isBoss) battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            }
+            catch (Exception e)
+            {
+                Debug.Log("失去連線，重新連線中‧‧‧  你想太多了");
+                throw e;
+            }
+            Global.MiceCount--;
         }
-        catch (Exception e)
-        {
-            Debug.Log("失去連線，重新連線中‧‧‧  你想太多了");
-            throw e;
-        }
-        Global.MiceCount--;
     }
 
     void OnDied(float aliveTime)
     {
-        this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
-        gameObject.SetActive(false);
+        if (Global.isGameStart)
+        {
+            this.transform.parent.parent = GameObject.Find("ObjectPool/" + transform.parent.name).transform;
+            gameObject.SetActive(false);
 
-        try
-        {
-            _lastTime = aliveTime;
-            battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            try
+            {
+                _lastTime = aliveTime;
+                battleManager.UpadateScore(transform.parent.name, aliveTime);  // 增加分數
+            }
+            catch (Exception e)
+            {
+                Debug.Log("失去連線，重新連線中‧‧‧ 你想太多了");
+                throw e;
+            }
+            Global.MiceCount--;
         }
-        catch (Exception e)
-        {
-            Debug.Log("失去連線，重新連線中‧‧‧ 你想太多了");
-            throw e;
-        }
-        Global.MiceCount--;
     }
 
     public void Play()
