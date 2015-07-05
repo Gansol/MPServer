@@ -19,6 +19,11 @@ public class SyncLoad : MonoBehaviour
 
     }
 
+    public void LoadMainGame()
+    {
+        Application.LoadLevel(2);
+    }
+
     void OnLoadScene()      // MainGame > Battle
     {
         Global.photonService.LoadSceneEvent -= OnLoadScene;

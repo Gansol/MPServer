@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using MPProtocol;
 
-public class Global  
+public class Global
 {
-    public static readonly string serverPath = "http://192.168.1.2:8080/MicePow/";//Server路徑
+    public static readonly string serverPath = "http://192.168.88.77:58767/MicePow";//Server路徑
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
@@ -37,8 +37,9 @@ public class Global
     public static readonly string sDownloadList = "DownloadList.json";  // 下載列表
     public static readonly string sFullPackage = "FullPackageList.json";// 完整下載列表
 
+    public static bool isCheckBundle = false;       // 是否檢查資源
     public static bool isNewlyVision = true;        // 是否為新版本
-    public static bool isStartDownload = false;     // 是否開始下載
+    public static bool isVisionDownload = false;    // 是否開始下載版本列表
     public static bool isCompleted = false;         // 是否下載完成
     public static bool isReplaced = false;          // 是否取代列表完成
     public static bool isJoinMember = true;         // 是否加入會員
@@ -60,8 +61,10 @@ public class Global
 
     public static int loadScene;            // 要被載入的場景
 
+    public static int maxConnTimes = 5;  // 重新連限次數
+
     public static string Ret = "";          // 回傳值
-    public static  int PrimaryID = 0;       // 主索引
+    public static int PrimaryID = 0;       // 主索引
     public static string Account = "";      // 帳號
     public static string Nickname = "";     // 暱稱
     public static int RoomID = -1;          // 房間ID
