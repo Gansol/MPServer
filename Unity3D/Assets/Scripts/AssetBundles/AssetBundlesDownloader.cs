@@ -100,6 +100,7 @@ public class AssetBundlesDownloader : MonoBehaviour
                 GetComponent<AssetBundleChecker>().fileDownload = true;
                 _fileDownload = true;
                 if (_fileCount == 0) {
+                    StartCoroutine(ReplaceItemList());
                     Global.isCheckBundle = true;
                     Global.isVisionDownload = true;
                 }
@@ -113,6 +114,7 @@ public class AssetBundlesDownloader : MonoBehaviour
         else if (File.Exists(Application.persistentDataPath + "/AssetBundles/" + assets) && !Global.isCompleted) //全部下載完成 取代檔案列表
         {
             _fileCount--;
+            _fileDownload = true;
             if (_fileCount == 0)
             {
                 StartCoroutine(ReplaceItemList());

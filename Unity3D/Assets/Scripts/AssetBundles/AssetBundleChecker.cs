@@ -51,7 +51,6 @@ public class AssetBundleChecker : MonoBehaviour
 
     private IEnumerator CompareAssetBundles(string localPathFile, string serverPathFile) //比對 檔案
     {
-        string localPath = Application.persistentDataPath + "/List/"; // 本機 檔案列表 路徑
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
 
         WWW wwwItemList = new WWW(serverPathFile); // 下載 伺服器 檔案列表

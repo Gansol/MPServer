@@ -9,7 +9,7 @@ using System;
 //未完成，只有讀伺服器資料
 public class VisionChecker : MonoBehaviour
 {
-    AssetBundlesHash bundleHash; //hash文件用
+//    AssetBundlesHash bundleHash; //hash文件用
     AssetBundleChecker bundleChecker = null;
     private string _listText; //暫存 讀取的List文字
     private byte[] _bVisionFile; //暫存 伺服器版本列表
@@ -20,7 +20,7 @@ public class VisionChecker : MonoBehaviour
 
     void Start()
     {
-        bundleHash = gameObject.AddComponent<AssetBundlesHash>();
+        //bundleHash = gameObject.AddComponent<AssetBundlesHash>();
         reConnTimes = 0;
     }
 
@@ -28,7 +28,6 @@ public class VisionChecker : MonoBehaviour
     {
         string localListPath = Application.persistentDataPath + "/List/";
         string localVisionListFile = localListPath + Global.sVisionList;
-        string localItemListFile = localListPath + Global.sItemList;
 
     reconnection: ;
         WWW wwwVisionList = new WWW(Global.serverListPath + Global.sVisionList);
@@ -60,7 +59,7 @@ public class VisionChecker : MonoBehaviour
             //Dictionary<KEY(鍵值),Vaule(值)> 
             //foreach ( 遞增值(陣列內涵值) in 陣列 )
             //取得伺服器版本列表
-            if (!(bundleHash.SHA1Complier(File.ReadAllBytes(localVisionListFile)) == bundleHash.SHA1Complier(_bVisionFile))) //本機 比較 伺服器 版本
+            if (!(AssetBundlesHash.SHA1Complier(File.ReadAllBytes(localVisionListFile)) == AssetBundlesHash.SHA1Complier(_bVisionFile))) //本機 比較 伺服器 版本
             {
                 Debug.Log("不是最新版本!");
                 Global.isNewlyVision = false;

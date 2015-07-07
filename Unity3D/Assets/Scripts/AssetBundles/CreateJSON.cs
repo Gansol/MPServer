@@ -8,7 +8,7 @@ using MiniJSON;
 //目前只比較bytes差別，本檔案沒有判斷檔案關開等例外情況
 public class CreateJSON : MonoBehaviour
 {
-    AssetBundlesHash bundleHash ;
+//    AssetBundlesHash bundleHash ;
 
     private string[] pathFiles;
     private byte[] bytesFile;
@@ -16,7 +16,7 @@ public class CreateJSON : MonoBehaviour
  
     public void AssetBundlesJSON() //建立 檔案列表
     {
-        bundleHash = gameObject.AddComponent<AssetBundlesHash>();
+        //bundleHash = gameObject.AddComponent<AssetBundlesHash>();
         Dictionary<string, object> dictBundles = new Dictionary<string, object>();
 
         string hash;
@@ -35,7 +35,7 @@ public class CreateJSON : MonoBehaviour
         foreach (string path in pathFiles) // 尋遍所有資料夾下 檔案路徑
         {
             bytesFile = File.ReadAllBytes(path); //讀取檔案bytes
-            hash = bundleHash.SHA1Complier(bytesFile);//Hash bytes
+            hash = AssetBundlesHash.SHA1Complier(bytesFile);//Hash bytes
             dictBundles.Add(Path.GetFileName(path), hash);//把hash過的值存入字典檔
         }
         CreateFile(Json.Serialize(dictBundles), itemListURL , Global.sItemList); //建立 新 檔案列表

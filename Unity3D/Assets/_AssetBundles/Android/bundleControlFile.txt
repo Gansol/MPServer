@@ -1,3 +1,0 @@
-BundleName:android_panel.unity3d
-VersionNumber:4
-

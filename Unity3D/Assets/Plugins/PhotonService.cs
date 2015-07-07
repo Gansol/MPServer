@@ -572,7 +572,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             #endregion
 
             default:
-                Debug.LogError("the given key not found" + operationResponse.OperationCode);
+                Debug.LogError("the given key not found! " + operationResponse.OperationCode);
                 break;
         }
 

@@ -24,7 +24,7 @@ public class VisionManager : MonoBehaviour
         {
             if (!Global.isCompleted) //全部完成 停止全部比較作業
             {
-                if (!Global.isNewlyVision && !Global.isVisionDownload) //版本太舊 開始下載
+                if (Global.isNewlyVision && !Global.isVisionDownload) //版本太舊 開始下載
                 {
                     Debug.Log("Your vision outdatad ! ");
                     Global.isVisionDownload = true;
