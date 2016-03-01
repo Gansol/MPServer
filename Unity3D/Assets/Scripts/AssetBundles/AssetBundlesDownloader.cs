@@ -95,6 +95,10 @@ public class AssetBundlesDownloader : MonoBehaviour
                 Debug.Log("AssetBundle Downloaded!");
                 System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/AssetBundles/"); //建立 檔案目錄
                 byte[] file = wwwAssetBundles.bytes; //轉換為二進位物件
+                string[] folder = assets.Split('/');
+                string folderPath = Application.persistentDataPath + "/AssetBundles/" + folder[0];
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
                 File.WriteAllBytes(Application.persistentDataPath + "/AssetBundles/" + assets, file); //寫入 檔案 WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
                 _fileCount--;
                 GetComponent<AssetBundleChecker>().fileDownload = true;

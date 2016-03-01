@@ -17,11 +17,31 @@ using System.Linq;
  *                          Description
  * ***************************************************************
  * 
+ * AssetBundlesCreator Alpha v1.0.0
+ * 
  * 建立AssetBundle Hash資訊
  * 自動建立AssetBundle與相關依賴物件(無壓縮)
  * 自動建立AssetBundle與相關依賴物件(LZMA壓縮)
  * ※禁止使用相同檔名，否則會覆蓋並出現錯誤※
  * 
+ * 使用方法:
+ * 在AssetBundle Folder下(可修改)，建立資料夾放入資產即可開始打包
+ * 可建立多個資料夾分類
+ * 
+ * 1.AssetBundles Folder: 資產資料夾路徑 i.e. /AssetFolderName/
+ * 2.Export Folder: 輸出資料夾 i.e. /ExportFolderName/Paltform/
+ * 3.Bundle file ext: 輸出資產的副檔名 。
+ * 4.資料夾路徑會隨著平台轉，自動切換預設位置(常用平台)。
+ * 5.BundleType: 可選擇要打包的種類(目前常用項目4項)。
+ * 6.Uncompressed AssetBundle: 勾選後將不會壓縮AssetBundle。
+ * 7-1.Dependent AssetBundle: 勾選後將啟用建置依賴包。
+ * 7-2.勾選後必須再建立子資料夾 "第一排序"資料夾必定是被依賴物件。
+ *     第二個資料夾資產會依賴第一個資料夾內資產，且為"第二排序"。
+ * 7-3.AssetBundle/MyObject/Share <--  AssetBundle/MyObject/Unique
+ * 8.Build Platform: AssetBundle建置平台
+ * 9.Other Platform: 其他平台(可能不支援，無法測試)
+ * 10.AssetBundle Hash: 可以建立物件對應的Hash 輸出JSON文件
+ * 11.HashType: 目前提供三種Hash MD5(32) SHA1(40) SHA512(64)
  * ***************************************************************/
 
 public class AssetBundlesCreator : EditorWindow
@@ -29,31 +49,30 @@ public class AssetBundlesCreator : EditorWindow
     public static string perfabFolder =
 #if UNITY_ANDROID
  "/AssetBundles/";
-#elif UNITY_IPHONE
+#elif UNITY_IPHONE || UNITY_IOS
     "/AssetBundles/";
-#elif UNITY_STANDALONE
+#elif UNITY_WEBPLAYER
     "/AssetBundles/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/AssetBundles/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        "/AssetBundles/";
 #endif
 
     public static string exportFolder =
 #if UNITY_ANDROID
  "/_AssetBundles/Android/";
-#elif UNITY_IPHONE
+#elif UNITY_IPHONE  || UNITY_IOS
     "/_AssetBundles/iOS/";
-#elif UNITY_STANDALONE
-    "/_AssetBundles/STANDALONE/";
+#elif UNITY_WEBPLAYER
+    "/_AssetBundles/WebPlayer/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    "/_AssetBundles/STANDALONE_WIN/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/_AssetBundles/STANDALONE_OSX/";
 #endif
 
-    public Planform planform =
-#if UNITY_ANDROID
- Planform.Android;
-#elif UNITY_IPHONE
-        Planform.iOS;
-#elif UNITY_STANDALONE
-    Planform.STANDALONE;
-#endif
-
-    public static string fileExtension = ".unity3d";
+    static string fileExtension = ".unity3d";
 
     static BuildTarget buildTarget = BuildTarget.WP8Player;
     static BuildAssetBundleOptions deterministicAssetBundle;
@@ -62,9 +81,9 @@ public class AssetBundlesCreator : EditorWindow
     static List<string> ext = new List<string> { };
     static string[] hashType = new string[] { "SHA1", "MD5", "SHA512" };
 
-    public Rect baseWindowRect = new Rect(10, 25, 400, 50);
-    public Rect buildWindowRect = new Rect(10, 250, 400, 50);
-    public Rect hashWindowsRect = new Rect(10, 450, 400, 50);
+    Rect baseWindowRect = new Rect(10, 25, 400, 50);
+    Rect buildWindowRect = new Rect(10, 290, 400, 50);
+    Rect hashWindowsRect = new Rect(10, 500, 400, 50);
 
     static bool _uncompressed;
     static bool _dependent;
@@ -74,17 +93,16 @@ public class AssetBundlesCreator : EditorWindow
     static bool _bPng;
     static bool _bJpge;
     static int _hashIndex;
+    static bool _bMp3;
+    static bool _bWav;
+    static bool _bOgg;
+    static bool _bAnim;
+    static bool _bController;
 
     static string _hash;
     static string _targetDir = Application.dataPath + exportFolder; // 建置目錄
     static string _perfabDir = Application.dataPath + perfabFolder; // 預置物件目錄
 
-    public enum Planform : byte
-    {
-        Android,
-        iOS,
-        STANDALONE,
-    }
 
 
     [MenuItem("Gansol/Build AssetBundle %&b")]
@@ -105,13 +123,12 @@ public class AssetBundlesCreator : EditorWindow
 
 
 
-    void BaseWondow(int unusedWindowID) // 基礎選項視窗物件
+    private void BaseWondow(int unusedWindowID) // 基礎選項視窗物件
     {
         // unusedWindowID = 視窗ID
         perfabFolder = EditorGUILayout.TextField("AssetBundles folder: ", perfabFolder);
         exportFolder = EditorGUILayout.TextField("Export folder: ", exportFolder);
         fileExtension = EditorGUILayout.TextField("Bundle file ext: ", fileExtension);
-        EditorGUILayout.LabelField("");
         EditorGUILayout.LabelField("Bundle Type");
         GUILayout.BeginHorizontal();
         _bPrefab = GUILayout.Toggle(_bPrefab, "*.prefab"); // CheckBox 核取欄位
@@ -119,13 +136,27 @@ public class AssetBundlesCreator : EditorWindow
         _bPng = GUILayout.Toggle(_bPng, "*.png"); // CheckBox 核取欄位
         _bJpge = GUILayout.Toggle(_bJpge, "*.jpg"); // CheckBox 核取欄位
         GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        _bMp3 = GUILayout.Toggle(_bMp3, "*.mp3"); // CheckBox 核取欄位
+        _bWav = GUILayout.Toggle(_bWav, "*.wav"); // CheckBox 核取欄位
+        _bOgg = GUILayout.Toggle(_bOgg, "*.ogg"); // CheckBox 核取欄位
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        _bAnim = GUILayout.Toggle(_bAnim, "*.anim"); // CheckBox 核取欄位
+        _bController = GUILayout.Toggle(_bController, "*.controller"); // CheckBox 核取欄位
+        GUILayout.EndHorizontal();
         EditorGUILayout.LabelField("");
         _uncompressed = GUILayout.Toggle(_uncompressed, "Uncompressed AssetBundle"); // CheckBox 核取欄位
         _dependent = GUILayout.Toggle(_dependent, "Dependent AssetBundle");
         EditorGUILayout.LabelField("");
+        if (GUILayout.Button("Clear Cache"))
+        {
+            Caching.CleanCache();
+            Debug.Log("*****LoadFromCacheordDownload Clear!*****");
+        }
     }
 
-    void BuildAssetWondow(int unusedWindowID)   // 建置選項視窗物件
+    private void BuildAssetWondow(int unusedWindowID)   // 建置選項視窗物件
     {
         // unusedWindowID = 視窗ID
         if (GUILayout.Button("Android"))
@@ -167,7 +198,7 @@ public class AssetBundlesCreator : EditorWindow
         EditorGUILayout.EndToggleGroup();   //核取區域結尾
     }
 
-    void BuildHashWondow(int unusedWindowID)    // 雜湊選項視窗物件
+    private void BuildHashWondow(int unusedWindowID)    // 雜湊選項視窗物件
     {
         EditorGUILayout.LabelField("Hash Type");
         _hashIndex = EditorGUILayout.Popup(_hashIndex, hashType);   // ListBox 下拉式選單(只能用字串陣列當選項值)
@@ -178,18 +209,18 @@ public class AssetBundlesCreator : EditorWindow
         }
     }
 
-    private static void BundleTypeSelect()
+    private static void BundleTypeSelect()  // 選擇要打包的副檔名
     {
         Debug.Log(_bPrefab);
         if (_bPrefab) ext.Add(".prefab"); else ext.Remove(".prefab");
         if (_bMat) ext.Add(".mat"); else ext.Remove(".mat");
         if (_bPng) ext.Add(".png"); else ext.Remove(".png");
         if (_bJpge) ext.Add(".jpg"); else ext.Remove(".jpg");
-
-        foreach (string item in ext)
-        {
-            Debug.Log("ITEM:" + item);
-        }
+        if (_bMp3) ext.Add(".mp3"); else ext.Remove(".mp3");
+        if (_bWav) ext.Add(".wav"); else ext.Remove(".wav");
+        if (_bOgg) ext.Add(".ogg"); else ext.Remove(".ogg");
+        if (_bAnim) ext.Add(".anim"); else ext.Remove(".anim");
+        if (_bController) ext.Add(".controller"); else ext.Remove(".controller");
     }
 
     private static void BuildAssetBundle()  // 建置
@@ -202,7 +233,7 @@ public class AssetBundlesCreator : EditorWindow
             BuildAssetLZMA();
     }
 
-    public static void BuildAssetLZMA() // Build AssetBundle(Compressed) 建立壓縮的AssetBundle
+    private static void BuildAssetLZMA() // Build AssetBundle(Compressed) 建立壓縮的AssetBundle
     {
         // BuildAssetLZMA 和 BuildAssetNoLZMA 只差別在 BuildAssetBundleOptions.UncompressedAssetBundle
         InfoCreator();  // 建立資產訊息
@@ -211,13 +242,18 @@ public class AssetBundlesCreator : EditorWindow
             Directory.CreateDirectory(_targetDir);
 
         string[] folders = Directory.GetDirectories(_perfabDir);    // 取得目錄所有下資料夾
-
+        
         foreach (string folder in folders)  // 尋遍所有資料夾
         {
+            string folderName = Path.GetFileName(Path.GetDirectoryName(folder+"/"));
+            if (!Directory.Exists(_targetDir+folderName))  // 如果資料夾不存在則建立
+                Directory.CreateDirectory(_targetDir  + folderName+"/");
+            string outputFolder = _targetDir + folderName+"/";
+            
             if (_dependent) // 如果是依賴資產型態
             {
                 string[] innFolder = Directory.GetDirectories(folder + "/");    // 取得目錄下所有子資料夾
-
+                
                 //共用資產
                 if (!File.Exists(innFolder[0] + "/" + "BundleInfo.json"))   // 如果找不到資產清單 報錯
                 {
@@ -242,7 +278,7 @@ public class AssetBundlesCreator : EditorWindow
                         if (File.Exists(filePath))  // 如果輸出資料夾下已經有舊檔案，刪除檔案
                             File.Delete(filePath);
                         //Build;
-                        if (BuildPipeline.BuildAssetBundle(obj, null, _targetDir + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
+                        if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
                             AssetDatabase.Refresh();    // 加入依賴訊息後並重新整理資產訊息
                     }
                 }
@@ -255,7 +291,7 @@ public class AssetBundlesCreator : EditorWindow
                 }
                 else
                 {
-                    BundleUniqueAssetBundle();  // 建立獨立資產
+                    BundleUniqueAssetBundle(outputFolder);  // 建立獨立資產
                 }
 
 
@@ -270,7 +306,7 @@ public class AssetBundlesCreator : EditorWindow
                 else
                 {
                     LoadFile(folder + "/" + "BundleInfo.json");
-                    BundleUniqueAssetBundle();// 建立獨立資產
+                    BundleUniqueAssetBundle(outputFolder);// 建立獨立資產
                 }
             }
 
@@ -278,7 +314,7 @@ public class AssetBundlesCreator : EditorWindow
         }
     }
 
-    public static void BuildAssetNoLZMA()   // Build AssetNoLZMA 建立基本的的AssetBundle
+    private static void BuildAssetNoLZMA()   // Build AssetNoLZMA 建立基本的的AssetBundle
     {
         // 說明同上
         InfoCreator();
@@ -290,6 +326,10 @@ public class AssetBundlesCreator : EditorWindow
 
         foreach (string folder in folders)
         {
+            string folderName = Path.GetDirectoryName(folder);
+            if (!Directory.Exists(_targetDir + "/" + folderName))  // 如果資料夾不存在則建立
+                Directory.CreateDirectory(_targetDir + "/" + folderName);
+            string outputFolder = _targetDir + "/" + folderName;
             if (_dependent)
             {
                 string[] innFolder = Directory.GetDirectories(folder + "/");
@@ -333,7 +373,7 @@ public class AssetBundlesCreator : EditorWindow
                 }
                 else
                 {
-                    BundleUniqueAssetBundle();
+                    BundleUniqueAssetBundle(outputFolder);
                 }
 
 
@@ -348,7 +388,7 @@ public class AssetBundlesCreator : EditorWindow
                 else
                 {
                     LoadFile(folder + "/" + "BundleInfo.json");
-                    BundleUniqueAssetBundle();
+                    BundleUniqueAssetBundle(outputFolder);
                 }
             }
 
@@ -370,9 +410,7 @@ public class AssetBundlesCreator : EditorWindow
         return false;
     }
 
-
-
-    public static void BuildAssetHash() // 建立AssetBundle Hash
+    private static void BuildAssetHash() // 建立AssetBundle Hash
     {
         string bundleFolderPath = Application.dataPath + exportFolder;  //輸出路徑
         string[] pathFiles;
@@ -385,35 +423,37 @@ public class AssetBundlesCreator : EditorWindow
         }
         else
         {
+            string[] folders = Directory.GetDirectories(bundleFolderPath);
             Dictionary<string, object> dictBundles = new Dictionary<string, object>();
-            pathFiles = Directory.GetFiles(bundleFolderPath, "*" + fileExtension); //取得 本機資料夾 全部檔案
 
-
-            foreach (string file in pathFiles) // 尋遍所有資料夾下 檔案路徑
+            foreach (string folder in folders)
             {
-                bytesFile = File.ReadAllBytes(file); //讀取檔案bytes
-                switch (_hashIndex)
+                pathFiles = Directory.GetFiles(folder, "*" + fileExtension); //取得 本機資料夾 全部檔案
+
+                foreach (string file in pathFiles) // 尋遍所有資料夾下 檔案路徑
                 {
-                    case 0: // SHA1
-                        _hash = AssetBundlesHash.SHA1Complier(bytesFile);    // Hash bytes
-                        break;
-                    case 1: // MD5
-                        _hash = AssetBundlesHash.MD5Complier(bytesFile);     // Hash bytes
-                        break;
-                    case 2: // SHA512
-                        _hash = AssetBundlesHash.SHA512Complier(bytesFile);  // Hash bytes
-                        break;
+                    bytesFile = File.ReadAllBytes(file); //讀取檔案bytes
+                    switch (_hashIndex)
+                    {
+                        case 0: // SHA1
+                            _hash = AssetBundlesHash.SHA1Complier(bytesFile);    // Hash bytes
+                            break;
+                        case 1: // MD5
+                            _hash = AssetBundlesHash.MD5Complier(bytesFile);     // Hash bytes
+                            break;
+                        case 2: // SHA512
+                            _hash = AssetBundlesHash.SHA512Complier(bytesFile);  // Hash bytes
+                            break;
+                    }
+                    dictBundles.Add(Path.GetFileName(Path.GetDirectoryName(file))+"/"+Path.GetFileName(file), _hash);//把hash過的值存入字典檔
                 }
-                dictBundles.Add(Path.GetFileName(file), _hash);//把hash過的值存入字典檔
             }
             CreateFile(Json.Serialize(dictBundles), bundleFolderPath, "BundleHash.json"); //建立 新 檔案列表
         }
         Debug.Log("*****Bundle Hash Completed!*****" + "  Path:" + bundleFolderPath);
     }
 
-
-
-    public static void InfoCreator() //Bunlde InfoCreator 負責建立 Bundle資訊(物件名稱、Assets路徑)
+    private static void InfoCreator() //Bunlde InfoCreator 負責建立 Bundle資訊(物件名稱、Assets路徑)
     {
         string folderPath = Application.dataPath + perfabFolder;
         if (!Directory.Exists(folderPath))
@@ -442,7 +482,7 @@ public class AssetBundlesCreator : EditorWindow
         }
     }
 
-    public static void AssetInfoJSON(string folder) //解析 檔案列表路徑
+    private static void AssetInfoJSON(string folder) //解析 檔案列表路徑
     {
         Dictionary<string, object> dictBundles = new Dictionary<string, object>();
 
@@ -467,7 +507,7 @@ public class AssetBundlesCreator : EditorWindow
         CreateFile(Json.Serialize(dictBundles), folder + "/", "BundleInfo.json"); //建立 新 檔案列表
     }
 
-    protected static void CreateFile(string contant, string path, string fileName) //建立JSON檔案
+    private static void CreateFile(string contant, string path, string fileName) //建立JSON檔案
     {
         if (File.Exists(path + fileName))
             File.Delete(path + fileName);
@@ -478,9 +518,7 @@ public class AssetBundlesCreator : EditorWindow
         }
     }
 
-
-    #region BundleUniqueAssetBundle
-    static void BundleUniqueAssetBundle()
+    private static void BundleUniqueAssetBundle(string outputFolder)   // 打包獨立資產
     {
         Object obj;
         uint crc = 0;
@@ -494,16 +532,15 @@ public class AssetBundlesCreator : EditorWindow
             //Build;
             if (_uncompressed)
             {
-                if (BuildPipeline.BuildAssetBundle(obj, null, _targetDir + file.Key + fileExtension, out crc, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
+                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
                     AssetDatabase.Refresh();
             }
             else
             {
-                if (BuildPipeline.BuildAssetBundle(obj, null, _targetDir + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
+                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
                     AssetDatabase.Refresh();
             }
             BuildPipeline.PopAssetDependencies();
         }
     }
-    #endregion
 }

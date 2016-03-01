@@ -21,7 +21,7 @@ public class SyncLoad : MonoBehaviour
 
     public void LoadMainGame()
     {
-        Application.LoadLevel(2);
+        Application.LoadLevel(1);
     }
 
     void OnLoadScene()      // MainGame > Battle
@@ -35,7 +35,7 @@ public class SyncLoad : MonoBehaviour
     void OnExitRoom()       // MainGame < Battle
     {
         Global.photonService.ExitRoomEvent -= OnExitRoom;
-        Application.LoadLevel(2);
+        Application.LoadLevel(1);
 
     }
 }

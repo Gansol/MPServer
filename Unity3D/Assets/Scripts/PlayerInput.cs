@@ -25,7 +25,7 @@ public class PlayerInput : MonoBehaviour
         perPos = Input.mousePosition;
         perPos.z =0.67f;
         pos = (Camera.main.orthographic) ? UICamera.mainCamera.ScreenToWorldPoint(Input.mousePosition) : UICamera.mainCamera.ScreenToWorldPoint(perPos);
-        // hit = (Camera.main.orthographic) ? Physics2D.Raycast(pos, Vector2.zero) : Physics2D.Raycast(pos, Vector2.zero);
+         hit = (Camera.main.orthographic) ? Physics2D.Raycast(pos, Vector2.zero) : Physics2D.Raycast(pos, Vector2.zero);
 //        Debug.Log("pos:" + pos + "XX" + Input.mousePosition);
         if (hit && hit.collider != null)
         {

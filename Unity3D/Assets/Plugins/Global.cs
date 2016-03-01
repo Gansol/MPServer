@@ -88,6 +88,8 @@ public class Global
     public static string MiceAmount = "";   // 老鼠數量 JSON資料
     public static string Friend = "";       // 好友列表 JSON資料
 
+    public static string ext = ".unity3d";       // AB副檔名
+
     public static class OtherData
     {
         public static int PrimaryID = 0;        // 主索引
@@ -100,4 +102,5 @@ public class Global
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
     public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();   // 老鼠屬性資料 JSON資料
+
 }
