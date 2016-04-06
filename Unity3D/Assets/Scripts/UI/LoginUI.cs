@@ -380,7 +380,6 @@ public class LoginUI : MonoBehaviour
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)
         {
-
             case (byte)MemberType.Facebook:
                 {
                     try

@@ -423,17 +423,18 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             string miceData = (string)operationResponse.Parameters[(byte)MiceParameterCode.MiceData];
                             Global.miceProperty = Json.Deserialize(miceData) as Dictionary<string, object>;
                             Global.isMiceLoaded = true;
-
+                            /* 印出老鼠資料
                             foreach (KeyValuePair<string, object> item in Global.miceProperty)
                             {
-                                //Debug.LogWarning("We can see this is Dictionary Object:" + item.Value);
+                                Debug.LogWarning("We can see this is Dictionary Object:" + item.Value);
                                 var innDict = item.Value as Dictionary<string, object>;
 
                                 foreach (KeyValuePair<string, object> inner in innDict)
                                 {
-                                    //Debug.Log("Key:" + inner.Key + " Value:" + inner.Value);
+                                    Debug.Log("Key:" + inner.Key + " Value:" + inner.Value);
                                 }
                             }
+                             * */
                         }
                     }
                     catch (Exception e)
