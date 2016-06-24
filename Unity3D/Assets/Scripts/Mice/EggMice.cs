@@ -45,7 +45,11 @@ public class EggMice : MonoBehaviour
 
     void Awake()
     {
-        battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
+        if (Global.BattleStatus == true)
+        {
+            battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
+        }
+
         upFlag = true;
         dieFlag = false;
         isDisappear = false;

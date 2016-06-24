@@ -4,10 +4,18 @@ using System.Collections.Generic;
 
 public class TEST2 : MonoBehaviour
 {
-    public IEnumerator A(string a)
+    int i;
+    void Start()
     {
+        i = 0;
+    }
 
-        Debug.Log(a);
+    public IEnumerator A(int a)
+    {
+        i++;
+        Debug.Log("times:"+a.ToString());
+
+        Debug.Log("value:" + i);
         yield return null;
     }
 }

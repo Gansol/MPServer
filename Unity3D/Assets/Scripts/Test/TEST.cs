@@ -12,7 +12,12 @@ public class TEST : MonoBehaviour
         TEST2 t = new TEST2();
         for (int i = 0; i < 3; i++)
         {
-            StartCoroutine(t.A(i.ToString()));
+            StartCoroutine(t.A(i));
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            StartCoroutine(t.A(i));
         }
     }
 }

@@ -9,12 +9,13 @@ public class AssetBundleManager
     public bool isLoadAtlas { get { return _isLoadAtlas; } }
     public bool isLoadMat { get { return _isLoadMat; } }
     public bool isLoadPrefab { get { return _isLoadPrefab; } }
-    public bool isLoadObject { get { return _isLoadObject; } set { _isLoadObject = value;} }
+    public bool isLoadObject { get { return _isLoadObject; } set { _isLoadObject = value; } }
     public bool isStartLoadAsset { get { return _isStartLoadAsset; } }
     public string ReturnMessage { get { return _ReturnMessage; } }
     public string Ret { get { return _Ret; } }
     public int progress { get { return _progress; } }
-    public int loadedCount { get { return _loadedCount; } set { _loadedCount = value; } }
+    public int loadedABCount { get { return _loadedABCount; } set { _loadedABCount = value; } }
+    public int loadedObjectCount { get { return _loadedObjectCount; } set { _loadedObjectCount = value; } }
 
     private AssetBundleRequest _request = null;
     private static WWW www = null;
@@ -26,7 +27,8 @@ public class AssetBundleManager
     private string _ReturnMessage = "";
     private string _Ret = "C000";
     private int _progress = 0;
-    private int _loadedCount = 0;
+    private int _loadedABCount = 0;
+    private int _loadedObjectCount = 0;
 
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
 
@@ -47,7 +49,7 @@ public class AssetBundleManager
         _ReturnMessage = "";
         _Ret = "C000";
         _progress = 0;
-        _loadedCount = 0;
+        _loadedABCount = 0;
     }
 
     public class AssetBundleRef
@@ -57,6 +59,8 @@ public class AssetBundleManager
 
     public IEnumerator LoadAtlas(string assetName, System.Type type)
     {
+        
+        
         AssetBundleRef abRef;
         if (!dictAssetBundleRefs.TryGetValue(assetName, out abRef))
         {
@@ -86,7 +90,7 @@ public class AssetBundleManager
             if (www.error != null)
             {
                 _Ret = "C002";
-                _ReturnMessage = "載入資源失敗！ : \n" + www.error;
+                _ReturnMessage = "載入資源失敗！ : \n" + assetName + "\n" + www.error;
                 throw new Exception(www.error);
             }
             else if (www.isDone)
@@ -102,6 +106,7 @@ public class AssetBundleManager
                 else if (type == typeof(Material)) _isLoadMat = true;
                 else if (type == typeof(GameObject)) _isLoadPrefab = true;
                 www.Dispose();
+                
             }
         }
         else
@@ -110,6 +115,8 @@ public class AssetBundleManager
             else if (type == typeof(Material)) _isLoadMat = true;
             else if (type == typeof(GameObject)) _isLoadPrefab = true;
         }
+
+        _loadedABCount++;   // 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
     }
 
 
@@ -117,7 +124,13 @@ public class AssetBundleManager
     {
         //Debug.Log("( 1 ) :" + assetName);
         AssetBundleRef abRef;
-        if (!dictAssetBundleRefs.TryGetValue(assetName, out abRef))
+
+        //foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+        //{
+        //    Debug.Log("AB DICT: " + item.Key.ToString());
+        //}
+        
+        if (!bLoadedAssetbundle(assetName))
         {
             while (_isLoadPrefab == false)
                 yield return null;
@@ -128,32 +141,30 @@ public class AssetBundleManager
             yield return www;
             try
             {
-
-            
-            _ReturnMessage = "正再載入遊戲物件... ( " + assetName + Global.ext + " )";
-            //Debug.Log("( 2 ) :" + assetName);
-            if (www.error != null)
-            {
-                _Ret = "C002";
-                _ReturnMessage = "載入遊戲物件失敗！ : \n" + www.error;
-                //Debug.Log("( 3 ) :" + assetName);
+                _ReturnMessage = "正再載入遊戲物件... ( " + assetName + Global.ext + " )";
+                //Debug.Log("( 2 ) :" + assetName);
+                if (www.error != null)
+                {
+                    _Ret = "C002";
+                    _ReturnMessage = "載入遊戲物件失敗！ :" + assetName + "\n" + www.error;
+                    //Debug.Log("( 3 ) :" + assetName);
+                }
+                else if (www.isDone)
+                {
+                    _Ret = "C001";
+                    _ReturnMessage = "載入遊戲物件完成" + "( " + assetName + " )";
+                    abRef = new AssetBundleRef();
+                    abRef.assetBundle = www.assetBundle;
+                    dictAssetBundleRefs.Add(assetName, abRef);
+                    string[] asset = assetName.Split('/');
+                    _request = abRef.assetBundle.LoadAsync(asset[1], type);
+                    _isLoadObject = true;
+                    
+                    www.Dispose();
+                    //Debug.Log("( 4 ) :" + assetName);
+                }
             }
-            else if (www.isDone)
-            {
-                _Ret = "C001";
-                _ReturnMessage = "載入遊戲物件完成" + "( " + assetName + " )";
-                abRef = new AssetBundleRef();
-                abRef.assetBundle = www.assetBundle;
-                dictAssetBundleRefs.Add(assetName, abRef);
-                string[] asset = assetName.Split('/');
-                _request = abRef.assetBundle.LoadAsync(asset[1], type);
-                _isLoadObject = true;
-                _loadedCount++;
-                www.Dispose();
-                //Debug.Log("( 4 ) :" + assetName);
-            }
-            }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
@@ -161,7 +172,37 @@ public class AssetBundleManager
         else // 已經載入了 不須載入
         {
             _isLoadObject = true;
-            _loadedCount++;
+        }
+        
+        _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
+    }
+
+    public bool bLoadedAssetbundle(string name)
+    {
+        AssetBundleRef abRef;
+        bool Loaded;
+        return Loaded = dictAssetBundleRefs.TryGetValue(name, out abRef) ? Loaded = true : Loaded = false;
+    }
+    /// <summary>
+    /// 取得已載入AssetBundle
+    /// </summary>
+    /// <param name="url">"folder/assetbundle"</param>
+    /// <returns></returns>
+    public static AssetBundle getAssetBundle(string url)
+    {
+        string keyName = url;
+        AssetBundleRef abRef;
+        if (dictAssetBundleRefs.TryGetValue(keyName, out abRef))
+            return abRef.assetBundle;
+        else
+            return null;
+    }
+    
+    public void LoadedBundle()
+    {
+        foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+        {
+           Debug.Log("AB DICT: " + item.Key.ToString());
         }
     }
 
