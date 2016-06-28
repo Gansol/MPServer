@@ -81,7 +81,7 @@ public class Global
     public static int SumScore = 0;         // 總分
     public static Int16 SumLost = 0;          // 總漏掉的老鼠
     public static int SumKill = 0;          // 總除掉的老鼠
-
+    public static int MeunObjetDepth = 10000; // 主選單物件深度
     public static string Item = "";         // 漏掉的老鼠
     public static string MiceAll = "";      // 全部老鼠 JSON資料
     public static string Team = "";         // 隊伍老鼠 JSON資料

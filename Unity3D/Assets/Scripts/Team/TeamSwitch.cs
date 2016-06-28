@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MiceSwitch : MonoBehaviour
-{
+public class TeamSwitchOLD : MonoBehaviour {
+
     [Range(0, 1)]
     public float lerpSpeed = 0.25f;
     public bool activeBtn;
@@ -21,7 +21,7 @@ public class MiceSwitch : MonoBehaviour
 
     private float _distance;
 
-    // Use this for initialization
+	// Use this for initialization
     void Start()
     {
         _originPos = transform.localPosition;
@@ -30,18 +30,20 @@ public class MiceSwitch : MonoBehaviour
         _other = gameObject;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.localPosition, _toPos) < .5f && _other.tag == "TeamIcon")
+        if (transform.childCount != 0)
+            activeBtn = true;
+
+        if (Vector3.Distance(transform.localPosition, _toPos) < .5f && _other.tag == "MiceIcon")
         {
-            transform.localPosition = _toPos;          
+            transform.localPosition = _toPos;
             transform.GetChild(0).parent = _other.transform;
             _clone.name = gameObject.name;
             _clone.tag = gameObject.tag;
-            _goHome = false;
             _clone.GetComponent<MiceSwitch>().activeBtn = !activeBtn;
             _clone.GetComponent<UIDragObject>().enabled = false;
+            _goHome = false;
             Destroy(gameObject);
 
             Debug.Log("GET IT!");
@@ -60,7 +62,7 @@ public class MiceSwitch : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
 
-        if (other.tag == "TeamIcon" && _isPress)
+        if (other.tag=="MiceIcon" && _isPress)
         {
             _other = other.gameObject;
             _toPos = other.transform.localPosition;
@@ -72,7 +74,7 @@ public class MiceSwitch : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
 
-        if (other.tag == "TeamIcon" && !_isPress)
+        if (other.tag == "MiceIcon" && !_isPress)
         {
             _isTrigger = false;
             Debug.Log("Left! : " + gameObject.name + " " + _isTrigger);
@@ -84,7 +86,7 @@ public class MiceSwitch : MonoBehaviour
         Debug.Log("Hello");
     }
 
-    void OnHover(bool isOver)
+       void OnHover(bool isOver)
     {
         if (activeBtn)
         {
@@ -100,10 +102,8 @@ public class MiceSwitch : MonoBehaviour
         if (activeBtn)
         {
             _isPress = isPress;
-            
             if (isPress )
             {
-                GetComponent<BoxCollider>().isTrigger = true;
                 TweenColor.Begin(this.gameObject, 0.1f, new Color(0.90f, 0.90f, 0.90f));
                 _clone = (GameObject)Instantiate(this.gameObject);
                 _clone.transform.parent = this.transform.parent;
@@ -113,7 +113,6 @@ public class MiceSwitch : MonoBehaviour
             }
             else if (_isTrigger && !isPress)    // 碰撞且放開時 交換物件
             {
-                GetComponent<BoxCollider>().isTrigger = false;
                 _isTrigger = !_isTrigger;
                 _goHome = true;
                 _destroy = false;
@@ -124,7 +123,6 @@ public class MiceSwitch : MonoBehaviour
             }
             else if (!_isTrigger && !isPress)  // 無碰撞且放開時 返回
             {
-                GetComponent<BoxCollider>().isTrigger = false;
                 _toPos = _originPos;
                 _goHome = _destroy = true;
                 _distance = Vector3.Distance(transform.localPosition, _toPos);
@@ -141,5 +139,4 @@ public class MiceSwitch : MonoBehaviour
     {
         transform.localPosition = Vector3.Lerp(from, to, speed);
     }
-
 }

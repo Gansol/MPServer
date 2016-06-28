@@ -158,7 +158,7 @@ public class PanelManager2 : MonoBehaviour
                             if (assetBundleManager.bLoadedAssetbundle(name) != true)    //如果AB還沒載入
                             {
                                 _objCount = 1 * 2;
-                                assetBundleManager.init();
+                                //assetBundleManager.init();
                                 StartCoroutine(assetBundleManager.LoadGameObject(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(GameObject)));
                                 StartCoroutine(assetBundleManager.LoadGameObject(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Animation)));
                             }
@@ -209,6 +209,42 @@ public class PanelManager2 : MonoBehaviour
         AssetBundleManager.UnloadUnusedAssets();
         //assetBundleManager.loadedCount = 0; //錯誤
     }
+
+
+
+    /// <summary>
+    /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
+    /// </summary>
+    /// <param name="data">JSON資料</param>
+    /// <param name="parent">實體化父系位置</param>
+    void InstantiateObject(string data, Transform parent)
+    {
+        _objCount = 0;
+        string bundleName = "EggMice/EggMice";
+            if (assetBundleManager.bLoadedAssetbundle(bundleName))
+            {
+                AssetBundle bundle = AssetBundleManager.getAssetBundle(bundleName);
+                if (bundle != null)
+                {
+                    _clone = (GameObject)Instantiate(bundle.mainAsset);
+                    _clone.transform.parent = parent.GetChild(_objCount);
+                    _clone.name = "EggMice";
+                    _clone.transform.localPosition = Vector3.zero;
+                    _clone.transform.localScale = Vector3.one;
+                    _objCount++;
+                }
+                else
+                {
+                    Debug.LogError("Assetbundle reference not set to an instance.");
+                }
+            }
+
+        assetBundleManager.LoadedBundle();
+        Debug.Log(assetBundleManager.loadedObjectCount);
+
+        _objCount = 0;
+    }
+
 
     public void OnMiceDrag(string miceName)
     {

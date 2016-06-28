@@ -17,6 +17,11 @@ public class TeamPanelManager : MonoBehaviour
     private int _matCount;
     private int _objCount;
 
+    private bool _isCompleted = false;
+
+    public float delayBetween2Clicks; // Change value in editor
+    private float lastClickTime = 0;
+
     void Awake()
     {
         assetBundleManager = new AssetBundleManager();
@@ -33,6 +38,11 @@ public class TeamPanelManager : MonoBehaviour
     void Update()
     {//錯誤
 
+        if (assetBundleManager.isStartLoadAsset && !_isCompleted)
+        {
+            Debug.Log("訊息：" + assetBundleManager.ReturnMessage);
+        }
+
         if (assetBundleManager.loadedABCount == _matCount && _matCount != 0)
         {
             Debug.Log("assetBundleManager.loadedCount = " + assetBundleManager.loadedABCount + "     _matCount:= " + _matCount);
@@ -46,39 +56,34 @@ public class TeamPanelManager : MonoBehaviour
             assetBundleManager.loadedObjectCount = _matCount = 0;
             InstantiateObject();
         }
-
-        /*
-        if (assetBundleManager.loadedCount != 0 && assetBundleManager.loadedCount == 1)     // 載入完成時顯示老鼠
-        {
-            _clone = (GameObject)Instantiate(assetBundleManager.request.asset);
-            _clone.SetActive(false);
-            _clone.transform.parent = _miceImage.transform;
-            _clone.name = assetBundleManager.request.asset.name;
-            _clone.transform.localPosition = Vector3.zero;
-            _clone.transform.localScale = Vector3.one;
-            _clone.layer = _miceImage.transform.gameObject.layer;
-            _clone.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-
-            _animator = _clone.transform.GetChild(0).GetComponent<Animator>();
-            Destroy(_clone.transform.GetChild(0).GetComponent(_clone.name));
-            SwitchDepth(_clone);
-
-            GameObject _tmp;
-            if (dictMiceImage.TryGetValue(_clone.name, out _tmp) != null)
-            {
-                dictMiceImage.Add(_clone.name, _clone);
-            }
-            _tmpMiceImage = _clone;
-            _clone.SetActive(true);
-
-            AssetBundleManager.UnloadUnusedAssets();
-            assetBundleManager.loadedCount = 0; //錯誤
-        }
-         * */
     }
-
+    
     public void OnMiceClick(GameObject btn_mice)
     {
+
+        if (Time.time - lastClickTime < delayBetween2Clicks)    // Double Click
+        {
+            Debug.Log("Double clicked");
+            btn_mice.SendMessage("Mice2Team");
+        }
+        else
+        {
+            StartCoroutine(OnClickCoroutine(btn_mice));
+        }
+        lastClickTime = Time.time;
+
+
+    }
+
+    IEnumerator OnClickCoroutine(GameObject btn_mice)
+    {
+        yield return new WaitForSeconds(delayBetween2Clicks);
+
+        if (Time.time - lastClickTime < delayBetween2Clicks)
+        {
+            yield break;
+        }
+
         _btnClick = btn_mice;
         if (_lastClick != btn_mice) // 不同按鈕按太快會出錯
         {
@@ -90,6 +95,7 @@ public class TeamPanelManager : MonoBehaviour
 
             if (dictMiceImage.TryGetValue(miceName, out _miceImage))    // 假如已經載入老鼠圖片了 直接顯示
             {
+                Debug.Log("MiceName: " + dictMiceImage.TryGetValue(miceName, out _miceImage));
                 _miceImage.SetActive(true);
                 _tmpMiceImage = _miceImage;
             }
@@ -98,9 +104,11 @@ public class TeamPanelManager : MonoBehaviour
                 LoadAsset(btn_mice);
             }
 
-
+            LoadProperty(btn_mice.name);
 
         }
+
+        Debug.Log("Simple click");
     }
 
     private void LoadAsset(GameObject obj)
@@ -115,26 +123,24 @@ public class TeamPanelManager : MonoBehaviour
                 var i = 0;
                 foreach (KeyValuePair<string, object> inner in innDict) //載入老鼠資料
                 {
-                    if (i == 0) //載入老鼠圖 (PS:0在SQL中是老鼠名稱所以用來載入圖片)
+                    try
                     {
-                        try
+                        if (i == 0 && assetBundleManager.bLoadedAssetbundle(name) != true) //如果AB還沒載入 載入老鼠圖 (PS:0在SQL中是老鼠名稱所以用來載入圖片)
                         {
-                            if (assetBundleManager.bLoadedAssetbundle(name) != true)    //如果AB還沒載入
-                            {
-                                _matCount = 1 * 3;
-                                assetBundleManager.init();
-                                StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Texture)));
-                                StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Material)));
-                                StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(GameObject)));
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            throw e;
+                            _matCount = 1 * 3;
+                            assetBundleManager.init();
+                            StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Texture)));
+                            StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Material)));
+                            StartCoroutine(assetBundleManager.LoadAtlas(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(GameObject)));
                         }
                     }
-                    i++;
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
+                    break;
                 }
+                break;
             }
         }
     }
@@ -143,9 +149,9 @@ public class TeamPanelManager : MonoBehaviour
     {
         foreach (KeyValuePair<string, object> item in Global.miceProperty)  // 載入玩家擁有老鼠
         {
-            string tmp = (string)obj.name.ToString().Remove(0, 4); // + pageVaule 還沒加入翻頁值
-            Debug.Log("TMP NAME: " + tmp + " / " + "key name: " + item.Key);
-            if (tmp == item.Key.ToString()) //如果按鈕和玩家擁有老鼠相同
+            string tmpName = (string)obj.name.ToString().Remove(0, 4); // + pageVaule 還沒加入翻頁值 tmpName = Mice(1)>1
+            Debug.Log("TMP NAME: " + tmpName + " / " + "key name: " + item.Key);
+            if (tmpName == item.Key.ToString()) //如果按鈕和玩家擁有老鼠相同 Key=123
             {
                 var innDict = item.Value as Dictionary<string, object>;
                 var i = 0;
@@ -157,10 +163,10 @@ public class TeamPanelManager : MonoBehaviour
                         {
                             if (assetBundleManager.bLoadedAssetbundle(name) != true)    //如果AB還沒載入
                             {
-                                _objCount=1*2;
-                                assetBundleManager.init();
+                                _objCount = 1;  // 錯誤
+                                //assetBundleManager.init();
                                 StartCoroutine(assetBundleManager.LoadGameObject(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(GameObject)));
-                                StartCoroutine(assetBundleManager.LoadGameObject(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Animation)));
+                               // StartCoroutine(assetBundleManager.LoadGameObject(inner.Value.ToString() + "/" + inner.Value.ToString(), typeof(Animation)));
                             }
                         }
                         catch (Exception e)
@@ -168,14 +174,27 @@ public class TeamPanelManager : MonoBehaviour
                             throw e;
                         }
                     }
-                    else if (i < innDict.Count) // 載入老鼠數值說明 innDict.Count SQL中轉換成字典的資料筆數
+                    break;
+                }
+                break;
+            }
+        }
+    }
+
+    private void LoadProperty(string name)
+    {
+        string tmpName = (string)name.ToString().Remove(0, 4); // + pageVaule 還沒加入翻頁值
+        foreach (KeyValuePair<string, object> item in Global.miceProperty)  // 載入玩家擁有老鼠
+        {
+            if (tmpName == item.Key.ToString()) //如果按鈕和玩家擁有老鼠相同
+            {
+                var innDict = item.Value as Dictionary<string, object>;
+                int i = 0;
+                foreach (KeyValuePair<string, object> inner in innDict) //載入老鼠資料
+                {
+                    if (i != 0)
                     {
-                        Debug.Log("Name: " + miceProperty[i].transform.name);
-                        miceProperty[i].transform.GetComponent<UILabel>().depth = 3077;
-                        miceProperty[i].transform.GetComponent<UILabel>().fontSize = 30;
-                        miceProperty[i].transform.GetComponent<UILabel>().alignment = NGUIText.Alignment.Left;
                         miceProperty[i].transform.GetComponent<UILabel>().text = inner.Value.ToString();
-                        Debug.Log(" ******Value: " + inner.Value.ToString());
                     }
                     i++;
                 }
@@ -186,17 +205,18 @@ public class TeamPanelManager : MonoBehaviour
     private void InstantiateObject()
     {
         _clone = (GameObject)Instantiate(assetBundleManager.request.asset);
-        _clone.SetActive(false);
+        ObjectManager.SwitchDepthLayer(_clone, _miceImage, Global.MeunObjetDepth);
         _clone.transform.parent = _miceImage.transform;
+        _clone.SetActive(false);
         _clone.name = assetBundleManager.request.asset.name;
         _clone.transform.localPosition = Vector3.zero;
         _clone.transform.localScale = Vector3.one;
         _clone.layer = _miceImage.transform.gameObject.layer;
         _clone.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+        
 
-        _animator = _clone.transform.GetChild(0).GetComponent<Animator>();
         Destroy(_clone.transform.GetChild(0).GetComponent(_clone.name));
-        SwitchDepth(_clone);
+
 
         GameObject _tmp;
         if (dictMiceImage.TryGetValue(_clone.name, out _tmp) != null)
@@ -206,60 +226,56 @@ public class TeamPanelManager : MonoBehaviour
         _tmpMiceImage = _clone;
         _clone.SetActive(true);
 
+        _animator = _clone.transform.GetChild(0).GetComponent<Animator>();
+        AnimatorStateInfo currentState = _animator.GetCurrentAnimatorStateInfo(0);
+
+            Debug.Log(currentState.nameHash);
+
+        assetBundleManager.LoadedBundle();
+        Debug.Log(assetBundleManager.loadedObjectCount);
         AssetBundleManager.UnloadUnusedAssets();
-        //assetBundleManager.loadedCount = 0; //錯誤
+
+        _isCompleted = !_isCompleted;
     }
+
+
+    /*
+    /// <summary>
+    /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
+    /// </summary>
+    /// <param name="data">JSON資料</param>
+    /// <param name="parent">實體化父系位置</param>
+    void InstantiateObject()
+    {
+        _objCount = 0;
+        string bundleName = "EggMice/EggMice";
+        if (assetBundleManager.bLoadedAssetbundle(bundleName))
+        {
+            AssetBundle bundle = AssetBundleManager.getAssetBundle(bundleName);
+            if (bundle != null)
+            {
+                _clone = (GameObject)Instantiate(bundle.mainAsset);
+                _clone.transform.parent = _miceImage.transform;
+                _clone.name = "EggMice";
+                _clone.transform.localPosition = Vector3.zero;
+                _clone.transform.localScale = Vector3.one;
+                _objCount++;
+            }
+            else
+            {
+                Debug.LogError("Assetbundle reference not set to an instance.");
+            }
+        }
+
+        assetBundleManager.LoadedBundle();
+        Debug.Log(assetBundleManager.loadedObjectCount);
+
+        _objCount = 0;
+    }
+    */
 
     public void OnMiceDrag(string miceName)
     {
 
-    }
-
-    private void SwitchDepth(GameObject clone)  //改變老鼠圖片深度
-    {
-        int count = 0;
-        count = clone.transform.GetChild(0).childCount;
-        for (int i = 0; i < count; i++)
-        {
-            int j = 0;
-
-            while (j < clone.transform.GetChild(0).GetChild(i).childCount)
-            {
-                if (clone.transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<UISprite>() == null)
-                {
-                    int k = 0;
-                    while (k < clone.transform.GetChild(0).GetChild(i).GetChild(j).childCount)
-                    {
-                        if (clone.transform.GetChild(0).GetChild(i).GetChild(j).GetChild(k).GetComponent<UISprite>() == null)
-                        {
-                            int x = 0;
-                            while (x < clone.transform.GetChild(0).GetChild(i).GetChild(j).GetChild(k).childCount)
-                            {
-                                UISprite sprite;
-                                sprite = clone.transform.GetChild(0).GetChild(i).GetChild(j).GetChild(k).GetChild(x).GetComponent<UISprite>();
-                                sprite.depth += 500;
-                                clone.layer = clone.transform.parent.gameObject.layer;
-                                x++;
-                            }
-                            k++;
-                        }
-                        UISprite sprite2;
-                        sprite2 = clone.transform.GetChild(0).GetChild(i).GetChild(j).GetChild(k).GetComponent<UISprite>();
-                        sprite2.depth += 500;
-                        clone.layer = clone.transform.parent.gameObject.layer;
-                        k++;
-                    }
-                    j++;
-                }
-                else
-                {
-                    UISprite sprite;
-                    sprite = clone.transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<UISprite>();
-                    sprite.depth += 500;
-                    clone.layer = clone.transform.parent.gameObject.layer;
-                    j++;
-                }
-            }
-        }
-    }
+    }   
 }

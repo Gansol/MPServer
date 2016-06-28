@@ -59,8 +59,6 @@ public class AssetBundleManager
 
     public IEnumerator LoadAtlas(string assetName, System.Type type)
     {
-        
-        
         AssetBundleRef abRef;
         if (!dictAssetBundleRefs.TryGetValue(assetName, out abRef))
         {
@@ -82,7 +80,7 @@ public class AssetBundleManager
             }
 
             _isStartLoadAsset = true;
-            Debug.Log("New Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
+            Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
             www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext, 1);
             yield return www;
 
@@ -106,7 +104,6 @@ public class AssetBundleManager
                 else if (type == typeof(Material)) _isLoadMat = true;
                 else if (type == typeof(GameObject)) _isLoadPrefab = true;
                 www.Dispose();
-                
             }
         }
         else
@@ -129,7 +126,7 @@ public class AssetBundleManager
         //{
         //    Debug.Log("AB DICT: " + item.Key.ToString());
         //}
-        
+
         if (!bLoadedAssetbundle(assetName))
         {
             while (_isLoadPrefab == false)
@@ -159,7 +156,7 @@ public class AssetBundleManager
                     string[] asset = assetName.Split('/');
                     _request = abRef.assetBundle.LoadAsync(asset[1], type);
                     _isLoadObject = true;
-                    
+
                     www.Dispose();
                     //Debug.Log("( 4 ) :" + assetName);
                 }
@@ -173,7 +170,7 @@ public class AssetBundleManager
         {
             _isLoadObject = true;
         }
-        
+
         _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
     }
 
@@ -197,13 +194,15 @@ public class AssetBundleManager
         else
             return null;
     }
-    
+
     public void LoadedBundle()
     {
+        string msg = "";
         foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
         {
-           Debug.Log("AB DICT: " + item.Key.ToString());
+            msg += "\n" + item.Key.ToString();
         }
+        Debug.Log("AssetBundles in Dictinary: " + msg + "\n");
     }
 
     public static void Unload(string assetName, System.Type type, bool allObjects)

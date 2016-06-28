@@ -125,9 +125,9 @@ namespace Gansol
 
                 return 1;
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw ;
             }
         }
         #endregion
@@ -206,9 +206,9 @@ namespace Gansol
                 else
                     return 2;
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw;
             }
         }
         #endregion
@@ -241,9 +241,9 @@ namespace Gansol
 
                 return 1;
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw ;
             }
         }
         #endregion
@@ -277,9 +277,9 @@ namespace Gansol
 
                 return 1;
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw ;
             }
         }
         #endregion
@@ -327,9 +327,9 @@ namespace Gansol
 
                 return 1;
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw;
             }
         }
         #endregion
@@ -346,9 +346,9 @@ namespace Gansol
                 byte[] bytPlainText = encoding.GetBytes(strPlainText);
                 return Convert.ToBase64String(bytPlainText);
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw;
             }
         }
         #endregion
@@ -364,9 +364,9 @@ namespace Gansol
                 bytCipherText = Convert.FromBase64String(strCipherText);
                 return uEncoding.GetString(bytCipherText);
             }
-            catch (Exception EX)
+            catch (Exception e)
             {
-                throw EX;
+                throw ;
             }
         }
         #endregion

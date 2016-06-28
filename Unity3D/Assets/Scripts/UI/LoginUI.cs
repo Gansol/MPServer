@@ -11,10 +11,11 @@ using MiniJSON;
 
 public class LoginUI : MonoBehaviour
 {
+    public GameObject[] LoginObject;
+
     private Dictionary<string, object> FBProfiler = null;
     private string _defaultAccout = "請輸入帳號(8~16英文數字)";
     private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
-
 
     private string getAccount = "";
     private string getPassowrd = "";
@@ -99,6 +100,12 @@ public class LoginUI : MonoBehaviour
 
                 if (Global.LoginStatus) // 若已登入
                 {
+                    foreach (GameObject item in LoginObject)
+                    {
+                        if (item!=null)
+                            item.SetActive(false);
+                    }
+
                     GUI.Label(new Rect(30, 40, 400, 20), "Your Nickname : " + Global.Nickname); // 顯示暱稱
                     GUI.Label(new Rect(30, 60, 400, 20), "Your Sex : " + Global.Sex); // 顯示性別
                     GUI.Label(new Rect(30, 80, 400, 20), "Your Age : " + Global.Age); // 顯示性別

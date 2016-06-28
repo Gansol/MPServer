@@ -65,7 +65,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw e;
+                throw;
             }
         }
 
@@ -83,7 +83,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw e;
+                throw ;
             }
         }
 
@@ -102,7 +102,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw e;
+                throw ;
             }
         }
 
@@ -126,7 +126,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw e;
+                throw ;
             }
         }
 
@@ -151,7 +151,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw e;
+                throw ;
             }
         }
     }

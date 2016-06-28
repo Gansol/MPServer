@@ -15,21 +15,23 @@ public class PanelManager : MonoBehaviour
     public GameObject[] TeamParent;
     public string[] assetName;
 
-    private GameObject clone;
+    private GameObject _clone;
     private GameObject myParent;
 
-    private bool _bundleLoaded = false;
-    private int fileNum;
-    private string _name;
-    private bool _objetLoaded = false;
     private static bool _isLoadTeam = false;
     private static bool _teamON = false;
+    private bool _bundleLoaded = false;
+    private bool _objetLoaded = false;
+    private bool _isCompleted = false;
+    private int fileNum;
+    private string _name;
     private int _loadObjCount = 0;
     private int _miceCount = 0;
     private int _teamCount = 0;
     private int _matCount = 0;
     private int _objCount = 0;
     private int _panelNo = -1;
+
     void Awake()
     {
         assetBundleManager = new AssetBundleManager();
@@ -37,12 +39,12 @@ public class PanelManager : MonoBehaviour
 
     void Update()
     {
-        if (assetBundleManager.isStartLoadAsset)
+        if (assetBundleManager.isStartLoadAsset && !_isCompleted)
         {
             Debug.Log("訊息：" + assetBundleManager.ReturnMessage);
         }
 
-        Debug.Log(assetBundleManager.loadedABCount);
+//        Debug.Log(assetBundleManager.loadedABCount);
         if (assetBundleManager.loadedABCount == _matCount && _matCount != 0 && _isLoadTeam != true)   // 2
         {
             Debug.Log("(Update) _matCount: " + _matCount);
@@ -100,11 +102,14 @@ public class PanelManager : MonoBehaviour
                 if (bundle != null)
                 {
                     Debug.Log("LoadMice : " + item.Value.ToString());
-                    clone = (GameObject)Instantiate(bundle.mainAsset);
-                    clone.transform.parent = parent.GetChild(_objCount);
-                    clone.name = item.Value.ToString();
-                    clone.transform.localPosition = Vector3.zero;
-                    clone.transform.localScale = Vector3.one;
+                    _clone = (GameObject)Instantiate(bundle.mainAsset);
+                    _clone.layer = parent.gameObject.layer;
+                    _clone.transform.parent = parent.GetChild(_objCount);
+                    _clone.name = item.Value.ToString();
+                    _clone.transform.localPosition = Vector3.zero;
+                    _clone.transform.localScale = Vector3.one;
+                    parent.GetChild(_objCount).GetComponent<TeamSwitcher>().enabled = true; // 開啟老鼠隊伍交換功能 0628未確定功能
+                    parent.GetChild(_objCount).GetComponent<UIDragObject>().enabled = true; // 開啟老鼠拖曳功能 0628未確定功能
                     _objCount++;
                 }
                 else
@@ -115,7 +120,7 @@ public class PanelManager : MonoBehaviour
         }
 
         assetBundleManager.LoadedBundle();
-        Debug.Log(assetBundleManager.loadedObjectCount);
+        //Debug.Log(assetBundleManager.loadedObjectCount);
 
         _objCount = 0;
     }
@@ -123,6 +128,7 @@ public class PanelManager : MonoBehaviour
     void InitTeam()
     {
         Panel[_panelNo].SetActive(true);
+        _isCompleted = !_isCompleted;
         AssetBundleManager.UnloadUnusedAssets();
         _bundleLoaded = true;
         //assetBundleManager.loadedCount = 0;
