@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using MPProtocol;
 
-public class SpawnManager : MonoBehaviour
+public class SpawnManager : SpawnController
 {
 }
+
 

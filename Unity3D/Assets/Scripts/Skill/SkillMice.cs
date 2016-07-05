@@ -22,24 +22,12 @@ public class SkillMice : MonoBehaviour
 
     }
 
-    void OnClick()
+    void OnHit()
     {
-        /*
-        Dictionary<int, string> team = Json.Deserialize(Global.Team) as Dictionary<int, string>;
-
-        foreach (KeyValuePair<int, string> item in team)
-        {
-            if (item.Value == name)
-            {
-                miceID = item.Key;
-                break;
-            }
-        }
-        */
-
         if (flag)
         {
-            Global.photonService.SendDamage(2);
+            Debug.Log("Click Skill:"+transform.GetChild(0).name);
+            Global.photonService.SendSkill(transform.GetChild(0).name);
             flag = false;
         }
     }

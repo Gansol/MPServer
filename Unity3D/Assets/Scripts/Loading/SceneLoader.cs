@@ -1,38 +1,47 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 
-public class SceneLoader : MonoBehaviour {
+public class SceneLoader : MonoBehaviour
+{
+    public GameObject processBar;
+    private AsyncOperation async;
+    uint _process;
 
-    private bool flag;
-    //public GameObject progressBar;
-	// Use this for initialization
-	void Start () {
-        flag = true;
-        Debug.Log("Scene" + Application.loadedLevelName);
-      
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if (Application.loadedLevel==2 && flag)
-        {
-            flag = false;
-            StartCoroutine(LoadLevel());
-        }
-	}
-
-    private IEnumerator LoadLevel()
+    void Start()
     {
-        try
-        {
-            AsyncOperation progress = Application.LoadLevelAsync(Global.loadScene);  //之後要改成LoadScene
-            //progressBar.GetComponent<UILabel>().text = "Name:" + Application.loadedLevelName + "\n" + progress + "%";
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Message: " + e.Message + " 於: " + e.StackTrace);
-        }
-        yield return null;
+        StartCoroutine(LoadScene());
     }
+
+    IEnumerator LoadScene()
+    {
+        async = Application.LoadLevelAsync(Global.loadScene);
+        async.allowSceneActivation = false;
+
+        yield return async;
+    }
+
+    void Update()
+    {
+        if (async == null)
+            return;
+
+        
+//        Debug.Log(async.progress * 100);
+        if (async.progress < 0.9f)  // 會卡在90% else = 100%
+        {
+            _process = (uint)(async.progress * 100);
+        }
+        else
+        {
+            _process = 100;
+        }
+
+        processBar.GetComponent<UILabel>().text = _process.ToString() + "%";
+
+        if (_process == 100)
+        {
+            async.allowSceneActivation = true;
+        }
+    }
+
 }

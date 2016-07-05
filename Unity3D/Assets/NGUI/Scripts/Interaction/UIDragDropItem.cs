@@ -258,9 +258,9 @@ public class UIDragDropItem : MonoBehaviour
 			mTrans.parent = UIDragDropRoot.root;
 
 		Vector3 pos = mTrans.localPosition;
-		pos.z = 0f;
+		pos.z = 800f;
 		mTrans.localPosition = pos;
-
+        Debug.Log("(1)X:" + pos.x + "Y:" + pos.y + "Z:" + pos.z);
 		TweenPosition tp = GetComponent<TweenPosition>();
 		if (tp != null) tp.enabled = false;
 
@@ -307,6 +307,7 @@ public class UIDragDropItem : MonoBehaviour
 				Vector3 pos = mTrans.localPosition;
 				pos.z = 0f;
 				mTrans.localPosition = pos;
+                
 			}
 			else
 			{

@@ -1,0 +1,45 @@
+﻿using UnityEngine;
+using System.Collections;
+using System;
+
+public class SceneLoader : MonoBehaviour
+{
+    public GameObject ProgressLabel;
+    private bool flag;
+    //public GameObject progressBar;
+    // Use this for initialization
+
+
+    private void Start()
+    {
+        flag = true;
+        Debug.Log("Global.loadScene: "+Global.loadScene);
+        ProgressLabel.GetComponent<UILabel>().text = "0%";
+    }
+
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Application.loadedLevel == 2 && flag)
+        {
+            flag = false;
+            StartCoroutine(LoadLevel());
+        }
+    }
+
+    private IEnumerator LoadLevel()
+    {
+        try
+        {
+            AsyncOperation progress = Application.LoadLevelAsync(Global.loadScene);  //之後要改成LoadScene
+            //progressBar.GetComponent<UILabel>().text = "Name:" + Application.loadedLevelName + "\n" + progress + "%";
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Message: " + e.Message + " 於: " + e.StackTrace);
+        }
+        yield return null;
+    }
+}

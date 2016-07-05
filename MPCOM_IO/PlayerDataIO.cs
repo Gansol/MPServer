@@ -82,6 +82,9 @@ namespace MPCOM
                         playerData.MaxCombo = Convert.ToInt16(DS.Tables[0].Rows[0]["MaxCombo"]);
                         playerData.MaxScore = Convert.ToInt32(DS.Tables[0].Rows[0]["MaxScore"]);
                         playerData.SumScore = Convert.ToInt32(DS.Tables[0].Rows[0]["SumScore"]);
+                        playerData.SumLost = Convert.ToInt16(DS.Tables[0].Rows[0]["SumLost"]);
+                        playerData.SumKill = Convert.ToInt32(DS.Tables[0].Rows[0]["SumKill"]);
+                        playerData.Item = Convert.ToString(DS.Tables[0].Rows[0]["Item"]);
                         playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
                         playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
                         playerData.MiceAmount = Convert.ToString(DS.Tables[0].Rows[0]["MiceAmount"]);
@@ -109,9 +112,9 @@ namespace MPCOM
         }
         #endregion
 
-        #region UpdatePlayerData 更新玩家資料
+        #region UpdatePlayerData 更新玩家(全部)資料
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account,byte rank,byte exp,Int16 maxCombo,int maxScore,int sumScore,string miceAll,string team ,string miceAmount,string friend)
+        public PlayerData UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost,int sumKill,string item, string miceAll, string team, string miceAmount, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -135,14 +138,18 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)   
                     {
-                        string query = @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount,Friend=@friend WHERE Account=@account";
+                        string query = @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount,Friend=@friend WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@rank", rank);
                         command.Parameters.AddWithValue("@exp", exp);
                         command.Parameters.AddWithValue("@maxCombo", maxCombo);
                         command.Parameters.AddWithValue("@maxScore", maxScore);
                         command.Parameters.AddWithValue("@sumScore", sumScore);
+                        command.Parameters.AddWithValue("@sumLost", sumLost);
+                        command.Parameters.AddWithValue("@sumKill", sumKill);
+                        command.Parameters.AddWithValue("@item", item);
                         command.Parameters.AddWithValue("@miceAll", miceAll);
                         command.Parameters.AddWithValue("@team", team);
                         command.Parameters.AddWithValue("@miceAmount", miceAmount);
@@ -171,5 +178,125 @@ namespace MPCOM
 
         #endregion UpdatePlayerData
 
+        #region UpdatePlayerData 更新玩家(GameOver)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account,byte rank, byte exp, Int16 maxCombo, int maxScore,int sumScore, Int16 sumLost, int sumKill, string item, string miceAmount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
+
+                    // 如果找到玩家資料
+                    if (DS.Tables[0].Rows.Count == 1)
+                    {
+                        string query = 
+                                @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
+                                SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAmount=@miceAmount WHERE Account=@account";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear(); 
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@rank", rank);
+                        command.Parameters.AddWithValue("@exp", exp);
+                        command.Parameters.AddWithValue("@maxCombo", maxCombo);
+                        command.Parameters.AddWithValue("@maxScore", maxScore);
+                        command.Parameters.AddWithValue("@sumScore", sumScore);
+                        command.Parameters.AddWithValue("@sumLost", sumLost);
+                        command.Parameters.AddWithValue("@sumKill", sumKill);
+                        command.Parameters.AddWithValue("@item", item);
+                        command.Parameters.AddWithValue("@miceAmount", miceAmount);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S403";
+                        playerData.ReturnMessage = "更新玩家資料成功！";
+                    }
+                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+                    {
+                        playerData.ReturnCode = "S404";
+                        playerData.ReturnMessage = "更新玩家資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+
+        #endregion UpdatePlayerData
+
+        #region UpdatePlayerData 更新玩家(Team)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
+
+                    // 如果找到玩家資料
+                    if (DS.Tables[0].Rows.Count == 1)
+                    {
+                        string query = @"UPDATE PlayerData SET MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount WHERE Account=@account";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@miceAll", miceAll);
+                        command.Parameters.AddWithValue("@team", team);
+                        command.Parameters.AddWithValue("@miceAmount", miceAmount);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S420";
+                        playerData.ReturnMessage = "更新老鼠資料成功！";
+                    }
+                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+                    {
+                        playerData.ReturnCode = "S421";
+                        playerData.ReturnMessage = "更新老鼠資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
     }
+    #endregion
 }

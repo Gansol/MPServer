@@ -1,0 +1,47 @@
+﻿using UnityEngine;
+
+public class VisionManager : MonoBehaviour
+{
+    private AssetBundlesDownloader downloader = new AssetBundlesDownloader(); //下載用
+    private VisionChecker visionChecker = new VisionChecker();
+    private bool flag = true;
+
+    void Start() //開始檢查版本
+    {
+        StartCoroutine(visionChecker.CheckVision());
+
+    }
+
+    void Update() //等待完成
+    {
+        try
+        {
+            if (!Global.isCompleted) //全部完成 停止全部比較作業
+            {
+                if (!Global.isNewlyVision) //版本太舊 開始下載
+                {
+                    Debug.Log("Your vision outdatad ! ");
+                    Global.isNewlyVision = true;
+                    Debug.Log("Start Downloading . . .");
+                    StartCoroutine(downloader.DownloadList(Global.sDownloadList));
+                }
+                else if (!Global.isBundleEquals && Global.isVisionDownload) //版本相同 檢查資源 (第一次檢查)
+                {
+                    Debug.Log("開始檢查遊戲資源. . .");
+                    Global.isBundleEquals = true;
+                    StartCoroutine(GetComponent<AssetBundleChecker>().StartCheck());
+                }
+            }
+            else if (Global.isCompleted && Global.isBundleEquals && !Global.isReplaced) //替換最新資源列表
+            {
+                Debug.Log("更新遊戲版本列表");
+                StartCoroutine(visionChecker.ReplaceVisionList());
+                Global.isReplaced = !Global.isReplaced;
+            }
+        }
+        catch (System.IO.IOException e)
+        {
+            Debug.Log("Vision Manager Error: " + e);
+        }
+    }
+}

@@ -35,38 +35,135 @@ namespace MPCOM
         {
             return true;
         }
+        #region variable 變數區
+        private Int16 harvest = 200;
+        private Int16 drivingMice = 50;
+        private Int16 harvestRate = 10;               // 分數倍率
+        private Int16 reduce = -500;                  // 減少分數
 
-        private int harvest = 200;
-        private int drivingMice = 50;
-        private int harvestRate = 10;               // 分數倍率
-        private int reduce = 500;                   // 減少分數
+        private Int16 harvestReward = 100;
+        private Int16 drivingMiceReward = 200;
+        private Int16 harvestRateReward = 400;
+        private Int16 worldBossReward = 10000;
 
-        private int harvestReward = 100;
-        private int drivingMiceReward = 200;
-        private int badMiceReward = 300;
-        private int harvestRateReward = 400;
-        private int worldBossReward = 10000;
+        private struct EggMice
+        {
+            public static int eatFull = 10;    // 2.5s = 4
+            public static float perEat = 1;
+            public static float eatingRate = 0.25f;
+            public static float hp = 25f;
+            public static int skill = 1;
+        }
+
+        private struct BlackMice
+        {
+            public static int eatFull = 20;    // 2s = 10
+            public static float perEat = 5;
+            public static float eatingRate = 0.5f;
+        }
+
+        private struct CandyMice
+        {
+            public static int eatFull = 32;    // 3s = 10.667
+            public static float perEat = 8;
+            public static float eatingRate = 0.75f;
+        }
+
+        private struct RabbitMice
+        {
+            public static int eatFull = 24;    // 2.64s = 9.091
+            public static float perEat = 3;
+            public static float eatingRate = 0.33f;
+        }
+
+        private struct NinjaMice
+        {
+            public static int eatFull = 28;    // 2.86s = 9.79
+            public static float perEat = 7;
+            public static float eatingRate = 0.67f;
+        }
+        #endregion
 
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-        public BattleData ClacScore(byte miceID, float time, float eatingRate, Int16 score)
+        public BattleData ClacScore(string miceName, float aliveTime)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
+            Int16 score = 0;
 
             try
             {
-                switch (miceID) //用老鼠ID來判斷 取得的分數是否異常
+                switch (miceName) //用老鼠ID來判斷 取得的分數是否異常
                 {
-                    case 1: //EggMice
+                    case "EggMice": //EggMice
                         {
-                            //to do verification
-                            if (score > 100) //這裡亂寫的 要想驗證方法
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / EggMice.eatingRate));
+
+                            if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
-                                battleData.ReturnCode = "S502";
-                                battleData.ReturnMessage = "驗證分數失敗！";
-                                return battleData;
+                                score = Convert.ToInt16(EggMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(EggMice.eatFull - EggMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "BlackMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / BlackMice.eatingRate));
+
+                            if (BlackMice.perEat * ateTimes >= BlackMice.eatFull)
+                            {
+                                score = Convert.ToInt16(BlackMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(BlackMice.eatFull - BlackMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "CandyMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / CandyMice.eatingRate));
+
+                            if (CandyMice.perEat * ateTimes >= CandyMice.eatFull)
+                            {
+                                score = Convert.ToInt16(CandyMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(CandyMice.eatFull - CandyMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "RabbitMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / RabbitMice.eatingRate));
+
+                            if (RabbitMice.perEat * ateTimes >= RabbitMice.eatFull)
+                            {
+                                score = Convert.ToInt16(RabbitMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(RabbitMice.eatFull - RabbitMice.perEat * ateTimes);
+                            }
+                            break;
+                        }
+                    case "NinjaMice": //EggMice
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / NinjaMice.eatingRate));
+
+                            if (NinjaMice.perEat * ateTimes >= NinjaMice.eatFull)
+                            {
+                                score = Convert.ToInt16(NinjaMice.eatFull * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(NinjaMice.eatFull - NinjaMice.perEat * ateTimes);
                             }
                             break;
                         }
@@ -87,7 +184,7 @@ namespace MPCOM
         #region ClacMissionReward 計算任務完成分數
 
         [AutoComplete]
-        public BattleData ClacMissionReward(byte mission, float missionRate,int customValue)
+        public BattleData ClacMissionReward(byte mission, float missionRate, Int16 customValue)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -98,43 +195,105 @@ namespace MPCOM
                 {
                     case Mission.Harvest:
                         {
-                            if (missionRate <= 0 || missionRate > 10)
-                            {
-                                battleData.ReturnCode = "S504";
-                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
-                                return battleData;
-                            }
-                            else
+                            if (missionRate > 0 || missionRate < 10)
                             {
                                 battleData.missionReward = (Int16)Math.Round((missionRate * harvestReward), 0);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
                             }
+                            break;
                         }
                     case Mission.DrivingMice:
                         {
-                            if (missionRate <= 0) // 這裡自訂參數 customValue 是Combo
+                            if (missionRate > 0 && customValue >= drivingMice) // 這裡自訂參數 customValue 是Combo
                             {
-                                battleData.ReturnCode = "S504";
-                                battleData.ReturnMessage = "驗證任務獎勵失敗！";
-                                return battleData;
-                            }
-                            else
-                            {
-                                battleData.missionReward = (Int16)(missionRate * drivingMiceReward);
+                                battleData.missionReward = (Int16)Math.Round(missionRate * drivingMiceReward);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
                             }
+                            break;
+                        }
+                    case Mission.Reduce:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = (Int16)Math.Round(missionRate * reduce);
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.HarvestRate:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = 0;
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.Exchange:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                battleData.missionReward = 0;
+                                battleData.ReturnCode = "S503";
+                                battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                return battleData;
+                            }
+                            break;
+                        }
+                    case Mission.WorldBoss:
+                        {
+                            if (missionRate > 0) // 時間倒扣分
+                            {
+                                float percent = (float)customValue / 100;
+
+                                if (customValue == 50)  // 平手 獎勵/2
+                                {
+                                    battleData.missionReward = (Int16)(worldBossReward / 2);
+                                    battleData.customValue = (Int16)(worldBossReward / 2);
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
+                                if (customValue > 50)   // (Host)勝利 獲得獎勵X貢獻百分比
+                                {
+                                    Int16 reward = (Int16)Math.Round((float)worldBossReward * percent);     // worldBossReward x 獲得百分比
+                                    battleData.missionReward = reward;
+                                    battleData.customValue = (Int16)(reward / -10);                         // customValue 對手獎勵
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
+                                else if (customValue < 50)  // (Host)失敗 獲得懲罰 
+                                {
+                                    float otherPercent = 1 - percent;
+                                    Int16 reward = (Int16)Math.Round((float)worldBossReward * otherPercent);// worldBossReward x 獲得百分比
+                                    battleData.missionReward = (Int16)(reward / -10);
+                                    battleData.customValue = reward;                                        // customValue 對手獎勵
+                                    battleData.ReturnCode = "S503";
+                                    battleData.ReturnMessage = "驗證任務獎勵成功！";
+                                    return battleData;
+                                }
+                            }
+                            break;
                         }
                 }
             }
             catch (Exception e)
             {
-                
+
                 throw e;
             }
+
+            battleData.ReturnCode = "S504";
+            battleData.ReturnMessage = "驗證任務獎勵失敗！";
             return battleData;
         }
 
@@ -188,22 +347,14 @@ namespace MPCOM
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
                         }
-                    case Mission.BadMice: // 壞老鼠
+                    case Mission.WorldBoss: // BOSS
                         {
                             // missionRate 是老鼠ID
-                            battleData.missionScore = (Int16)missionRate;
+                            battleData.missionScore = (Int16)EggMice.hp;
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
                         }
-                    //case Mission.WorldBoss: // 壞老鼠
-                    //    {
-                    //        // missionRate 是老鼠ID
-                    //        battleData.missionScore = (Int16)missionRate;
-                    //        battleData.ReturnCode = "S505";
-                    //        battleData.ReturnMessage = "選擇任務成功！";
-                    //        return battleData;
-                    //    }
                 }
             }
             catch (Exception e)
@@ -216,5 +367,62 @@ namespace MPCOM
         }
 
         #endregion
+
+        #region GameOver 遊戲結束
+        [AutoComplete]
+        public BattleData GameOver(short score,short otherScore, short gameTime, short lostMice)
+        {
+            battleData.ReturnCode = "(Logic)S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                if (score >= 0)
+                {
+                    battleData.score = score;
+                    
+                    float reward = 0;
+                    float exp = 0;
+
+                    if (gameTime >= 0)
+                    {
+                        reward = (score / 10 * 1.0f);
+                        exp = 1;
+                    }
+                    else if (gameTime >= 120)
+                    {
+                        reward = (score / 10 * 1.05f);
+                        exp = 2;
+                    }
+                    else if (gameTime >= 300)
+                    {
+                        reward = (score / 10 * 1.1f);
+                        exp = 5;
+                    }
+
+                    if (lostMice == 0) reward *= 1.5f;
+                    if (score > otherScore) exp *= 2f;
+
+                    battleData.sliverReward = (Int16)reward;
+                    battleData.expReward = (byte)exp;
+                    battleData.ReturnCode = "S501";
+                    battleData.ReturnMessage = "計算獎勵成功！";
+                    return battleData;
+                }
+                else
+                {
+                    battleData.ReturnCode = "S507";
+                    battleData.ReturnMessage = "計算獎勵失敗！";
+                    return battleData;
+                }
+            }
+            catch (Exception e)
+            {
+               
+                throw e;
+            }
+        }
+        #endregion
+
     }
 }
