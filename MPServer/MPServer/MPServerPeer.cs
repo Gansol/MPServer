@@ -683,9 +683,9 @@ namespace MPServer
                                 MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, miceAmount, friend)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Data OK");
 
-                                if (playerData.ReturnCode == "S401")//取得玩家資料成功 回傳玩家資料
+                                if (playerData.ReturnCode == "S403")//取得玩家資料成功 回傳玩家資料
                                 {
-                                    Log.Debug("playerData.ReturnCode == S401");
+                                    Log.Debug("playerData.ReturnCode == S403");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.EXP, exp }, 
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
@@ -693,7 +693,7 @@ namespace MPServer
                                         { (byte)PlayerDataParameterCode.Friend, friend } 
                                     };
 
-                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.Updated, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
                                 else// 失敗 傳空值+錯誤訊息
@@ -707,6 +707,43 @@ namespace MPServer
                             break;
                         #endregion
 
+                        #region UpdateMiceData 更新玩家(Team)資料
+                        case (byte)PlayerDataOperationCode.UpdateMice:
+                            {
+                                Log.Debug("IN UpdateMiceData");
+
+                                string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];        // Json資料
+                                string team = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Team];              // Json資料
+                                string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];  // Json資料
+
+                                MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                Log.Debug("IO OK");
+                                MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account,  miceAll, team, miceAmount)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                Log.Debug("Data OK");
+
+                                if (playerData.ReturnCode == "S420")//取得玩家資料成功 回傳玩家資料
+                                {
+                                    Log.Debug("playerData.ReturnCode == S420");
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode },{ (byte)PlayerDataParameterCode.MiceAll, miceAll } , 
+                                        { (byte)PlayerDataParameterCode.Team, team } ,{ (byte)PlayerDataParameterCode.MiceAmount, miceAmount }
+                                        }; 
+                                    
+
+                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+                                else// 失敗 傳空值+錯誤訊息
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+
+                            }
+                            break;
+                        #endregion
 
                         #region LoadCurrency 載入貨幣資料
                         case (byte)CurrencyOperationCode.Load:

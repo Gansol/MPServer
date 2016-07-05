@@ -376,7 +376,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.Team = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team];
                             Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
                             Global.Friend = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend];
-                            Debug.Log("Loaded:" + (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Item]);
+                            Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
                             Global.isPlayerDataLoaded = true;
                         }
                     }
@@ -456,6 +456,46 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];
                             UpdateScoreEvent(score);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region Updated 更新玩家資料
+
+            case (byte)PlayerDataResponseCode.Updated:   // 載入玩家資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Debug.Log("Updated Player Data.");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region UpdatedMice 更新老鼠資料
+
+            case (byte)PlayerDataResponseCode.UpdatedMice:   // 載入玩家資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Debug.Log("Updated Mice.");
                         }
                     }
                     catch (Exception e)
@@ -805,14 +845,15 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     #region UpdatePlayerData 更新玩家資料
     /// <summary>
     /// 更新玩家資料
-    /// </summary>
-    public void UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, string miceAll, string team, string miceAmount, string friend)
+    /// </summary>                                              
+    public void UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.EXP, exp },
              { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore },
+             { (byte)PlayerDataParameterCode.SumLost, sumLost },{ (byte)PlayerDataParameterCode.SumKill, sumKill },{ (byte)PlayerDataParameterCode.Item, item },
              { (byte)PlayerDataParameterCode.MiceAll, miceAll }, { (byte)PlayerDataParameterCode.Team, team }, { (byte)PlayerDataParameterCode.MiceAmount, miceAmount },
              { (byte)PlayerDataParameterCode.Friend, friend }};
             this.peer.OpCustom((byte)PlayerDataOperationCode.Update, parameter, true, 0, true); // operationCode is RoomSpeak
@@ -824,6 +865,26 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
+    #region UpdateMiceData 更新玩家資料
+    /// <summary>
+    /// 更新老鼠資料
+    /// </summary>
+    public void UpdateMiceData(string account,string miceAll, string team, string miceAmount)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)PlayerDataParameterCode.Account, account },  { (byte)PlayerDataParameterCode.MiceAll, miceAll },
+            { (byte)PlayerDataParameterCode.Team, team }, { (byte)PlayerDataParameterCode.MiceAmount, miceAmount },
+             };
+            this.peer.OpCustom((byte)PlayerDataOperationCode.UpdateMice, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+    #endregion
 
     #region LoadCurrency 載入貨幣資料
     /// <summary>

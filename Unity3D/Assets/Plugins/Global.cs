@@ -13,7 +13,7 @@ public class Global
  "/AndroidList/";
 #elif UNITY_IPHONE
     "/iOSList/";
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN
     "/WebList/";
 #else
  string.Empty;

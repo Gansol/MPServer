@@ -1,164 +1,167 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using MiniJSON;
-
+/* ***************************************************************
+ * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 負責Panel切換
+ * 之後有空改回載入Team.unity現在並沒有載入是直接放在場景 
+ * 實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+ * 用拉進來的Panel要砍掉，並加入已載入dictPanelRefs字典
+ * ***************************************************************
+ *                          ChangeLog
+ * 20160701 v1.0.0  0版完成 
+ * ****************************************************************/
 public class PanelManager : MonoBehaviour
 {
+    #region 欄位
     AssetBundleManager assetBundleManager;
-    private Dictionary<string, object> _dictObject = null;
 
-    public bool _isLoadTeamData { get; set; }
-    public string pathFile;
     public GameObject[] Panel;
-    public GameObject[] TeamParent;
     public string[] assetName;
+    public bool _isLoadTeamData { get; set; }
 
-    private GameObject _clone;
-    private GameObject myParent;
+    private Dictionary<string, GameObject> dictPanelRefs;
+    private Dictionary<string, object> _dictObject = null;
+    private GameObject _clone, _myParent, _loadingPanel;
 
-    private static bool _isLoadTeam = false;
-    private static bool _teamON = false;
-    private bool _bundleLoaded = false;
-    private bool _objetLoaded = false;
-    private bool _isCompleted = false;
-    private int fileNum;
     private string _name;
-    private int _loadObjCount = 0;
-    private int _miceCount = 0;
-    private int _teamCount = 0;
-    private int _matCount = 0;
-    private int _objCount = 0;
-    private int _panelNo = -1;
+    private bool _LoadedPanel, _teamON, _bundleLoaded, _objetLoaded, _isCompleted, _isSent2Panel;
+    private int _loadObjCount, _miceCount, _teamCount, _matCount, _objCount, _panelNo;
+    #endregion
 
     void Awake()
     {
         assetBundleManager = new AssetBundleManager();
+        dictPanelRefs = new Dictionary<string, GameObject>();
+        _panelNo = -1;
     }
 
     void Update()
     {
-        if (assetBundleManager.isStartLoadAsset && !_isCompleted)
-        {
-            Debug.Log("訊息：" + assetBundleManager.ReturnMessage);
-        }
+        if (assetBundleManager != null)
+            if (assetBundleManager.isStartLoadAsset && !_LoadedPanel)
+                if (!string.IsNullOrEmpty(assetBundleManager.ReturnMessage))
+                    Debug.Log("訊息：" + assetBundleManager.ReturnMessage);
 
-//        Debug.Log(assetBundleManager.loadedABCount);
-        if (assetBundleManager.loadedABCount == _matCount && _matCount != 0 && _isLoadTeam != true)   // 2
+        if (assetBundleManager.loadedABCount == _matCount && _matCount != 0 && !_LoadedPanel)
         {
-            Debug.Log("(Update) _matCount: " + _matCount);
-            _isLoadTeam = true;
+            _LoadedPanel = true;
             assetBundleManager.loadedABCount = _matCount = 0;
-            LoadObject(Global.MiceAll);
+            LoadObject(assetName[_panelNo], 1);
         }
 
-        if (assetBundleManager.loadedObjectCount == _objCount && _objCount != 0 && _isLoadTeam == true)
+        if (assetBundleManager.loadedObjectCount == _objCount && _objCount != 0 && _LoadedPanel)
         {
-            assetBundleManager.loadedObjectCount = _matCount = _objCount = 0;
-            InstantiateObject(Global.MiceAll, TeamParent[0].transform);
-            InstantiateObject(Global.Team, TeamParent[1].transform);
-            InitTeam();
+            // dictPanelRefs.Add(name, gameObject); 載入AB時啟用
+            assetBundleManager.loadedObjectCount = _objCount = 0;
+            InitPanel(Panel[_panelNo]);
         }
     }
 
-
-    void LoadAsset(string assetName, int fileNum) //1
+    #region -- 載入資產片斷程式 --
+    void LoadAsset(string assetName, int fileNum)
     {
         _matCount += fileNum * 3;
-        Debug.Log("(LoadAsset) _matCount: " + _matCount);
+        assetBundleManager.init();
         StartCoroutine(assetBundleManager.LoadAtlas(assetName, typeof(Texture)));
         StartCoroutine(assetBundleManager.LoadAtlas(assetName, typeof(Material)));
         StartCoroutine(assetBundleManager.LoadAtlas(assetName, typeof(GameObject)));
     }
 
-    void LoadObject(string data)    // 載入遊戲物件
+    void LoadObject(string assetName, int fileNum)
     {
-        _dictObject = Json.Deserialize(data) as Dictionary<string, object>;
-        _objCount += _dictObject.Count;
-        Debug.Log("(LoadObject) _objCount: " + _objCount);
-        foreach (KeyValuePair<string, object> item in _dictObject)
-        {
-            Debug.Log("LoadObject : " + item.Value.ToString());
-            StartCoroutine(assetBundleManager.LoadGameObject("MiceICON/" + item.Value.ToString().Remove(item.Value.ToString().Length - 4) + "ICON", typeof(GameObject)));
-        }
+        _objCount = fileNum;
+        if (!assetBundleManager.bLoadedAssetbundle(assetName + "Panel/" + assetName))
+            StartCoroutine(assetBundleManager.LoadGameObject(assetName, typeof(GameObject)));
     }
+    #endregion
 
-    /// <summary>
-    /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
-    /// </summary>
-    /// <param name="data">JSON資料</param>
-    /// <param name="parent">實體化父系位置</param>
-    void InstantiateObject(string data, Transform parent)
+    #region -- InitPanel 開始載入Panel內容 --
+    void InitPanel(GameObject loadingPanel)
     {
-        _dictObject = Json.Deserialize(data) as Dictionary<string, object>;
-        _objCount = 0;
-        foreach (KeyValuePair<string, object> item in _dictObject)
-        {
-            string bundleName = "MiceICON/" + item.Value.ToString().Remove(item.Value.ToString().Length - 4) + "ICON";
-            if (assetBundleManager.bLoadedAssetbundle(bundleName))
-            {
-                AssetBundle bundle = AssetBundleManager.getAssetBundle(bundleName);
-                if (bundle != null)
-                {
-                    Debug.Log("LoadMice : " + item.Value.ToString());
-                    _clone = (GameObject)Instantiate(bundle.mainAsset);
-                    _clone.layer = parent.gameObject.layer;
-                    _clone.transform.parent = parent.GetChild(_objCount);
-                    _clone.name = item.Value.ToString();
-                    _clone.transform.localPosition = Vector3.zero;
-                    _clone.transform.localScale = Vector3.one;
-                    parent.GetChild(_objCount).GetComponent<TeamSwitcher>().enabled = true; // 開啟老鼠隊伍交換功能 0628未確定功能
-                    parent.GetChild(_objCount).GetComponent<UIDragObject>().enabled = true; // 開啟老鼠拖曳功能 0628未確定功能
-                    _objCount++;
-                }
-                else
-                {
-                    Debug.LogError("Assetbundle reference not set to an instance.");
-                }
-            }
-        }
-
-        assetBundleManager.LoadedBundle();
-        //Debug.Log(assetBundleManager.loadedObjectCount);
-
-        _objCount = 0;
-    }
-
-    void InitTeam()
-    {
-        Panel[_panelNo].SetActive(true);
-        _isCompleted = !_isCompleted;
+        loadingPanel.transform.GetChild(0).SendMessage("OnMessage");
         AssetBundleManager.UnloadUnusedAssets();
         _bundleLoaded = true;
-        //assetBundleManager.loadedCount = 0;
+        // InstantiatePanel(); // 實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     }
-
-    public void LoadPlayerPanel()
+    #endregion
+    
+    #region -- LoadPanel 載入Panel(外部呼叫用) --
+    public void LoadPanel(GameObject panel)
     {
-
-    }
-
-    public void LoadTeamPanel(GameObject obj)
-    {
-        _panelNo = 1;
-        _name = assetName[1];
-
-        if (!_isLoadTeam)
+        _panelNo = 0;
+        foreach (GameObject item in Panel)
         {
-            LoadAsset("MiceICON/MiceICON", 1);
+            if (item == panel)
+                break;
+            _panelNo++;
+        }
+
+        _name = assetName[_panelNo];
+
+        if (!_LoadedPanel)
             LoadAsset(assetName[_panelNo], 1);
-        }
 
-        if (!_teamON)
+        PanelSwitch(_panelNo);
+    }
+    #endregion
+
+    #region -- PanelSwitch Panel 開/關 --
+    /// <summary>
+    /// Panel 開/關狀態
+    /// </summary>
+    /// <param name="panelNo">Panel編號</param>
+    void PanelSwitch(int panelNo)
+    {
+        switch (panelNo)
         {
-            Panel[1].SetActive(true);
-            _teamON = !_teamON;
-        }
-        else
-        {
-            Panel[1].SetActive(false);
-            _teamON = !_teamON;
+            case 0:
+                break;
+            case 1:
+                {
+                    if (!_teamON)
+                    {
+                        Global.photonService.LoadPlayerData(Global.Account);    // 錯誤 應該只載入TEAM
+                        Panel[_panelNo].SetActive(true);                        // 錯誤 如改為載入AB 要等載入後顯示
+                        _teamON = !_teamON;
+                    }
+                    else
+                    {
+                        Panel[_panelNo].SetActive(false);
+                        _teamON = !_teamON;
+                    }
+                    break;
+                }
+            default:
+                Debug.LogError("PanelNo is unknow!");
+                break;
         }
     }
+    #endregion 
+
+    #region -- 字典 檢查/取值 片段 --
+    public bool bLoadedPanel(string panelName)
+    {
+        return dictPanelRefs.ContainsKey(panelName) ? true : false;
+    }
+    #endregion
+    
+    /*
+    void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    {
+        GameObject go;
+        go= (GameObject)Instantiate(AssetBundleManager.getAssetBundle("TeamPanel/Team").mainAsset);
+        go.transform.parent = Panel[_panelNo].transform;
+        go.transform.localPosition = new Vector3(-25, -54, 0);
+        go.transform.localScale = new Vector3(2, 2, 1);
+        go.name = "Team";
+        Debug.Log("TEST");
+    }
+    */
 }

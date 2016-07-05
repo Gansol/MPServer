@@ -37,8 +37,8 @@ public class DataUI : MonoBehaviour {
            // Debug.Log("ITEM:" + Global.Item);
             if (GUI.Button(new Rect(200, 160, 100, 20), "Update Rnak")) // 88 是測試資料 有問題 需要改掉
             {
-                Global.photonService.UpdatePlayerData(Global.Account, 88, Global.EXP, Global.MaxCombo, Global.MaxScore, Global.SumScore, Global.MiceAll, Global.Team, Global.MiceAmount,Global.Friend);
-            }
+                Global.photonService.UpdatePlayerData(Global.Account, 88, Global.EXP, Global.MaxCombo, Global.MaxScore, Global.SumScore, Global.SumLost, Global.SumKill,Global.Item, Global.MiceAll, Global.Team, Global.MiceAmount, Global.Friend);
+            }                                               //
 
             if (GUI.Button(new Rect(200, 180, 100, 20), "ReLoad Data"))
             {

@@ -104,5 +104,30 @@ namespace MPCOM
             return TextUtility.SerializeToStream(playerData);
         }
         #endregion
+
+        #region UpdatePlayerData 更新玩家(TeamUpdate時)資料
+        /// <summary>
+        /// 更新 玩家(TeamUpdate時)資料
+        /// </summary>
+        public byte[] UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerData(account, miceAll,  team,  miceAmount);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
     }
 }

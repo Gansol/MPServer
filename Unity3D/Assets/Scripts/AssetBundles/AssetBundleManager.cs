@@ -2,7 +2,19 @@
 using System.Collections.Generic;
 using System.Collections;
 using System;
+/* ***************************************************************
 
+-----Copyright © 2015 Gansol Studio. All Rights Reserved.-----
+----------- CC BY-NC-SA 4.0
+----------- @Website: EasyUnity@blogspot.com
+----------- @Email: GansolTW@gmail.com
+----------- @Author: Krola.
+******************************************************************/
+/* ***************************************************************
+ *                          ChangeLog
+ * v0.0.2 20160629  fixbug: loaded bundle check.
+ * v0.0.1 20150000  AssetbundleManager publish.    
+ * ***************************************************************/
 public class AssetBundleManager
 {
     public AssetBundleRequest request { get { return _request; } }
@@ -60,7 +72,13 @@ public class AssetBundleManager
     public IEnumerator LoadAtlas(string assetName, System.Type type)
     {
         AssetBundleRef abRef;
-        if (!dictAssetBundleRefs.TryGetValue(assetName, out abRef))
+
+        bool chkAtlas,chkMat,chkPrefab;
+        chkAtlas =dictAssetBundleRefs.TryGetValue(assetName + "Atlas", out abRef);
+        chkMat =dictAssetBundleRefs.TryGetValue(assetName + "Mat", out abRef);
+        chkPrefab =dictAssetBundleRefs.TryGetValue(assetName + "Prefab", out abRef);
+
+        if (!chkAtlas && !chkMat && !chkPrefab)
         {
             string fileName = "";
 
@@ -80,15 +98,24 @@ public class AssetBundleManager
             }
 
             _isStartLoadAsset = true;
-            Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
+            //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
             www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext, 1);
             yield return www;
 
+                while (!www.isDone) // 當下載還沒完成
+                    yield return null;
+
             _ReturnMessage = "正再載入資源... ( " + fileName + Global.ext + " )";
-            if (www.error != null)
+            if (www.error!=null)
             {
                 _Ret = "C002";
                 _ReturnMessage = "載入資源失敗！ : \n" + assetName + "\n" + www.error;
+                foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+                {
+                    Debug.LogError("AB DICT: " + item.Key.ToString());
+                }
+                
+                Debug.LogError("assetName:" + assetName + "   Get AB: " + bLoadedAssetbundle(assetName));
                 throw new Exception(www.error);
             }
             else if (www.isDone)
@@ -103,7 +130,7 @@ public class AssetBundleManager
                 if (type == typeof(Texture)) _isLoadAtlas = true;
                 else if (type == typeof(Material)) _isLoadMat = true;
                 else if (type == typeof(GameObject)) _isLoadPrefab = true;
-                www.Dispose();
+                // www.Dispose(); 如果發現網路吃很大要補回修改新方法
             }
         }
         else
@@ -117,15 +144,10 @@ public class AssetBundleManager
     }
 
 
-    public IEnumerator LoadGameObject(string assetName, System.Type type)
+    public IEnumerator LoadGameObject(string assetName, System.Type type)   // 錯誤 要加一個 floder
     {
         //Debug.Log("( 1 ) :" + assetName);
         AssetBundleRef abRef;
-
-        //foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
-        //{
-        //    Debug.Log("AB DICT: " + item.Key.ToString());
-        //}
 
         if (!bLoadedAssetbundle(assetName))
         {
@@ -135,6 +157,8 @@ public class AssetBundleManager
             //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
             WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext, 1);
             _progress = (int)www.progress * 100;
+            while (!www.isDone) // 當下載還沒完成
+                yield return null;
             yield return www;
             try
             {
@@ -163,7 +187,8 @@ public class AssetBundleManager
             }
             catch (Exception e)
             {
-                throw e;
+                Debug.LogError("Error: " + e.Message);
+                throw;
             }
         }
         else // 已經載入了 不須載入
@@ -195,6 +220,9 @@ public class AssetBundleManager
             return null;
     }
 
+    /// <summary>
+    /// 查看已載入的AssetBundle
+    /// </summary>
     public void LoadedBundle()
     {
         string msg = "";
@@ -205,7 +233,13 @@ public class AssetBundleManager
         Debug.Log("AssetBundles in Dictinary: " + msg + "\n");
     }
 
-    public static void Unload(string assetName, System.Type type, bool allObjects)
+    /// <summary>
+    /// 移除載入的AssetBundle
+    /// </summary>
+    /// <param name="assetName">物件名稱</param>
+    /// <param name="type"></param>
+    /// <param name="allObjects"></param>
+    public static void Unload(string assetName, System.Type type, bool allObjects)  // 錯誤 assetName 應該是URL
     {
         string fileName = "";
 
