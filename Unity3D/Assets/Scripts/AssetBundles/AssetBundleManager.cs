@@ -73,10 +73,10 @@ public class AssetBundleManager
     {
         AssetBundleRef abRef;
 
-        bool chkAtlas,chkMat,chkPrefab;
-        chkAtlas =dictAssetBundleRefs.TryGetValue(assetName + "Atlas", out abRef);
-        chkMat =dictAssetBundleRefs.TryGetValue(assetName + "Mat", out abRef);
-        chkPrefab =dictAssetBundleRefs.TryGetValue(assetName + "Prefab", out abRef);
+        bool chkAtlas, chkMat, chkPrefab;
+        chkAtlas = dictAssetBundleRefs.TryGetValue(assetName + "Atlas", out abRef);
+        chkMat = dictAssetBundleRefs.TryGetValue(assetName + "Mat", out abRef);
+        chkPrefab = dictAssetBundleRefs.TryGetValue(assetName + "Prefab", out abRef);
 
         if (!chkAtlas && !chkMat && !chkPrefab)
         {
@@ -102,11 +102,8 @@ public class AssetBundleManager
             www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext, 1);
             yield return www;
 
-                while (!www.isDone) // 當下載還沒完成
-                    yield return null;
-
             _ReturnMessage = "正再載入資源... ( " + fileName + Global.ext + " )";
-            if (www.error!=null)
+            if (www.error != null)
             {
                 _Ret = "C002";
                 _ReturnMessage = "載入資源失敗！ : \n" + assetName + "\n" + www.error;
@@ -114,7 +111,7 @@ public class AssetBundleManager
                 {
                     Debug.LogError("AB DICT: " + item.Key.ToString());
                 }
-                
+
                 Debug.LogError("assetName:" + assetName + "   Get AB: " + bLoadedAssetbundle(assetName));
                 throw new Exception(www.error);
             }
@@ -157,38 +154,29 @@ public class AssetBundleManager
             //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
             WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext, 1);
             _progress = (int)www.progress * 100;
-            while (!www.isDone) // 當下載還沒完成
-                yield return null;
             yield return www;
-            try
-            {
-                _ReturnMessage = "正再載入遊戲物件... ( " + assetName + Global.ext + " )";
-                //Debug.Log("( 2 ) :" + assetName);
-                if (www.error != null)
-                {
-                    _Ret = "C002";
-                    _ReturnMessage = "載入遊戲物件失敗！ :" + assetName + "\n" + www.error;
-                    //Debug.Log("( 3 ) :" + assetName);
-                }
-                else if (www.isDone)
-                {
-                    _Ret = "C001";
-                    _ReturnMessage = "載入遊戲物件完成" + "( " + assetName + " )";
-                    abRef = new AssetBundleRef();
-                    abRef.assetBundle = www.assetBundle;
-                    dictAssetBundleRefs.Add(assetName, abRef);
-                    string[] asset = assetName.Split('/');
-                    _request = abRef.assetBundle.LoadAsync(asset[1], type);
-                    _isLoadObject = true;
 
-                    www.Dispose();
-                    //Debug.Log("( 4 ) :" + assetName);
-                }
-            }
-            catch (Exception e)
+            _ReturnMessage = "正再載入遊戲物件... ( " + assetName + Global.ext + " )";
+            //Debug.Log("( 2 ) :" + assetName);
+            if (www.error != null)
             {
-                Debug.LogError("Error: " + e.Message);
-                throw;
+                _Ret = "C002";
+                _ReturnMessage = "載入遊戲物件失敗！ :" + assetName + "\n" + www.error;
+                //Debug.Log("( 3 ) :" + assetName);
+            }
+            else if (www.isDone)
+            {
+                _Ret = "C001";
+                _ReturnMessage = "載入遊戲物件完成" + "( " + assetName + " )";
+                abRef = new AssetBundleRef();
+                abRef.assetBundle = www.assetBundle;
+                dictAssetBundleRefs.Add(assetName, abRef);
+                string[] asset = assetName.Split('/');
+                _request = abRef.assetBundle.LoadAsync(asset[1], type);
+                _isLoadObject = true;
+
+                www.Dispose();
+                //Debug.Log("( 4 ) :" + assetName);
             }
         }
         else // 已經載入了 不須載入
@@ -223,7 +211,7 @@ public class AssetBundleManager
     /// <summary>
     /// 查看已載入的AssetBundle
     /// </summary>
-    public void LoadedBundle()
+    public static void LoadedBundle()
     {
         string msg = "";
         foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件

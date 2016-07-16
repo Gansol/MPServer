@@ -3,7 +3,6 @@ using System.Collections;
 
 public class SyncLoad : MonoBehaviour
 {
-
     public int nextLevel;
     // Use this for initialization
     void Start()

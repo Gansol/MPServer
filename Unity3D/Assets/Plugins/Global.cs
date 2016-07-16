@@ -87,6 +87,7 @@ public class Global
     public static string Team = "";         // 隊伍老鼠 JSON資料
     public static string MiceAmount = "";   // 老鼠數量 JSON資料
     public static string Friend = "";       // 好友列表 JSON資料
+    public static string ReturnMessage = "";       // 回傳訊息
 
     public static string ext = ".unity3d";       // AB副檔名
 

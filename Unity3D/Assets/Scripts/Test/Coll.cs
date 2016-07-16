@@ -4,15 +4,31 @@ using System.Collections.Generic;
 using System;
 public class Coll : MonoBehaviour {
 
-    CorountineTest ct;
-	// Use this for initialization
+    AssetLoader loader;
+
 	void Start () {
-        ct = new CorountineTest();
-       StartCoroutine(ct.aa(this));
+        gameObject.AddComponent<AssetLoader>();
+        loader = GetComponent<AssetLoader>();
+        loader.LoadAsset("MiceICON/", "MiceICON");
+        loader.LoadPrefab("MiceICON/", "EggICON");
         
+        Debug.Log("Start End");
 	}
-    void bb()
+
+    void Update()
     {
-        Debug.Log("BB");
+        if (loader.loadedObj)
+        {
+            loader.init();
+            SS();
+        }
     }
+
+    void SS()
+    {
+        Instantiate(AssetBundleManager.getAssetBundle("MiceICON/EggICON").mainAsset as GameObject);
+    }
+
+
+    public bool Completed { get; set; }
 }

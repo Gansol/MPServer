@@ -41,7 +41,7 @@ public class TeamSwitcher : MonoBehaviour
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
     private GameObject _clone, _other, _miceTarget;           // 複製物件、碰撞時對方物件、原老鼠位置
-    private int _depth;                                       // UISprite深度
+    private int _depth,teamCountMax;                          // UISprite深度
     private float _distance;                                  // 兩物件間距離
     private bool _isTrigged, _goTarget, _isPress, _destroy;   // 是否觸發、移動目標、是否按下、是否摧毀
     private Vector3 _originPos, _toPos;                       // 原始座標、目標作標
@@ -56,6 +56,7 @@ public class TeamSwitcher : MonoBehaviour
         _goTarget = false;
         _activeBtn = true;
         _other = gameObject;
+        teamCountMax = 5;
     }
 
     void Update()
@@ -350,10 +351,10 @@ public class TeamSwitcher : MonoBehaviour
             {
                 int offset;
                 offset = team.Count == 0 ? 0 : 1;
-                _other.transform.GetChild(0).parent = tm.teamParent[1].transform.GetChild(team.Count - offset);
-                tm.teamParent[1].transform.GetChild(team.Count - offset).GetChild(0).localPosition = Vector3.zero;
-                tm.teamParent[1].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().enabled = true;
-                tm.teamParent[1].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
+                _other.transform.GetChild(0).parent = tm.infoGroupsArea[2].transform.GetChild(team.Count - offset);
+                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetChild(0).localPosition = Vector3.zero;
+                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().enabled = true;
+                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
             }
         }
         else
@@ -363,14 +364,14 @@ public class TeamSwitcher : MonoBehaviour
                 for (int i = 0; i < (team.Count - btnNo); i++)                  // 5-2=3  
                 {
                     team[(btnNo + i).ToString()] = team[((btnNo + i) + 1).ToString()];  // team[2]=team[2+1] value
-                    tm.teamParent[1].transform.GetChild(btnNo + i).GetChild(0).parent = tm.teamParent[1].transform.GetChild(btnNo + i - 1); // team[2+i]=team[2+i-1] parent =>team[2]=team[1]
+                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0).parent = tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1); // team[2+i]=team[2+i-1] parent =>team[2]=team[1]
                     if (i == 0)     // 因為第一個物件會有2個Child所以要GetChild(1) 下一個按鈕移過來的Mice
-                        tm.teamParent[1].transform.GetChild(btnNo + i - 1).GetChild(1).localPosition = Vector3.zero;
+                        tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(1).localPosition = Vector3.zero;
                     else
-                        tm.teamParent[1].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    tm.teamParent[1].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    tm.teamParent[1].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().enabled = true;
-                    tm.teamParent[1].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
+                        tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
+                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
+                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().enabled = true;
+                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
                 }
                 Global.Team = Json.Serialize(team);
             }
@@ -381,20 +382,27 @@ public class TeamSwitcher : MonoBehaviour
     #region -- Mice2Click 雙擊老鼠 返回原始位置 (注意Mice Team不同) --
     void Mice2Click()
     {
-        Dictionary<string, object> team = Json.Deserialize(Global.Team) as Dictionary<string, object>;
         if (tag == "MiceIcon")
         {
-            GameObject teamBtn = tm.teamParent[1].transform.GetChild(team.Count).gameObject;
             string miceName = transform.GetChild(0).name;
 
-            Move2Clone();
-            TeamManager.dictLoadedTeam.Add(miceName, _clone);
-            TeamManager.dictLoadedMice[miceName] = _clone;
-            AddTeam(miceName, null);
-            transform.GetChild(0).parent = teamBtn.transform;
-            teamBtn.transform.GetChild(0).localPosition = Vector3.zero;
-            EnDisableBtn(teamBtn, true);
-            Destroy(gameObject);
+            if (!TeamManager.dictLoadedTeam.ContainsKey(miceName) && TeamManager.dictLoadedTeam.Count != teamCountMax)  // full and same
+            {
+                Dictionary<string, object> team = Json.Deserialize(Global.Team) as Dictionary<string, object>;
+                GameObject teamBtn = tm.infoGroupsArea[2].transform.GetChild(team.Count).gameObject;
+
+                Move2Clone();
+
+                TeamManager.dictLoadedTeam.Add(miceName, _clone);
+                TeamManager.dictLoadedMice[miceName] = _clone;
+                AddTeam(miceName, null);
+
+                transform.GetChild(0).parent = teamBtn.transform;
+                teamBtn.transform.GetChild(0).localPosition = Vector3.zero;
+
+                EnDisableBtn(teamBtn, true);
+                Destroy(gameObject);
+            }
         }
         else
         {
