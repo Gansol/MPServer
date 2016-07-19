@@ -20,21 +20,22 @@ public class AssetLoader : MonoBehaviour
     void Update()
     {
         if (assetBundleManager != null)
+        {
             _returnMessage = assetBundleManager.ReturnMessage;
 
-        if (assetBundleManager.loadedObjectCount == _objCount && _objCount != 0)
-        {
-            assetBundleManager.loadedObjectCount = _objCount = 0;
-            loadedObj = true;
-        }
+            if (assetBundleManager.loadedObjectCount == _objCount && _objCount != 0)
+            {
+                assetBundleManager.loadedObjectCount = _objCount = 0;
+                loadedObj = true;
+            }
 
-        if(assetBundleManager.isLoadPrefab)
-            assetBundleManager.init();
+            if (assetBundleManager.isLoadPrefab)
+                assetBundleManager.init();
+        }
     }
 
     public void LoadAsset(string folderPath, string assetName)
     {
-        assetBundleManager = new AssetBundleManager();
         assetBundleManager.init();
 
         StartCoroutine(assetBundleManager.LoadAtlas(folderPath + assetName, typeof(Texture)));

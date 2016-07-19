@@ -36,7 +36,7 @@ public class VisionManager : MonoBehaviour
         #region BundleCheck 檢查檔案
         if (visionChecker.visionChk)
         {
-            if (visionChecker.isNewlyVision && !bundleCheckComplete)
+            if (!bundleCheckComplete)
             {
                 bundleCheckComplete = true;
                 bundleChecker.StartCheck();

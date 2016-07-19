@@ -77,66 +77,67 @@ public class AssetBundleManager
         chkAtlas = dictAssetBundleRefs.TryGetValue(assetName + "Atlas", out abRef);
         chkMat = dictAssetBundleRefs.TryGetValue(assetName + "Mat", out abRef);
         chkPrefab = dictAssetBundleRefs.TryGetValue(assetName + "Prefab", out abRef);
-
-        if (!chkAtlas && !chkMat && !chkPrefab)
+        if (!bLoadedAssetbundle(assetName))
         {
-            string fileName = "";
-
-            if (type == typeof(Texture)) fileName = assetName + "Atlas";
-
-            if (type == typeof(Material))
+            if (!chkAtlas && !chkMat && !chkPrefab)
             {
-                fileName = assetName + "Mat";
-                while (_isLoadAtlas == false)
-                    yield return null;
-            }
-            if (type == typeof(GameObject))
-            {
-                fileName = assetName + "Prefab";
-                while (_isLoadMat == false)
-                    yield return null;
-            }
+                string fileName = "";
 
-            _isStartLoadAsset = true;
-            //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
-            www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext, 1);
-            yield return www;
+                if (type == typeof(Texture)) fileName = assetName + "Atlas";
 
-            _ReturnMessage = "正再載入資源... ( " + fileName + Global.ext + " )";
-            if (www.error != null)
-            {
-                _Ret = "C002";
-                _ReturnMessage = "載入資源失敗！ : \n" + assetName + "\n" + www.error;
-                foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+                if (type == typeof(Material))
                 {
-                    Debug.LogError("AB DICT: " + item.Key.ToString());
+                    fileName = assetName + "Mat";
+                    while (_isLoadAtlas == false)
+                        yield return null;
+                }
+                if (type == typeof(GameObject))
+                {
+                    fileName = assetName + "Prefab";
+                    while (_isLoadMat == false)
+                        yield return null;
                 }
 
-                Debug.LogError("assetName:" + assetName + "   Get AB: " + bLoadedAssetbundle(assetName));
-                throw new Exception(www.error);
+                _isStartLoadAsset = true;
+                //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
+                www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext, 1);
+                yield return www;
+
+                _ReturnMessage = "正再載入資源... ( " + fileName + Global.ext + " )";
+                if (www.error != null)
+                {
+                    _Ret = "C002";
+                    _ReturnMessage = "載入資源失敗！ : \n" + assetName + "\n" + www.error;
+                    foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+                    {
+                        Debug.LogError("AB DICT: " + item.Key.ToString());
+                    }
+
+                    Debug.LogError("assetName:" + assetName + "   Get AB: " + bLoadedAssetbundle(assetName));
+                    throw new Exception(www.error);
+                }
+                else if (www.isDone)
+                {
+                    _Ret = "C001";
+                    _ReturnMessage = "載入資源完成" + fileName;
+                    abRef = new AssetBundleRef();
+                    abRef.assetBundle = www.assetBundle;
+                    dictAssetBundleRefs.Add(fileName, abRef);
+                    string[] asset = fileName.Split('/');
+                    AssetBundleRequest request = abRef.assetBundle.LoadAsync(asset[1], type);
+                    if (type == typeof(Texture)) _isLoadAtlas = true;
+                    else if (type == typeof(Material)) _isLoadMat = true;
+                    else if (type == typeof(GameObject)) _isLoadPrefab = true;
+                    // www.Dispose(); 如果發現網路吃很大要補回修改新方法
+                }
             }
-            else if (www.isDone)
+            else
             {
-                _Ret = "C001";
-                _ReturnMessage = "載入資源完成" + fileName;
-                abRef = new AssetBundleRef();
-                abRef.assetBundle = www.assetBundle;
-                dictAssetBundleRefs.Add(fileName, abRef);
-                string[] asset = fileName.Split('/');
-                AssetBundleRequest request = abRef.assetBundle.LoadAsync(asset[1], type);
                 if (type == typeof(Texture)) _isLoadAtlas = true;
                 else if (type == typeof(Material)) _isLoadMat = true;
                 else if (type == typeof(GameObject)) _isLoadPrefab = true;
-                // www.Dispose(); 如果發現網路吃很大要補回修改新方法
             }
         }
-        else
-        {
-            if (type == typeof(Texture)) _isLoadAtlas = true;
-            else if (type == typeof(Material)) _isLoadMat = true;
-            else if (type == typeof(GameObject)) _isLoadPrefab = true;
-        }
-
         _loadedABCount++;   // 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
     }
 

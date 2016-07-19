@@ -22,10 +22,11 @@ public class PanelManager : MonoBehaviour
 {
     #region 欄位
     AssetLoader assetLoader;                                // 資源載入組件
+    public string folder;                                   // 資料夾路徑
     public GameObject[] Panel;                              // 存放Panel位置
-    private GameObject _clone;                              // 存放克隆物件
-    private Dictionary<string, PanelState> dictPanelRefs;   // Panel參考
-    
+    private GameObject _clone, _opendedPanel;                  // 存放克隆物件、已開起的Pnael
+    private static Dictionary<string, PanelState> dictPanelRefs;   // Panel參考
+
     private string _panelName;                              // panel名稱
     private bool _loadedPanel;                              // 載入的Panel
     private int _panelNo;                                   // Panel編號
@@ -44,13 +45,11 @@ public class PanelManager : MonoBehaviour
         StartCoroutine(Test());
     }
 
-
     IEnumerator Test()
     {
-        assetLoader.LoadAsset("TeamPanel/", "comic");
-        yield return new WaitForSeconds(.5f);
-        assetLoader.LoadAsset("TeamPanel/", "LiHeiPro");
-        
+        assetLoader.LoadAsset("Panel/", "ComicFont");
+        yield return new WaitForSeconds(1f);
+        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
     }
 
     void Update()
@@ -61,9 +60,9 @@ public class PanelManager : MonoBehaviour
 
         if (assetLoader.loadedObj && !_loadedPanel)                 // 載入Panel完成時
         {
-            _loadedPanel = !_loadedPanel;               
+            _loadedPanel = !_loadedPanel;
             InstantiatePanel();
-            PanelSwitch(_panelNo);
+            PanelSwitch();
             InitPanel(Panel[_panelNo]);
         }
     }
@@ -85,12 +84,12 @@ public class PanelManager : MonoBehaviour
         {
             _loadedPanel = false;
             assetLoader.init();
-            assetLoader.LoadAsset(_panelName + "Panel/", _panelName);
-            assetLoader.LoadPrefab(_panelName + "Panel/", _panelName);
+            assetLoader.LoadAsset("Panel/", "Panel");
+            assetLoader.LoadPrefab("Panel/", _panelName);
         }
         else
         {
-            PanelSwitch(_panelNo);
+            PanelSwitch();
         }
 
     }
@@ -110,31 +109,34 @@ public class PanelManager : MonoBehaviour
     /// Panel 開/關狀態
     /// </summary>
     /// <param name="panelNo">Panel編號</param>
-    void PanelSwitch(int panelNo)
+    void PanelSwitch()
     {
-        PanelState panelState = dictPanelRefs[_panelName];
-        switch (panelNo)
+        if (Panel[_panelNo] != null)
         {
-            case 0:
-                break;
-            case 1:
+            PanelState panelState = dictPanelRefs[_panelName];
+            if (!panelState.onOff)
+            {
+                if (_opendedPanel != null)
                 {
-                    if (!panelState.onOff)
-                    {
-                        Global.photonService.LoadPlayerData(Global.Account);    // 錯誤 應該只載入TEAM
-                        Panel[_panelNo].SetActive(true);                        // 錯誤 如改為載入AB 要等載入後顯示
-                        panelState.onOff = !panelState.onOff;
-                    }
-                    else
-                    {
-                        Panel[_panelNo].SetActive(false);
-                        panelState.onOff = !panelState.onOff;
-                    }
-                    break;
+                    _panelName = _opendedPanel.name.Remove(_opendedPanel.name.Length - 7);   // 7 = xxx(Panel) > xxx
+                    dictPanelRefs[_panelName].onOff = false;
+                    _opendedPanel.SetActive(false);
                 }
-            default:
-                Debug.LogError("PanelNo is unknow!");
-                break;
+                   
+                Global.photonService.LoadPlayerData(Global.Account);    // 錯誤 應該只載入TEAM
+                Panel[_panelNo].SetActive(true);                        // 錯誤 如改為載入AB 要等載入後顯示
+                panelState.onOff = !panelState.onOff;
+                _opendedPanel = Panel[_panelNo];
+            }
+            else
+            {
+                Panel[_panelNo].SetActive(false);
+                panelState.onOff = !panelState.onOff;
+            }
+        }
+        else
+        {
+            Debug.LogError("PanelNo is unknow!");
         }
     }
     #endregion
@@ -150,16 +152,13 @@ public class PanelManager : MonoBehaviour
     void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     {
         PanelState panelState = new PanelState();
-        panelState.obj = (GameObject)Instantiate(AssetBundleManager.getAssetBundle(_panelName + "Panel/" + _panelName).mainAsset);
+        panelState.obj = (GameObject)Instantiate(AssetBundleManager.getAssetBundle("Panel/" + _panelName).mainAsset);
         panelState.obj.transform.parent = Panel[_panelNo].transform;
         panelState.obj.transform.localPosition = Vector3.zero;
-        panelState.obj.transform.localScale = new Vector3(2, 2, 1);
+        panelState.obj.transform.localScale = Vector3.one;
         panelState.obj.name = _panelName;
 
         dictPanelRefs.Add(_panelName, new PanelState());
     }
     #endregion
-
-
-
 }
