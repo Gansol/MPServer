@@ -33,7 +33,7 @@ public class TeamManager : MonoBehaviour
     /// TeamIcon名稱、Mice按鈕索引物件
     /// </summary>
     public static Dictionary<string, GameObject> dictLoadedTeam { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
-    [Range(0.2f,0.4f)]
+    [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // Change value in editor
     public float actorScale = 0.8f;
 
@@ -41,15 +41,15 @@ public class TeamManager : MonoBehaviour
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
     private Dictionary<string, GameObject> _dictActor;                              // 已載入角色參考
 
-    private int  _page;                                                             // 材質數量、物件數量、翻一頁+10
-    private float _lastClickTime;                                                   
+    private int _page;                                                             // 材質數量、物件數量、翻一頁+10
+    private float _lastClickTime;
     private bool _diableBtn, _LoadedIcon, _LoadedActor;
     #endregion
 
     void Awake()
     {
-         _page = 0;
-         _miceActor = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
+        _page = 0;
+        _miceActor = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
         _dictMiceData = Json.Deserialize(Global.MiceAll) as Dictionary<string, object>;
@@ -137,9 +137,9 @@ public class TeamManager : MonoBehaviour
         foreach (KeyValuePair<string, object> item in dictionary)
         {
             string bundleName = item.Value.ToString().Remove(item.Value.ToString().Length - 4) + "ICON";
-            if (assetLoader.GetAsset("MiceICON/",bundleName))                  // 已載入資產時
+            if (assetLoader.GetAsset("MiceICON/", bundleName))                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset("MiceICON/",bundleName);
+                GameObject bundle = assetLoader.GetAsset("MiceICON/", bundleName);
                 Transform miceBtn = myParent.GetChild(i);
 
                 Add2Refs(bundle, miceBtn);     // 加入物件參考
@@ -170,7 +170,7 @@ public class TeamManager : MonoBehaviour
     {
         GameObject _miceImage;
         string miceName = btn_mice.transform.GetChild(0).name;
-        
+
         _btnClick = btn_mice;
 
         if (_tmpActor != null) _tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
@@ -205,7 +205,7 @@ public class TeamManager : MonoBehaviour
     {
         string miceName = _btnClick.transform.GetChild(0).name;
 
-        _clone = (GameObject)Instantiate(assetLoader.GetAsset(miceName + "/" , miceName));
+        _clone = (GameObject)Instantiate(assetLoader.GetAsset(miceName + "/", miceName));
         ObjectManager.SwitchDepthLayer(_clone, _miceActor, Global.MeunObjetDepth);
 
         _clone.transform.parent = _miceActor.transform;
