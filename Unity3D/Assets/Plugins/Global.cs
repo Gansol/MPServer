@@ -102,6 +102,24 @@ public class Global
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
-    public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();   // 老鼠屬性資料 JSON資料
+    public static int arrayX = 0, arrayY = 0;
+    public static string[,] miceProperty = new string[arrayX, arrayY];   // 老鼠屬性資料 JSON資料
+    public static Dictionary<string, object> miceProperty2 = new Dictionary<string, object>();   // 老鼠屬性資料 JSON資料
+    public enum UILayer
+    {
+        Nothing = 0,
+        Default = 1,
+        Battle = 8,
+        HUD = 9,
+        Store = 10,
+        Player = 11,
+        ItemInfo = 12,
+        Message = 13,
+    }
 
+    public enum Camrea
+    {
+        MainCamera,
+        HUDCamera,
+    }
 }

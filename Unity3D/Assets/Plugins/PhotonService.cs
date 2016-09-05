@@ -65,7 +65,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ShowMissionScoreHandler OtherMissionScoreEvent;
     public event ShowMissionScoreHandler MissionCompleteEvent;
 
-    public delegate void GameOverHandler(Int16 score,byte exp,Int16 sliverReward);
+    public delegate void GameOverHandler(Int16 score, byte exp, Int16 sliverReward);
     public event GameOverHandler GameOverEvent;
 
 
@@ -300,6 +300,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
+
             #region ExitRoom 離開房間
 
             case (byte)BattleOperationCode.ExitRoom:    // 離開房間
@@ -353,6 +354,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 break;
 
             #endregion
+
 
             #region LoadPlayerData 載入玩家資料
 
@@ -416,35 +418,65 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             case (byte)MiceResponseCode.LoadMice:   // 取得老鼠資料
                 {
-                    try
-                    {
-                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
-                        {
-                            string miceData = (string)operationResponse.Parameters[(byte)MiceParameterCode.MiceData];
-                            Global.miceProperty = Json.Deserialize(miceData) as Dictionary<string, object>;
-                            Global.isMiceLoaded = true;
-                            /* 印出老鼠資料
-                            foreach (KeyValuePair<string, object> item in Global.miceProperty)
-                            {
-                                Debug.LogWarning("We can see this is Dictionary Object:" + item.Value);
-                                var innDict = item.Value as Dictionary<string, object>;
 
-                                foreach (KeyValuePair<string, object> inner in innDict)
-                                {
-                                    Debug.Log("Key:" + inner.Key + " Value:" + inner.Value);
-                                }
-                            }
-                             * */
-                        }
-                    }
-                    catch (Exception e)
+                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                     {
-                        Debug.Log(e.Message + e.StackTrace);
+                        string miceData = (string)operationResponse.Parameters[(byte)MiceParameterCode.MiceData];
+
+                        Dictionary<string, object> dictMiceData = Json.Deserialize(miceData) as Dictionary<string, object>;
+
+                        foreach (KeyValuePair<string, object> item in dictMiceData)
+                        {
+                            var innDict = item.Value as Dictionary<string, object>;
+                            Global.arrayY = innDict.Count;
+                            break;
+                        }
+
+                        Global.miceProperty = new string[dictMiceData.Count, Global.arrayY];
+                        int i = 0;
+
+                        foreach (KeyValuePair<string, object> item in dictMiceData)
+                        {
+                            int j = 0;
+                            var innDict = item.Value as Dictionary<string, object>;
+
+                            foreach (KeyValuePair<string, object> inner in innDict)
+                            {
+                                Global.miceProperty[i, j] = inner.Value.ToString();
+                                j++;
+                            }
+                            i++;
+                        }
+
+                        //for (int x = 0; x < Global.miceProperty.GetLength(0); x++)
+                        //{
+                        //    for (int u = 0; u < Global.miceProperty.GetLength(1); u++)
+                        //    {
+                        //        Debug.Log(Global.miceProperty[x, u]);
+                        //    }
+                        //}
+                        //Global.miceProperty = jString as string[,];
+
+
+                        Global.isMiceLoaded = true;
+                        /* 印出老鼠資料
+                        foreach (KeyValuePair<string, object> item in Global.miceProperty)
+                        {
+                            Debug.LogWarning("We can see this is Dictionary Object:" + item.Value);
+                            var innDict = item.Value as Dictionary<string, object>;
+
+                            foreach (KeyValuePair<string, object> inner in innDict)
+                            {
+                                Debug.Log("Key:" + inner.Key + " Value:" + inner.Value);
+                            }
+                        }
+                         * */
                     }
                 }
                 break;
 
             #endregion
+
 
             #region UpdateScore 更新分數
 
@@ -593,7 +625,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];     // 這是GameScore不含扣分
                             byte exp = (byte)operationResponse.Parameters[(byte)BattleParameterCode.EXPReward];
-                            Int16 sliverReward =(Int16)operationResponse.Parameters[(byte)BattleParameterCode.SliverReward];
+                            Int16 sliverReward = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.SliverReward];
 
                             Global.MaxCombo = (Int16)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxCombo];
                             Global.MaxScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxScore];
@@ -604,12 +636,35 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
                             GameOverEvent(score, exp, sliverReward);
-                            Debug.Log("GameOver:"+(string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Item]);
+                            Debug.Log("GameOver:" + (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Item]);
                             Debug.Log("RECIVE GameOver !");
                         }
                         else
                         {
-                            Debug.Log("RECIVE GameOver ERROR !"+" 錯誤碼:"+operationResponse.OperationCode+"  錯誤訊息:"+operationResponse.DebugMessage);
+                            Debug.Log("RECIVE GameOver ERROR !" + " 錯誤碼:" + operationResponse.OperationCode + "  錯誤訊息:" + operationResponse.DebugMessage);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+
+            #region LoadCurrency 載入貨幣資料
+
+            case (byte)ItemResponseCode.Success: // 取得貨幣資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
+                            Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
+                            Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
                         }
                     }
                     catch (Exception e)
@@ -869,7 +924,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 更新老鼠資料
     /// </summary>
-    public void UpdateMiceData(string account,string miceAll, string team, string miceAmount)
+    public void UpdateMiceData(string account, string miceAll, string team, string miceAmount)
     {
         try
         {
@@ -1100,6 +1155,25 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         catch (Exception e)
         {
             throw e;
+        }
+    }
+    #endregion
+
+    #region BuyItem 購買商品
+    /// <summary>
+    /// 購買商品
+    /// </summary>
+    public void BuyItem(string account, string[] goods)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)PlayerDataParameterCode.Account, account },  { (byte)ItemParameterCode.Goods,goods}};
+            this.peer.OpCustom((byte)ItemOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw;
         }
     }
     #endregion
