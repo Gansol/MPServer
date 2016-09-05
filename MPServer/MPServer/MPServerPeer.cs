@@ -919,14 +919,14 @@ namespace MPServer
                                     Log.Debug("LoadMice IO OK");
                                     MPCOM.MiceData miceData = (MPCOM.MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                     Log.Debug("LoadMice Data OK");
-
+                                    Log.Debug("Server Data: "+miceData.miceProperty);
                                     if (miceData.ReturnCode == "S801")//取得老鼠資料成功 回傳玩家資料
                                     {
                                         Log.Debug("miceData.ReturnCode == S801");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty } 
                                     };
-
+                                        
                                         OperationResponse response = new OperationResponse((byte)MiceResponseCode.LoadMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = miceData.ReturnMessage.ToString() };
                                         SendOperationResponse(response, new SendParameters());
                                     }
@@ -1225,6 +1225,42 @@ namespace MPServer
                             break;
                         #endregion
 
+                        #region LoadMice 載入老鼠資料
+                        case (byte)ItemOperationCode.BuyItem:
+                            {
+                                try
+                                {
+                                    Log.Debug("IN BuyItem");
+
+                                    MPCOM.MiceDataUI miceDataUI = new MPCOM.MiceDataUI(); //實體化 IO (連結資料庫拿資料)
+                                    Log.Debug("BuyItem IO OK");
+                                    MPCOM.MiceData miceData = (MPCOM.MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("BuyItem Data OK");
+                                    if (miceData.ReturnCode == "S601")//取得老鼠資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug("miceData.ReturnCode == S801");
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty } 
+                                    };
+
+                                        OperationResponse response = new OperationResponse((byte)MiceResponseCode.LoadMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = miceData.ReturnMessage.ToString() };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = miceData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+
+                            }
+                            break;
+                        #endregion
                     }
                 }
             }

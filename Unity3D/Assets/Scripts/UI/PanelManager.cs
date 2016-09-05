@@ -24,7 +24,8 @@ public class PanelManager : MonoBehaviour
     AssetLoader assetLoader;                                // 資源載入組件
     public string folder;                                   // 資料夾路徑
     public GameObject[] Panel;                              // 存放Panel位置
-    private GameObject _clone, _opendedPanel;                  // 存放克隆物件、已開起的Pnael
+
+    private GameObject _clone;                  // 存放克隆物件、已開起的Pnael
     private static Dictionary<string, PanelState> dictPanelRefs;   // Panel參考
 
     private string _panelName;                              // panel名稱
@@ -68,6 +69,11 @@ public class PanelManager : MonoBehaviour
     }
 
     #region -- LoadPanel 載入Panel(外部呼叫用) --
+    /// <summary>
+    /// 載入Panel
+    /// </summary>
+    /// <param name="panel">Panel</param>
+    /// <param name="obj">物件自己</param>
     public void LoadPanel(GameObject panel)
     {
         _panelNo = 0;
@@ -86,12 +92,12 @@ public class PanelManager : MonoBehaviour
             assetLoader.init();
             assetLoader.LoadAsset("Panel/", "Panel");
             assetLoader.LoadPrefab("Panel/", _panelName);
+
         }
         else
         {
             PanelSwitch();
         }
-
     }
     #endregion
 
@@ -114,24 +120,22 @@ public class PanelManager : MonoBehaviour
         if (Panel[_panelNo] != null)
         {
             PanelState panelState = dictPanelRefs[_panelName];
-            if (!panelState.onOff)
+            if (!Panel[_panelNo].activeSelf)  // if closed
             {
-                if (_opendedPanel != null)
-                {
-                    _panelName = _opendedPanel.name.Remove(_opendedPanel.name.Length - 7);   // 7 = xxx(Panel) > xxx
-                    dictPanelRefs[_panelName].onOff = false;
-                    _opendedPanel.SetActive(false);
-                }
-                   
+
+
                 Global.photonService.LoadPlayerData(Global.Account);    // 錯誤 應該只載入TEAM
                 Panel[_panelNo].SetActive(true);                        // 錯誤 如改為載入AB 要等載入後顯示
                 panelState.onOff = !panelState.onOff;
-                _opendedPanel = Panel[_panelNo];
+                EventMaskSwitch.openedPanel = Panel[_panelNo];
+                EventMaskSwitch.Switch(Panel[_panelNo]);
             }
             else
             {
+                EventMaskSwitch.openedPanel = null;
                 Panel[_panelNo].SetActive(false);
                 panelState.onOff = !panelState.onOff;
+                Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
             }
         }
         else
@@ -157,8 +161,10 @@ public class PanelManager : MonoBehaviour
         panelState.obj.transform.localPosition = Vector3.zero;
         panelState.obj.transform.localScale = Vector3.one;
         panelState.obj.name = _panelName;
-
+        panelState.obj.layer = Panel[_panelNo].layer;
         dictPanelRefs.Add(_panelName, new PanelState());
+
+        EventMaskSwitch.Switch(panelState.obj);
     }
     #endregion
 }

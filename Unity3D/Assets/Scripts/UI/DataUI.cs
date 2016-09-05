@@ -34,7 +34,7 @@ public class DataUI : MonoBehaviour {
             GUI.Label(new Rect(200, 100, 400, 20), "Your MaxScore : " + Global.MaxScore);    // 顯示最高分
             GUI.Label(new Rect(200, 120, 400, 20), "Your MiceAll : " + Global.MiceAll);      // 顯示全部老鼠
             GUI.Label(new Rect(200, 140, 400, 20), "Your Friend : " + Global.Friend);        // 顯示朋友列表
-           // Debug.Log("ITEM:" + Global.Item);
+//            Debug.Log("MiceData:" + Global.miceProperty.Length);
             if (GUI.Button(new Rect(200, 160, 100, 20), "Update Rnak")) // 88 是測試資料 有問題 需要改掉
             {
                 Global.photonService.UpdatePlayerData(Global.Account, 88, Global.EXP, Global.MaxCombo, Global.MaxScore, Global.SumScore, Global.SumLost, Global.SumKill,Global.Item, Global.MiceAll, Global.Team, Global.MiceAmount, Global.Friend);
@@ -55,7 +55,7 @@ public class DataUI : MonoBehaviour {
 
         if (Global.isMiceLoaded)
         {
-            GUI.Label(new Rect(200, 340, 400, 200), "Your Mice : " + Global.miceProperty.Count);            // 顯示老鼠資料 dict<string,object>
+            GUI.Label(new Rect(200, 340, 400, 200), "Your Mice : " + Global.miceProperty);            // 顯示老鼠資料 dict<string,object>
         }
     }
 }

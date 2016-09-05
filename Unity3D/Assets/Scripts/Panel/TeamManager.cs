@@ -102,7 +102,9 @@ public class TeamManager : MonoBehaviour
             yield break;
 
         LoadActor(btn_mice);
-        LoadProperty(btn_mice.name);
+        Debug.Log(btn_mice.transform.GetChild(0).name);
+        LoadMiceProperty loadProerty = new LoadMiceProperty();
+        loadProerty.LoadProperty(btn_mice.transform.GetChild(0).gameObject,infoGroupsArea[1],1);
         //Debug.Log("Simple click");
     }
     #endregion
@@ -237,27 +239,6 @@ public class TeamManager : MonoBehaviour
         {
             if (dictLoadedMice.ContainsKey(item.Value.ToString()))
                 dictLoadedMice[item.Value.ToString()].SendMessage("DisableBtn");
-        }
-    }
-    #endregion
-
-    #region -- LoadProperty 載入老鼠屬性 --
-    private void LoadProperty(string name)
-    {
-        string key = (int.Parse(name.Remove(0, 4)) + _page).ToString();     // + pageVaule 還沒加入翻頁值
-        foreach (KeyValuePair<string, object> item in Global.miceProperty)  // 載入玩家擁有老鼠
-        {
-            if (key == item.Key.ToString())                                 //如果按鈕和玩家擁有老鼠相同
-            {
-                var innDict = item.Value as Dictionary<string, object>;
-                int i = 0;
-                foreach (KeyValuePair<string, object> inner in innDict)     //載入老鼠資料
-                {
-                    if (i != 0) infoGroupsArea[1].transform.GetChild(i).GetComponent<UILabel>().text = inner.Value.ToString();// (PS:0在SQL中是老鼠名稱)
-                    i++;
-                }
-                break;
-            }
         }
     }
     #endregion

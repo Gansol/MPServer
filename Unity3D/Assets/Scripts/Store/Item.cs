@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Item : MonoBehaviour
 {
-    public string itemName;
-    public float[] property;
+    public string[] property;
 
     void OnClick()
     {
