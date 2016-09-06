@@ -8,13 +8,15 @@
 
     public enum ItemResponseCode
     {
-        Success = 82,
-        Failed = 83,
+        BuyItem = 81,
     }
 
     public enum ItemParameterCode
     {
-        Goods = 84,
+        ItemName = 84,
+        ItemType = 85,
+        BuyCount = 86,
+        Limit= 87,
     }
 
     public enum ItemProperty
@@ -29,7 +31,7 @@
         Price = 7,
         Description =8,
         SayHello = 9,
-        GoodsType = 10,
+        ItemType = 10,
         Limit = 11,
         BuyCount = 12,
     }

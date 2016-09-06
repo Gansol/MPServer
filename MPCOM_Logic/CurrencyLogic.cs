@@ -64,7 +64,7 @@ namespace MPCOM
         #region UpdateCurrency
 
         [AutoComplete]
-        public CurrencyData UpdateCurrency(string account, int rice,Int16 gold)
+        public CurrencyData UpdateCurrency(string account, byte itemType, int currency)
         {
             CurrencyData currencyData = new CurrencyData();
             currencyData.ReturnCode = "(Logic)S700";
@@ -73,8 +73,50 @@ namespace MPCOM
             try
             {
                 // to do check
-                    CurrencyIO currencyIO = new CurrencyIO();
-                    currencyData = currencyIO.UpdateCurrency(account,rice,gold);
+                int rice = 0;
+                Int16 gold = 0;
+
+
+                CurrencyIO currencyIO = new CurrencyIO();
+
+                currencyData = currencyIO.LoadCurrency(account);
+
+
+                switch (itemType)
+                {
+                    case 0:
+                        {
+                            if (currencyData.Rice > currency)
+                            {
+                                rice = currencyData.Rice - currency;
+                                currencyData = currencyIO.UpdateCurrency(account, rice);
+                            }
+                            else
+                            {
+                                currencyData.ReturnMessage = "遊戲幣不足！";
+                                currencyData.ReturnCode = "S711";
+                            }
+                            break;
+                        }
+                    case 1:
+                        {
+                            if (currencyData.Gold > currency)
+                            {
+                                gold = (Int16)(currencyData.Gold - (Int16)currency);
+                                currencyData = currencyIO.UpdateCurrency(account, gold);
+                            }
+                            else
+                            {
+                                currencyData.ReturnMessage = "金幣不足！";
+                                currencyData.ReturnCode = "S712";
+                            }
+                            break;
+                        }
+                    default:
+                        currencyData.ReturnMessage = "金流資料未知例外情況！";
+                        currencyData.ReturnCode = "S799";
+                        break;
+                }
             }
             catch (Exception e)
             {

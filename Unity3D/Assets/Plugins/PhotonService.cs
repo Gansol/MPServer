@@ -65,8 +65,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ShowMissionScoreHandler OtherMissionScoreEvent;
     public event ShowMissionScoreHandler MissionCompleteEvent;
 
+    //委派事件 GameOver
     public delegate void GameOverHandler(Int16 score, byte exp, Int16 sliverReward);
     public event GameOverHandler GameOverEvent;
+
+    //委派事件 GameOver
+    public delegate void UpdateCurrencyHandler();
+    public event UpdateCurrencyHandler UpdateCurrencyEvent;
 
 
     public bool ServerConnected
@@ -656,7 +661,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #region LoadCurrency 載入貨幣資料
 
-            case (byte)ItemResponseCode.Success: // 取得貨幣資料
+            case (byte)ItemResponseCode.BuyItem: // 取得貨幣資料
                 {
                     try
                     {
@@ -664,12 +669,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
+                            Global.MiceAll = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll];
                             Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
+                            UpdateCurrencyEvent();
                         }
                     }
                     catch (Exception e)
                     {
-                        Debug.Log(e.Message + e.StackTrace);
+                        Debug.Log(e);
                     }
                 }
                 break;
@@ -1168,7 +1175,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-            { (byte)PlayerDataParameterCode.Account, account },  { (byte)ItemParameterCode.Goods,goods}};
+            { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Global.MiceAll },{ (byte)PlayerDataParameterCode.MiceAmount, Global.MiceAmount },
+            { (byte)ItemParameterCode.ItemName,goods[0]},{ (byte)ItemParameterCode.ItemType,byte.Parse(goods[1])},{ (byte)ItemParameterCode.BuyCount,int.Parse(goods[2])},};
             this.peer.OpCustom((byte)ItemOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)

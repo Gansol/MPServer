@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using MiniJSON;
+using System;
 public class dem : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	    string[,] a = new string[2,2];
-        a.SetValue("a", 0,0);
-        a.SetValue("b", 0,1);
-
-        string j = Json.Serialize(a);
-        Debug.Log(j);
+        Int16 a = 0;
+        int b = 32767;
+        Debug.Log(a+=(Int16)b);
 	}
 	
 	// Update is called once per frame

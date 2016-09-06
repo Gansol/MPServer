@@ -210,7 +210,7 @@ namespace MPCOM
 
         #endregion
 
-        #region UpdatePlayerData 更新玩家(Team)資料 
+        #region UpdatePlayerData 更新玩家(Team)資料
 
         [AutoComplete]
         public PlayerData UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
@@ -292,7 +292,86 @@ namespace MPCOM
                     */
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdatePlayerData(account,  miceAll, team, miceAmount);
+                    playerData = playerDataIO.UpdatePlayerData(account, miceAll, team, miceAmount);
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return playerData;
+
+        }
+        #endregion
+
+        #region UpdatePlayerData 更新玩家(老鼠)資料
+
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName,int amount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //載入伺服器玩家資料提供比對
+                playerData = LoadPlayerData(account);
+
+                if (playerData.ReturnCode == "S401")
+                {
+                    clinetData = MiniJSON.Json.Deserialize(miceAll) as Dictionary<string, object>;
+                    serverData = MiniJSON.Json.Deserialize(playerData.MiceAll) as Dictionary<string, object>;
+
+                    if (serverData.Count != clinetData.Count)
+                    {
+                        playerData.ReturnCode = "S412";
+                        playerData.ReturnMessage = "老鼠成員異常！";
+                    }
+                    
+                    if (!serverData.ContainsValue(miceName))
+                    {
+                        serverData.Add((serverData.Count + 1).ToString(), miceName);
+                        miceAll = MiniJSON.Json.Serialize(serverData);
+                    }
+                    
+                    clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
+                    serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
+
+                    //如果與伺服器資料 數量不相同  這沒驗證個別道具數量 只有驗證總數
+                    if (serverData.Count == clinetData.Count)
+                    {
+                        foreach (KeyValuePair<string, object> serverMice in serverData)
+                        {
+                            if (serverMice.Value != clinetData[serverMice.Key])
+                            {
+                                playerData.ReturnCode = "S414";
+                                playerData.ReturnMessage = "老鼠數量異常！";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S414";
+                        playerData.ReturnMessage = "老鼠數量異常！";
+                    }
+                    
+                    if (!serverData.ContainsKey(miceName))
+                    {
+                        serverData.Add(miceName, amount);
+                    }
+                    else
+                    {
+                        int miceCount = int.Parse(serverData[miceName].ToString());
+                        serverData[miceName] = miceCount + amount;
+                    }
+                    miceAmount = MiniJSON.Json.Serialize(serverData);
+
+                    //如果驗證成功 寫入玩家資料
+                    PlayerDataIO playerDataIO = new PlayerDataIO();
+                    playerData = playerDataIO.UpdatePlayerData(account, miceAll, miceAmount);
                 }
 
             }
@@ -330,18 +409,19 @@ namespace MPCOM
                 // if (playerData.ReturnCode == "S401") MiceAmountChk(miceAmount);  // 還沒寫好
                 // if (playerData.ReturnCode == "S401")    ItemChk(item)    // 還沒寫好
 
-               if (playerData.ReturnCode == "S401")  {
-                   playerData.SumScore+=score;
-                   if (maxScore > playerData.MaxScore) playerData.MaxScore = maxScore;
-                   playerData.SumLost += lostMice;
-                   playerData.SumKill += killMice;
+                if (playerData.ReturnCode == "S401")
+                {
+                    playerData.SumScore += score;
+                    if (maxScore > playerData.MaxScore) playerData.MaxScore = maxScore;
+                    playerData.SumLost += lostMice;
+                    playerData.SumKill += killMice;
 
-                   if (playerData.EXP +exp >= maxExp && playerData.Rank != 100)
-                   {
-                       playerData.Rank += 1;
-                       exp -= maxExp;
-                       playerData.EXP += exp;
-                   }
+                    if (playerData.EXP + exp >= maxExp && playerData.Rank != 100)
+                    {
+                        playerData.Rank += 1;
+                        exp -= maxExp;
+                        playerData.EXP += exp;
+                    }
 
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
@@ -413,7 +493,7 @@ namespace MPCOM
             playerData.ReturnCode = "S401";
             return playerData;
         }
-        
+
         private PlayerData MaxScoreChk(int maxScore)
         {
             PlayerData playerData = new PlayerData();
@@ -433,10 +513,10 @@ namespace MPCOM
             PlayerData playerData = new PlayerData();
 
             if (lostMice < 0 && lostMice > Int16.MaxValue)
-                {
-                    playerData.ReturnCode = "S417";
-                    playerData.ReturnMessage = "玩家跑掉的老鼠數量異常！";
-                }
+            {
+                playerData.ReturnCode = "S417";
+                playerData.ReturnMessage = "玩家跑掉的老鼠數量異常！";
+            }
             playerData.ReturnCode = "S401";
             return playerData;
         }
@@ -446,11 +526,11 @@ namespace MPCOM
             PlayerData playerData = new PlayerData();
 
             if (killMice < 0 && killMice > int.MaxValue)
-                {
-                    playerData.ReturnCode = "S418";
-                    playerData.ReturnMessage = "玩家趕跑的老鼠數量異常！";
-                }
-                playerData.ReturnCode = "S401";
+            {
+                playerData.ReturnCode = "S418";
+                playerData.ReturnMessage = "玩家趕跑的老鼠數量異常！";
+            }
+            playerData.ReturnCode = "S401";
             return playerData;
         }
 
@@ -458,7 +538,7 @@ namespace MPCOM
         {
             clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
             serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
-            
+
             //如果與伺服器資料 數量不相同
             if (serverData.Count == clinetData.Count)
             {

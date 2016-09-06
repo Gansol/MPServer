@@ -5,7 +5,7 @@ using PhotonHostRuntimeInterfaces;
 using System;
 using System.Collections.Generic;
 using Gansol;
-
+using MPCOM;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -114,16 +114,16 @@ namespace MPServer
                                 string joinTime = (string)operationRequest.Parameters[(byte)JoinMemberParameterCode.JoinDate];
                                 MemberType memberType = (MemberType)operationRequest.Parameters[(byte)JoinMemberParameterCode.MemberType];
 
-                                MPCOM.MemberUI memberUI = new MPCOM.MemberUI();
-                                MPCOM.MemberData memberData;
+                                MemberUI memberUI = new MemberUI();
+                                MemberData memberData;
 
                                 if ((byte)memberType == 1)
                                 {
-                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, password, nickname, age, sex, IP, email, joinTime, (byte)memberType));
+                                    memberData = (MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, password, nickname, age, sex, IP, email, joinTime, (byte)memberType));
                                 }
                                 else
                                 {
-                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, nickname, IP, email, joinTime, (byte)memberType));
+                                    memberData = (MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, nickname, IP, email, joinTime, (byte)memberType));
                                 }
 
                                 if (memberData.ReturnCode == "S101")
@@ -165,9 +165,9 @@ namespace MPServer
                                 string passowrd = (string)operationRequest.Parameters[(byte)LoginParameterCode.Password];
                                 MemberType memberType = (MemberType)operationRequest.Parameters[(byte)LoginParameterCode.MemberType];
                                 Log.Debug("Account:" + account + "Password:" + passowrd);
-                                MPCOM.MemberUI memberUI = new MPCOM.MemberUI(); //實體化 UI (連結資料庫拿資料)
+                                MemberUI memberUI = new MemberUI(); //實體化 UI (連結資料庫拿資料)
                                 Log.Debug("Login IO OK");
-                                MPCOM.MemberData memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                MemberData memberData = (MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Login Data OK");
                                 Log.Debug("memberData.Account: " + memberData.Account);
                                 //＊＊＊＊＊這有問題 如果重複登入 不能去拿伺服器資料 會偷資料＊＊＊＊＊　
@@ -259,10 +259,10 @@ namespace MPServer
                                             }
                                             else if (memberType == MemberType.Google)  // SNS登入失敗 加入會員
                                             {
-                                                memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, "DefaultName", LocalIP, "example@example.com", DateTime.Now.ToString(), (byte)memberType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                                memberData = (MemberData)TextUtility.DeserializeFromStream(memberUI.JoinMember(account, "DefaultName", LocalIP, "example@example.com", DateTime.Now.ToString(), (byte)memberType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                                 if (memberData.ReturnCode == "S101")
                                                 {
-                                                    memberData = (MPCOM.MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                                    memberData = (MemberData)TextUtility.DeserializeFromStream(memberUI.MemberLogin(account, passowrd)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                                     if (memberData.ReturnCode == "S201")
                                                     {
                                                         Log.Debug("memberData.ReturnCode == S201");
@@ -356,8 +356,8 @@ namespace MPServer
                                         Log.Debug("Count:" + _server.room.waitingList.Count);
                                         _server.room.waitingList[1].TryGetValue("RoomActor1", out otherActor);
 
-                                        MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI();
-                                        MPCOM.PlayerData otherPlayerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherActor.Account));
+                                        PlayerDataUI playerDataUI = new PlayerDataUI();
+                                        PlayerData otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherActor.Account));
 
                                         Dictionary<byte, object> myParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, otherActor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, otherActor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, myTeam }, { (byte)MatchGameParameterCode.RoomPlace, "Guest" } };
                                         Dictionary<byte, object> otherParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, actor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, actor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, otherPlayerData.Team }, { (byte)MatchGameParameterCode.RoomPlace, "Host" } };
@@ -456,7 +456,7 @@ namespace MPServer
                                     Room.RoomActor otherActor = _server.room.GetOtherPlayer(roomID, actor.PrimaryID);
 
                                     // 移除遊戲中房間、玩家
-                                    if (otherActor!=null)
+                                    if (otherActor != null)
                                         _server.room.RemovePlayingRoom(roomID, actor.guid, otherActor.guid);
 
                                     Log.Debug("playingRoomList Count:" + _server.room.playingRoomList.Count);
@@ -615,9 +615,9 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
 
-                                MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI(); //初始化 IO (連結資料庫拿資料)
+                                PlayerDataUI playerDataUI = new PlayerDataUI(); //初始化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Data OK");
 
                                 byte rank = playerData.Rank;
@@ -678,9 +678,9 @@ namespace MPServer
                                 string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];  // Json資料
                                 string friend = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Friend];          // Json資料
 
-                                MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, miceAmount, friend)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, miceAmount, friend)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Data OK");
 
                                 if (playerData.ReturnCode == "S403")//取得玩家資料成功 回傳玩家資料
@@ -717,9 +717,9 @@ namespace MPServer
                                 string team = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Team];              // Json資料
                                 string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];  // Json資料
 
-                                MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account,  miceAll, team, miceAmount)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, miceAll, team, miceAmount)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Data OK");
 
                                 if (playerData.ReturnCode == "S420")//取得玩家資料成功 回傳玩家資料
@@ -728,8 +728,8 @@ namespace MPServer
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode },{ (byte)PlayerDataParameterCode.MiceAll, miceAll } , 
                                         { (byte)PlayerDataParameterCode.Team, team } ,{ (byte)PlayerDataParameterCode.MiceAmount, miceAmount }
-                                        }; 
-                                    
+                                        };
+
 
                                     OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
@@ -752,9 +752,9 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)CurrencyParameterCode.Account];
                                 Log.Debug("Account:" + account);
-                                MPCOM.CurrencyUI currencyUI = new MPCOM.CurrencyUI(); //實體化 IO (連結資料庫拿資料)
+                                CurrencyUI currencyUI = new CurrencyUI(); //實體化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.CurrencyData currencyData = (MPCOM.CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
                                 Log.Debug("Data OK");
 
                                 int rice = currencyData.Rice;
@@ -787,9 +787,9 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
 
-                                MPCOM.CurrencyUI currencyUI = new MPCOM.CurrencyUI(); //實體化 IO (連結資料庫拿資料)
+                                CurrencyUI currencyUI = new CurrencyUI(); //實體化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.CurrencyData currencyData = (MPCOM.CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                 Log.Debug("Data OK");
 
                                 int rice = currencyData.Rice;
@@ -822,9 +822,9 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
 
-                                MPCOM.CurrencyUI currencyUI = new MPCOM.CurrencyUI(); //實體化 IO (連結資料庫拿資料)
+                                CurrencyUI currencyUI = new CurrencyUI(); //實體化 IO (連結資料庫拿資料)
                                 Log.Debug("IO OK");
-                                MPCOM.CurrencyData currencyData = (MPCOM.CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
                                 Log.Debug("Data OK");
 
                                 Int16 gold = currencyData.Gold;
@@ -863,9 +863,9 @@ namespace MPServer
                                     string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceName];
                                     float aliveTime = (float)operationRequest.Parameters[(byte)BattleParameterCode.Time];
 
-                                    MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //初始化 UI 
+                                    BattleUI battleUI = new BattleUI(); //初始化 UI 
                                     //Log.Debug("BattleUI OK");
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數
+                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數
                                     //Log.Debug("BattleData OK");
 
 
@@ -915,18 +915,18 @@ namespace MPServer
                                 {
                                     Log.Debug("IN LoadMice");
 
-                                    MPCOM.MiceDataUI miceDataUI = new MPCOM.MiceDataUI(); //實體化 IO (連結資料庫拿資料)
+                                    MiceDataUI miceDataUI = new MiceDataUI(); //實體化 IO (連結資料庫拿資料)
                                     Log.Debug("LoadMice IO OK");
-                                    MPCOM.MiceData miceData = (MPCOM.MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    MiceData miceData = (MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                     Log.Debug("LoadMice Data OK");
-                                    Log.Debug("Server Data: "+miceData.miceProperty);
+                                    Log.Debug("Server Data: " + miceData.miceProperty);
                                     if (miceData.ReturnCode == "S801")//取得老鼠資料成功 回傳玩家資料
                                     {
                                         Log.Debug("miceData.ReturnCode == S801");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty } 
                                     };
-                                        
+
                                         OperationResponse response = new OperationResponse((byte)MiceResponseCode.LoadMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = miceData.ReturnMessage.ToString() };
                                         SendOperationResponse(response, new SendParameters());
                                     }
@@ -959,8 +959,8 @@ namespace MPServer
                                     float missionRate = (float)operationRequest.Parameters[(byte)BattleParameterCode.MissionRate];
 
 
-                                    MPCOM.BattleUI battleUI = new MPCOM.BattleUI();
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission, missionRate));
+                                    BattleUI battleUI = new BattleUI();
+                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission, missionRate));
                                     Int16 missionScore = battleData.missionScore;
 
                                     if (mission == (byte)Mission.WorldBoss)
@@ -1001,9 +1001,9 @@ namespace MPServer
                                     float missionRate = (float)operationRequest.Parameters[(byte)BattleParameterCode.MissionRate];
                                     Int16 customValue = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.CustomValue];
 
-                                    MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //初始化 UI 
+                                    BattleUI battleUI = new BattleUI(); //初始化 UI 
                                     Log.Debug("BattleUI OK");
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.ClacMissionReward(mission, missionRate, customValue)); //計算分數
+                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacMissionReward(mission, missionRate, customValue)); //計算分數
                                     Log.Debug("BattleData OK");
                                     Int16 missionReward = battleData.missionReward;
 
@@ -1169,22 +1169,22 @@ namespace MPServer
                                     string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
 
 
-                                    MPCOM.BattleUI battleUI = new MPCOM.BattleUI(); //實體化 IO (連結資料庫拿資料)
-                                    MPCOM.BattleData battleData = (MPCOM.BattleData)TextUtility.DeserializeFromStream(battleUI.GameOver(score, otherScore, gameTime, lostMice)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    BattleUI battleUI = new BattleUI(); //實體化 IO (連結資料庫拿資料)
+                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.GameOver(score, otherScore, gameTime, lostMice)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                     Log.Debug("GameOver Data OK");
 
                                     if (battleData.ReturnCode == "S501")
                                     {
-                                        MPCOM.PlayerDataUI playerDataUI = new MPCOM.PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
-                                        MPCOM.PlayerData playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, score, battleData.expReward, maxCombo, score, lostMice, killMice, item, miceAmount));// 更新會員資料
-                                        
+                                        PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, score, battleData.expReward, maxCombo, score, lostMice, killMice, item, miceAmount));// 更新會員資料
+
                                         if (playerData.ReturnCode == "S403")
                                         {
-                                            playerData = (MPCOM.PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account)); // 載入玩家資料 playerData的資料 = 資料庫拿的資料 用account去找
+                                            playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account)); // 載入玩家資料 playerData的資料 = 資料庫拿的資料 用account去找
                                         }
                                         else
                                         {
-                                            Log.Debug("Update PlayerData Error!" + "  Code:"+playerData.ReturnCode+"  Message:"+playerData.ReturnMessage);
+                                            Log.Debug("Update PlayerData Error!" + "  Code:" + playerData.ReturnCode + "  Message:" + playerData.ReturnMessage);
                                         }
 
                                         if (playerData.ReturnCode == "S401")
@@ -1225,32 +1225,61 @@ namespace MPServer
                             break;
                         #endregion
 
-                        #region LoadMice 載入老鼠資料
+                        #region BuyItem 購買商品
                         case (byte)ItemOperationCode.BuyItem:
                             {
                                 try
                                 {
                                     Log.Debug("IN BuyItem");
+                                    string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                    string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];
+                                    string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
+                                    string itemName = (string)operationRequest.Parameters[(byte)ItemParameterCode.ItemName];
+                                    byte itemType = (byte)operationRequest.Parameters[(byte)ItemParameterCode.ItemType];
+                                    int buyCount = (int)operationRequest.Parameters[(byte)ItemParameterCode.BuyCount];
 
-                                    MPCOM.MiceDataUI miceDataUI = new MPCOM.MiceDataUI(); //實體化 IO (連結資料庫拿資料)
+
+                                    ItemUI itemUI = new ItemUI(); //實體化 IO (連結資料庫拿資料)
                                     Log.Debug("BuyItem IO OK");
-                                    MPCOM.MiceData miceData = (MPCOM.MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("BuyItem Data OK");
-                                    if (miceData.ReturnCode == "S601")//取得老鼠資料成功 回傳玩家資料
-                                    {
-                                        Log.Debug("miceData.ReturnCode == S801");
-                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty } 
-                                    };
+                                    ItemData itemData = (ItemData)TextUtility.DeserializeFromStream(itemUI.GetItemData(itemName, itemType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("BuyItem Data OK" + itemData.Price);
 
-                                        OperationResponse response = new OperationResponse((byte)MiceResponseCode.LoadMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = miceData.ReturnMessage.ToString() };
-                                        SendOperationResponse(response, new SendParameters());
-                                    }
-                                    else    // 失敗
+
+                                    CurrencyUI currencyUI = new CurrencyUI();
+                                    CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, itemType, itemData.Price * buyCount));
+                                     
+
+                                    Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode);
+
+                                    if (currencyData.ReturnCode == "S703")
                                     {
-                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = miceData.ReturnMessage.ToString() };
-                                        SendOperationResponse(actorResponse, new SendParameters());
+                                        itemUI.UpdateItemBuyCount(itemName, itemType, buyCount);
+                                        currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+
+                                        Log.Debug("SEE SEE " + account + " " + miceAll + " " + miceAmount + " " + itemName + " " + buyCount);
+                                        PlayerDataUI playerUI = new PlayerDataUI();
+
+                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerData(account, miceAll, miceAmount, itemName, buyCount));
+
+                                        if (playerData.ReturnCode == "S420")//取得老鼠資料成功 回傳玩家資料
+                                        {
+                                            playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.LoadPlayerData(account));
+                                            Log.Debug("BuyItem playerData OK");
+                                           
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                                                     { (byte)MiceParameterCode.Ret, itemData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,{ (byte)PlayerDataParameterCode.MiceAmount, playerData.MiceAmount } ,
+                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } 
+                                            };
+
+                                            OperationResponse response = new OperationResponse((byte)ItemResponseCode.BuyItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = itemData.ReturnMessage.ToString() };
+                                            SendOperationResponse(response, new SendParameters());
+                                        }
+                                        else    // 失敗
+                                        {
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = itemData.ReturnMessage.ToString() };
+                                            SendOperationResponse(actorResponse, new SendParameters());
+                                        }
                                     }
                                 }
                                 catch (Exception e)

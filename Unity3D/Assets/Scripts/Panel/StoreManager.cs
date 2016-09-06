@@ -20,7 +20,7 @@ public class StoreManager : MonoBehaviour
     private Dictionary<string, object> _miceData;
     private Dictionary<string, GameObject> _dictActor;
     /// <summary>
-    /// 儲存購買商品資料 0:商品總類、1:商品ID、2:價格、3:數量
+    /// 儲存購買商品資料 0:商品ID、1:類型、2:數量
     /// </summary>
     private string[] goods;
 
@@ -28,7 +28,9 @@ public class StoreManager : MonoBehaviour
     {
         assetLoader = gameObject.AddComponent<AssetLoader>();
         _dictActor = new Dictionary<string, GameObject>();
-        goods = new string[4];
+        goods = new string[3];
+        Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
+
     }
 
     void Update()
@@ -66,7 +68,15 @@ public class StoreManager : MonoBehaviour
     {
         assetLoader.LoadAsset(assetFolder[0] + "/", assetFolder[0]);
         LoadGashapon(assetFolder[0]);
+        LoadPlayerInfo();
         _lastPanel = gameObject;
+    }
+
+    private void LoadPlayerInfo()
+    {
+        infoGroupsArea[0].transform.GetChild(0).GetComponent<UILabel>().text = "20";
+        infoGroupsArea[0].transform.GetChild(1).GetComponent<UILabel>().text = Global.Rice.ToString();
+        infoGroupsArea[0].transform.GetChild(2).GetComponent<UILabel>().text = Global.Gold.ToString();
     }
 
     #region -- OnClick 按下事件 --
@@ -77,6 +87,8 @@ public class StoreManager : MonoBehaviour
 
     public void OnItemClick(GameObject obj)
     {
+        goods[0] = obj.name;
+        goods[1] = obj.GetComponent<Item>().property[(int)ItemProperty.ItemType];
         Debug.Log(obj.name);
         _lastItem = obj;
         infoGroupsArea[4].SetActive(true);
@@ -107,14 +119,14 @@ public class StoreManager : MonoBehaviour
 
     public void OnQuantity(GameObject obj)
     {
-        int price = int.Parse(infoGroupsArea[5].transform.GetChild(2).GetComponent<UILabel>().text); 
-        int sum = int.Parse(infoGroupsArea[5].transform.GetChild(3).GetComponent<UILabel>().text);
-        int count = int.Parse(infoGroupsArea[5].transform.GetChild(4).GetComponent<UILabel>().text);
+        int price = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(2).GetComponent<UILabel>().text);
+        int sum = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text);
+        int count = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text);
 
         count += (obj.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
-        goods[3] = infoGroupsArea[5].transform.GetChild(4).GetComponent<UILabel>().text = count.ToString();
-        infoGroupsArea[5].transform.GetChild(3).GetComponent<UILabel>().text = (price * count).ToString();
+        goods[2] = infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = count.ToString();
+        infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = (price * count).ToString();
     }
 
     public void OnComfirm()
