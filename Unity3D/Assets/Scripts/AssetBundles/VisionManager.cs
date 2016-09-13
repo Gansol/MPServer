@@ -31,7 +31,7 @@ public class VisionManager : MonoBehaviour
 
     void Update() //等待完成
     {
-        Debug.Log(Global.ReturnMessage);
+        Debug.Log(Global.ReturnMessage + "  visionChecker.visionChk: " + visionChecker.visionChk);
 
         #region BundleCheck 檢查檔案
         if (visionChecker.visionChk)

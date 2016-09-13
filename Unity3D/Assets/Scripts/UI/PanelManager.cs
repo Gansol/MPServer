@@ -122,17 +122,14 @@ public class PanelManager : MonoBehaviour
             PanelState panelState = dictPanelRefs[_panelName];
             if (!Panel[_panelNo].activeSelf)  // if closed
             {
-
-
                 Global.photonService.LoadPlayerData(Global.Account);    // 錯誤 應該只載入TEAM
                 Panel[_panelNo].SetActive(true);                        // 錯誤 如改為載入AB 要等載入後顯示
                 panelState.onOff = !panelState.onOff;
-                EventMaskSwitch.openedPanel = Panel[_panelNo];
                 EventMaskSwitch.Switch(Panel[_panelNo]);
+                EventMaskSwitch.lastPanel = Panel[_panelNo];
             }
             else
             {
-                EventMaskSwitch.openedPanel = null;
                 Panel[_panelNo].SetActive(false);
                 panelState.onOff = !panelState.onOff;
                 Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;

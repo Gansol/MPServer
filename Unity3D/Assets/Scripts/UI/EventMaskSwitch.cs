@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class EventMaskSwitch  {
-
-    public static GameObject openedPanel;
-
+public static class EventMaskSwitch
+{
+    public static GameObject lastPanel;
+    public static GameObject openedPanel { get { return _openedPanel; } }
+    private static GameObject _openedPanel;
     #region -- EventMaskSwtich --
     // 位元移位運算子<< >> 2近位 左移、右移  0 << 1(左移1)  --->  00 = 0
     // 1 << 1(左移1)  -->  001 = 1
@@ -19,6 +20,12 @@ public static class EventMaskSwitch  {
     {
         foreach (Camera c in Camera.allCameras)
             c.GetComponent<UICamera>().eventReceiverMask = 1 << obj.layer;
+        _openedPanel = obj;
     }
     #endregion
+
+    private static GameObject GetPanel()
+    {
+        return openedPanel;
+    }
 }

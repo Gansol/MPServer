@@ -18,11 +18,13 @@
         SumScore = 25,
         SumLost = 26,
         SumKill = 27,
-        Item = 28,
-        MiceAll = 29,
-        Team = 30,
-        MiceAmount = 31,
-        Friend = 32,
+        SumWin = 28,
+        SumBattle = 29,
+        Item = 30,
+        MiceAll = 31,
+        Team = 32,
+        MiceAmount = 33,
+        Friend = 34,
     }
 
     public enum PlayerDataResponseCode

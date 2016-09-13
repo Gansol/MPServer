@@ -66,12 +66,16 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ShowMissionScoreHandler MissionCompleteEvent;
 
     //委派事件 GameOver
-    public delegate void GameOverHandler(Int16 score, byte exp, Int16 sliverReward);
+    public delegate void GameOverHandler(Int16 score, byte exp, Int16 sliverReward, byte battleResult);
     public event GameOverHandler GameOverEvent;
 
-    //委派事件 GameOver
+    //委派事件 UpdateCurrency
     public delegate void UpdateCurrencyHandler();
     public event UpdateCurrencyHandler UpdateCurrencyEvent;
+
+    //委派事件 ShowMessage
+    public delegate void ShowMessageHandler();
+    public event ShowMessageHandler ShowMessageEvent;
 
 
     public bool ServerConnected
@@ -377,7 +381,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.SumScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumScore];
                             Global.SumLost = (Int16)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumLost];
                             Global.SumKill = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumKill];
-
+                            Global.SumWin = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumWin];
+                            Global.SumBattle = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumBattle];
+                            
                             Global.Item = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Item];
                             Global.MiceAll = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll];
                             Global.Team = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team];
@@ -631,6 +637,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];     // 這是GameScore不含扣分
                             byte exp = (byte)operationResponse.Parameters[(byte)BattleParameterCode.EXPReward];
                             Int16 sliverReward = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.SliverReward];
+                            byte battleResult = (byte)operationResponse.Parameters[(byte)BattleParameterCode.BattleResult];
 
                             Global.MaxCombo = (Int16)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxCombo];
                             Global.MaxScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxScore];
@@ -640,7 +647,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
                             Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
-                            GameOverEvent(score, exp, sliverReward);
+                            GameOverEvent(score, exp, sliverReward, battleResult);
                             Debug.Log("GameOver:" + (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Item]);
                             Debug.Log("RECIVE GameOver !");
                         }
@@ -659,9 +666,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             #endregion
 
 
-            #region LoadCurrency 載入貨幣資料
+            #region BuyItem 購買道具
 
-            case (byte)ItemResponseCode.BuyItem: // 取得貨幣資料
+            case (byte)ItemResponseCode.BuyItem: // 購買道具
                 {
                     try
                     {
@@ -672,6 +679,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.MiceAll = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll];
                             Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
                             UpdateCurrencyEvent();
+                            ShowMessageEvent();
                         }
                     }
                     catch (Exception e)

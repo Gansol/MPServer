@@ -44,29 +44,30 @@ public class AssetBundleChecker : MonoBehaviour
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
 
-        WWW wwwItemList = new WWW(serverPathFile); // 下載 伺服器 檔案列表
-        yield return wwwItemList;
+        using (WWW wwwItemList = new WWW(serverPathFile))
+        { // 下載 伺服器 檔案列表
+            yield return wwwItemList;
 
-        if (wwwItemList.error != null && reConnTimes < Global.maxConnTimes)
-        {
-            reConnTimes++;
-            Global.ReturnMessage = "Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
-            //Debug.LogError("Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
-            yield return new WaitForSeconds(1.0f);
-        }
-        if (wwwItemList.isDone)
-        {
-            reConnTimes = 0;
-            Global.ReturnMessage = "Item List Downloaded!";
-            CompareListFile(wwwItemList.text, localPathFile);
+            if (wwwItemList.error != null && reConnTimes < Global.maxConnTimes)
+            {
+                reConnTimes++;
+                Global.ReturnMessage = "Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
+                Debug.LogError("Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
+                yield return new WaitForSeconds(1.0f);
+            }
+            if (wwwItemList.isDone)
+            {
+                reConnTimes = 0;
+                Global.ReturnMessage = "Item List Downloaded!";
+                CompareListFile(wwwItemList.text, localPathFile);
 
+            }
+            else if (reConnTimes == Global.maxConnTimes)
+            {
+                Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
+                //Debug.Log("Can't connecting to Server! Please check your network status.");
+            }
         }
-        else if (reConnTimes == Global.maxConnTimes)
-        {
-            Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
-            //Debug.Log("Can't connecting to Server! Please check your network status.");
-        }
-        wwwItemList.Dispose();// 關閉串流
     }
     #endregion
 

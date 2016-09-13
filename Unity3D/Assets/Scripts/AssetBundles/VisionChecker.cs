@@ -37,67 +37,72 @@ public class VisionChecker
     #region CheckVision
     public IEnumerator CheckVision() //檢查版本
     {
+
         string localListPath = Application.persistentDataPath + "/List/";
         string localVisionListFile = localListPath + Global.sVisionList;
-
-        WWW wwwVisionList = new WWW(Global.serverListPath + Global.sVisionList);
-        yield return wwwVisionList;
-
-        //Debug.Log("FILE Contain= " + www.text);
-        
-        Debug.Log("IN CHECK VISION");
-
-        if (wwwVisionList.error != null && reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
+        if(!Directory.Exists(localListPath)) Directory.CreateDirectory(localListPath);
+        Debug.LogError("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
+        // Debug.LogError("Eclipse Debug : " + localVisionListFile);
+        using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.sVisionList))
         {
-            reConnTimes++;
-            Global.ReturnMessage = "Download Vision List Error !   " + wwwVisionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
-            //Debug.Log("Download Vision List Error !   " + wwwVisionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
-            wwwVisionList.Dispose();
-            yield return new WaitForSeconds(1.0f);
-            CheckVision();
-        }
-        else if (wwwVisionList.isDone)    //開始檢查版本
-        {
-            reConnTimes = 0;
-            _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwVisionList.text); // 儲存 下載好的檔案版本
 
-            // 如果本機 版本列表檔案 不存在 建立空檔
-            if (!File.Exists(localVisionListFile))
-            {
-                File.Create(localVisionListFile).Close();
-                File.WriteAllText(localVisionListFile, "{}");
-            }
+            yield return wwwVisionList;
 
-            //Dictionary<KEY(鍵值),Vaule(值)> 
-            //foreach ( 遞增值(陣列內涵值) in 陣列 )
-            //取得伺服器版本列表
-            if (!(AssetBundlesHash.SHA1Complier(File.ReadAllBytes(localVisionListFile)) == AssetBundlesHash.SHA1Complier(_bVisionFile))) //本機 比較 伺服器 版本
+            //Debug.Log("FILE Contain= " + www.text);
+        CheckVisionFlag:
+            Debug.Log("IN CHECK VISION");
+
+            if (wwwVisionList.error != null && reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
             {
-                Global.ReturnMessage = "不是最新版本!";
-                //Debug.Log("不是最新版本!");
-                _isNewlyVision = false;
+                reConnTimes++;
+                Global.ReturnMessage = "Download Vision List Error !   " + wwwVisionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
+                Debug.Log("Download Vision List Error !   " + wwwVisionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
                 wwwVisionList.Dispose();
-                _visionChk = true;  // 加入大版本時刪除並改寫 錯誤
-                //to do check v1.0.0 > v2.0.0 > GooglePlay
+                yield return new WaitForSeconds(1.0f);
+                goto CheckVisionFlag;
             }
-            else //版本相同 再次檢查檔案 (這是在版本列表不同下的 再次檢查)
+            else if (wwwVisionList.isDone)    //開始檢查版本
             {
-                Global.ReturnMessage = "本機檔案為最新版本!";
-                //Debug.Log("本機檔案為最新版本!");
-                _isNewlyVision = true;
-                wwwVisionList.Dispose();
-                _visionChk = true;
+                reConnTimes = 0;
+                _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwVisionList.text); // 儲存 下載好的檔案版本
+
+                // 如果本機 版本列表檔案 不存在 建立空檔
+                if (!File.Exists(localVisionListFile))
+                {
+                    File.Create(localVisionListFile).Close();
+                    File.WriteAllText(localVisionListFile, "{}");
+                }
+
+                //Dictionary<KEY(鍵值),Vaule(值)> 
+                //foreach ( 遞增值(陣列內涵值) in 陣列 )
+                //取得伺服器版本列表
+                if (!(AssetBundlesHash.SHA1Complier(File.ReadAllBytes(localVisionListFile)) == AssetBundlesHash.SHA1Complier(_bVisionFile))) //本機 比較 伺服器 版本
+                {
+                    Global.ReturnMessage = "不是最新版本!";
+                    Debug.Log("不是最新版本!");
+                    _isNewlyVision = false;
+                    wwwVisionList.Dispose();
+                    _visionChk = true;  // 加入大版本時刪除並改寫 錯誤
+                    //to do check v1.0.0 > v2.0.0 > GooglePlay
+                }
+                else //版本相同 再次檢查檔案 (這是在版本列表不同下的 再次檢查)
+                {
+                    Global.ReturnMessage = "本機檔案為最新版本!";
+                    Debug.Log("本機檔案為最新版本!");
+                    _isNewlyVision = true;
+                    wwwVisionList.Dispose();
+                    _visionChk = true;
+                }
+
+
             }
 
-            
+            else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
+            {
+                Global.ReturnMessage = "Can't connecting to Server! Please check your network status!";
+                Debug.LogError("Can't connecting to Server! Please check your network status!");
+            }
         }
-
-        else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
-        {
-            Global.ReturnMessage = "Can't connecting to Server! Please check your network status!";
-            Debug.LogError("Can't connecting to Server! Please check your network status!");
-        }
-        wwwVisionList.Dispose();    // 關閉串流
     }
     #endregion
 

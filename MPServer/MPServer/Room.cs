@@ -412,6 +412,7 @@ namespace MPServer
         {
             protected DateTime joinTime; // 多增加進入房間時間的屬性，並且設為唯讀
             public DateTime JoinTime { get { return joinTime; } }
+            public int gameScore { get; set; }
 
             public RoomActor(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP)
                 : base(guid, PrimaryID, Account, Nickname, Age, Sex, IP)

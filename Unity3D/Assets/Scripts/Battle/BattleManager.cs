@@ -333,10 +333,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void OnGameOver(Int16 score, byte exp, Int16 sliverReward)
+    void OnGameOver(Int16 score, byte exp, Int16 sliverReward,byte battleResult)
     {
         bool result;
-        result = (_score > _otherScore) ? true : false;
+        result = (battleResult > 0) ? true : false;
         battleHUD.GoodGameMsg(score, result, exp, sliverReward, _combo, _killMice, _lostMice, _isHighScore, _isHighCombo);
     }
 

@@ -32,7 +32,10 @@ public class ScrollView : MonoBehaviour
 
     void Update()
     {
-#if UNITY_ANDROID || UNITY_IOS
+        try
+        {
+#if UNITY_EDITOR
+#elif UNITY_ANDROID || UNITY_IOS
         Touch touch = Input.GetTouch(0);
         currentCameraX = Camera.main.transform.localPosition.x;
 
@@ -102,6 +105,11 @@ public class ScrollView : MonoBehaviour
             StartCoroutine(GoEnd());
         }
 #endif
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     IEnumerator GoStart() // 緩慢的移動至開始位置

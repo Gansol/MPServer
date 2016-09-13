@@ -30,6 +30,8 @@ namespace MPCOM
         public int SumScore;		// 總分數
         public Int16 SumLost;		// 總跑掉老鼠
         public int SumKill;		    // 總清除老鼠
+        public int SumWin;		    // 總勝場
+        public int SumBattle;		// 總場次
 
         public string Item;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊

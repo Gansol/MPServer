@@ -84,6 +84,8 @@ namespace MPCOM
                         playerData.SumScore = Convert.ToInt32(DS.Tables[0].Rows[0]["SumScore"]);
                         playerData.SumLost = Convert.ToInt16(DS.Tables[0].Rows[0]["SumLost"]);
                         playerData.SumKill = Convert.ToInt32(DS.Tables[0].Rows[0]["SumKill"]);
+                        playerData.SumWin = Convert.ToInt32(DS.Tables[0].Rows[0]["SumWin"]);
+                        playerData.SumBattle = Convert.ToInt32(DS.Tables[0].Rows[0]["SumBattle"]);
                         playerData.Item = Convert.ToString(DS.Tables[0].Rows[0]["Item"]);
                         playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
                         playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
@@ -178,9 +180,9 @@ namespace MPCOM
 
         #endregion UpdatePlayerData
 
-        #region UpdatePlayerData 更新玩家(GameOver)資料
+        #region UpdateGameOver 更新玩家(GameOver)資料
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account,byte rank, byte exp, Int16 maxCombo, int maxScore,int sumScore, Int16 sumLost, int sumKill, string item, string miceAmount)
+        public PlayerData UpdateGameOver(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill,int sumWin,int sumBattle, string item, string miceAmount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -206,7 +208,7 @@ namespace MPCOM
                     {
                         string query = 
                                 @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
-                                SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAmount=@miceAmount WHERE Account=@account";
+                                SumLost=@sumLost,SumKill=@sumKill,SumWin=@sumWin,SumBattle=@sumBattle,Item=@item,MiceAmount=@miceAmount WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear(); 
                         command.Parameters.AddWithValue("@account", account);
@@ -217,6 +219,8 @@ namespace MPCOM
                         command.Parameters.AddWithValue("@sumScore", sumScore);
                         command.Parameters.AddWithValue("@sumLost", sumLost);
                         command.Parameters.AddWithValue("@sumKill", sumKill);
+                        command.Parameters.AddWithValue("@sumWin", sumWin);
+                        command.Parameters.AddWithValue("@sumBattle", sumBattle);
                         command.Parameters.AddWithValue("@item", item);
                         command.Parameters.AddWithValue("@miceAmount", miceAmount);
                         command.ExecuteNonQuery();

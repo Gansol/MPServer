@@ -69,7 +69,7 @@ public class StoreManager : MonoBehaviour
         assetLoader.LoadAsset(assetFolder[0] + "/", assetFolder[0]);
         LoadGashapon(assetFolder[0]);
         LoadPlayerInfo();
-        _lastPanel = gameObject;
+        EventMaskSwitch.lastPanel = gameObject;
     }
 
     private void LoadPlayerInfo()
@@ -95,25 +95,25 @@ public class StoreManager : MonoBehaviour
         LoadMiceProperty loadProperty = new LoadMiceProperty();
         loadProperty.LoadProperty(obj, infoGroupsArea[4], 0);
         LoadActor(obj);
-        _lastPanel = infoGroupsArea[4];
-
         EventMaskSwitch.Switch(infoGroupsArea[4]);
     }
 
-    public void OnBuyClick()
+    public void OnBuyClick(GameObject myPanel)
     {
-        _lastPanel.SetActive(false);
+        myPanel.SetActive(false);
         infoGroupsArea[5].SetActive(true);
         BuyWindowsInit();
         LoadMiceProperty loadProperty = new LoadMiceProperty();
         loadProperty.LoadProperty(_lastItem, infoGroupsArea[5], 2);
-        _lastPanel = infoGroupsArea[5];
         EventMaskSwitch.Switch(infoGroupsArea[5]);
     }
 
     private void BuyWindowsInit()
     {
-        infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = (1).ToString();  // count = 1
+        goods[0] = _lastItem.GetComponent<Item>().property[(int)ItemProperty.MiceName];
+        goods[1] = _lastItem.GetComponent<Item>().property[(int)ItemProperty.ItemType];
+        goods[2] ="1";
+        infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = "1";  // count = 1
         infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = _lastItem.GetComponent<Item>().property[(int)ItemProperty.Price]; // price
     }
 
@@ -129,15 +129,15 @@ public class StoreManager : MonoBehaviour
         infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = (price * count).ToString();
     }
 
-    public void OnComfirm()
+    public void OnComfirm(GameObject myPanel)
     {
+        myPanel.SetActive(false);
         Global.photonService.BuyItem(Global.Account, goods);
     }
 
     public void OnClosed(GameObject obj)
     {
-        EventMaskSwitch.openedPanel = null;
-        _lastPanel = null;
+        EventMaskSwitch.lastPanel = null;
         GameObject root = obj.transform.parent.parent.gameObject;
 
         _tmpTab.SetActive(false);
@@ -150,7 +150,7 @@ public class StoreManager : MonoBehaviour
 
     public void OnReturn(GameObject obj)
     {
-        _lastPanel.SetActive(false);
+        EventMaskSwitch.openedPanel.SetActive(false);
         EventMaskSwitch.Switch(obj);
     }
 
@@ -269,6 +269,7 @@ public class StoreManager : MonoBehaviour
     #region -- InstantiateActor 實體化老鼠角色 --
     private void InstantiateActor(GameObject parent)
     {
+
         string miceName = _btnClick.transform.GetComponentInChildren<UISprite>().name;
 
         _clone = (GameObject)Instantiate(assetLoader.GetAsset(miceName + "/", miceName));
@@ -293,6 +294,7 @@ public class StoreManager : MonoBehaviour
         _LoadedActor = true;
 
         AssetBundleManager.UnloadUnusedAssets();
+
     }
     #endregion
     #region -- InstantiateGashapon 實體化轉蛋物件--
@@ -335,43 +337,46 @@ public class StoreManager : MonoBehaviour
     /// <param name="myParent">實體化父系位置</param>
     void InstantiateItem(string[,] miceData, Transform myParent)
     {
-        int posX, posY;
-        posX = posY = 0;
-        string itemName = "Item", folderPath = "Panel/";
-
-        for (int i = 0; i < miceData.GetLength(0); i++)
+        if (myParent.transform.childCount == 0)
         {
+            int posX, posY;
+            posX = posY = 0;
+            string itemName = "Item", folderPath = "Panel/";
 
-            if (assetLoader.GetAsset(folderPath, itemName))                  // 已載入資產時
+            for (int i = 0; i < miceData.GetLength(0); i++)
             {
-                // 物件位置排序
-                if (i % 9 == 0 && i != 0)
-                {
-                    posX = itemOffsetX * 3;
-                    posY = 0;
-                }
-                else if (i % 3 == 0 && i != 0)
-                {
-                    posY += itemOffsetY;
-                    posX = 0;
-                }
-                
-                GameObject bundle = assetLoader.GetAsset(folderPath, itemName);
-                Transform parent = myParent;
 
-                _clone = (GameObject)Instantiate(bundle);             // 實體化
-                _clone.layer = myParent.gameObject.layer;
-                _clone.transform.parent = parent;
-                _clone.name = miceData[i,0];
-                _clone.transform.localPosition = new Vector3(posX, posY);
-                _clone.transform.localScale = Vector3.one;
-                posX += itemOffsetX;
-
-                for (int j = 0; j < miceData.GetLength(1) - 1; j++)
+                if (assetLoader.GetAsset(folderPath, itemName))                  // 已載入資產時
                 {
-                    _clone.GetComponent<Item>().property[j] = miceData[i, j];
-                }
+                    // 物件位置排序
+                    if (i % 9 == 0 && i != 0)
+                    {
+                        posX = itemOffsetX * 3;
+                        posY = 0;
+                    }
+                    else if (i % 3 == 0 && i != 0)
+                    {
+                        posY += itemOffsetY;
+                        posX = 0;
+                    }
 
+                    GameObject bundle = assetLoader.GetAsset(folderPath, itemName);
+                    Transform parent = myParent;
+
+                    _clone = (GameObject)Instantiate(bundle);             // 實體化
+                    _clone.layer = myParent.gameObject.layer;
+                    _clone.transform.parent = parent;
+                    _clone.name = miceData[i, 0];
+                    _clone.transform.localPosition = new Vector3(posX, posY);
+                    _clone.transform.localScale = Vector3.one;
+                    posX += itemOffsetX;
+
+                    for (int j = 0; j < miceData.GetLength(1) - 1; j++)
+                    {
+                        _clone.GetComponent<Item>().property[j] = miceData[i, j];
+                    }
+
+                }
             }
         }
     }
@@ -386,31 +391,31 @@ public class StoreManager : MonoBehaviour
     void InstantiateMice(string[,] miceData, Transform myParent, string folder)
     {
 
-            for (int i = 0; i < miceData.GetLength(0); i++)
+        for (int i = 0; i < miceData.GetLength(0); i++)
+        {
+            string bundleName = miceData[i, 0].Remove(miceData[i, 0].Length - 4) + "ICON";
+            Debug.Log(i + bundleName);
+            if (assetLoader.GetAsset(folder + "/", bundleName))                  // 已載入資產時
             {
-                string bundleName = miceData[i, 0].Remove(miceData[i, 0].Length - 4) + "ICON";
-                Debug.Log(i + bundleName);
-                if (assetLoader.GetAsset(folder + "/", bundleName))                  // 已載入資產時
-                {
-                    GameObject bundle = assetLoader.GetAsset(folder + "/", bundleName);
-                    Transform parent = myParent.GetChild(i).GetChild(0);
+                GameObject bundle = assetLoader.GetAsset(folder + "/", bundleName);
+                Transform parent = myParent.GetChild(i).GetChild(0);
 
-                    //Add2Refs(bundle, miceBtn);     // 加入物件參考
+                //Add2Refs(bundle, miceBtn);     // 加入物件參考
 
-                    _clone = (GameObject)Instantiate(bundle);             // 實體化
-                    _clone.layer = myParent.gameObject.layer;
-                    _clone.transform.parent = parent;
-                    _clone.name = miceData[i, 0];
-                    _clone.GetComponent<UISprite>().depth = 310;
-                    _clone.transform.localPosition = Vector3.zero;
-                    _clone.transform.localScale = Vector3.one;
-                    _clone.GetComponent<UISprite>().width = 150;
-                }
-                else
-                {
-                    Debug.LogError("Assetbundle reference not set to an instance.");
-                }
+                _clone = (GameObject)Instantiate(bundle);             // 實體化
+                _clone.layer = myParent.gameObject.layer;
+                _clone.transform.parent = parent;
+                _clone.name = miceData[i, 0];
+                _clone.GetComponent<UISprite>().depth = 310;
+                _clone.transform.localPosition = Vector3.zero;
+                _clone.transform.localScale = Vector3.one;
+                _clone.GetComponent<UISprite>().width = 150;
             }
+            else
+            {
+                Debug.LogError("Assetbundle reference not set to an instance.");
+            }
+        }
         _LoadedMice = true;
     }
     #endregion

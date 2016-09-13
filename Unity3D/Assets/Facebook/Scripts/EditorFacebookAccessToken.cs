@@ -22,23 +22,24 @@ public class EditorFacebookAccessToken : MonoBehaviour
         }
 
         string downloadUrl = IntegratedPluginCanvasLocation.FbSkinUrl;
-        var www = new WWW(downloadUrl);
-
-        yield return www;
-
-        if (www.error != null)
+        using (var www = new WWW(downloadUrl))
         {
-            FbDebug.Error("Could not find the Facebook Skin: " + www.error);
-            yield break;
-        }
+            yield return www;
 
-        fbSkin = www.assetBundle.mainAsset as GUISkin;
-        www.assetBundle.Unload(false);
-    } 
+            if (www.error != null)
+            {
+                FbDebug.Error("Could not find the Facebook Skin: " + www.error);
+                yield break;
+            }
+
+            fbSkin = www.assetBundle.mainAsset as GUISkin;
+            www.assetBundle.Unload(false);
+        }
+    }
 
     void OnGUI()
     {
-        
+
         var windowTop = Screen.height / 2 - windowHeight / 2;
         var windowLeft = Screen.width / 2 - windowWidth / 2;
         if (fbSkin != null)

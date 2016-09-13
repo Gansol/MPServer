@@ -48,6 +48,7 @@ public class TeamManager : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log("AAAAAAAAAAA  " + Global.MiceAll);
         _page = 0;
         _miceActor = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
         dictLoadedMice = new Dictionary<string, GameObject>();

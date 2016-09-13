@@ -309,7 +309,7 @@ namespace MPCOM
         #region UpdatePlayerData 更新玩家(老鼠)資料
 
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName,int amount)
+        public PlayerData UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName, int amount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -330,13 +330,13 @@ namespace MPCOM
                         playerData.ReturnCode = "S412";
                         playerData.ReturnMessage = "老鼠成員異常！";
                     }
-                    
+
                     if (!serverData.ContainsValue(miceName))
                     {
                         serverData.Add((serverData.Count + 1).ToString(), miceName);
                         miceAll = MiniJSON.Json.Serialize(serverData);
                     }
-                    
+
                     clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
 
@@ -357,7 +357,7 @@ namespace MPCOM
                         playerData.ReturnCode = "S414";
                         playerData.ReturnMessage = "老鼠數量異常！";
                     }
-                    
+
                     if (!serverData.ContainsKey(miceName))
                     {
                         serverData.Add(miceName, amount);
@@ -385,10 +385,10 @@ namespace MPCOM
         }
         #endregion
 
-        #region UpdatePlayerData 更新玩家(GameOver時)資料
+        #region UpdateGameOver 更新玩家(GameOver時)資料
 
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, string item, string miceAmount)
+        public PlayerData UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item, string miceAmount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -415,6 +415,8 @@ namespace MPCOM
                     if (maxScore > playerData.MaxScore) playerData.MaxScore = maxScore;
                     playerData.SumLost += lostMice;
                     playerData.SumKill += killMice;
+                    playerData.SumBattle += 1;
+                    playerData.SumWin += battleResult > 0 ? 1 : 0;
 
                     if (playerData.EXP + exp >= maxExp && playerData.Rank != 100)
                     {
@@ -423,9 +425,11 @@ namespace MPCOM
                         playerData.EXP += exp;
                     }
 
+                    
+
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdatePlayerData(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill, item, miceAmount);
+                    playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill,playerData.SumWin,playerData.SumBattle, item, miceAmount);
                 }
 
             }

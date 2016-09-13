@@ -627,6 +627,8 @@ namespace MPServer
                                 Int32 sumScore = playerData.SumScore;
                                 Int16 sumLost = playerData.SumLost;
                                 Int32 sumKill = playerData.SumKill;
+                                int sumWin = playerData.SumWin;
+                                int sumBattle = playerData.SumBattle;
 
                                 string item = playerData.Item;                  // Json資料
                                 string miceAll = playerData.MiceAll;            // Json資料
@@ -640,9 +642,9 @@ namespace MPServer
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.EXP, exp }, 
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
-                                        { (byte)PlayerDataParameterCode.SumLost, sumLost } ,{ (byte)PlayerDataParameterCode.SumKill, sumKill } ,{ (byte)PlayerDataParameterCode.Item, item } ,
-                                        { (byte)PlayerDataParameterCode.MiceAll, miceAll } , { (byte)PlayerDataParameterCode.Team, team } ,{ (byte)PlayerDataParameterCode.MiceAmount, miceAmount } , 
-                                        { (byte)PlayerDataParameterCode.Friend, friend } 
+                                        { (byte)PlayerDataParameterCode.SumLost, sumLost } ,{ (byte)PlayerDataParameterCode.SumKill, sumKill },{ (byte)PlayerDataParameterCode.SumWin, sumWin },
+                                        { (byte)PlayerDataParameterCode.SumBattle, sumBattle },{ (byte)PlayerDataParameterCode.Item, item } ,{ (byte)PlayerDataParameterCode.MiceAll, miceAll } ,
+                                        { (byte)PlayerDataParameterCode.Team, team } ,{ (byte)PlayerDataParameterCode.MiceAmount, miceAmount } ,{ (byte)PlayerDataParameterCode.Friend, friend } 
                                     };
 
                                     OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
@@ -873,6 +875,10 @@ namespace MPServer
 
                                     if (battleData.ReturnCode == "S501")//計算分數成功 回傳玩家資料
                                     {
+                                        Room room =new Room();
+                                        Room.RoomActor roomActor;
+                                        roomActor = room.GetActorFromGuid(peerGuid);
+                                        roomActor.gameScore += battleData.score;
                                         //回傳給原玩家
                                         //Log.Debug("battleData.ReturnCode == S501");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
@@ -1175,8 +1181,18 @@ namespace MPServer
 
                                     if (battleData.ReturnCode == "S501")
                                     {
+                                        Room room = new Room();
+                                        Room.RoomActor roomActor, roomOtherActor;
+                                        roomActor = room.GetActorFromGuid(peerGuid);
+                                        roomOtherActor = room.GetOtherPlayer(roomID, primaryID);
+
+                                        Log.Debug("Player Score : " + roomActor.gameScore + "   Other Score : " + roomOtherActor.gameScore);
+
+                                        battleData.battleResult = (roomActor.gameScore > roomOtherActor.gameScore) ? (byte)1 : (byte)0;
+
+
                                         PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
-                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, score, battleData.expReward, maxCombo, score, lostMice, killMice, item, miceAmount));// 更新會員資料
+                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdateGameOver(account, score, battleData.expReward, maxCombo, score, lostMice, killMice, battleData.battleResult, item, miceAmount));// 更新會員資料
 
                                         if (playerData.ReturnCode == "S403")
                                         {
@@ -1191,7 +1207,7 @@ namespace MPServer
                                         {
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                      { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, score },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },
-                                                     { (byte)BattleParameterCode.EXPReward, battleData.expReward },{ (byte)PlayerDataParameterCode.MaxScore, playerData.MaxScore } ,
+                                                     { (byte)BattleParameterCode.EXPReward, battleData.expReward },{ (byte)BattleParameterCode.BattleResult, battleData.battleResult },{ (byte)PlayerDataParameterCode.MaxScore, playerData.MaxScore } ,
                                                      { (byte)PlayerDataParameterCode.SumLost, playerData.SumLost },{ (byte)PlayerDataParameterCode.SumKill, playerData.SumKill },{ (byte)PlayerDataParameterCode.Item, playerData.Item },
                                                      { (byte)PlayerDataParameterCode.MiceAmount, playerData.MiceAmount },{ (byte)PlayerDataParameterCode.MaxCombo, playerData.MaxCombo },{ (byte)PlayerDataParameterCode.Rank, playerData.Rank },                                            };
 
