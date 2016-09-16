@@ -29,7 +29,7 @@ namespace MPCOM
             return true;
         }
 
-        #region GetItemData 取得道具數量
+        #region LoadItemData 取得道具數量
         /// <summary>
         /// 取得道具數量
         /// </summary>
@@ -37,7 +37,7 @@ namespace MPCOM
         /// <param name="itemType">道具類別</param>
         /// <returns></returns>
         [AutoComplete]
-        public ItemData GetItemData(string itemName, byte itemType)
+        public ItemData LoadItemData()
         {
             ItemData itemData = new ItemData();
             itemData.ReturnCode = "(Logic)S600";
@@ -47,7 +47,7 @@ namespace MPCOM
             
             try
             {
-                itemData = itemIO.GetItemData(itemName, itemType);
+                itemData = itemIO.LoadItemData();
             }
             catch (Exception e)
             {
@@ -58,87 +58,6 @@ namespace MPCOM
 
         }
         #endregion
-
-        #region UpdateItemBuyCount 更新道具購買總數
-        /// <summary>
-        /// 更新道具購買"總數"
-        /// </summary>
-        /// <param name="itemName">道具名稱</param>
-        /// <param name="itemType">道具類別</param>
-        /// <param name="buyCount">購買數量</param>
-        /// <returns></returns>
-        [AutoComplete]
-        public ItemData UpdateItemBuyCount(string itemName, byte itemType, int buyCount)
-        {
-            ItemData itemData = new ItemData();
-            itemData.ReturnCode = "(Logic)S600";
-            itemData.ReturnMessage = "";
-
-            ItemIO itemIO = new ItemIO();
-
-            try
-            {
-                itemData = itemIO.GetItemData(itemName, itemType);
-                itemData.BuyCount += buyCount;
-
-                if (itemData.ReturnCode == "S601")
-                {
-                    //如果驗證成功 寫入玩家資料
-                    itemData = itemIO.UpdateItemBuyCount(itemData.ItemName, itemData.ItemType, itemData.BuyCount);
-                }
-
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            return itemData;
-
-        }
-        #endregion
-
-        #region UpdateItemLimit 更新道具限量數量
-        /// <summary>
-        /// 更新道具"限量"數量
-        /// </summary>
-        /// <param name="itemName">道具名稱</param>
-        /// <param name="itemType">道具類別</param>
-        /// <param name="buyCount">購買數量</param>
-        /// <returns></returns>
-        [AutoComplete]
-        public ItemData UpdateItemLimit(string itemName, byte itemType, int buyCount)
-        {
-            ItemData itemData = new ItemData();
-            itemData.ReturnCode = "(Logic)S600";
-            itemData.ReturnMessage = "";
-
-            ItemIO itemIO = new ItemIO();
-
-            try
-            {
-                itemData = itemIO.GetItemData(itemName, itemType);
-                itemData.Limit -= (Int16)buyCount;
-
-                if (itemData.ReturnCode == "S601")
-                {
-                    //如果驗證成功 寫入玩家資料
-                    itemData = itemIO.UpdatedItemLimit(itemData.ItemName, itemData.ItemType, itemData.Limit);
-                }
-
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            return itemData;
-
-        }
-        #endregion
-
-        
-
     }
 
 

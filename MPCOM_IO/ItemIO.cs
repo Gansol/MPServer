@@ -1,5 +1,7 @@
 ﻿using ExitGames.Logging;
+using MiniJSON;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.EnterpriseServices;
@@ -39,181 +41,87 @@ namespace MPCOM
             return true;
         }
 
-        #region UpdatedItemBuyCount 更新道具購買總數
-        /// <summary>
-        /// 更新道具購買"總數"
-        /// </summary>
-        /// <param name="itemName">道具名稱</param>
-        /// <param name="itemType">道具類別</param>
-        /// <param name="buyCount">購買數量</param>
-        /// <returns></returns>
+        // to do
+        #region LoadItemData 載入道具資料
         [AutoComplete]
-        public ItemData UpdateItemBuyCount(string itemName, byte itemType, int buyCount)
+        public ItemData LoadItemData()
         {
-            ItemData itemData = default(ItemData);
-            itemData.ReturnCode = "(IO)S600";
-            itemData.ReturnMessage = "";
-            DataSet DS = new DataSet();
-
-            try
-            {
-                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
-                {
-                    SqlCommand sqlCmd = new SqlCommand();
-                    sqlCmd.Connection = sqlConn;
-                    sqlConn.Open();
-
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM ItemData WHERE (ItemName='{0}') AND (ItemType='{1}') ", itemName, itemType), sqlConn);
-                    adapter.Fill(DS);
-                    Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
-
-
-                    //假如資料表中找到資料 更新資料
-                    if (DS.Tables[0].Rows.Count == 1)
-                    {
-                        string query = @"UPDATE ItemData SET BuyCount=@buyCount WHERE ItemName=@itemName AND ItemType=@itemType";
-                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
-                        command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@itemName", itemName);
-                        command.Parameters.AddWithValue("@itemType", itemType);
-                        command.Parameters.AddWithValue("@buyCount", buyCount);
-                        command.ExecuteNonQuery();
-
-                        itemData.ReturnCode = "S602";
-                        itemData.ReturnMessage = "更新道具資料成功！";
-                    }
-                    else if (DS.Tables[0].Rows.Count == 0)
-                    {
-                        itemData.ReturnCode = "S603";
-                        itemData.ReturnMessage = "無法取得更新道具資料！";
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                itemData.ReturnCode = "S699";
-                itemData.ReturnMessage = "無法取得道具資訊，未知例外情況！";
-                Log.Debug("(IO)UpdateItemData failed!" + e.Message + " Track: " + e.StackTrace);
-                throw e;
-            }
-            return itemData;
-        }
-        #endregion
-
-        #region UpdatedItemLimit 更新道具限量數量
-        /// <summary>
-        /// 更新道具"限量"數量
-        /// </summary>
-        /// <param name="itemName">道具名稱</param>
-        /// <param name="itemType">道具類別</param>
-        /// <param name="limit">限量數</param>
-        /// <returns></returns>
-        [AutoComplete]
-        public ItemData UpdatedItemLimit(string itemName, byte itemType, Int16 limit)
-        {
-            ItemData itemData = default(ItemData);
-            itemData.ReturnCode = "(IO)S600";
-            itemData.ReturnMessage = "";
-            DataSet DS = new DataSet();
-
-            try
-            {
-                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
-                {
-                    SqlCommand sqlCmd = new SqlCommand();
-                    sqlCmd.Connection = sqlConn;
-                    sqlConn.Open();
-
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM ItemData WHERE (ItemName='{0}') AND (ItemType='{1}') ", itemName, itemType), sqlConn);
-                    adapter.Fill(DS);
-                    Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
-
-
-                    //假如資料表中找到資料 更新資料
-                    if (DS.Tables[0].Rows.Count == 1)
-                    {
-                        string query = @"UPDATE ItemData SET Limit=@limit";
-                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
-                        command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@limit", limit);
-                        command.ExecuteNonQuery();
-
-                        itemData.ReturnCode = "S602";
-                        itemData.ReturnMessage = "更新道具資料成功！";
-                    }
-                    else if (DS.Tables[0].Rows.Count == 0)
-                    {
-                        itemData.ReturnCode = "S603";
-                        itemData.ReturnMessage = "無法取得更新道具資料！";
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                itemData.ReturnCode = "S699";
-                itemData.ReturnMessage = "無法取得道具資訊，未知例外情況！";
-                Log.Debug("(IO)UpdateItemData failed!" + e.Message + " Track: " + e.StackTrace);
-                throw e;
-            }
-            return itemData;
-        }
-        #endregion
-
-        #region GetItemData 取得道具資料
-        /// <summary>
-        /// 取得道具資料
-        /// </summary>
-        /// <param name="itemName">道具名稱</param>
-        /// <param name="itemType">道具類別</param>
-        /// <returns></returns>
-        [AutoComplete]
-        public ItemData GetItemData(string itemName, byte itemType)
-        {
-            ItemData itemData = default(ItemData);
+            ItemData itemData = new ItemData();
             itemData.ReturnCode = "S600";
             itemData.ReturnMessage = "";
             DataSet DS = new DataSet();
+
             try
             {
-                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                // 把引號'變成''以防止隱碼攻擊
+                //Account = Account.Replace("'", "''");
+                //Password = Password.Replace("'", "''");
+
+                using (SqlConnection sqlConn = new SqlConnection(connectionString))
                 {
+
                     SqlCommand sqlCmd = new SqlCommand();
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
+
+                    Log.Debug("連線資訊 :" + sqlConn.ToString());
+
+                    // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM ItemData WHERE (ItemName='{0}') AND (ItemType='{1}') ", itemName, itemType), sqlConn);
+                    adapter.SelectCommand = new SqlCommand("SELECT * FROM Item_ItemData", sqlConn);
                     adapter.Fill(DS);
+                }
+                // 若有讀到則 取得所有資料
+                if (DS.Tables[0].Rows.Count > 0)
+                {
+                    int i = 0, j = 0;
 
-                    //如果找到道具資料
-                    if (DS.Tables[0].Rows.Count > 0)
+                    foreach (DataTable table in DS.Tables)
                     {
-                        itemData.ItemName = (string)DS.Tables[0].Rows[0]["ItemName"];
-                        itemData.Price = Convert.ToInt32(DS.Tables[0].Rows[0]["Price"]);
-                        itemData.ItemType = Convert.ToByte(DS.Tables[0].Rows[0]["ItemType"]);
-                        itemData.Limit = Convert.ToInt16(DS.Tables[0].Rows[0]["Limit"]);
-                        itemData.LimitTime = Convert.ToDateTime(DS.Tables[0].Rows[0]["LimitTime"]);
-                        itemData.BuyCount = (int)DS.Tables[0].Rows[0]["BuyCount"];
-                        itemData.ReturnCode = "S601";
+                        int arrayX = table.Rows.Count;
+                        int arrayY = table.Columns.Count; // -1因為減去索引鍵值
+                        string[,] sqlData = new string[arrayX, arrayY];
+                        Dictionary<int, object> dictData = new Dictionary<int, object>();
+
+
+                        foreach (DataRow row in table.Rows)
+                        {
+                            j = 0;
+                            Dictionary<int, object> dictData2 = new Dictionary<int, object>();
+                            foreach (DataColumn col in table.Columns)
+                            {
+                                sqlData[i, j] = table.Rows[i][col].ToString();  // 0是索引值
+                                dictData2.Add(j, table.Rows[i][col].ToString());
+                                Log.Debug("Item Data: " + table.Rows[i][col].ToString());
+                                j++;
+                            }
+                            dictData.Add(i, dictData2);
+                            i++;
+                        }
+                        itemData.itemProperty = Json.Serialize(dictData);
                     }
-                    else
-                    {
-                        itemData.ReturnCode = "S604";
-                        itemData.ReturnMessage = "無法取得道具資訊！";
-                    }
+                    itemData.ReturnCode = "S601"; //true
+                }
+                else
+                {
+                    itemData.ReturnCode = "602";
+                    itemData.ReturnMessage = "取得道具資料失敗！";
                 }
             }
-            catch (Exception e)
+            catch (Exception ｅ)
             {
                 itemData.ReturnCode = "S699";
-                itemData.ReturnMessage = "無法取得道具資訊，未知例外情況！";
-                Log.Debug("(IO)GetItemData failed!" + e.Message + " Track: " + e.StackTrace);
-                throw e;
+                itemData.ReturnMessage = "載入道具資料例外情況！";
+                throw ｅ;
             }
-            return itemData;
+
+            return itemData; //回傳資料
         }
-    }
         #endregion
+    }
+        
+
+
+
+
 }

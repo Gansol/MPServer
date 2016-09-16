@@ -440,6 +440,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             var innDict = item.Value as Dictionary<string, object>;
                             Global.arrayY = innDict.Count;
+                            Debug.Log("MiceData: " + item.Value.ToString());
                             break;
                         }
 
@@ -454,6 +455,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             foreach (KeyValuePair<string, object> inner in innDict)
                             {
                                 Global.miceProperty[i, j] = inner.Value.ToString();
+                                Debug.Log(inner.Value.ToString());
                                 j++;
                             }
                             i++;
@@ -486,6 +488,129 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 }
                 break;
 
+            #endregion
+
+            #region LoadStore 載入商店資料
+
+            case (byte)StoreResponseCode.LoadStore:   // 取得老鼠資料
+                {
+                    Debug.Log("Server Response : LoadStore");
+                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                    {
+                        string storeData = (string)operationResponse.Parameters[(byte)StoreParameterCode.StoreData];
+
+                        Dictionary<string, object> dictStoreData = Json.Deserialize(storeData) as Dictionary<string, object>;
+
+                        foreach (KeyValuePair<string, object> item in dictStoreData)
+                        {
+                            var innDict = item.Value as Dictionary<string, object>;
+                            Global.arrayY = innDict.Count;
+                            Debug.Log("StoreData: " + item.Value.ToString());
+                            break;
+                        }
+
+                        Global.storeItem = new string[dictStoreData.Count, Global.arrayY];
+                        int i = 0;
+
+                        foreach (KeyValuePair<string, object> item in dictStoreData)
+                        {
+                            int j = 0;
+                            var innDict = item.Value as Dictionary<string, object>;
+
+                            foreach (KeyValuePair<string, object> inner in innDict)
+                            {
+                                Global.storeItem[i, j] = inner.Value.ToString();
+                                Debug.Log(inner.Value.ToString());
+                                j++;
+                            }
+                            i++;
+                        }
+                        Global.isStoreLoaded = true;
+                    }
+                }
+                break;
+            #endregion
+
+            #region LoadItem 載入道具資料
+
+            case (byte)ItemResponseCode.LoadItem:   // 取得老鼠資料
+                {
+                    Debug.Log("Server Response : LoadItem");
+                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                    {
+                        string itemData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
+
+                        Dictionary<string, object> dictItemData = Json.Deserialize(itemData) as Dictionary<string, object>;
+
+                        foreach (KeyValuePair<string, object> item in dictItemData)
+                        {
+                            var innDict = item.Value as Dictionary<string, object>;
+                            Global.arrayY = innDict.Count;
+                            Debug.Log("itemData: " + item.Value.ToString());
+                            break;
+                        }
+
+                        Global.itemProperty = new string[dictItemData.Count, Global.arrayY];
+                        int i = 0;
+
+                        foreach (KeyValuePair<string, object> item in dictItemData)
+                        {
+                            int j = 0;
+                            var innDict = item.Value as Dictionary<string, object>;
+
+                            foreach (KeyValuePair<string, object> inner in innDict)
+                            {
+                                Global.itemProperty[i, j] = inner.Value.ToString();
+                                Debug.Log(inner.Value.ToString());
+                                j++;
+                            }
+                            i++;
+                        }
+                        Global.isItemLoaded = true;
+                    }
+                }
+                break;
+            #endregion
+
+            #region LoadArmor 載入裝備資料
+
+            case (byte)ItemResponseCode.LoadArmor:   // 取得老鼠資料
+                {
+                    Debug.Log("Server Response : LoadArmor");
+                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                    {
+                        string armorData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
+
+                        Dictionary<string, object> dictArmorData = Json.Deserialize(armorData) as Dictionary<string, object>;
+
+                        foreach (KeyValuePair<string, object> armor in dictArmorData)
+                        {
+                            var innDict = armor.Value as Dictionary<string, object>;
+                            Global.arrayY = innDict.Count;
+                            Debug.Log("armorData: " + armor.Value.ToString());
+                            break;
+                        }
+
+                        Global.armorProperty = new string[dictArmorData.Count, Global.arrayY];
+                        int i = 0;
+
+                        foreach (KeyValuePair<string, object> armor in dictArmorData)
+                        {
+                            int j = 0;
+                            var innDict = armor.Value as Dictionary<string, object>;
+
+                            foreach (KeyValuePair<string, object> inner in innDict)
+                            {
+                                Global.armorProperty[i, j] = inner.Value.ToString();
+                                Debug.Log(inner.Value.ToString());
+                                j++;
+                            }
+                            i++;
+                        }
+                        Global.isArmorLoaded = true;
+                    }
+                }
+                break;
             #endregion
 
 
@@ -668,7 +793,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #region BuyItem 購買道具
 
-            case (byte)ItemResponseCode.BuyItem: // 購買道具
+            case (byte)StoreResponseCode.BuyItem: // 購買道具
                 {
                     try
                     {
@@ -1028,6 +1153,61 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
+    #region LoadStoreData 載入老鼠資料
+    /// <summary>
+    /// 載入老鼠資料
+    /// </summary>
+    public void LoadStoreData()
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+            this.peer.OpCustom((byte)StoreOperationCode.LoadStore, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region LoadItemData 載入道具資料
+    /// <summary>
+    /// 載入道具資料
+    /// </summary>
+    public void LoadItemData()
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+            this.peer.OpCustom((byte)ItemOperationCode.LoadItem, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region LoadArmorData 載入裝備資料
+    /// <summary>
+    /// 載入裝備資料
+    /// </summary>
+    public void LoadArmorData()
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+            this.peer.OpCustom((byte)ItemOperationCode.LoadArmor, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+
     #region UpdateScore 更新分數 地鼠用
     /// <summary>
     /// 更新分數 地鼠用
@@ -1049,7 +1229,6 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         }
     }
     #endregion
-
 
     #region SendMission 傳送任務
     /// <summary>
@@ -1185,7 +1364,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Global.MiceAll },{ (byte)PlayerDataParameterCode.MiceAmount, Global.MiceAmount },
             { (byte)ItemParameterCode.ItemName,goods[0]},{ (byte)ItemParameterCode.ItemType,byte.Parse(goods[1])},{ (byte)ItemParameterCode.BuyCount,int.Parse(goods[2])},};
-            this.peer.OpCustom((byte)ItemOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+            this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {

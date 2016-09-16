@@ -73,7 +73,7 @@ namespace MPCOM
 
                     // 讀取會員資料 並填入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM GameCurrency WHERE (Account='{0}')", Account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}')", Account), sqlConn);
                     adapter.Fill(DS);
 
                     // 若有讀到則取得所有資料
@@ -128,12 +128,12 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
                     {
-                        string query = @"UPDATE GameCurrency SET Rice=@rice WHERE Account=@account";
+                        string query = @"UPDATE Player_GameCurrency SET Rice=@rice WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
@@ -186,12 +186,12 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
                     {
-                        string query = @"UPDATE GameCurrency SET Gold=@gold WHERE Account=@account";
+                        string query = @"UPDATE Player_GameCurrency SET Gold=@gold WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@gold", gold);
@@ -244,12 +244,12 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
                     {
-                        string query = @"UPDATE GameCurrency SET Rice=@rice,Gold=@gold WHERE Account=@account";
+                        string query = @"UPDATE Player_GameCurrency SET Rice=@rice,Gold=@gold WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@rice", rice);

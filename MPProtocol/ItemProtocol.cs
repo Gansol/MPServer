@@ -3,36 +3,35 @@
 
     public enum ItemOperationCode
     {
-        BuyItem = 81,
+        LoadItem = 82,
+        LoadArmor = 83,
     }
 
     public enum ItemResponseCode
     {
-        BuyItem = 81,
+        LoadItem = 82,
+        LoadArmor = 83,
     }
 
     public enum ItemParameterCode
     {
+        Ret=0,
         ItemName = 84,
         ItemType = 85,
         BuyCount = 86,
         Limit= 87,
+        ItemData=88,
     }
 
     public enum ItemProperty
     {
-        MiceName = 0,
-        EatingRate = 1,
-        MiceSpeed = 2,
-        EatFull = 3,
-        BossSkill = 4,
-        BossHP = 5,
-        MiceCost = 6,
-        Price = 7,
-        Description =8,
-        SayHello = 9,
-        ItemType = 10,
-        Limit = 11,
-        BuyCount = 12,
+        ItemID=0,
+        MiceName = 1,
+        EatingRate = 2,
+        MiceSpeed = 3,
+        EatFull = 4,
+        BossSkill = 5,
+        HP = 6,
+        MiceCost = 7,
     }
 }

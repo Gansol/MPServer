@@ -1,7 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+/* ***************************************************************
+ * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 負責載入資產、取得載入的資產 
+ * AssetBundleManager <-- AssetLoader
+ * ***************************************************************
+ *                           ChangeLog
+ * 20160711 v1.0.0  新增載入資產                        
+ * ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
     AssetBundleManager assetBundleManager;

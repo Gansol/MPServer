@@ -3,7 +3,9 @@ using System.Collections;
 
 public class Item : MonoBehaviour
 {
-    public string[] property;
+    public string[] itemProperty;
+    public string[] itemInfo;
+    public string[] etcInfo;
 
     void OnClick()
     {

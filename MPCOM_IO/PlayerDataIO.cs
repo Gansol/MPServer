@@ -71,7 +71,7 @@ namespace MPCOM
 
                     // 讀取玩家資料 填入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM PlayerData WHERE (Account='{0}')", Account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}')", Account), sqlConn);
                     adapter.Fill(DS);
 
                     // 若有讀到則取得所有資料
@@ -132,7 +132,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
@@ -140,7 +140,7 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)   
                     {
-                        string query = @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount,Friend=@friend WHERE Account=@account";
+                        string query = @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount,Friend=@friend WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
@@ -198,7 +198,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
@@ -206,8 +206,8 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)
                     {
-                        string query = 
-                                @"UPDATE PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
+                        string query =
+                                @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
                                 SumLost=@sumLost,SumKill=@sumKill,SumWin=@sumWin,SumBattle=@sumBattle,Item=@item,MiceAmount=@miceAmount WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear(); 
@@ -265,7 +265,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
@@ -273,7 +273,7 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)
                     {
-                        string query = @"UPDATE PlayerData SET MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount WHERE Account=@account";
+                        string query = @"UPDATE Player_PlayerData SET MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
@@ -322,7 +322,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
@@ -330,7 +330,7 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)
                     {
-                        string query = @"UPDATE PlayerData SET MiceAll=@miceAll,MiceAmount=@miceAmount WHERE Account=@account";
+                        string query = @"UPDATE Player_PlayerData SET MiceAll=@miceAll,MiceAmount=@miceAmount WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);

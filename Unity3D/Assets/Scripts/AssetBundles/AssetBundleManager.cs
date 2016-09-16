@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 /* ***************************************************************
-
------Copyright © 2015 Gansol Studio. All Rights Reserved.-----
------------ CC BY-NC-SA 4.0
------------ @Website: EasyUnity@blogspot.com
------------ @Email: GansolTW@gmail.com
------------ @Author: Krola.
-******************************************************************/
-/* ***************************************************************
+ * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 負責資產管理
+ * ***************************************************************
  *                          ChangeLog
  * v0.0.2 20160629  fixbug: loaded bundle check.
  * v0.0.1 20150000  AssetbundleManager publish.    

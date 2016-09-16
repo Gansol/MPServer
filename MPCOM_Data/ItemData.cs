@@ -23,11 +23,6 @@ namespace MPCOM
         public string ReturnCode;               // 回傳值
         public string ReturnMessage;            // 回傳說明文字<30全形字
 
-        public string ItemName;                 // 道具名稱
-        public int Price;                       // 價格
-        public byte ItemType;                   // 道具類型
-        public Int16 Limit;                       // 限量
-        public DateTime LimitTime;              // 限時
-        public int BuyCount;                    // 購買數量
+        public string itemProperty;             // 道具屬性
     }
 }

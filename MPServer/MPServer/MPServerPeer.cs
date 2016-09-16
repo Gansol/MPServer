@@ -952,6 +952,82 @@ namespace MPServer
                             break;
                         #endregion
 
+                        #region LoadStore 載入商店資料
+                        case (byte)StoreOperationCode.LoadStore:
+                            {
+                                try
+                                {
+                                    Log.Debug("IN LoadStore");
+
+                                    StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
+                                    Log.Debug("LoadStore IO OK");
+                                    StoreData storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("LoadStore Data OK");
+                                    Log.Debug("Server Data: " + storeData.StoreItem);
+                                    if (storeData.ReturnCode == "S901")//取得老鼠資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug("LoadStore.ReturnCode == S901");
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)StoreParameterCode.Ret, storeData.ReturnCode }, { (byte)StoreParameterCode.StoreData,storeData.StoreItem } 
+                                    };
+
+                                        OperationResponse response = new OperationResponse((byte)StoreResponseCode.LoadStore, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage.ToString() };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+
+                            }
+                            break;
+                        #endregion
+
+                        #region LoadItem 載入道具資料
+                        case (byte)ItemOperationCode.LoadItem:
+                            {
+                                try
+                                {
+                                    Log.Debug("IN LoadItem");
+
+                                    ItemUI ItemUI = new ItemUI(); //實體化 IO (連結資料庫拿資料)
+                                    Log.Debug("LoadItem IO OK");
+                                    ItemData itemData = (ItemData)TextUtility.DeserializeFromStream(ItemUI.LoadItemData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("LoadItem Data OK");
+                                    Log.Debug("Server Data: " + itemData.itemProperty);
+                                    if (itemData.ReturnCode == "S901")//取得老鼠資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug("LoadItem.ReturnCode == S901");
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)ItemParameterCode.Ret, itemData.ReturnCode }, { (byte)ItemParameterCode.ItemData,itemData.itemProperty } 
+                                    };
+
+                                        OperationResponse response = new OperationResponse((byte)ItemResponseCode.LoadItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = itemData.ReturnMessage.ToString() };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = itemData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+
+                            }
+                            break;
+                        #endregion
+
                         #region Mission 發送任務
                         case (byte)BattleOperationCode.Mission:
                             {
@@ -1242,7 +1318,7 @@ namespace MPServer
                         #endregion
 
                         #region BuyItem 購買商品
-                        case (byte)ItemOperationCode.BuyItem:
+                        case (byte)StoreOperationCode.BuyItem:
                             {
                                 try
                                 {
@@ -1255,45 +1331,53 @@ namespace MPServer
                                     int buyCount = (int)operationRequest.Parameters[(byte)ItemParameterCode.BuyCount];
 
 
-                                    ItemUI itemUI = new ItemUI(); //實體化 IO (連結資料庫拿資料)
+                                    StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
                                     Log.Debug("BuyItem IO OK");
-                                    ItemData itemData = (ItemData)TextUtility.DeserializeFromStream(itemUI.GetItemData(itemName, itemType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("BuyItem Data OK" + itemData.Price);
+                                    StoreData storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData(itemName, itemType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("BuyItem Data OK" + storeData.Price);
 
-
-                                    CurrencyUI currencyUI = new CurrencyUI();
-                                    CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, itemType, itemData.Price * buyCount));
-                                     
-
-                                    Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode);
-
-                                    if (currencyData.ReturnCode == "S703")
+                                    if (storeData.ReturnCode == "S901")
                                     {
-                                        itemUI.UpdateItemBuyCount(itemName, itemType, buyCount);
-                                        currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+                                        CurrencyUI currencyUI = new CurrencyUI();
+                                        CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, itemType, storeData.Price * buyCount));
 
-                                        Log.Debug("SEE SEE " + account + " " + miceAll + " " + miceAmount + " " + itemName + " " + buyCount);
-                                        PlayerDataUI playerUI = new PlayerDataUI();
 
-                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerData(account, miceAll, miceAmount, itemName, buyCount));
+                                        Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode);
 
-                                        if (playerData.ReturnCode == "S420")//取得老鼠資料成功 回傳玩家資料
+                                        if (currencyData.ReturnCode == "S703")
                                         {
-                                            playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.LoadPlayerData(account));
-                                            Log.Debug("BuyItem playerData OK");
-                                           
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                                                     { (byte)MiceParameterCode.Ret, itemData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,{ (byte)PlayerDataParameterCode.MiceAmount, playerData.MiceAmount } ,
+                                            storeDataUI.UpdateStoreBuyCount(itemName, itemType, buyCount);
+                                            currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+
+                                            Log.Debug("SEE SEE " + account + " " + miceAll + " " + miceAmount + " " + itemName + " " + buyCount);
+                                            PlayerDataUI playerUI = new PlayerDataUI();
+
+                                            PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerData(account, miceAll, miceAmount, itemName, buyCount));
+
+                                            if (playerData.ReturnCode == "S420")//取得老鼠資料成功 回傳玩家資料
+                                            {
+                                                playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.LoadPlayerData(account));
+                                                Log.Debug("BuyItem playerData OK");
+
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                                                     { (byte)MiceParameterCode.Ret, storeData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,{ (byte)PlayerDataParameterCode.MiceAmount, playerData.MiceAmount } ,
                                                                      { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } 
                                             };
 
-                                            OperationResponse response = new OperationResponse((byte)ItemResponseCode.BuyItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = itemData.ReturnMessage.ToString() };
-                                            SendOperationResponse(response, new SendParameters());
+                                                OperationResponse response = new OperationResponse((byte)StoreOperationCode.BuyItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage.ToString() };
+                                                SendOperationResponse(response, new SendParameters());
+                                            }
+                                            else    // 失敗
+                                            {
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                                OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+                                            }
                                         }
                                         else    // 失敗
                                         {
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = itemData.ReturnMessage.ToString() };
+                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
                                             SendOperationResponse(actorResponse, new SendParameters());
                                         }
                                     }

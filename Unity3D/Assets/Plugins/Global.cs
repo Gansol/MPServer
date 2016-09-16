@@ -47,6 +47,9 @@ public class Global
     public static bool isPlayerDataLoaded = false;  // 是否載入玩家資料
     public static bool isCurrencyLoaded = false;    // 是否載入玩家資料
     public static bool isMiceLoaded = false;        // 是否載入老鼠資料
+    public static bool isStoreLoaded = false;        // 是否載入老鼠資料
+    public static bool isItemLoaded = false;        // 是否載入老鼠資料
+    public static bool isArmorLoaded = false;        // 是否載入老鼠資料
     public static bool isLoaded = false;            // 是否載入場景
 
     public static bool LoginStatus = false;	        // true = 已登入,  false = 未登入
@@ -106,8 +109,11 @@ public class Global
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
     public static int arrayX = 0, arrayY = 0;
-    public static string[,] miceProperty = new string[arrayX, arrayY];   // 老鼠屬性資料 JSON資料
-    public static Dictionary<string, object> miceProperty2 = new Dictionary<string, object>();   // 老鼠屬性資料 JSON資料
+    public static string[,] miceProperty = new string[arrayX, arrayY];   // 老鼠屬性資料 
+    public static string[,] storeItem = new string[arrayX, arrayY];   // 商店屬性資料 
+    public static string[,] itemProperty = new string[arrayX, arrayY];   // 道具屬性資料 
+    public static string[,] armorProperty = new string[arrayX, arrayY];   // 裝備屬性資料 
+
     public enum UILayer
     {
         Nothing = 0,

@@ -330,7 +330,7 @@ public class TeamSwitcher : MonoBehaviour
         _clone.transform.localScale = transform.localScale;
         _clone.name = gameObject.name;
         _clone.tag = gameObject.tag;
-        _depth = ObjectManager.SwitchDepthLayer(gameObject, gameObject, Global.MeunObjetDepth); // 移動時深度提到最高防止遮擋
+        _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MeunObjetDepth); // 移動時深度提到最高防止遮擋
     }
     #endregion
 

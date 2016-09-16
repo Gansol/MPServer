@@ -16,8 +16,9 @@ using MiniJSON;
  * + pageVaule 還沒加入翻頁值
  * ***************************************************************
  *                           ChangeLog
- * 20160711 v1.0.1  1次重構，獨立AssetLoader                       
- * 20160705 v1.0.0  0版完成，載入老鼠部分未來需要修改                    
+ * 20160914 v1.0.1b  2次重購，獨立實體化物件  
+ * 20160711 v1.0.1a  1次重構，獨立AssetLoader                       
+ * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
  * ****************************************************************/
 
 public class TeamManager : MonoBehaviour
@@ -35,7 +36,7 @@ public class TeamManager : MonoBehaviour
     public static Dictionary<string, GameObject> dictLoadedTeam { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
     [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // Change value in editor
-    public float actorScale = 0.8f;
+    public Vector3 actorScale;
 
     private GameObject _clone, _miceActor, _tmpActor, _btnClick, _doubleClickChk;   // 克隆、老鼠角色、暫存角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
@@ -49,6 +50,7 @@ public class TeamManager : MonoBehaviour
     void Awake()
     {
         Debug.Log("AAAAAAAAAAA  " + Global.MiceAll);
+        actorScale = new Vector3(0.8f, 0.8f, 1);
         _page = 0;
         _miceActor = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
         dictLoadedMice = new Dictionary<string, GameObject>();
@@ -104,8 +106,8 @@ public class TeamManager : MonoBehaviour
 
         LoadActor(btn_mice);
         Debug.Log(btn_mice.transform.GetChild(0).name);
-        LoadMiceProperty loadProerty = new LoadMiceProperty();
-        loadProerty.LoadProperty(btn_mice.transform.GetChild(0).gameObject,infoGroupsArea[1],1);
+        LoadProperty loadProerty = new LoadProperty();
+        loadProerty.LoadMiceProperty(btn_mice.transform.GetChild(0).gameObject, infoGroupsArea[1], 0);
         //Debug.Log("Simple click");
     }
     #endregion
@@ -145,14 +147,10 @@ public class TeamManager : MonoBehaviour
                 GameObject bundle = assetLoader.GetAsset("MiceICON/", bundleName);
                 Transform miceBtn = myParent.GetChild(i);
 
-                Add2Refs(bundle, miceBtn);     // 加入物件參考
+                InstantiateObject insObj = new InstantiateObject();
+                _clone = insObj.Instantiate(bundle, miceBtn, item.Value.ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
 
-                _clone = (GameObject)Instantiate(bundle);             // 實體化
-                _clone.layer = myParent.gameObject.layer;
-                _clone.transform.parent = miceBtn;
-                _clone.name = item.Value.ToString();
-                _clone.transform.localPosition = Vector3.zero;
-                _clone.transform.localScale = Vector3.one;
+                Add2Refs(bundle, miceBtn);     // 加入物件參考
 
                 miceBtn.GetComponent<TeamSwitcher>().enabled = true;           // 開啟老鼠隊伍交換功能
                 miceBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn"); // 開啟按鈕功能
@@ -206,30 +204,28 @@ public class TeamManager : MonoBehaviour
     #region -- InstantiateActor 實體化老鼠角色 --
     private void InstantiateActor()
     {
+        GameObject _tmp;
         string miceName = _btnClick.transform.GetChild(0).name;
+        InstantiateObject insObj = new InstantiateObject();
+        GameObject bundle = (GameObject)assetLoader.GetAsset(miceName + "/", miceName);
 
-        _clone = (GameObject)Instantiate(assetLoader.GetAsset(miceName + "/", miceName));
-        ObjectManager.SwitchDepthLayer(_clone, _miceActor, Global.MeunObjetDepth);
-
-        _clone.transform.parent = _miceActor.transform;
-        _clone.SetActive(false);
-        _clone.name = miceName;
-        _clone.transform.localPosition = Vector3.zero;
-        _clone.transform.localScale = Vector3.one;
-        _clone.layer = _miceActor.transform.gameObject.layer;
-        _clone.transform.localScale = new Vector3(actorScale, actorScale, 1);
+        if (bundle != null)                  // 已載入資產時
+        {
+            _clone = insObj.InstantiateActor(bundle, _miceActor.transform, miceName, actorScale);
+        }
+        else
+        {
+            Debug.LogError("Assetbundle reference not set to an instance. at InstantiateActor.");
+        }
 
         Destroy(_clone.transform.GetChild(0).GetComponent(_clone.name));    // 刪除Battle用腳本
 
-        GameObject _tmp;
-        if (_dictActor.TryGetValue(_clone.name, out _tmp) != null)
+        if (_dictActor.TryGetValue(_clone.name, out _tmp) != false)
             _dictActor.Add(_clone.name, _clone);
 
         _tmpActor = _clone;
-        _clone.SetActive(true);
         _LoadedActor = true;
 
-        AssetBundleManager.UnloadUnusedAssets();
     }
     #endregion
 

@@ -42,7 +42,8 @@ public class DataUI : MonoBehaviour {
 
             if (GUI.Button(new Rect(200, 180, 100, 20), "ReLoad Data"))
             {
-                Global.photonService.LoadPlayerData(Global.Account);
+                //Global.photonService.LoadPlayerData(Global.Account);
+                Global.photonService.LoadMiceData();
             }
 
         }
