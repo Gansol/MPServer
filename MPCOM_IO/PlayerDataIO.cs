@@ -3,6 +3,8 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.EnterpriseServices;
+using System.Collections.Generic;
+using MiniJSON;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -38,7 +40,7 @@ namespace MPCOM
         string connectionString = string.Format("Server = {0};Database = {1};User ID = {2};Password = {3};", host, database, id, pwd);
 
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
-        
+
         protected override bool CanBePooled()
         {
             return true;
@@ -106,7 +108,151 @@ namespace MPCOM
             {
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "取得玩家資料例外情況！";
-                Log.Debug("Load PlayerData Failed ! " + e.Message +" 於: "+e.StackTrace);
+                Log.Debug("Load PlayerData Failed ! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+
+            return playerData;
+        }
+        #endregion
+
+        #region LoadPlayerItem 載入玩家道具資料
+        /// <summary>
+        /// 載入玩家道具資料
+        /// </summary>
+        /// <returns>PlayerData</returns>
+        [AutoComplete]
+        public PlayerData LoadPlayerItem(string account)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                // 把引號'變成''以防止隱碼攻擊
+                //Account = Account.Replace("'", "''");
+                //Password = Password.Replace("'", "''");
+
+                using (SqlConnection sqlConn = new SqlConnection(connectionString))
+                {
+
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    Log.Debug("連線資訊 :" + sqlConn.ToString());
+
+                    // 讀取老鼠資料 寫入DS資料列
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM Player_PlayerItem WHERE (Account='{0}')", account), sqlConn);
+                    adapter.Fill(DS);
+                }
+                // 若有讀到則 取得所有資料
+                if (DS.Tables[0].Rows.Count > 0)
+                {
+                    int i = 0, j = 0;
+
+                    foreach (DataTable table in DS.Tables)
+                    {
+                        int arrayX = table.Rows.Count;
+                        int arrayY = table.Columns.Count; // -1因為減去索引鍵值
+                        string[,] sqlData = new string[arrayX, arrayY];
+                        Dictionary<int, object> dictData = new Dictionary<int, object>();
+
+
+                        foreach (DataRow row in table.Rows)
+                        {
+                            j = 0;
+                            Dictionary<int, object> dictData2 = new Dictionary<int, object>();
+                            foreach (DataColumn col in table.Columns)
+                            {
+                                sqlData[i, j] = table.Rows[i][col].ToString();  // 0是索引值
+                                dictData2.Add(j, table.Rows[i][col].ToString());
+                                Log.Debug("Player Item: " + table.Rows[i][col].ToString());
+                                j++;
+                            }
+                            dictData.Add(i, dictData2);
+                            i++;
+                        }
+                        playerData.playerProperty = Json.Serialize(dictData);
+                    }
+                    playerData.ReturnCode = "S425"; //true
+                    playerData.ReturnMessage = "取得玩家道具資料成功！";
+                }
+                else
+                {
+                    playerData.ReturnCode = "S426";
+                    playerData.ReturnMessage = "取得玩家道具資料失敗！";
+                }
+            }
+            catch (Exception ｅ)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "載入玩家道具資料例外情況！";
+                throw ｅ;
+            }
+
+            return playerData; //回傳資料
+        }
+        #endregion
+
+        #region LoadPlayerItem 載入玩家道具(單筆)資料
+        /// <summary>
+        /// 載入玩家道具(單筆)資料
+        /// </summary>
+        /// <returns>PlayerData</returns>
+        [AutoComplete]
+        public PlayerData LoadPlayerItem(string account, Int16 itemID)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";             //預設值
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                // 把引號'變成''以防止隱碼攻擊
+                //Account = Account.Replace("'", "''");
+                //Password = Password.Replace("'", "''");
+
+                using (SqlConnection sqlConn = new SqlConnection(connectionString))
+                {
+
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
+
+                    // 讀取玩家資料 填入DS資料列
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(String.Format("SELECT * FROM Player_PlayerItem WHERE (Account='{0}') AND (ItemID='{1}')", account, itemID), sqlConn);
+                    adapter.Fill(DS);
+
+                    // 若有讀到則取得所有資料
+                    if (DS.Tables[0].Rows.Count > 0)
+                    {
+                        playerData.ItemID = itemID;
+                        playerData.ItemCount = Convert.ToInt16(DS.Tables[0].Rows[0]["ItemCount"]);
+                        playerData.ItemType = Convert.ToByte(DS.Tables[0].Rows[0]["ItemType"]);
+                        Log.Debug(playerData.ReturnMessage + "playerData.ItemCount:" + playerData.ItemCount);
+                        playerData.ReturnCode = "S425"; //true
+                        playerData.ReturnMessage = "取得玩家道具資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S426";
+                        playerData.ReturnMessage = "取得玩家道具資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("Load PlayerData Failed ! " + e.Message + " 於: " + e.StackTrace);
                 throw e;
             }
 
@@ -116,7 +262,7 @@ namespace MPCOM
 
         #region UpdatePlayerData 更新玩家(全部)資料
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost,int sumKill,string item, string miceAll, string team, string miceAmount, string friend)
+        public PlayerData UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -138,7 +284,7 @@ namespace MPCOM
                     //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
 
                     // 如果找到玩家資料
-                    if (DS.Tables[0].Rows.Count == 1)   
+                    if (DS.Tables[0].Rows.Count == 1)
                     {
                         string query = @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,MiceAmount=@miceAmount,Friend=@friend WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
@@ -182,7 +328,7 @@ namespace MPCOM
 
         #region UpdateGameOver 更新玩家(GameOver)資料
         [AutoComplete]
-        public PlayerData UpdateGameOver(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill,int sumWin,int sumBattle, string item, string miceAmount)
+        public PlayerData UpdateGameOver(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, int sumWin, int sumBattle, string item, string miceAmount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -210,7 +356,7 @@ namespace MPCOM
                                 @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
                                 SumLost=@sumLost,SumKill=@sumKill,SumWin=@sumWin,SumBattle=@sumBattle,Item=@item,MiceAmount=@miceAmount WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
-                        command.Parameters.Clear(); 
+                        command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
                         command.Parameters.AddWithValue("@rank", rank);
                         command.Parameters.AddWithValue("@exp", exp);
@@ -249,7 +395,7 @@ namespace MPCOM
 
         #region UpdatePlayerData 更新玩家(Team)資料
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, string miceAll,string team, string miceAmount)
+        public PlayerData UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -301,8 +447,8 @@ namespace MPCOM
             }
             return playerData;
         }
-    
-    #endregion
+
+        #endregion
 
         #region UpdatePlayerData 更新玩家(老鼠)資料
         [AutoComplete]
@@ -352,6 +498,75 @@ namespace MPCOM
             {
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(道具)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+            Log.Debug("account:" + account + "itemName:" + itemID + "itemType:" + itemType + "itemCount:" + itemCount);
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerItem WHERE Account='{0}' AND ItemID='{1}' ", account, itemID), sqlConn);
+                    adapter.Fill(DS);
+
+                    int dataCount = DS.Tables[0].Rows.Count;
+                    // 如果找到玩家資料
+                    if (dataCount == 1)
+                    {
+                        string query = @"UPDATE Player_PlayerItem SET ItemCount=@itemCount WHERE Account=@account AND ItemID=@itemID";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@ItemID", itemID);
+                        command.Parameters.AddWithValue("@itemCount", itemCount);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S422";
+                        playerData.ReturnMessage = "更新玩家道具資料成功！";
+                    }
+                    else if (dataCount == 0) // 如果沒有找到玩家資料
+                    {
+                        string query = "INSERT INTO Player_PlayerItem (Account,ItemID,ItemCount,ItemType) VALUES(@account, @itemID, @itemCount, @itemType)";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@itemID", itemID);
+                        command.Parameters.AddWithValue("@itemCount", itemCount);
+                        command.Parameters.AddWithValue("@itemType", itemType);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S423";
+                        playerData.ReturnMessage = "新增玩家道具資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S424";
+                        playerData.ReturnMessage = "更新玩家道具資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "更新玩家道具資料例外情況！";
                 Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
                 throw e;
             }

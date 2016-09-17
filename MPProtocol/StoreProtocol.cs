@@ -15,7 +15,12 @@
     public enum StoreParameterCode
     {
         Ret = 0,
-        StoreData = 1,
+        ItemID = 93,
+        ItemName = 94,
+        ItemType = 95,
+        CurrencyType = 96,
+        BuyCount = 97,
+        StoreData = 98,
     }
 
     public enum StoreProperty

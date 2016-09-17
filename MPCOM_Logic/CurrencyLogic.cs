@@ -64,7 +64,7 @@ namespace MPCOM
         #region UpdateCurrency
 
         [AutoComplete]
-        public CurrencyData UpdateCurrency(string account, byte itemType, int currency)
+        public CurrencyData UpdateCurrency(string account, byte currencyType, int currency)
         {
             CurrencyData currencyData = new CurrencyData();
             currencyData.ReturnCode = "(Logic)S700";
@@ -82,7 +82,7 @@ namespace MPCOM
                 currencyData = currencyIO.LoadCurrency(account);
 
 
-                switch (itemType)
+                switch (currencyType)
                 {
                     case 0:
                         {

@@ -110,9 +110,8 @@ public class Global
 
     public static int arrayX = 0, arrayY = 0;
     public static string[,] miceProperty = new string[arrayX, arrayY];   // 老鼠屬性資料 
-    public static string[,] storeItem = new string[arrayX, arrayY];   // 商店屬性資料 
     public static string[,] itemProperty = new string[arrayX, arrayY];   // 道具屬性資料 
-    public static string[,] armorProperty = new string[arrayX, arrayY];   // 裝備屬性資料 
+    public static string[,] storeItem = new string[arrayX, arrayY];   // 商店屬性資料 
 
     public enum UILayer
     {

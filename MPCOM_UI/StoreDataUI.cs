@@ -22,9 +22,9 @@ namespace MPCOM
     public interface IStoreDataUI    // 使用介面 可以提供給不同程式語言繼承使用      
     {
         byte[] LoadStoreData();
-        byte[] LoadStoreData(string itemName, byte itemType);
-        byte[] UpdateStoreBuyCount(string itemName, byte itemType, int buyCount);
-        byte[] UpdateStoreLimit(string itemName, byte itemType, int buyCount);
+        byte[] LoadStoreData(Int16 itemID, byte itemType);
+        byte[] UpdateStoreBuyCount(Int16 itemID, byte itemType, Int16 buyCount);
+        byte[] UpdateStoreLimit(Int16 itemID, byte itemType, int buyCount);
 
     }
 
@@ -42,7 +42,7 @@ namespace MPCOM
         /// <param name="itemName"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        public byte[] LoadStoreData(string itemName,byte itemType)
+        public byte[] LoadStoreData(Int16 itemID, byte itemType)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "(UI)S900";
@@ -52,7 +52,7 @@ namespace MPCOM
             {
 
                 StoreDataLogic storeDataLogic = new StoreDataLogic();
-                storeData = storeDataLogic.LoadStoreData(itemName, itemType);
+                storeData = storeDataLogic.LoadStoreData(itemID, itemType);
             }
             catch (Exception e)
             {
@@ -98,7 +98,7 @@ namespace MPCOM
         /// <param name="itemType">道具類別</param>
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
-        public byte[] UpdateStoreBuyCount(string itemName, byte itemType, int buyCount)
+        public byte[] UpdateStoreBuyCount(Int16 itemID, byte itemType, Int16 buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "S900";
@@ -107,7 +107,7 @@ namespace MPCOM
             try
             {
                 StoreDataLogic storeDataLogic = new StoreDataLogic();
-                storeData = storeDataLogic.UpdateStoreBuyCount(itemName, itemType, buyCount);
+                storeData = storeDataLogic.UpdateStoreBuyCount(itemID, itemType, buyCount);
             }
             catch (Exception e)
             {
@@ -126,7 +126,7 @@ namespace MPCOM
         /// <param name="itemType">道具類別</param>
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
-        public byte[] UpdateStoreLimit(string itemName, byte itemType, int buyCount)
+        public byte[] UpdateStoreLimit(Int16 itemID, byte itemType, int buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "S900";
@@ -135,7 +135,7 @@ namespace MPCOM
             try
             {
                 StoreDataLogic storeDataLogic = new StoreDataLogic();
-                storeData = storeDataLogic.UpdateStoreLimit(itemName, itemType, buyCount);
+                storeData = storeDataLogic.UpdateStoreLimit(itemID, itemType, buyCount);
             }
             catch (Exception e)
             {
@@ -145,6 +145,5 @@ namespace MPCOM
             return TextUtility.SerializeToStream(storeData);
         }
         #endregion
-
     }
 }

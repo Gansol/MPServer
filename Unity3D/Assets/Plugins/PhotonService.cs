@@ -572,46 +572,6 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 break;
             #endregion
 
-            #region LoadArmor 載入裝備資料
-
-            case (byte)ItemResponseCode.LoadArmor:   // 取得老鼠資料
-                {
-                    Debug.Log("Server Response : LoadArmor");
-                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
-                    {
-                        string armorData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
-
-                        Dictionary<string, object> dictArmorData = Json.Deserialize(armorData) as Dictionary<string, object>;
-
-                        foreach (KeyValuePair<string, object> armor in dictArmorData)
-                        {
-                            var innDict = armor.Value as Dictionary<string, object>;
-                            Global.arrayY = innDict.Count;
-                            Debug.Log("armorData: " + armor.Value.ToString());
-                            break;
-                        }
-
-                        Global.armorProperty = new string[dictArmorData.Count, Global.arrayY];
-                        int i = 0;
-
-                        foreach (KeyValuePair<string, object> armor in dictArmorData)
-                        {
-                            int j = 0;
-                            var innDict = armor.Value as Dictionary<string, object>;
-
-                            foreach (KeyValuePair<string, object> inner in innDict)
-                            {
-                                Global.armorProperty[i, j] = inner.Value.ToString();
-                                Debug.Log(inner.Value.ToString());
-                                j++;
-                            }
-                            i++;
-                        }
-                        Global.isArmorLoaded = true;
-                    }
-                }
-                break;
-            #endregion
 
 
             #region UpdateScore 更新分數
@@ -805,6 +765,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.MiceAmount = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
                             UpdateCurrencyEvent();
                             ShowMessageEvent();
+                        }
+                        else
+                        {
+                            Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
                     catch (Exception e)
@@ -1189,23 +1153,6 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
-    #region LoadArmorData 載入裝備資料
-    /// <summary>
-    /// 載入裝備資料
-    /// </summary>
-    public void LoadArmorData()
-    {
-        try
-        {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-            this.peer.OpCustom((byte)ItemOperationCode.LoadArmor, parameter, true, 0, false); // operationCode is RoomSpeak
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
-    }
-    #endregion
 
 
     #region UpdateScore 更新分數 地鼠用
@@ -1359,11 +1306,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// </summary>
     public void BuyItem(string account, string[] goods)
     {
+        Debug.Log(goods[0] +" "+ goods[1] +" "+ goods[2] +" "+ goods[3]);
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Global.MiceAll },{ (byte)PlayerDataParameterCode.MiceAmount, Global.MiceAmount },
-            { (byte)ItemParameterCode.ItemName,goods[0]},{ (byte)ItemParameterCode.ItemType,byte.Parse(goods[1])},{ (byte)ItemParameterCode.BuyCount,int.Parse(goods[2])},};
+            { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[0])},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[1])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[2])},
+            { (byte)StoreParameterCode.BuyCount,Int16.Parse(goods[3])}};
             this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)

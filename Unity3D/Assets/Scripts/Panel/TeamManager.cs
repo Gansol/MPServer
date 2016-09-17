@@ -125,7 +125,7 @@ public class TeamManager : MonoBehaviour
     {
         foreach (KeyValuePair<string, object> item in dictionary)
         {
-            assetLoader.LoadPrefab("MiceICON/", item.Value.ToString().Remove(item.Value.ToString().Length - 4) + "ICON");
+            assetLoader.LoadPrefab("MiceICON/", item.Value.ToString() + "ICON");
         }
     }
     #endregion
@@ -141,7 +141,7 @@ public class TeamManager : MonoBehaviour
         int i = 0;
         foreach (KeyValuePair<string, object> item in dictionary)
         {
-            string bundleName = item.Value.ToString().Remove(item.Value.ToString().Length - 4) + "ICON";
+            string bundleName = item.Value.ToString() + "ICON";
             if (assetLoader.GetAsset("MiceICON/", bundleName))                  // 已載入資產時
             {
                 GameObject bundle = assetLoader.GetAsset("MiceICON/", bundleName);
@@ -244,12 +244,12 @@ public class TeamManager : MonoBehaviour
     /// <summary>
     /// 加入老鼠參考
     /// </summary>
-    /// <param name="obj">AssetBundle</param>
+    /// <param name="bundle">AssetBundle</param>
     /// <param name="myParent">參考按鈕</param>
-    void Add2Refs(GameObject obj, Transform myParent)
+    void Add2Refs(GameObject bundle, Transform myParent)
     {
         string btnArea = myParent.parent.name;                          //按鈕存放區域名稱 Team / Mice 區域
-        string miceName = obj.name.Remove(obj.name.Length - 4) + "Mice";
+        string miceName = bundle.name.Remove(bundle.name.Length - 4) +"Mice";
 
         if (btnArea == "Mice")
             dictLoadedMice.Add(miceName, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置

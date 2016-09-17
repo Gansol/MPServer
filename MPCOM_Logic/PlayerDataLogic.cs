@@ -16,7 +16,7 @@ using System.EnterpriseServices;
  * 載入玩家資料、更新玩家資料
  * >>try catch 要移除 使用AutoComplete就可 移除後刪除
  * >>邏輯都沒寫(還要再看看)
- * 
+ * UpdatePlayerItem沒寫邏輯
  * ***************************************************************/
 
 namespace MPCOM
@@ -65,6 +65,56 @@ namespace MPCOM
             return playerData;
         }
 
+        #endregion
+
+        #region LoadPlayerItem 載入玩家道具(單筆)資料
+        /// <summary>
+        /// 載入玩家道具(單筆)資料
+        /// </summary>
+        public PlayerData LoadPlayerItem(string account, Int16 itemID)
+        {
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //to do check 
+
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.LoadPlayerItem(account, itemID);
+            }
+            catch
+            {
+                throw;
+            }
+
+            return playerData;
+        }
+        #endregion
+
+        #region LoadPlayerItem 載入玩家道具(全部)資料
+        /// <summary>
+        /// 載入玩家道具(全部)資料
+        /// </summary>
+        public PlayerData LoadPlayerItem(string account)
+        {
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //to do check 
+
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.LoadPlayerItem(account);
+            }
+            catch
+            {
+                throw;
+            }
+
+            return playerData;
+        }
         #endregion
 
         #region UpdatePlayerData 更新玩家(全部)資料 這裡怪怪的(Admin才能使用)
@@ -425,11 +475,11 @@ namespace MPCOM
                         playerData.EXP += exp;
                     }
 
-                    
+
 
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill,playerData.SumWin,playerData.SumBattle, item, miceAmount);
+                    playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill, playerData.SumWin, playerData.SumBattle, item, miceAmount);
                 }
 
             }
@@ -443,6 +493,47 @@ namespace MPCOM
         }
 
         #endregion
+
+        #region UpdatePlayerItem 更新玩家(道具)資料
+        public PlayerData UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
+        {
+            try
+            {
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+
+                playerData = playerDataIO.LoadPlayerItem(account, itemID);
+                
+                playerData.ItemCount += itemCount;
+
+                playerData = playerDataIO.UpdatePlayerItem(account, itemID, itemType, playerData.ItemCount);
+
+
+                return playerData;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         private PlayerData RankChk(byte rank)
         {

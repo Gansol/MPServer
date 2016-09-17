@@ -101,6 +101,7 @@ namespace MPCOM
                         itemData.itemProperty = Json.Serialize(dictData);
                     }
                     itemData.ReturnCode = "S601"; //true
+                    itemData.ReturnMessage = "取得道具資料成功！";
                 }
                 else
                 {
@@ -118,6 +119,7 @@ namespace MPCOM
             return itemData; //回傳資料
         }
         #endregion
+
     }
         
 

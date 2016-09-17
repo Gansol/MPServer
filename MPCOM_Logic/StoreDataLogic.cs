@@ -1,6 +1,6 @@
 ﻿using System;
 using System.EnterpriseServices;
-
+using ExitGames.Logging;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -28,8 +28,8 @@ namespace MPCOM
     public class StoreDataLogic : ServicedComponent// ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
         StoreData storeData = new StoreData();
-
-
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
+       
         protected override bool CanBePooled()
         {
             return true;
@@ -43,17 +43,17 @@ namespace MPCOM
         /// <param name="itemType"></param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData LoadStoreData(string itemName , byte itemType)
+        public StoreData LoadStoreData(Int16 itemID, byte itemType)
         {
             storeData.ReturnCode = "(Logic)S900";
             storeData.ReturnMessage = "";
-
+            
             try
             {
                 //to do check 
 
                 StoreDataIO storeDataIO = new StoreDataIO();
-                storeData = storeDataIO.LoadStoreData(itemName,itemType);
+                storeData = storeDataIO.LoadStoreData(itemID, itemType);
 
             }
             catch (Exception e)
@@ -105,23 +105,29 @@ namespace MPCOM
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData UpdateStoreBuyCount(string itemName, byte itemType, int buyCount)
+        public StoreData UpdateStoreBuyCount(Int16 itemID, byte itemType, Int16 buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "(Logic)S900";
             storeData.ReturnMessage = "";
 
             StoreDataIO storeDataIO = new StoreDataIO();
-
+            
             try
             {
-                storeData = storeDataIO.LoadStoreData(itemName,itemType);
+                storeData = storeDataIO.LoadStoreData(itemID, itemType);
                 storeData.BuyCount += buyCount;
-
+                
                 if (storeData.ReturnCode == "S901")
                 {
+                    
                     //如果驗證成功 寫入玩家資料
-                    storeData = storeDataIO.UpdateStoreBuyCount(storeData.ItemName, storeData.ItemType, storeData.BuyCount);
+                    storeData = storeDataIO.UpdateStoreBuyCount(itemID, itemType, storeData.BuyCount);
+                    //Log.Debug("storeData.ReturnCode: " + storeData.ReturnCode + "storeData.BuyCount: " + storeData.BuyCount);
+                }
+                else
+                {
+                    storeData.ReturnCode = "(Logic)S904";
                 }
 
             }
@@ -144,7 +150,7 @@ namespace MPCOM
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData UpdateStoreLimit(string itemName, byte itemType, int buyCount)
+        public StoreData UpdateStoreLimit(Int16 itemID, byte itemType, int buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "(Logic)S900";
@@ -154,13 +160,13 @@ namespace MPCOM
 
             try
             {
-                storeData = storeDataIO.LoadStoreData(itemName, itemType);
+                storeData = storeDataIO.LoadStoreData(itemID, itemType);
                 storeData.PromotionsCount -= (Int16)buyCount;
 
                 if (storeData.ReturnCode == "S901")
                 {
                     //如果驗證成功 寫入玩家資料
-                    storeData = storeDataIO.UpdatedStoreLimit(storeData.ItemName, storeData.ItemType, storeData.PromotionsCount);
+                    storeData = storeDataIO.UpdatedStoreLimit(itemID, storeData.ItemType, storeData.PromotionsCount);
                 }
 
             }
