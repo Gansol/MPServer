@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.EnterpriseServices;
 using System.Collections.Generic;
 using MiniJSON;
-
+using MPProtocol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -157,9 +157,9 @@ namespace MPCOM
                     foreach (DataTable table in DS.Tables)
                     {
                         int arrayX = table.Rows.Count;
-                        int arrayY = table.Columns.Count; // -1因為減去索引鍵值
-                        string[,] sqlData = new string[arrayX, arrayY];
-                        Dictionary<int, object> dictData = new Dictionary<int, object>();
+                        int arrayY = table.Columns.Count - 1; // -1因為減去索引鍵值
+                        string itemID = "";
+                        Dictionary<string, object> dictData = new Dictionary<string, object>();
 
 
                         foreach (DataRow row in table.Rows)
@@ -168,15 +168,18 @@ namespace MPCOM
                             Dictionary<int, object> dictData2 = new Dictionary<int, object>();
                             foreach (DataColumn col in table.Columns)
                             {
-                                sqlData[i, j] = table.Rows[i][col].ToString();  // 0是索引值
-                                dictData2.Add(j, table.Rows[i][col].ToString());
-                                Log.Debug("Player Item: " + table.Rows[i][col].ToString());
+                                if (j != 0)// 0是索引值 帳號
+                                {
+                                    dictData2.Add(j - 1, table.Rows[i][col].ToString());
+                                }
+                                if (j == 1)
+                                    itemID = table.Rows[i][col].ToString();
                                 j++;
                             }
-                            dictData.Add(i, dictData2);
+                            dictData.Add(itemID, dictData2);
                             i++;
                         }
-                        playerData.playerProperty = Json.Serialize(dictData);
+                        playerData.PlayerItem = Json.Serialize(dictData);
                     }
                     playerData.ReturnCode = "S425"; //true
                     playerData.ReturnMessage = "取得玩家道具資料成功！";
@@ -506,6 +509,7 @@ namespace MPCOM
 
         #endregion
 
+
         #region UpdatePlayerItem 更新玩家(道具)資料
         [AutoComplete]
         public PlayerData UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
@@ -555,6 +559,149 @@ namespace MPCOM
 
                         playerData.ReturnCode = "S423";
                         playerData.ReturnMessage = "新增玩家道具資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S424";
+                        playerData.ReturnMessage = "更新玩家道具資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "更新玩家道具資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(多筆道具)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerItem(string account, Dictionary<Int16, Dictionary<string, object>> dictItemUsage)
+        {
+            PlayerData playerData = new PlayerData();
+            DataSet DS = new DataSet();
+            string updateString = @"UPDATE Player_PlayerItem SET ItemCount = (case";
+            string updateString2 = "";  // sql where data
+            char[] charsToTrim = { ',' };
+
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+
+            // 建立 SQL字串 ItemCount
+            foreach (KeyValuePair<Int16, Dictionary<string, object>> inner in dictItemUsage)
+            {
+                foreach (KeyValuePair<string, object> item in inner.Value)
+                {
+                    if (item.Key == ((short)PlayerItem.ItemID).ToString())
+                    {
+                        updateString += String.Format(" when ItemID='{0}' ", item.Value);
+                        updateString2 += item.Value + ",";
+                    }
+                    if (item.Key == ((short)PlayerItem.ItemCount).ToString())
+                        updateString += String.Format(" then '{0}' ", item.Value);
+                }
+            }
+
+            updateString2 = updateString2.TrimEnd(charsToTrim);
+            updateString += "end), UseCount = (case";
+
+            // 建立 SQL字串 UseCount
+            foreach (KeyValuePair<Int16, Dictionary<string, object>> inner in dictItemUsage)
+            {
+                foreach (KeyValuePair<string, object> item in inner.Value)
+                {
+                    if (item.Key == ((short)PlayerItem.ItemID).ToString())
+                        updateString += String.Format(" when ItemID='{0}' ", item.Value);
+
+                    if (item.Key == ((short)PlayerItem.UseCount).ToString())
+                        updateString += String.Format(" then '{0}' ", item.Value);
+                }
+            }
+
+            updateString += "end)  WHERE ItemID in (" + updateString2 + ")";
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerItem WHERE Account='{0}'", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    int dataCount = DS.Tables[0].Rows.Count;
+                    // 如果找到玩家資料
+                    if (dataCount > 0)
+                    {
+                        string query = updateString;
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S422";
+                        playerData.ReturnMessage = "更新玩家道具資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S424";
+                        playerData.ReturnMessage = "更新玩家道具資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "更新玩家道具資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(道具)裝備狀態
+        [AutoComplete]
+        public PlayerData UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+            //Log.Debug("account:" + account + "itemName:" + itemID + "itemType:" + itemType + "itemCount:" + itemCount);
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerItem WHERE Account='{0}' AND ItemID='{1}' ", account, itemID), sqlConn);
+                    adapter.Fill(DS);
+
+                    int dataCount = DS.Tables[0].Rows.Count;
+                    // 如果找到玩家資料
+                    if (dataCount == 1)
+                    {
+                        string query = @"UPDATE Player_PlayerItem SET isEquip=@isEquip WHERE Account=@account AND ItemID=@itemID";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@ItemID", itemID);
+                        command.Parameters.AddWithValue("@isEquip", isEquip);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S422";
+                        playerData.ReturnMessage = "更新玩家道具資料成功！";
                     }
                     else
                     {

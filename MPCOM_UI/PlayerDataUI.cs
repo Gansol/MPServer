@@ -245,5 +245,62 @@ namespace MPCOM
             return TextUtility.SerializeToStream(playerData);
         }
         #endregion
+
+        #region UpdatePlayerItem 更新玩家(多筆道具)資料
+        /// <summary>
+        /// 更新玩家(多筆道具)資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="jItemUsage"></param>
+        /// <returns></returns>
+        public byte[] UpdatePlayerItem(string account, string jItemUsage)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerItem(account, jItemUsage);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(道具)裝備狀態
+        /// <summary>
+        /// 更新玩家(道具)裝備狀態
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="itemID"></param>
+        /// <param name="isEquip"></param>
+        /// <returns></returns>
+        public byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerItem(account, itemID, isEquip);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
     }
 }

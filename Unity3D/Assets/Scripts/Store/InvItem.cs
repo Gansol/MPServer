@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerManager : MonoBehaviour {
+public class InvItem : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -12,9 +12,4 @@ public class PlayerManager : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    void OnMessage()
-    {
-        Debug.Log("Player Recive Message!");
-    }
 }

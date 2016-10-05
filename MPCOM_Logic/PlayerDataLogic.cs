@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.EnterpriseServices;
-
+using MiniJSON;
+using ExitGames.Logging;
+using MPProtocol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -32,7 +34,7 @@ namespace MPCOM
         PlayerData playerData = new PlayerData();
         Dictionary<string, object> clinetData;
         Dictionary<string, object> serverData;
-
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         private byte maxExp = 100;
         private byte maxRank = 100;
 
@@ -502,11 +504,130 @@ namespace MPCOM
                 PlayerDataIO playerDataIO = new PlayerDataIO();
 
                 playerData = playerDataIO.LoadPlayerItem(account, itemID);
-                
+
                 playerData.ItemCount += itemCount;
 
                 playerData = playerDataIO.UpdatePlayerItem(account, itemID, itemType, playerData.ItemCount);
 
+
+                return playerData;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(多筆道具)資料
+        public PlayerData UpdatePlayerItem(string account, string jItemUsage)
+        {
+            PlayerDataIO playerDataIO = new PlayerDataIO();
+            playerData = playerDataIO.LoadPlayerItem(account);
+
+            var dictClinetData = Json.Deserialize(jItemUsage) as Dictionary<string, object>;
+            var dictServerData = Json.Deserialize(playerData.PlayerItem) as Dictionary<string, object>;
+
+            Dictionary<Int16, Dictionary<string, object>> dictSendData = new Dictionary<Int16, Dictionary<string, object>>();
+            Log.Debug("FUCK");
+            //Log.Debug("dictServerItem.Count:" + dictServerItem.Count + "dictClient.Count:" + dictClient.Count);
+
+            foreach (KeyValuePair<string, object> dictNestedClinetData in dictClinetData) // 玩家道具使用量 迴圈
+            {
+                //var innClientItem = dictClinetItemUsage as Dictionary<string, object>;  // 道具資料字典
+
+                foreach (KeyValuePair<string, object> dictNestedServerData in dictServerData)   // 伺服器道具資料 迴圈
+                {
+                    Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
+
+
+                    object itemID,serverItemCount; // 道具ID
+                    object serverItemObejct, clientItemObejct; // 道具資料
+
+                    //dictServerItem = dictNestedServerData.Value as Dictionary<string, object>;
+
+                    dictServerData.TryGetValue(dictNestedClinetData.Key, out serverItemObejct);    // 找到與伺服器對應的道具資料 key=10001
+                    var dictServerItem = serverItemObejct as Dictionary<string, object>;
+
+
+                    Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
+
+                    
+
+
+                       
+                    
+                   
+                    dictServerItem.TryGetValue(((short)PlayerItem.ItemID).ToString(), out itemID); // 取出道具數量
+                    dictServerItem.TryGetValue(((short)PlayerItem.ItemCount).ToString(), out serverItemCount); // 取出道具數量
+
+
+                    dictClinetData.TryGetValue(itemID.ToString(), out clientItemObejct);
+                    // to do compare data
+
+                    var dictClient = clientItemObejct as Dictionary<string, object>;
+
+                    object serverCount, serverUseage, clientCount, clientUseage;
+
+                    dictServerItem.TryGetValue(((short)PlayerItem.ItemCount).ToString(),out serverCount);
+                    dictServerItem.TryGetValue(((short)PlayerItem.UseCount).ToString(), out serverUseage);
+                    dictClient.TryGetValue(((short)PlayerItem.ItemCount).ToString(), out clientCount);
+                    dictClient.TryGetValue(((short)PlayerItem.UseCount).ToString(), out clientUseage);
+
+                    Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientCount: " + clientCount + "clientUseage: " + clientUseage);
+                    Log.Debug(serverCount +"  "+ clientUseage);
+
+                    int sCount = Convert.ToInt32(serverCount);
+                    int sUseage = Convert.ToInt32(serverUseage);
+                    int cCount = Convert.ToInt32(clientCount);
+                    int cUseage = Convert.ToInt32(clientUseage);
+
+                    //|| (int)clientCount > Int16.MaxValue
+                    if (sCount < cUseage)
+                    {
+                        playerData.ReturnCode = "S427";
+                        playerData.ReturnMessage = "玩家道具資料異常！";
+                        return playerData;
+                    }
+                    else if (sCount == cCount)
+                    {
+                        int itemCount,useCount;
+                        itemCount = sCount - cUseage;
+                        useCount = cUseage + sUseage;
+                        dictClient[((short)PlayerItem.ItemCount).ToString()] = itemCount;
+                        dictClient[((short)PlayerItem.UseCount).ToString()] = useCount;
+                        dictSendData.Add(Int16.Parse(itemID.ToString()), dictClient);
+                        Log.Debug("ItemCount: " + itemCount + "  UseCount: " + useCount);
+                    }/*
+                        else if (serverCount == clientUseage)
+                        {
+                            // 未來如果要移除為0的道具 在啟用
+                          * // IO 需新增 刪除
+                          return playerData;
+                        }*/
+                    else
+                    {
+                        playerData.ReturnCode = "S427";
+                        playerData.ReturnMessage = "玩家道具資料異常！";
+                        return playerData;
+                    }
+
+                    break;
+                }
+            }
+            playerData = playerDataIO.UpdatePlayerItem(account, dictSendData);
+
+            return playerData;
+        }
+        #endregion
+
+        #region UpdatePlayerItem 更新玩家(道具)裝備狀態
+        public PlayerData UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        {
+            try
+            {
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.UpdatePlayerItem(account, itemID, isEquip);
 
                 return playerData;
             }

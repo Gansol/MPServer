@@ -228,6 +228,7 @@ public class PoolManager : MonoBehaviour
             _dictObject.Add(Int16.Parse(item.Key), item.Value.ToString());
         }
         _tmpDict.Clear();
+        Debug.Log(Global.OtherData.Team);
         _tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<string, object>;
 
         //把對手的老鼠存入HashSet中等待比較

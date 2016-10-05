@@ -45,6 +45,7 @@ public class Global
     public static bool isJoinMember = true;         // 是否加入會員
 
     public static bool isPlayerDataLoaded = false;  // 是否載入玩家資料
+    public static bool isPlayerItemLoaded = false;  // 是否載入玩家資料
     public static bool isCurrencyLoaded = false;    // 是否載入玩家資料
     public static bool isMiceLoaded = false;        // 是否載入老鼠資料
     public static bool isStoreLoaded = false;        // 是否載入老鼠資料
@@ -73,7 +74,7 @@ public class Global
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
     public static byte Age = 0;              // 年齡
-    public static MemberType MemberType;     // 年齡
+    public static MemberType MemberType;     // 
     public static int Rice = 0;             // 遊戲幣
     public static Int16 Gold = 0;           // 金幣
 
@@ -108,10 +109,10 @@ public class Global
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
-    public static int arrayX = 0, arrayY = 0;
-    public static string[,] miceProperty = new string[arrayX, arrayY];   // 老鼠屬性資料 
-    public static string[,] itemProperty = new string[arrayX, arrayY];   // 道具屬性資料 
-    public static string[,] storeItem = new string[arrayX, arrayY];   // 商店屬性資料 
+    public static string[,] miceProperty ;   // 老鼠屬性資料 
+    public static string[,] itemProperty;   // 道具屬性資料 
+    public static string[,] storeItem ;   // 商店屬性資料 
+    public static string[,] playerItem;   // 商店屬性資料 
 
     public enum UILayer
     {

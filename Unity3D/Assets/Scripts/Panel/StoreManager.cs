@@ -19,7 +19,7 @@ using MPProtocol;
  * 20160711 v1.0.1a  1次重構，獨立AssetLoader                       
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                     
  * ****************************************************************/
-public class StoreManager : MonoBehaviour
+public class StoreManager : PanelManager
 {
     public GameObject[] infoGroupsArea;
     public string[] assetFolder;
@@ -27,7 +27,7 @@ public class StoreManager : MonoBehaviour
     public Vector3 actorScale;
 
     private AssetLoader assetLoader;
-    private GameObject _clone, _btnClick, _tmpActor, _lastPanel, _lastItem, _lastStoreItemGroup;
+    private GameObject  _btnClick, _tmpActor, _lastPanel, _lastItem, _lastStoreItemGroup;
     private static GameObject _tmpTab;
     private bool _LoadedGashapon, _LoadedMice, _LoadedActor;
     private Dictionary<string, object> _miceData;
@@ -43,7 +43,7 @@ public class StoreManager : MonoBehaviour
     void Awake()
     {
         actorScale = new Vector3(1.5f, 1.5f, 1);
-        assetLoader = gameObject.AddComponent<AssetLoader>();
+        assetLoader =gameObject.AddComponent<AssetLoader>();
         _dictActor = new Dictionary<string, GameObject>();
         buyingGoodsData = new string[4];
         Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
@@ -135,9 +135,10 @@ public class StoreManager : MonoBehaviour
         LoadActor(obj,int.Parse(obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType]));   // 錯誤 暫時道具沒有動畫物件
         EventMaskSwitch.Switch(infoGroupsArea[4]);
     }
-
+    
     public void OnBuyClick(GameObject myPanel)
     {
+        
         myPanel.SetActive(false);
         infoGroupsArea[5].SetActive(true);
         BuyWindowsInit();
@@ -215,7 +216,7 @@ public class StoreManager : MonoBehaviour
                 {
                     _itemType = (int)StoreType.Mice;
                     selectData();
-                    GetItemInfoFromType(itemData, _itemType);
+                    itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
                     assetLoader.LoadAsset(folderString + "/", folderString);
@@ -230,7 +231,7 @@ public class StoreManager : MonoBehaviour
                 {
                     _itemType = (int)StoreType.Item;
                     selectData();
-                    GetItemInfoFromType(itemData, _itemType);
+                    itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
                     assetLoader.LoadAsset(folderString + "/", folderString);
@@ -245,7 +246,7 @@ public class StoreManager : MonoBehaviour
                 {
                     _itemType = (int)StoreType.Armor;
                     selectData();
-                    GetItemInfoFromType(itemData, _itemType);
+                   itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
                     assetLoader.LoadAsset(folderString + "/", folderString);
@@ -281,15 +282,6 @@ public class StoreManager : MonoBehaviour
     }
     #endregion
 
-    #region -- LoadIconObject 載入老鼠物件 -- //修改
-    void LoadIconObject(string[,] itemData, string folder)    // 載入遊戲物件
-    {
-        for (int i = 0; i < itemData.GetLength(0); i++)
-        {
-            assetLoader.LoadPrefab(folder + "/", itemData[i, 1] + "ICON");
-        }
-    }
-    #endregion
 
     #region -- LoadPrice 載入物件價格 --
     void LoadPrice(string[,] miceData, Transform parent, int itemType)
@@ -341,6 +333,21 @@ public class StoreManager : MonoBehaviour
 
                 //LoadMiceAsset(btn_mice);
             }
+        }
+    }
+    #endregion
+
+    #region -- LoadIconObject 載入載入ICON物件 --
+    /// <summary>
+    /// 載入ICON物件
+    /// </summary>
+    /// <param name="itemData">物件陣列</param>
+    /// <param name="folder">資料夾</param>
+    public void LoadIconObject(string[,] itemData, string folder)    // 載入遊戲物件
+    {
+        for (int i = 0; i < itemData.GetLength(0); i++)
+        {
+            assetLoader.LoadPrefab(folder + "/", itemData[i, 1] + "ICON");
         }
     }
     #endregion
@@ -399,7 +406,7 @@ public class StoreManager : MonoBehaviour
 
     #region -- InstantiateItem 實體化商店物件--
     /// <summary>
-    /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
+    /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
     /// </summary>
     /// <param name="dictionary">資料字典</param>
     /// <param name="myParent">實體化父系位置</param>
@@ -407,7 +414,7 @@ public class StoreManager : MonoBehaviour
     {
         if (itemPanel.transform.childCount == 0)
         {
-            _lastStoreItemGroup = CreateStoreItemGroup(itemPanel, itemType);
+            _lastStoreItemGroup = CreateEmptyGroup(itemPanel, itemType);
             InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.GetLength(0));
         }
         else
@@ -421,23 +428,14 @@ public class StoreManager : MonoBehaviour
             else if (_lastStoreItemGroup != itemPanel.FindChild(itemType.ToString()))
             {
                 _lastStoreItemGroup.SetActive(false);
-                _lastStoreItemGroup= CreateStoreItemGroup(itemPanel, itemType);
+                _lastStoreItemGroup= CreateEmptyGroup(itemPanel, itemType);
                 InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.GetLength(0));
             }
         }
     }
 
 
-    GameObject CreateStoreItemGroup(Transform itemPanel,int itemType)
-    {
-        GameObject _storeItemGroup = new GameObject(itemType.ToString());   // 商品物件空群組
-        _storeItemGroup.transform.parent = itemPanel;
-        _storeItemGroup.layer = itemPanel.gameObject.layer;
-        _storeItemGroup.transform.localPosition = Vector3.zero;
-        _storeItemGroup.transform.localScale = Vector3.one;
 
-        return _storeItemGroup;
-    }
 
     void InstantiateItem2(string[,] itemData, Transform parent, int itemCount)
     {
@@ -449,7 +447,7 @@ public class StoreManager : MonoBehaviour
         {
             if (assetLoader.GetAsset(folderPath, itemName))                  // 已載入資產時
             {
-                pos = sortItemPos(9, 3, pos, count + i);
+                pos = sortItemPos(9, 3,new Vector2(itemOffsetX,itemOffsetY), pos, count + i);
                 GameObject bundle = assetLoader.GetAsset(folderPath, itemName);
                 InstantiateObject insObj = new InstantiateObject();
 
@@ -517,69 +515,6 @@ public class StoreManager : MonoBehaviour
             }
         }
         _LoadedMice = true;
-    }
-    #endregion
-
-    #region -- sortItemPos 排序道具位置  --
-    /// <summary>
-    /// 排序道具位置
-    /// </summary>
-    /// <param name="xCount">第一頁最大數量</param>
-    /// <param name="yCount">每行道具數量</param>
-    /// <param name="pos">目前物件位置</param>
-    /// <param name="counter">計數</param>
-    /// <returns></returns>
-    private Vector2 sortItemPos(int xCount, int yCount, Vector2 pos, int counter)
-    {
-        // 物件位置排序
-        if (counter % xCount == 0 && counter != 0) // 3 % 9 =0
-        {
-            pos.x = itemOffsetX * 3;
-            pos.y = 0;
-        }
-        else if (counter % yCount == 0 && counter != 0)//3 3 =0
-        {
-            pos.y += itemOffsetY;
-            pos.x = 0;
-        }
-        return pos;
-    }
-    #endregion
-
-
-
-    #region GetItemInfoFromType
-    string[,] GetItemInfoFromType(string[,] itemData, int type)
-    {
-        List<List<string>> b = new List<List<string>>();
-        List<string> a;
-
-        for (int i = 0; i < itemData.GetLength(0); i++)
-        {
-            string itemType = itemData[i, 0].Remove(1, itemData[i, 0].Length - 1); // 商品ID第一個字元為類別
-            if (itemType == type.ToString())
-            {
-                a = new List<string>();
-                for (int j = 0; j < itemData.GetLength(1); j++)
-                {
-                    a.Add(itemData[i, j]);
-                }
-                b.Add(a);
-            }
-        }
-
-        this.itemData = new string[b.Count, b[0].Count];
-
-        for (int i = 0; i < b.Count; i++)
-        {
-            List<string> c = b[i];
-
-            for (int j = 0; j < c.Count; j++)
-            {
-                this.itemData[i, j] = c[j];
-            }
-        }
-        return this.itemData;
     }
     #endregion
 }

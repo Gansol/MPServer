@@ -358,7 +358,7 @@ namespace MPServer
 
                                         PlayerDataUI playerDataUI = new PlayerDataUI();
                                         PlayerData otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherActor.Account));
-
+                                        Log.Debug("otherPlayerData.Team: " + otherPlayerData.Team);
                                         Dictionary<byte, object> myParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, otherActor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, otherActor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, myTeam }, { (byte)MatchGameParameterCode.RoomPlace, "Guest" } };
                                         Dictionary<byte, object> otherParameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.PrimaryID, actor.PrimaryID }, { (byte)MatchGameParameterCode.Nickname, actor.Nickname }, { (byte)MatchGameParameterCode.RoomID, _server.room.myRoom }, { (byte)MatchGameParameterCode.Team, otherPlayerData.Team }, { (byte)MatchGameParameterCode.RoomPlace, "Host" } };
 
@@ -609,7 +609,7 @@ namespace MPServer
                         #endregion
 
                         #region LoadPlayerData 載入玩家資料
-                        case (byte)PlayerDataOperationCode.Load:
+                        case (byte)PlayerDataOperationCode.LoadPlayer:
                             {
                                 Log.Debug("IN LoadPlayerData");
 
@@ -647,7 +647,7 @@ namespace MPServer
                                         { (byte)PlayerDataParameterCode.Team, team } ,{ (byte)PlayerDataParameterCode.MiceAmount, miceAmount } ,{ (byte)PlayerDataParameterCode.Friend, friend } 
                                     };
 
-                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.LoadedPlayer, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
                                 else // 失敗 傳空值+錯誤訊息
@@ -661,7 +661,7 @@ namespace MPServer
                         #endregion
 
                         #region UpdatePlayerData 更新玩家資料
-                        case (byte)PlayerDataOperationCode.Update:
+                        case (byte)PlayerDataOperationCode.UpdatePlayer:
                             {
                                 Log.Debug("IN UpdatePlayerData");
 
@@ -695,7 +695,7 @@ namespace MPServer
                                         { (byte)PlayerDataParameterCode.Friend, friend } 
                                     };
 
-                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.Updated, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedPlayer, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
                                 else// 失敗 傳空值+錯誤訊息
@@ -734,6 +734,53 @@ namespace MPServer
 
 
                                     OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+                                else// 失敗 傳空值+錯誤訊息
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+
+                            }
+                            break;
+                        #endregion
+
+                        #region UpdatePlayerData 更新玩家資料
+                        case (byte)PlayerDataOperationCode.UpdateItem:
+                            {
+                                Log.Debug("IN UpdatePlayerData");
+
+                                string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+
+                                PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                PlayerData playerData = new PlayerData();
+
+                                if (operationRequest.Parameters.Count == 3)
+                                { // 3個參數=更新裝備狀態
+                                    bool isEquip = (bool)operationRequest.Parameters[(byte)PlayerDataParameterCode.Equip];
+                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.Item];
+                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, itemID, isEquip)); // 更新裝備狀態
+                                }
+                                else// 更新數量
+                                {
+                                    string jItemUsage = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.UseCount];
+                                    Log.Debug("jItemUsage:  " + jItemUsage);
+                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, jItemUsage)); // 更新道具數量
+                                }
+
+                                if (playerData.ReturnCode == "S422")//取得玩家資料成功 回傳玩家資料
+                                {
+                                    Log.Debug("playerData.ReturnCode == S422");
+
+                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerItem(account)); // 更新道具數量
+                                    Log.Debug("playerData.PlayerItem:" + playerData.PlayerItem);
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                            { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem, playerData.PlayerItem }, 
+                                         };
+
+                                    OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
                                 else// 失敗 傳空值+錯誤訊息
@@ -925,7 +972,7 @@ namespace MPServer
                                     Log.Debug("LoadMice IO OK");
                                     MiceData miceData = (MiceData)TextUtility.DeserializeFromStream(miceDataUI.LoadMiceData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                     Log.Debug("LoadMice Data OK");
-                                    Log.Debug("Server Data: " + miceData.miceProperty);
+                                    //Log.Debug("Server Data: " + miceData.miceProperty);
                                     if (miceData.ReturnCode == "S801")//取得老鼠資料成功 回傳玩家資料
                                     {
                                         Log.Debug("miceData.ReturnCode == S801");
@@ -1016,6 +1063,44 @@ namespace MPServer
                                     {
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
                                         OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = itemData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+
+                            }
+                            break;
+                        #endregion
+
+                        #region LoadItem 載入道具資料
+                        case (byte)PlayerDataOperationCode.LoadItem:
+                            {
+                                try
+                                {
+                                    Log.Debug("IN LoadPlayerItem");
+                                    string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                    PlayerDataUI palyerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
+                                    Log.Debug("LoadPlayerItem IO OK");
+                                    PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(palyerDataUI.LoadPlayerItem(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("LoadPlayerItem Data OK");
+                                    Log.Debug("Server Data: " + playerData.PlayerItem);
+                                    if (playerData.ReturnCode == "S425")//取得老鼠資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug("LoadPlayerItem.ReturnCode == S425");
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem,playerData.PlayerItem } 
+                                            };
+
+                                        OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.LoadedItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage.ToString() };
                                         SendOperationResponse(actorResponse, new SendParameters());
                                     }
                                 }
@@ -1326,7 +1411,7 @@ namespace MPServer
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];
                                     string miceAmount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAmount];
-                                    Int16 itemID= (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
+                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
                                     byte itemType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.ItemType];
                                     byte currencyType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.CurrencyType];
                                     Int16 buyCount = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.BuyCount];
@@ -1356,7 +1441,7 @@ namespace MPServer
 
                                                 #region UpdatePlayerData
                                                 PlayerDataUI playerUI = new PlayerDataUI();
-                                                PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerItem(account,itemID,itemType,buyCount));
+                                                PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerItem(account, itemID, itemType, buyCount));
 
                                                 if (playerData.ReturnCode == "S422" || playerData.ReturnCode == "S423") //更新玩家道具資料成功 回傳玩家資料
                                                 {
@@ -1384,7 +1469,7 @@ namespace MPServer
                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
                                                 SendOperationResponse(actorResponse, new SendParameters());
-                                            } 
+                                            }
                                             #endregion
                                         }
                                     }

@@ -21,11 +21,11 @@ using System.Collections;
 public class PanelManager : MonoBehaviour
 {
     #region 欄位
-    AssetLoader assetLoader;                                // 資源載入組件
+    AssetLoader _assetLoader;                                // 資源載入組件
     public string folder;                                   // 資料夾路徑
     public GameObject[] Panel;                              // 存放Panel位置
 
-    private GameObject _clone;                  // 存放克隆物件、已開起的Pnael
+    public GameObject _clone;                  // 存放克隆物件、已開起的Pnael
     private static Dictionary<string, PanelState> dictPanelRefs;   // Panel參考
 
     private string _panelName;                              // panel名稱
@@ -41,25 +41,25 @@ public class PanelManager : MonoBehaviour
 
     void Awake()
     {
-        assetLoader = gameObject.AddComponent<AssetLoader>();
+        _assetLoader = gameObject.AddComponent<AssetLoader>();
         dictPanelRefs = new Dictionary<string, PanelState>();
         StartCoroutine(Test());
     }
 
     IEnumerator Test()
     {
-        assetLoader.LoadAsset("Panel/", "ComicFont");
+        _assetLoader.LoadAsset("Panel/", "ComicFont");
         yield return new WaitForSeconds(1f);
-        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+        _assetLoader.LoadAsset("Panel/", "LiHeiProFont");
     }
 
     void Update()
     {
         if (!_loadedPanel)                                          // 除錯訊息
-            if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-                Debug.Log("訊息：" + assetLoader.ReturnMessage);
+            if (!string.IsNullOrEmpty(_assetLoader.ReturnMessage))
+                Debug.Log("訊息：" + _assetLoader.ReturnMessage);
 
-        if (assetLoader.loadedObj && !_loadedPanel)                 // 載入Panel完成時
+        if (_assetLoader.loadedObj && !_loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
             InstantiatePanel();
@@ -89,9 +89,9 @@ public class PanelManager : MonoBehaviour
         if (!dictPanelRefs.ContainsKey(_panelName))
         {
             _loadedPanel = false;
-            assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "Panel");
-            assetLoader.LoadPrefab("Panel/", _panelName);
+            _assetLoader.init();
+            _assetLoader.LoadAsset("Panel/", "Panel");
+            _assetLoader.LoadPrefab("Panel/", _panelName);
 
         }
         else
@@ -149,6 +149,115 @@ public class PanelManager : MonoBehaviour
     }
     #endregion
 
+    #region -- CreateEmptyGroup 建立空物件群組 --
+    /// <summary>
+    /// 建立空物件群組
+    /// </summary>
+    /// <param name="parent">上層物件</param>
+    /// <param name="itemType">群組類型(名稱)</param>
+    /// <returns></returns>
+    public GameObject CreateEmptyGroup(Transform parent, int itemType)
+    {
+        GameObject emptyGroup = new GameObject(itemType.ToString());   // 商品物件空群組
+        emptyGroup.transform.parent = parent;
+        emptyGroup.layer = parent.gameObject.layer;
+        emptyGroup.transform.localPosition = Vector3.zero;
+        emptyGroup.transform.localScale = Vector3.one;
+        return emptyGroup;
+    }
+    #endregion
+
+    #region -- SortItemPos 排序道具位置  --
+    /// <summary>
+    /// 排序道具位置
+    /// </summary>
+    /// <param name="xCount">第一頁最大數量</param>
+    /// <param name="yCount">每行道具數量</param>
+    /// <param name="offset">目前物件位置</param>
+    /// <param name="pos">初始位置</param>
+    /// <param name="counter">計數</param>
+    /// <returns>物件位置</returns>
+    public Vector2 sortItemPos(int xCount, int yCount, Vector2 offset, Vector2 pos, int counter)
+    {
+        // 物件位置排序
+        if (counter % xCount == 0 && counter != 0) // 3 % 9 =0
+        {
+            pos.x = offset.x * 3;
+            pos.y = 0;
+        }
+        else if (counter % yCount == 0 && counter != 0)//3 3 =0
+        {
+            pos.y += offset.y;
+            pos.x = 0;
+        }
+        return pos;
+    }
+    #endregion
+
+    #region -- GetItemInfoFromType --
+    public string[,] GetItemInfoFromType(string[,] itemData, int type)
+    {
+        List<List<string>> b = new List<List<string>>();
+        List<string> a;
+
+        for (int i = 0; i < itemData.GetLength(0); i++)
+        {
+            string itemType = itemData[i, 0].Remove(1, itemData[i, 0].Length - 1); // 商品ID第一個字元為類別
+            if (itemType == type.ToString())
+            {
+                a = new List<string>();
+                for (int j = 0; j < itemData.GetLength(1); j++)
+                {
+                    a.Add(itemData[i, j]);
+                }
+                b.Add(a);
+            }
+        }
+
+        itemData = new string[b.Count, b[0].Count];
+
+        for (int i = 0; i < b.Count; i++)
+        {
+            List<string> c = b[i];
+
+            for (int j = 0; j < c.Count; j++)
+            {
+                itemData[i, j] = c[j];
+            }
+        }
+        return itemData;
+    }
+    #endregion
+
+    #region -- GetItemNameFromID --
+    public string GetItemNameFromID(string itemID, string[,] nameData)
+    {
+        for (int j = 0; j < nameData.GetLength(0); j++)
+        {
+            if (itemID == nameData[j, 0])
+            {
+                itemID = nameData[j, 1];
+                break;
+            }
+        }
+        return itemID;
+    } 
+    #endregion
+
+    #region -- GetItemNameFromID --
+    public string GetItemIDFromName(string itemName, string[,] itemData)
+    {
+        for (int j = 0; j < itemData.GetLength(0); j++)
+        {
+            if (itemName == itemData[j, 1])
+            {
+                itemName = itemData[j, 0];
+                break;
+            }
+        }
+        return itemName;
+    }
+    #endregion
     #region -- InstantiatePanel --
     void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     {

@@ -1,40 +1,41 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using MiniJSON;
-using System;
+using System.Collections;
+
 public class dem : MonoBehaviour
 {
+    public GameObject coll;
+    public GameObject coll2;
+    public UIAtlas atlas;
 
-    // Use this for initialization
     void Start()
     {
-        List<string> a = new List<string>();
-        List<List<string>> b = new List<List<string>>();
-        a.Add("a1");
-        a.Add("a2");
-        b.Add(a);
-        a.Add("b1");
-        a.Add("b2");
-        b.Add(a);
+        Vector3 a, b;
 
-        int x = 0, y = 0;
-        string[,] data;
+        Debug.Log("coll pos:" + coll.transform.position);
+        Debug.Log("coll2 pos:" + coll2.transform.position);
+
+        Debug.Log("coll lpos:" + coll.transform.localPosition);
+        Debug.Log("coll2 lpos:" + coll2.transform.localPosition);
+        Debug.Log("coll2 l lpos:" + coll.transform.InverseTransformPoint(coll2.transform.position));
 
 
-        for (int i = 0; i < b.Count-1; i++)
-        {
-            List<string> c = b[i];
-            data = new string[b.Count,c.Count];
-            for (int j = 0; j < c.Count; j++)
-            {
-                data[i, j] = c[j];
-            }
-        }
+        coll.transform.localPosition += coll.transform.InverseTransformPoint(coll2.transform.position);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnClick()
     {
+        coll.transform.localPosition += coll.transform.InverseTransformPoint(coll2.transform.position);
+        UISprite sprite = gameObject.GetComponent<UISprite>();
+        sprite.spriteName = "NGUI";
+        sprite.MakePixelPerfect();
+        UIButton btn = gameObject.GetComponent<UIButton>();
+        btn.normalSprite = sprite.spriteName;
 
+        GameObject go = new GameObject();
+
+        go.transform.parent = transform;
+        go.AddComponent<UISprite>();
+        go.GetComponent<UISprite>().atlas = atlas;
+        go.GetComponent<UISprite>().spriteName = "NGUI";
     }
 }

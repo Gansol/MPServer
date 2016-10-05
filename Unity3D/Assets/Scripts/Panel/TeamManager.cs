@@ -249,7 +249,7 @@ public class TeamManager : MonoBehaviour
     void Add2Refs(GameObject bundle, Transform myParent)
     {
         string btnArea = myParent.parent.name;                          //按鈕存放區域名稱 Team / Mice 區域
-        string miceName = bundle.name.Remove(bundle.name.Length - 4) +"Mice";
+        string miceName = bundle.name.Remove(bundle.name.Length - 4) + "Mice";
 
         if (btnArea == "Mice")
             dictLoadedMice.Add(miceName, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置

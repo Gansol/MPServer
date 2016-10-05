@@ -248,7 +248,6 @@ public class TeamSwitcher : MonoBehaviour
             {
                 Debug.LogError("A>B Bug!");
             }
-
         }
         else if (tag == "TeamIcon" && _other.tag == "TeamIcon") // B1 > B2
         {
