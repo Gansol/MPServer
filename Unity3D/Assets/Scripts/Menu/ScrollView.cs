@@ -34,76 +34,79 @@ public class ScrollView : MonoBehaviour
     {
         try
         {
-#if UNITY_EDITOR
-#elif UNITY_ANDROID || UNITY_IOS
-        Touch touch = Input.GetTouch(0);
-        currentCameraX = Camera.main.transform.localPosition.x;
+#if UNITY_ANDROID || UNITY_IOS
+            Touch touch;
+            currentCameraX = Camera.main.transform.localPosition.x;
 
-        switch (touch.phase)    // 依照Touch狀態判斷選單動作
-        {
-            case TouchPhase.Began:
+            if (Input.touchCount > 0)
+            {
+                touch = Input.GetTouch(0);
+                switch (touch.phase)    // 依照Touch狀態判斷選單動作
                 {
-                    StopAllCoroutines();
-                    break;
-                }
-            case TouchPhase.Moved:
-                {
-                    //label.GetComponent<UILabel>().text = "(M)W/5:" + Screen.width / 5 + " CamX:" + Mathf.Abs(currentCameraX);
-                    //如果在 限制範圍內(-+邊界偏移量) 移動選單(3DCamera)
-                    if ((Camera.main.transform.localPosition.x - touch.deltaPosition.x) > (endPos - panOffset) && (Camera.main.transform.localPosition.x - touch.deltaPosition.x) < (startPos + panOffset))
-                    {
-                        float touchDeltaPositionX = touch.deltaPosition.x;
-                        Camera.main.transform.Translate(-touchDeltaPositionX * scrollSpeed * Time.deltaTime, 0, 0);
-                    }
-                    break;
-                }
-            case TouchPhase.Ended:
-                {
-                    // 如果移動完畢了 比上次X小 (往商店移動)
-                    if (currentCameraX < lastCameraX)
-                    {
-                        //如果移動範圍 沒有超出界線 回到 開始選單  -215 >= -216 這有問題(往商店左邊移動時也會使用這個判斷)
-                        if (currentCameraX >= -Screen.width / denominator)
+                    case TouchPhase.Began:
                         {
-                            startFlag = true;
-
-                            //label.GetComponent<UILabel>().text = "(S1)CamX:" + Mathf.Abs(currentCameraX);
-                        }//如果移動範圍 超出界線 移動至 商店 -217 < -216
-                        else if (currentCameraX < -Screen.width / denominator)
-                        {
-                            //label.GetComponent<UILabel>().text = "(S2)CamX:" + Mathf.Abs(currentCameraX);
-                            endFlag = true;
+                            StopAllCoroutines();
+                            break;
                         }
-                    } // 如果 比上次X大 (往選單移動)
-                    else if (currentCameraX > lastCameraX)
-                    {// -1080 >= -864 這有問題(往選單右邊移動時也會使用這個判斷)
-                        if (currentCameraX >= -(Screen.width - (Screen.width / denominator)))
+                    case TouchPhase.Moved:
                         {
-                            //label.GetComponent<UILabel>().text = "(E1)CamX:" + Mathf.Abs(currentCameraX);
-                            startFlag = true;
-                        }//-1070 < -864
-                        else if (currentCameraX < -(Screen.width - (Screen.width / denominator)))
-                        {
-                            //label.GetComponent<UILabel>().text = "(E2)CamX:" + Mathf.Abs(currentCameraX);
-                            endFlag = true;
+                            //label.GetComponent<UILabel>().text = "(M)W/5:" + Screen.width / 5 + " CamX:" + Mathf.Abs(currentCameraX);
+                            //如果在 限制範圍內(-+邊界偏移量) 移動選單(3DCamera)
+                            if ((Camera.main.transform.localPosition.x - touch.deltaPosition.x) > (endPos - panOffset) && (Camera.main.transform.localPosition.x - touch.deltaPosition.x) < (startPos + panOffset))
+                            {
+                                float touchDeltaPositionX = touch.deltaPosition.x;
+                                Camera.main.transform.Translate(-touchDeltaPositionX * scrollSpeed * Time.deltaTime, 0, 0);
+                            }
+                            break;
                         }
-                    }
-                    lastCameraX = currentCameraX;
-                    break;
+                    case TouchPhase.Ended:
+                        {
+                            // 如果移動完畢了 比上次X小 (往商店移動)
+                            if (currentCameraX < lastCameraX)
+                            {
+                                //如果移動範圍 沒有超出界線 回到 開始選單  -215 >= -216 這有問題(往商店左邊移動時也會使用這個判斷)
+                                if (currentCameraX >= -Screen.width / denominator)
+                                {
+                                    startFlag = true;
+
+                                    //label.GetComponent<UILabel>().text = "(S1)CamX:" + Mathf.Abs(currentCameraX);
+                                }//如果移動範圍 超出界線 移動至 商店 -217 < -216
+                                else if (currentCameraX < -Screen.width / denominator)
+                                {
+                                    //label.GetComponent<UILabel>().text = "(S2)CamX:" + Mathf.Abs(currentCameraX);
+                                    endFlag = true;
+                                }
+                            } // 如果 比上次X大 (往選單移動)
+                            else if (currentCameraX > lastCameraX)
+                            {// -1080 >= -864 這有問題(往選單右邊移動時也會使用這個判斷)
+                                if (currentCameraX >= -(Screen.width - (Screen.width / denominator)))
+                                {
+                                    //label.GetComponent<UILabel>().text = "(E1)CamX:" + Mathf.Abs(currentCameraX);
+                                    startFlag = true;
+                                }//-1070 < -864
+                                else if (currentCameraX < -(Screen.width - (Screen.width / denominator)))
+                                {
+                                    //label.GetComponent<UILabel>().text = "(E2)CamX:" + Mathf.Abs(currentCameraX);
+                                    endFlag = true;
+                                }
+                            }
+                            lastCameraX = currentCameraX;
+                            break;
+                        }
                 }
-        }
 
-        if (startFlag)
-        {
-            startFlag = false;
-            StartCoroutine(GoStart());
-        }
+                if (startFlag)
+                {
+                    startFlag = false;
+                    StartCoroutine(GoStart());
+                }
 
-        if (endFlag)
-        {
-            endFlag = false;
-            StartCoroutine(GoEnd());
-        }
+                if (endFlag)
+                {
+                    endFlag = false;
+                    StartCoroutine(GoEnd());
+                }
+            }
 #endif
         }
         catch
@@ -169,5 +172,5 @@ public class ScrollView : MonoBehaviour
         }
 
     }
-//#endif
+    //#endif
 }

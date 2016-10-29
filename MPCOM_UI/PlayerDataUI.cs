@@ -24,11 +24,14 @@ namespace MPCOM
         byte[] LoadPlayerData(string account);
         byte[] LoadPlayerItem(string account);
         byte[] LoadPlayerItem(string account, Int16 itemID);
-        byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend);
-        byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item, string miceAmount);
-        byte[] UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName, int amount);
-        byte[] UpdatePlayerData(string account, string miceAll, string team, string miceAmount);
-        byte[] UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount);
+        byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team , string friend);
+        byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item);
+        byte[] UpdatePlayerData(string account, string miceAll , string miceName, int amount);
+        byte[] UpdatePlayerData(string account, string miceAll, string team );
+        byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount);
+        byte[] UpdatePlayerItem(string account, string jItemUsage);
+        byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
+        byte[] SortPlayerItem(string account, string jString);
     }
 
     public class PlayerDataUI : ServicedComponent, IPlayerDataUI    // 使用介面 可以提供給不同程式語言繼承使用  
@@ -114,7 +117,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家全部資料
         /// </summary>
-        public byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend)
+        public byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -123,7 +126,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, miceAmount, friend);
+                playerData = playerDataLogic.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, friend);
             }
             catch (Exception e)
             {
@@ -139,7 +142,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家(GameOver時)資料
         /// </summary>
-        public byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item, string miceAmount)
+        public byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -148,7 +151,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdateGameOver(account, score, exp, maxCombo, maxScore, lostMice, killMice, battleResult, item, miceAmount);
+                playerData = playerDataLogic.UpdateGameOver(account, score, exp, maxCombo, maxScore, lostMice, killMice, battleResult, item);
             }
             catch (Exception e)
             {
@@ -166,11 +169,10 @@ namespace MPCOM
         /// </summary>
         /// <param name="account"></param>
         /// <param name="miceAll"></param>
-        /// <param name="miceAmount"></param>
         /// <param name="miceName">老鼠名稱</param>
         /// <param name="amount">數量</param>
         /// <returns></returns>
-        public byte[] UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName, int amount)
+        public byte[] UpdatePlayerData(string account, string miceAll , string miceName, int amount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -179,7 +181,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerData(account, miceAll, miceAmount, miceName, amount);
+                playerData = playerDataLogic.UpdatePlayerData(account, miceAll, miceName, amount);
             }
             catch (Exception e)
             {
@@ -195,7 +197,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家(TeamUpdate時)資料
         /// </summary>
-        public byte[] UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
+        public byte[] UpdatePlayerData(string account, string miceAll, string team )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -204,7 +206,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerData(account, miceAll, team, miceAmount);
+                playerData = playerDataLogic.UpdatePlayerData(account, miceAll, team);
             }
             catch (Exception e)
             {
@@ -225,7 +227,7 @@ namespace MPCOM
         /// <param name="itemType"></param>
         /// <param name="itemCount"></param>
         /// <returns></returns>
-        public byte[] UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
+        public byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -234,7 +236,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerItem(account, itemID, itemType, itemCount);
+                playerData = playerDataLogic.UpdatePlayerItem(account, itemID, itemName, itemType, itemCount);
             }
             catch (Exception e)
             {
@@ -302,5 +304,34 @@ namespace MPCOM
             return TextUtility.SerializeToStream(playerData);
         }
         #endregion
+
+        #region SortPlayerItem 更新玩家(道具)裝備狀態
+        /// <summary>
+        /// 更新玩家(道具)裝備狀態
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="itemID"></param>
+        /// <param name="isEquip"></param>
+        /// <returns></returns>
+        public byte[] SortPlayerItem(string account, string jString)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.SortPlayerItem(account, jString);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+                #endregion
     }
 }

@@ -20,10 +20,10 @@ public class asd : MonoBehaviour {
 
         abm = new AssetBundleManager();
        abm.init();
-       StartCoroutine(abm.LoadAtlas("EggMice/EggMice", typeof(Material)));
-       StartCoroutine(abm.LoadAtlas("EggMice/EggMice", typeof(Texture)));
-       StartCoroutine(abm.LoadAtlas("EggMice/EggMice", typeof(GameObject)));
-       StartCoroutine(abm.LoadGameObject("EggMice/EggMice", typeof(GameObject)));
+       StartCoroutine(abm.LoadAtlas("EggMice/", "EggMice", typeof(Material)));
+       StartCoroutine(abm.LoadAtlas("EggMice/", "EggMice", typeof(Texture)));
+       StartCoroutine(abm.LoadAtlas("EggMice/", "EggMice", typeof(GameObject)));
+       StartCoroutine(abm.LoadGameObject("EggMice/","EggMice", typeof(GameObject)));
 	}
 	
 	// Update is called once per frame

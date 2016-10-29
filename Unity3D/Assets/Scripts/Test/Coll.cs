@@ -10,6 +10,22 @@ public class Coll : MonoBehaviour
     public float _lastClickTime = 0;
     private GameObject lastClickObject;
 
+
+    void Start()
+    {
+        object x;
+        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));
+        //AssetBundleManager.dictAssetBundleRefs.Remove("EggMiceICON");
+        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));
+        //System.GC.Collect();
+        //Resources.UnloadUnusedAssets();
+        AssetLoader loader = gameObject.AddComponent<AssetLoader>();
+
+        Instantiate(loader.GetAsset("EggMiceICON"));
+    }
+
+
+
     #region OnMiceClick
     public void OnMiceClick(GameObject btn_mice)
     {

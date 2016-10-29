@@ -79,7 +79,7 @@ public class SpawnController : MonoBehaviour
 
         if (Global.isGameStart)
         {
-            Debug.Log("Game Start!");
+            // Debug.Log("Game Start!");
             #region   -- 隨機產生老鼠 --
             if (spawnMode != SpawnMode.EasyMode && Global.spawnFlag)
             {

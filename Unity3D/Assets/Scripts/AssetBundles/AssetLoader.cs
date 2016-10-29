@@ -52,23 +52,30 @@ public class AssetLoader : MonoBehaviour
     {
         assetBundleManager.init();
 
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath + assetName, typeof(Texture)));
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath + assetName, typeof(Material)));
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath + assetName, typeof(GameObject)));
+        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(Texture)));
+        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(Material)));
+        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(GameObject)));
     }
 
     public void LoadPrefab(string folderPath, string assetName)    // 載入遊戲物件
     {
         loadedObj = false;
-        _objCount++;
-        StartCoroutine(assetBundleManager.LoadGameObject(folderPath + assetName, typeof(GameObject)));
+        if (!assetBundleManager.bLoadedAssetbundle(assetName))
+        {
+            _objCount++;
+            StartCoroutine(assetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
+        }
     }
 
-
-    public GameObject GetAsset(string folderPath, string assetName)
+    /// <summary>
+    /// 取得載入資產
+    /// </summary>
+    /// <param name="assetName"></param>
+    /// <returns>GameObject</returns>
+    public GameObject GetAsset(string assetName)
     {
-        if (assetBundleManager.bLoadedAssetbundle(folderPath+assetName))
-            return AssetBundleManager.getAssetBundle(folderPath + assetName).mainAsset as GameObject;
+        if (assetBundleManager.bLoadedAssetbundle(assetName))
+            return AssetBundleManager.getAssetBundle(assetName).mainAsset as GameObject;
         return null;
     }
 
@@ -76,6 +83,7 @@ public class AssetLoader : MonoBehaviour
     {
         _matCount = _objCount = 0;
         loadedObj = false;
+        assetBundleManager.init();
     }
 
 

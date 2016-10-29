@@ -108,7 +108,7 @@ public class BattleManager : MonoBehaviour
                 _isHighScore = true;
             }
 
-            if (_gameTime > 180 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_gameTime > 5 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
                 Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_gameTime, _maxCombo, _killMice, _lostMice);
@@ -343,6 +343,7 @@ public class BattleManager : MonoBehaviour
     void OnGameStart()
     {
         Global.isGameStart = true;
+        Debug.Log("Game Start!");
     }
 
     void OnExitRoom()                       // 離開房間時

@@ -8,7 +8,6 @@ public class SkillMice : MonoBehaviour
 
     bool flag;
     Dictionary<int, string> team;
-    int miceID;
 
     void Start()
     {

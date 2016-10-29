@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 public class PhotonTestOnly : MonoBehaviour {
 
+    bool flag = true;
 
     enum a :int
     {
@@ -63,7 +64,7 @@ public class PhotonTestOnly : MonoBehaviour {
         }
         */
         object x, y;
-        int a, b;
+        int a;
         x = 10001; y = 2;
 
         a = (int)x - (int)y;
@@ -76,7 +77,12 @@ public class PhotonTestOnly : MonoBehaviour {
         Debug.Log(js);
         if (GUI.Button(new Rect(100, 400, 250, 100), "Test"))
         {
-            Global.photonService.UpdatePlayerItem(js);
+            Global.photonService.UpdatePlayerItem(System.Convert.ToInt16("20001"), flag);
+            flag = !flag;
+        }
+        if (GUI.Button(new Rect(100, 300, 100, 100), "Test2"))
+        {
+            Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, Global.Team);
         }
     }
 }

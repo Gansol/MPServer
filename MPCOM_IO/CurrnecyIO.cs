@@ -128,7 +128,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Rice FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
@@ -186,7 +186,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Gold FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料

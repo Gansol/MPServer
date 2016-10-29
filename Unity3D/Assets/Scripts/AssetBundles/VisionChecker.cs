@@ -19,8 +19,6 @@ using System.IO;
 public class VisionChecker
 {
     //    AssetBundlesHash bundleHash; //hash文件用
-    AssetBundleChecker bundleChecker = null;
-    private string _listText; //暫存 讀取的List文字
     private byte[] _bVisionFile; //暫存 伺服器版本列表
     private int reConnTimes = 0;
     private bool _visionChk ;
@@ -41,7 +39,7 @@ public class VisionChecker
         string localListPath = Application.persistentDataPath + "/List/";
         string localVisionListFile = localListPath + Global.sVisionList;
         if(!Directory.Exists(localListPath)) Directory.CreateDirectory(localListPath);
-        Debug.LogError("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
+        Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
         // Debug.LogError("Eclipse Debug : " + localVisionListFile);
         using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.sVisionList))
         {

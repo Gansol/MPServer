@@ -122,7 +122,7 @@ namespace MPCOM
         #region UpdatePlayerData 更新玩家(全部)資料 這裡怪怪的(Admin才能使用)
 
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string miceAmount, string friend)
+        public PlayerData UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team , string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -190,7 +190,7 @@ namespace MPCOM
                         playerData.ReturnMessage = "隊伍老鼠異常！";
                     }
 
-
+                    /*
                     clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
 
@@ -211,7 +211,7 @@ namespace MPCOM
                         playerData.ReturnCode = "S414";
                         playerData.ReturnMessage = "老鼠數量異常！";
                     }
-
+                    */
 
                     clinetData = MiniJSON.Json.Deserialize(friend) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.Friend) as Dictionary<string, object>;
@@ -225,7 +225,7 @@ namespace MPCOM
 
 
                     clinetData = MiniJSON.Json.Deserialize(item) as Dictionary<string, object>;
-                    serverData = MiniJSON.Json.Deserialize(playerData.Item) as Dictionary<string, object>;
+                    serverData = MiniJSON.Json.Deserialize(playerData.SortedItem) as Dictionary<string, object>;
 
                     //如果與伺服器資料 數量不相同
                     if (serverData.Count == clinetData.Count)
@@ -247,7 +247,7 @@ namespace MPCOM
 
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, miceAmount, friend);
+                    playerData = playerDataIO.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, friend);
                 }
 
             }
@@ -265,7 +265,7 @@ namespace MPCOM
         #region UpdatePlayerData 更新玩家(Team)資料
 
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, string miceAll, string team, string miceAmount)
+        public PlayerData UpdatePlayerData(string account, string miceAll, string team )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -298,7 +298,7 @@ namespace MPCOM
                         playerData.ReturnMessage = "隊伍老鼠異常！";
                     }
 
-
+                    /*
                     clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
 
@@ -319,7 +319,7 @@ namespace MPCOM
                         playerData.ReturnCode = "S414";
                         playerData.ReturnMessage = "老鼠數量異常！";
                     }
-
+                    */
                     /*
                     clinetData = MiniJSON.Json.Deserialize(item) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.Item) as Dictionary<string, object>;
@@ -344,7 +344,7 @@ namespace MPCOM
                     */
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdatePlayerData(account, miceAll, team, miceAmount);
+                    playerData = playerDataIO.UpdatePlayerData(account, miceAll, team);
                 }
 
             }
@@ -361,7 +361,7 @@ namespace MPCOM
         #region UpdatePlayerData 更新玩家(老鼠)資料
 
         [AutoComplete]
-        public PlayerData UpdatePlayerData(string account, string miceAll, string miceAmount, string miceName, int amount)
+        public PlayerData UpdatePlayerData(string account, string miceAll , string miceName, int amount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -388,7 +388,7 @@ namespace MPCOM
                         serverData.Add((serverData.Count + 1).ToString(), miceName);
                         miceAll = MiniJSON.Json.Serialize(serverData);
                     }
-
+                    /*
                     clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
                     serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
 
@@ -420,10 +420,10 @@ namespace MPCOM
                         serverData[miceName] = miceCount + amount;
                     }
                     miceAmount = MiniJSON.Json.Serialize(serverData);
-
+*/
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdatePlayerData(account, miceAll, miceAmount);
+                    playerData = playerDataIO.UpdatePlayerData(account, miceAll);
                 }
 
             }
@@ -440,7 +440,7 @@ namespace MPCOM
         #region UpdateGameOver 更新玩家(GameOver時)資料
 
         [AutoComplete]
-        public PlayerData UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item, string miceAmount)
+        public PlayerData UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -481,7 +481,7 @@ namespace MPCOM
 
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
-                    playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill, playerData.SumWin, playerData.SumBattle, item, miceAmount);
+                    playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.EXP, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill, playerData.SumWin, playerData.SumBattle, item);
                 }
 
             }
@@ -497,13 +497,28 @@ namespace MPCOM
         #endregion
 
         #region UpdatePlayerItem 更新玩家(道具)資料
-        public PlayerData UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
+        public PlayerData UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount)
         {
             try
             {
                 PlayerDataIO playerDataIO = new PlayerDataIO();
+                PlayerData playerData2 = playerDataIO.LoadPlayerData(account);
+
+
+                if (itemType == (byte)StoreType.Mice)
+                {
+                    var dictMiceAll = Json.Deserialize(playerData2.MiceAll) as Dictionary<string, object>;
+                    if (!dictMiceAll.ContainsValue(itemName))
+                    {
+                        dictMiceAll.Add((dictMiceAll.Count + 1).ToString(), itemName);
+                        string miceAll = Json.Serialize(dictMiceAll);
+                        playerDataIO.UpdatePlayerData(account, miceAll);
+                    }
+                }
 
                 playerData = playerDataIO.LoadPlayerItem(account, itemID);
+
+
 
                 playerData.ItemCount += itemCount;
 
@@ -541,7 +556,7 @@ namespace MPCOM
                     Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
 
 
-                    object itemID,serverItemCount; // 道具ID
+                    object itemID, serverItemCount; // 道具ID
                     object serverItemObejct, clientItemObejct; // 道具資料
 
                     //dictServerItem = dictNestedServerData.Value as Dictionary<string, object>;
@@ -552,12 +567,12 @@ namespace MPCOM
 
                     Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
 
-                    
 
 
-                       
-                    
-                   
+
+
+
+
                     dictServerItem.TryGetValue(((short)PlayerItem.ItemID).ToString(), out itemID); // 取出道具數量
                     dictServerItem.TryGetValue(((short)PlayerItem.ItemCount).ToString(), out serverItemCount); // 取出道具數量
 
@@ -569,13 +584,13 @@ namespace MPCOM
 
                     object serverCount, serverUseage, clientCount, clientUseage;
 
-                    dictServerItem.TryGetValue(((short)PlayerItem.ItemCount).ToString(),out serverCount);
+                    dictServerItem.TryGetValue(((short)PlayerItem.ItemCount).ToString(), out serverCount);
                     dictServerItem.TryGetValue(((short)PlayerItem.UseCount).ToString(), out serverUseage);
                     dictClient.TryGetValue(((short)PlayerItem.ItemCount).ToString(), out clientCount);
                     dictClient.TryGetValue(((short)PlayerItem.UseCount).ToString(), out clientUseage);
 
                     Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientCount: " + clientCount + "clientUseage: " + clientUseage);
-                    Log.Debug(serverCount +"  "+ clientUseage);
+                    Log.Debug(serverCount + "  " + clientUseage);
 
                     int sCount = Convert.ToInt32(serverCount);
                     int sUseage = Convert.ToInt32(serverUseage);
@@ -591,7 +606,7 @@ namespace MPCOM
                     }
                     else if (sCount == cCount)
                     {
-                        int itemCount,useCount;
+                        int itemCount, useCount;
                         itemCount = sCount - cUseage;
                         useCount = cUseage + sUseage;
                         dictClient[((short)PlayerItem.ItemCount).ToString()] = itemCount;
@@ -638,8 +653,22 @@ namespace MPCOM
         }
         #endregion
 
+        #region SortPlayerItem 更新玩家(道具排序)資料
+        public PlayerData SortPlayerItem(string account, string jString)
+        {
+            try
+            {
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.SortPlayerItem(account, jString);
 
-
+                return playerData;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
 
 
 
@@ -749,7 +778,7 @@ namespace MPCOM
             playerData.ReturnCode = "S401";
             return playerData;
         }
-
+        /*
         private PlayerData MiceAmountChk(string miceAmount)
         {
             clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
@@ -779,11 +808,11 @@ namespace MPCOM
             playerData.ReturnMessage = "";
             return playerData;
         }
-
+        */
         private PlayerData ItemChk(string item)
         {
             clinetData = MiniJSON.Json.Deserialize(item) as Dictionary<string, object>;
-            serverData = MiniJSON.Json.Deserialize(playerData.Item) as Dictionary<string, object>;
+            serverData = MiniJSON.Json.Deserialize(playerData.SortedItem) as Dictionary<string, object>;
 
             //如果與伺服器資料 數量不相同
             if (serverData.Count == clinetData.Count)

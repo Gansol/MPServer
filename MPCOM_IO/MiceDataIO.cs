@@ -81,24 +81,20 @@ namespace MPCOM
 
                     foreach (DataTable table in DS.Tables)
                     {
-                        int arrayX = table.Rows.Count;
-                        int arrayY = table.Columns.Count; // -1因為減去索引鍵值
-                        string[,] sqlData = new string[arrayX, arrayY];
-                        Dictionary<int, object> dictData = new Dictionary<int, object>();
-                        
-                        
+                        Dictionary<string, object> dictData = new Dictionary<string, object>();
+                        string itemID = "";
+
                         foreach (DataRow row in table.Rows)
                         {
                             j = 0;
-                            Dictionary<int, object> dictData2 = new Dictionary<int, object>();
+                            Dictionary<string, object> dictData2 = new Dictionary<string, object>();
                             foreach (DataColumn col in table.Columns)
                             {
-                                    sqlData[i, j ] = table.Rows[i][col].ToString();  // 0是索引值
-                                    dictData2.Add(j, table.Rows[i][col].ToString());
-                                    Log.Debug("Mice Data: " + table.Rows[i][col].ToString());
+                                if (j == 0) itemID = table.Rows[i][col].ToString();
+                                    dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
                                 j++;
                             }
-                            dictData.Add(i, dictData2);
+                            dictData.Add(itemID, dictData2);
                             i++;
                         }
                         miceData.miceProperty = Json.Serialize(dictData);

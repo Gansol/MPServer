@@ -103,7 +103,7 @@ namespace MPCOM
 
                             if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
-                                score = Convert.ToInt16(EggMice.eatFull * -1);
+                                score -= Convert.ToInt16(EggMice.eatFull);
                             }
                             else
                             {
@@ -370,7 +370,7 @@ namespace MPCOM
 
         #region GameOver 遊戲結束
         [AutoComplete]
-        public BattleData GameOver(short score,short otherScore, short gameTime, short lostMice)
+        public BattleData GameOver(short score, short otherScore, short gameTime, short lostMice)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -380,23 +380,23 @@ namespace MPCOM
                 if (score >= 0)
                 {
                     battleData.score = score;
-                    
+
                     float reward = 0;
                     float exp = 0;
 
-                    if (gameTime >= 0)
+                    if (gameTime >= 30)
                     {
-                        reward = (score / 10 * 1.0f);
+                        reward = (score / 10 * 1.0f) + 5;
                         exp = 1;
                     }
                     else if (gameTime >= 120)
                     {
-                        reward = (score / 10 * 1.05f);
+                        reward = (score / 10 * 1.05f) + 25;
                         exp = 2;
                     }
                     else if (gameTime >= 300)
                     {
-                        reward = (score / 10 * 1.1f);
+                        reward = (score / 10 * 1.1f) + 50;
                         exp = 5;
                     }
 
@@ -418,7 +418,7 @@ namespace MPCOM
             }
             catch (Exception e)
             {
-               
+
                 throw e;
             }
         }

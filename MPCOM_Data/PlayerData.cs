@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Data;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -37,15 +37,13 @@ namespace MPCOM
         public Int16 ItemCount;
         public byte ItemType;
 
-        public string Item;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除
+        public string SortedItem;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除
         public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string Team;			// 隊伍			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAmount;	// 老鼠數量		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string Friend;		// 好友			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string playerProperty;   // 玩家資料
         public string PlayerItem;   // 玩家道具資料
-
-
 
 
 

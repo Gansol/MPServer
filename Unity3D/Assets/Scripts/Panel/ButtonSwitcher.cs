@@ -13,38 +13,23 @@ using System.Linq;
  * ***************************************************************
  * 負責按鈕間的交換作業
  *  NGUI BUG : Team交換時Tween會卡色
+ *  目前道具排序只有寫好一半(更新、取的資料完成) 實體化更新後的資料(未完成)
  * ***************************************************************
  *                           ChangeLog
- * 20160705 v1.0.0  0版完成，Team點兩下回彈還沒寫                         
+ * 20160705 v1.0.0  0版完成，Team點兩下回彈還沒寫 
+ * 20161029 v1.0.1  改變陣列搜尋至字典搜尋
  * ****************************************************************/
-public class ButtonSwitcher : MonoBehaviour
+public class ButtonSwitcher : MPButton
 {
     #region 欄位
     public GameObject team;
 
-    [Range(0, 1)]
-    [Tooltip("回彈速度")]
-    public float lerpSpeed = 0.25f;
-    [Range(0, 1)]
-    [Tooltip("漸變速度")]
-    public float tweenColorSpeed = 0.1f;
-    [Range(0, 1)]
-    [Tooltip("滑過時顏色")]
-    public float hoverColor = 0.95f;
-    [Range(0, 1)]
-    [Tooltip("按下時顏色")]
-    public float clickColor = 0.85f;
-    [Range(0, 1)]
-    [Tooltip("失效時時顏色")]
-    public float disableColor = 0.5f;
-    [Tooltip("隊伍離開距離")]                                 // 可以增加老鼠離開時自動加到最後
-    public float leftDist = 100f;
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
     private GameObject _clone, _other, _miceTarget, _pressingIcon;           // 複製物件、碰撞時對方物件、原老鼠位置
     private int _depth, teamCountMax;                          // UISprite深度
     private float _distance;                                  // 兩物件間距離
-    private bool _isTrigged, _goTarget, _isPress, _destroy;   // 是否觸發、移動目標、是否按下、是否摧毀
+    private bool _goTarget, _isPress, _destroy;   // 是否觸發、移動目標、是否按下、是否摧毀
     private Vector3 _originPos, _toPos;                       // 原始座標、目標作標
     private PlayerManager pm;
 
@@ -97,6 +82,8 @@ public class ButtonSwitcher : MonoBehaviour
             }
             else
             {
+                if (tag == "Inventory")
+                    gameObject.transform.GetComponentInParent<UIPanel>().clipping = UIDrawCall.Clipping.SoftClip;
                 EnDisableBtn(_clone, true);
                 GetComponent<BoxCollider>().isTrigger = false;
                 Destroy(gameObject);
@@ -152,14 +139,13 @@ public class ButtonSwitcher : MonoBehaviour
         pm = GetComponentInParent<PlayerManager>();
         if (_activeBtn)
         {
-            if (!_isTrigged && _other != gameObject && _other.tag != tag && transform.parent.name==_other.transform.parent.name)    // 按下時發生碰撞 且 放開時 交換物件   OnPress>RetOrSwitch 所以已經放開了
+            if (!_isTrigged && _other != gameObject && _other.tag != tag && transform.parent.name == _other.transform.parent.name)    // 按下時發生碰撞 且 放開時 交換物件   OnPress>RetOrSwitch 所以已經放開了
             {
                 SwitchBtn();
             }
             else if (_isTrigged && (_other.name != gameObject.name || _other.tag != tag))
             {
                 SwitchBtn();
-                Debug.Log("BUG!!!!!!!!!!");
             }
             else if (!_isTrigged || _other.name == gameObject.name)  // 無碰撞且放開時 或撞到自己的分身 返回 
             {                                                        // _other.name == gameObject.name 
@@ -183,6 +169,7 @@ public class ButtonSwitcher : MonoBehaviour
         if (tag == "Inventory")
         {
             Destroy(gameObject);
+            gameObject.transform.GetComponentInParent<UIPanel>().clipping = UIDrawCall.Clipping.SoftClip;
             EnDisableBtn(_clone, true);
         }
         else if (tag == "Item" || tag == "Equip")
@@ -195,26 +182,29 @@ public class ButtonSwitcher : MonoBehaviour
             }
             else if (_distance > leftDist && !_isTrigged)  // B1>out
             {
-                string imageName = image.name.Remove(image.name.Length - 4);
-                // TeamSequence(gameObject, false);
-                //RemoveTeam();
-                //PlayerManager.dictLoadedItem[image.name].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
-                //PlayerManager.dictLoadedItem[image.name].SendMessage("EnableBtn");                    // 啟動按鈕
-                //PlayerManager.dictLoadedEquiped.Remove(image.name);                                                        // 移除隊伍參考
+                string itemID = gameObject.name;
 
                 gameObject.transform.localPosition = _originPos;
                 _clone.name = "Item";
                 EnDisableBtn(_clone, false);
-                
-                PlayerManager.dictLoadedItem[gameObject.name].SendMessage("EnableBtn");
-                PlayerManager.dictLoadedEquiped.Remove(imageName);
 
-                string itemID = pm.GetItemIDFromName(imageName, Global.itemProperty);
-                Global.photonService.UpdatePlayerItem(System.Convert.ToInt16(itemID), false);
+                GameObject invButton = PlayerManager.dictLoadedItem[itemID];
+                if (invButton.transform.parent.name != pm._lastEmptyItemGroup.name)
+                {
+                    invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
+                    invButton.SendMessage("EnableBtn");
+                    invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法
+                }
+                else
+                {
+                    invButton.SendMessage("EnableBtn");
+                }
+                PlayerManager.dictLoadedEquiped.Remove(itemID);
+
+                Global.photonService.UpdatePlayerItem(short.Parse(itemID), false);
 
                 Destroy(_clone.GetComponentInChildren<UISprite>().gameObject);
                 Destroy(gameObject);
-
             }
         }
     }
@@ -231,117 +221,111 @@ public class ButtonSwitcher : MonoBehaviour
 
     void SwitchBtn()
     {// A>B B>A A>A B>B
+        string itemID = gameObject.name;
+        string otherItemID = _other.name;
+
         if (_other.tag != "Untagged")
         {
-            bool activeBtn = _other.GetComponent<ButtonSwitcher>()._activeBtn;
-            string imageName = _pressingIcon.name.Remove(_pressingIcon.name.Length - 4);
+            // A>B
 
-
-            if (tag != _other.tag)
-            {   // A>B B=empty
-                if (_other.transform.GetChild(0).childCount == 0)   // 要設定 Equip不能和道具交換
+            #region A>B
+            if (tag == "Inventory" && tag != _other.tag && transform.parent.name == _other.transform.parent.name) // 如果 tag不同且 父系(道具類別)相同
+            {
+                // A>B B count=0
+                if (_other.transform.GetChild(0).childCount == 0)
                 {
-                    _other.name = imageName;
+                    _other.name = itemID;
                     _pressingIcon.transform.parent = _other.transform.Find("Image");
                     _pressingIcon.transform.localScale = Vector3.one;
                     _pressingIcon.transform.localPosition = Vector3.zero;
+
                     Destroy(_pressingIcon.GetComponent<TweenColor>());
+
                     _pressingIcon.SetActive(false); _pressingIcon.SetActive(true);
                     EnDisableBtn(_other, true);
-
                     EnDisableBtn(_clone, false);
-                    if (tag == "Inventory")
-                        PlayerManager.dictLoadedEquiped.Add(imageName, _other);   // 在A>B時 改變索引至Clone 、 B>A空倉庫時，加入道具索引
 
-                   string itemID= pm.GetItemIDFromName (imageName, Global.itemProperty);
-
-                   Global.photonService.UpdatePlayerItem(System.Convert.ToInt16(itemID), true);
-                }
-                else // A>B B!=empty
-                {// 道具欄位上有物件，交換物件
-                    string otherName = _other.GetComponentInChildren<UISprite>().spriteName.Remove(_other.GetComponentInChildren<UISprite>().spriteName.Length - 4);
-                    if (tag == "Inventory" && _other.GetComponent<ButtonSwitcher>()._activeBtn)
-                    {
-                        _other.name = imageName;
-                        PlayerManager.dictLoadedEquiped.Remove(otherName); PlayerManager.dictLoadedEquiped.Add(imageName, _other);
-                        UISprite sprite = _other.GetComponentInChildren<UISprite>();
-                        sprite.gameObject.name = sprite.spriteName = gameObject.GetComponentInChildren<UISprite>().spriteName;
-                        PlayerManager.dictLoadedItem[otherName].SendMessage("EnableBtn");
-                        Destroy(gameObject);
-                        EnDisableBtn(_clone, false);
-
-                        string itemID = pm.GetItemIDFromName(imageName, Global.itemProperty);
-                        Global.photonService.UpdatePlayerItem(System.Convert.ToInt16(itemID), false);
-
-                        itemID = pm.GetItemIDFromName(otherName, Global.itemProperty);
-                        Global.photonService.UpdatePlayerItem(System.Convert.ToInt16(itemID), true);
-                    }
-                    else if (_other.tag == "Inventory")
-                    {
-                        PlayerManager.dictLoadedEquiped.Remove(imageName);
-                        PlayerManager.dictLoadedItem[imageName].SendMessage("EnableBtn");
-                        Destroy(gameObject);
-                        Debug.Log("BBBBUUUUUUUUGGGGGGGGGG!!!!!!!!!");
-                    }
-                    else
-                    {
-                        RetOrigin();
-                    }
-                }
-            }
-            else if (tag == _other.tag)//A1>A2 B1>B2 has object
-            { //avtive
-
-                
-
-                if (_other.GetComponent<ButtonSwitcher>()._activeBtn)
+                    PlayerManager.dictLoadedEquiped.Add(itemID, _other);   // 在A>B時 改變索引至Clone 、 B>A空倉庫時，加入道具索引
+                    _other.GetComponentInChildren<UISprite>().depth -= Global.MeunObjetDepth;
+                    Global.photonService.UpdatePlayerItem(short.Parse(itemID), true);
+                }// A>B B has object > switch
+                else if (_other.transform.GetChild(0).childCount != 0)
                 {
-                    string otherName = _other.GetComponentInChildren<UISprite>().spriteName.Remove(_other.GetComponentInChildren<UISprite>().spriteName.Length - 4);
-                    string spriteName = _other.GetComponentInChildren<UISprite>().spriteName;
+                    _other.name = itemID;
+                    PlayerManager.dictLoadedEquiped.Remove(otherItemID); PlayerManager.dictLoadedEquiped.Add(itemID, _other);
                     UISprite sprite = _other.GetComponentInChildren<UISprite>();
-                    sprite.gameObject.name = sprite.spriteName = GetComponentInChildren<UISprite>().spriteName;
+                    sprite.gameObject.name = sprite.spriteName = gameObject.GetComponentInChildren<UISprite>().spriteName;
+                    if (PlayerManager.dictLoadedItem[otherItemID].activeSelf)
+                        PlayerManager.dictLoadedItem[otherItemID].SendMessage("EnableBtn");
+                    Destroy(gameObject);
+                    EnDisableBtn(_clone, false);
 
-                    sprite = _clone.GetComponentInChildren<UISprite>();
-                    sprite.gameObject.name = sprite.spriteName = spriteName;
-                    
-                    _other.name = imageName;
-                    _clone.name = otherName;
-
-                    if (tag == "Inventory")
-                    {
-                        PlayerManager.dictLoadedItem[imageName] = _other;
-                        PlayerManager.dictLoadedItem[otherName] = _clone;
-                    }
-                }// not active A1>A2 empty object
-                else if (!_other.GetComponent<ButtonSwitcher>()._activeBtn)
-                {
-                    if (_other.transform.Find("Image").childCount == 0)
-                    {
-                        _clone.name = "Item";
-                        GameObject tmp = _clone.GetComponentInChildren<UISprite>().gameObject;
-                        _clone.GetComponent<TweenColor>().from = Color.white;
-                        _clone.GetComponentInChildren<UISprite>().transform.parent = _other.transform.Find("Image");
-                        tmp.transform.localPosition = Vector3.zero;
-                        tmp.SetActive(false); tmp.SetActive(true);
-                        _other.name = imageName;
-
-                        if (_other.GetComponent<TweenColor>()) Destroy(_other.GetComponent<TweenColor>());
-
-                        _other.GetComponentInChildren<UISprite>().color = Color.white;
-                        EnDisableBtn(_clone, false);
-                        EnDisableBtn(_other, true);
-                    }
+                    Global.photonService.UpdatePlayerItem(short.Parse(itemID), true);
+                    Global.photonService.UpdatePlayerItem(short.Parse(otherItemID), false);
                 }
-                else
-                {
-                    RetOrigin();
-                }
+                gameObject.transform.GetComponentInParent<UIPanel>().clipping = UIDrawCall.Clipping.SoftClip;
             }
-            else
+            #endregion
+
+            #region A>A B>B
+            else if (tag == _other.tag && tag == "Inventory") // && tag=="Inventory" 寫好實體化排序 和 裝備排序後去除
             {
-                RetOrigin();
+                string otherName = _other.name;
+                string spriteName = GetComponentInChildren<UISprite>().spriteName;
+
+                Dictionary<string, object> playerItem = new Dictionary<string, object>(Global.SortedItem);
+
+                Global.SwapDictValueByKey(itemID, otherName, playerItem);   // 交換值
+
+                // 交換鍵
+                Global.RenameKey(playerItem, itemID, "x");
+                Global.RenameKey(playerItem, otherName, itemID);
+                Global.RenameKey(playerItem, "x", otherName);
+
+                // 交換載入物件位置(鍵)
+                Global.RenameKey(PlayerManager.dictLoadedItem, itemID, "x");
+                Global.RenameKey(PlayerManager.dictLoadedItem, otherName, itemID);
+                Global.RenameKey(PlayerManager.dictLoadedItem, "x", otherName);
+
+                // other name = my name
+                _other.name = itemID;
+                string otherSpriteName = _other.GetComponentInChildren<UISprite>().spriteName;
+                _other.GetComponentInChildren<UISprite>().spriteName = spriteName;
+
+                // my name = other name
+                _clone.name = otherName;
+                _clone.GetComponentInChildren<UISprite>().spriteName = otherSpriteName;
+
+                Global.photonService.SortPlayerItem(playerItem);
             }
+            #endregion
         }
+        else
+        {
+            RetOrigin();
+        }
+        //}
+        //else if (tag != "Inventory") // B>out
+        //{
+        //    GameObject invButton = PlayerManager.dictLoadedItem[gameObject.name];
+        //    if (invButton.transform.parent.name != pm._lastEmptyItemGroup.name)
+        //    {
+        //        invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
+        //        invButton.SendMessage("EnableBtn");
+        //        invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法
+        //    }
+        //    else
+        //    {
+        //        invButton.SendMessage("EnableBtn");
+        //    }
+        //    PlayerManager.dictLoadedEquiped.Remove(itemID);
+
+        //    //string itemID = pm.GetItemIDFromName(imageName, Global.itemProperty);
+        //    Global.photonService.UpdatePlayerItem(short.Parse(itemID), false);
+
+        //    Destroy(_clone.GetComponentInChildren<UISprite>().gameObject);
+        //    Destroy(gameObject);
+        //}
     }
 
 
@@ -380,58 +364,7 @@ public class ButtonSwitcher : MonoBehaviour
 
 
 
-    #region -- EnDisableBtn 啟動/關閉按鈕(內部使用) --
-    /// <summary>
-    /// 改變物件功能 開/關
-    /// </summary>
-    /// <param name="go">生效物件</param>
-    /// <param name="enable">功能開關</param>
-    void EnDisableBtn(GameObject go, bool enable)
-    {
-        if (enable)
-        {
-            if (tag == "Inventory")
-                gameObject.transform.GetComponentInParent<UIPanel>().clipping = UIDrawCall.Clipping.SoftClip;
-            //go.GetComponent<UIDragScrollView>().enabled = enable;
-            go.GetComponent<ButtonSwitcher>().enabled = enable;
-            go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
-            go.GetComponent<UIDragObject>().enabled = enable;
-            TweenColor.Begin(go, tweenColorSpeed, Color.white);
-        }
-        else
-        {
-            go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
-            go.GetComponent<ButtonSwitcher>().enabled = enable;
-            TweenColor.Begin(go, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
-        }
-        go.GetComponent<BoxCollider>().isTrigger = false;
-        go.GetComponent<UIDragObject>().enabled = enable;
-    }
-    #endregion
 
-    #region -- DisableBtn 關閉按鈕(外部呼叫) --
-    public void DisableBtn()
-    {
-        TweenColor.Begin(this.gameObject, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
-        GetComponent<ButtonSwitcher>()._activeBtn = false;
-        GetComponent<ButtonSwitcher>().enabled = false;
-        GetComponent<UIDragObject>().enabled = false;
-        GetComponent<BoxCollider>().isTrigger = false;
-        _isTrigged = false;
-    }
-    #endregion
-
-    #region -- EnableBtn 關閉按鈕(外部呼叫) --
-    public void EnableBtn()
-    {
-        TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-        GetComponent<ButtonSwitcher>().enabled = true;
-        GetComponent<ButtonSwitcher>()._activeBtn = true;
-        GetComponent<UIDragObject>().enabled = true;
-        GetComponent<BoxCollider>().isTrigger = false;
-        _isTrigged = false;
-    }
-    #endregion
 }
 
 

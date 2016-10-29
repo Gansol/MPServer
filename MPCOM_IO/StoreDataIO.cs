@@ -29,7 +29,7 @@ namespace MPCOM
     // Required	共用交易 (如果存在的話)，並且建立新交易 (如果有必要的話)。
     // RequiresNew	不論目前內容的狀態如何，都使用新交易建立元件。
     // Supported	共用交易 (如果有存在的話)。
-    [Transaction(TransactionOption.Required)]
+    [Transaction(TransactionOption.RequiresNew)]
     public class StoreDataIO : ServicedComponent
     {
         static string host = "localhost\\SQLEXPRESS";           // 主機位置 IP(本機)\\伺服器名稱
@@ -79,7 +79,7 @@ namespace MPCOM
 
                     // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Store_ItemData WHERE (ItemID='{0}') ", itemID), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Price,PromotionsCount,BuyCount FROM Store_ItemData WHERE (ItemID='{0}') ", itemID), sqlConn);
                     adapter.Fill(DS);
                 }
                 // 若有讀到則 取得所有資料
@@ -149,24 +149,24 @@ namespace MPCOM
 
                     foreach (DataTable table in DS.Tables)
                     {
-                        int arrayX = table.Rows.Count;
-                        int arrayY = table.Columns.Count; // -1因為減去索引鍵值
-                        string[,] sqlData = new string[arrayX, arrayY];
-                        Dictionary<int, object> dictData = new Dictionary<int, object>();
-                        
-                        
+                        Dictionary<string, object> dictData = new Dictionary<string, object>();
+                        string itemID = "";
+
                         foreach (DataRow row in table.Rows)
                         {
                             j = 0;
-                            Dictionary<int, object> dictData2 = new Dictionary<int, object>();
+                            Dictionary<string, object> dictData2 = new Dictionary<string, object>();
                             foreach (DataColumn col in table.Columns)
                             {
-                                    sqlData[i, j ] = table.Rows[i][col].ToString();  // 0是索引值
-                                    dictData2.Add(j, table.Rows[i][col].ToString());
-                                    Log.Debug("Store Data: " + table.Rows[i][col].ToString());
+                                if (j == 0) itemID = table.Rows[i][col].ToString();
+                                dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
                                 j++;
+
+                                Log.Debug(dictData2[col.ColumnName]);
                             }
-                            dictData.Add(i, dictData2);
+
+                            dictData.Add(itemID, dictData2);
+                            Log.Debug(dictData[itemID]);
                             i++;
                         }
                         storeData.StoreItem = Json.Serialize(dictData);
@@ -217,7 +217,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Store_ItemData WHERE (ItemID='{0}')  ", itemID), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT ItemID FROM Store_ItemData WHERE (ItemID='{0}')  ", itemID), sqlConn);
                     adapter.Fill(DS);
                     Log.Debug("(StoreIO)Tables Count: " + DS.Tables[0].Rows.Count + itemID + itemType);
 
@@ -278,7 +278,7 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Store_ItemData WHERE (ItemID='{0}')  ",itemID), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT ItemID FROM Store_ItemData WHERE (ItemID='{0}')  ", itemID), sqlConn);
                     adapter.Fill(DS);
                     Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
 

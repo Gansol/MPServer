@@ -16,6 +16,7 @@
         UpdateMice = 63,        // 更新老鼠資料
         LoadItem = 64,          // 載入道具資料
         UpdateItem = 65,        // 更新道具資料
+        SortItem = 66,          // 排序道具資料
     }
 
     public enum PlayerDataParameterCode
@@ -31,7 +32,7 @@
         SumKill = 27,
         SumWin = 28,
         SumBattle = 29,
-        Item = 30,
+        SortedItem = 30,
         MiceAll = 31,
         Team = 32,
         MiceAmount = 33,
@@ -49,5 +50,6 @@
         UpdatedMice = 63,           // 更新老鼠資料完成
         LoadedItem = 64,            // 載入道具資料完成
         UpdatedItem = 65,           // 更新道具資料完成
+        SortedItem = 66,            // 排序道具資料完成
     }
 }

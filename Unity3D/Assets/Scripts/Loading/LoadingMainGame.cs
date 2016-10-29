@@ -4,7 +4,6 @@ using System.Collections;
 public class LoadingMainGame : MonoBehaviour {
 
     public int level;
-    AsyncOperation Loader;
 
     void Start()
     {

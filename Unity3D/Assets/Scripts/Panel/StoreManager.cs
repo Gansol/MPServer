@@ -27,25 +27,25 @@ public class StoreManager : PanelManager
     public Vector3 actorScale;
 
     private AssetLoader assetLoader;
-    private GameObject  _btnClick, _tmpActor, _lastPanel, _lastItem, _lastStoreItemGroup;
+    private GameObject _btnClick, _tmpActor, _lastItem, _lastStoreItemGroup;
     private static GameObject _tmpTab;
     private bool _LoadedGashapon, _LoadedMice, _LoadedActor;
-    private Dictionary<string, object> _miceData;
     private Dictionary<string, GameObject> _dictActor;
     private int _itemType = -1;
-    private string[,] itemData;
+    private Dictionary<string, object> itemData;
     private string folderString;
     /// <summary>
-    /// 儲存購買商品資料 0:商品ID、1:道具類型、2:貨幣類型、3:數量
+    /// 儲存購買商品資料 0:商品ID、1:商品名稱、2:道具類型、3:貨幣類型、4:數量
     /// </summary>
     private string[] buyingGoodsData;
 
     void Awake()
     {
+        Global.photonService.LoadStoreDataEvent += OnLoadPanel;
         actorScale = new Vector3(1.5f, 1.5f, 1);
-        assetLoader =gameObject.AddComponent<AssetLoader>();
+        assetLoader = gameObject.AddComponent<AssetLoader>();
         _dictActor = new Dictionary<string, GameObject>();
-        buyingGoodsData = new string[4];
+        buyingGoodsData = new string[5];
         Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
     }
 
@@ -54,6 +54,7 @@ public class StoreManager : PanelManager
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
+        // ins fisrt load panelScene : Gashapon
         if (assetLoader.loadedObj && !_LoadedGashapon)
         {
             _LoadedGashapon = !_LoadedGashapon;
@@ -66,11 +67,15 @@ public class StoreManager : PanelManager
         {
             _LoadedMice = !_LoadedMice;
             assetLoader.init();
+            //itemData = Global.storeItem;
             InstantiateItem(itemData, infoGroupsArea[3].transform, _itemType);
             Transform parent = infoGroupsArea[3].transform.FindChild(_itemType.ToString());
+            selectItemProperty(_itemType);
             LoadItemData(itemData, parent, _itemType);
             InstantiateItemIcon(itemData, parent);
-            LoadPrice(itemData, parent, _itemType);
+            selectItemData(_itemType);
+
+            LoadPrice(itemData, parent, _itemType);          
         }
 
         if (assetLoader.loadedObj && !_LoadedActor)
@@ -82,7 +87,23 @@ public class StoreManager : PanelManager
 
     }
 
-    void selectData()
+    void selectItemData(int _itemType)
+    {
+        switch (_itemType)
+        {
+            case (int)StoreType.Mice:
+                folderString = assetFolder[_itemType];
+                itemData = Global.storeItem;
+                break;
+            case (int)StoreType.Item:
+            case (int)StoreType.Armor:
+                folderString = assetFolder[_itemType];
+                itemData = Global.storeItem;
+                break;
+        }
+    }
+
+    void selectItemProperty(int _itemType)
     {
         switch (_itemType)
         {
@@ -98,7 +119,7 @@ public class StoreManager : PanelManager
         }
     }
 
-    void OnMessage()
+    void OnLoading()
     {
         assetLoader.LoadAsset(assetFolder[0] + "/", assetFolder[0]);
         LoadGashapon(assetFolder[0]);
@@ -106,6 +127,13 @@ public class StoreManager : PanelManager
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
         EventMaskSwitch.lastPanel = gameObject;
+    }
+
+    public void OnLoadPanel()
+    {
+        itemData = Global.storeItem;
+
+        Global.isStoreLoaded = false;
     }
 
     private void LoadPlayerInfo()
@@ -125,20 +153,22 @@ public class StoreManager : PanelManager
     public void OnItemClick(GameObject obj)
     {
         buyingGoodsData[0] = obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemID];
-        buyingGoodsData[1] = obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType];
+        buyingGoodsData[1] = obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemName];
+        buyingGoodsData[2] = obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType];
         Debug.Log(obj.name);
         _lastItem = obj;
         infoGroupsArea[4].SetActive(true);
+        int itemType = int.Parse(obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType]);
         LoadProperty loadProperty = new LoadProperty();
         loadProperty.LoadMiceProperty(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, 0);
-        loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, Global.miceProperty.GetLength(1));
-        LoadActor(obj,int.Parse(obj.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType]));   // 錯誤 暫時道具沒有動畫物件
+        loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, itemType);
+        LoadActor(obj, itemType);   // 錯誤 暫時道具沒有動畫物件
         EventMaskSwitch.Switch(infoGroupsArea[4]);
     }
-    
+
     public void OnBuyClick(GameObject myPanel)
     {
-        
+
         myPanel.SetActive(false);
         infoGroupsArea[5].SetActive(true);
         BuyWindowsInit();
@@ -151,9 +181,10 @@ public class StoreManager : PanelManager
     private void BuyWindowsInit()
     {
         buyingGoodsData[0] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemID];
-        buyingGoodsData[1] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType];
-        buyingGoodsData[2] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.CurrencyType];
-        buyingGoodsData[3] = "1";
+        buyingGoodsData[1] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemName];
+        buyingGoodsData[2] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.ItemType];
+        buyingGoodsData[3] = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.CurrencyType];
+        buyingGoodsData[4] = "1";
         infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = "1";  // count = 1
         infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = _lastItem.GetComponent<Item>().itemInfo[(int)StoreProperty.Price]; // price
     }
@@ -166,7 +197,7 @@ public class StoreManager : PanelManager
 
         count += (obj.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
-        buyingGoodsData[3] = infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = count.ToString();
+        buyingGoodsData[4] = infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = count.ToString();
         infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = (price * count).ToString();
     }
 
@@ -215,7 +246,7 @@ public class StoreManager : PanelManager
             case 2:
                 {
                     _itemType = (int)StoreType.Mice;
-                    selectData();
+                    selectItemData(_itemType);
                     itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
@@ -230,7 +261,7 @@ public class StoreManager : PanelManager
             case 3:
                 {
                     _itemType = (int)StoreType.Item;
-                    selectData();
+                    selectItemData(_itemType);
                     itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
@@ -245,8 +276,8 @@ public class StoreManager : PanelManager
             case 4:
                 {
                     _itemType = (int)StoreType.Armor;
-                    selectData();
-                   itemData = GetItemInfoFromType(itemData, _itemType);
+                    selectItemData(_itemType);
+                    itemData = GetItemInfoFromType(itemData, _itemType);
                     if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
                     assetLoader.init();
                     assetLoader.LoadAsset(folderString + "/", folderString);
@@ -284,9 +315,10 @@ public class StoreManager : PanelManager
 
 
     #region -- LoadPrice 載入物件價格 --
-    void LoadPrice(string[,] miceData, Transform parent, int itemType)
+    void LoadPrice(Dictionary<string, object> itemData, Transform parent, int itemType)
     {
-        for (int i = 0; i < miceData.GetLength(0); i++)
+        itemData = GetItemInfoFromType(itemData, itemType);
+        for (int i = 0; i < itemData.Count; i++)
         {
             parent.GetChild(i).GetComponentInChildren<UILabel>().text = parent.GetChild(i).GetComponent<Item>().itemInfo[(int)StoreProperty.Price];
         }
@@ -302,7 +334,7 @@ public class StoreManager : PanelManager
     #endregion
 
     #region -- LoadActor 載入老鼠角色 --
-    private void LoadActor(GameObject btn_mice,int itemType)
+    private void LoadActor(GameObject btn_mice, int itemType)
     {
         if (itemType == (int)StoreType.Mice)
         {
@@ -320,7 +352,7 @@ public class StoreManager : PanelManager
             }
             else
             {
-                if (assetLoader.GetAsset(miceName + "/", miceName) != null)
+                if (assetLoader.GetAsset(miceName) != null)
                 {
                     InstantiateActor(infoGroupsArea[4].transform.GetChild(0));
                 }
@@ -343,11 +375,14 @@ public class StoreManager : PanelManager
     /// </summary>
     /// <param name="itemData">物件陣列</param>
     /// <param name="folder">資料夾</param>
-    public void LoadIconObject(string[,] itemData, string folder)    // 載入遊戲物件
+    public void LoadIconObject(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
     {
-        for (int i = 0; i < itemData.GetLength(0); i++)
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            assetLoader.LoadPrefab(folder + "/", itemData[i, 1] + "ICON");
+            var nestedData = item.Value as Dictionary<string, object>;
+            object itemName;
+            nestedData.TryGetValue("ItemName", out itemName);
+            assetLoader.LoadPrefab(folder + "/", itemName.ToString() + "ICON");
         }
     }
     #endregion
@@ -358,7 +393,7 @@ public class StoreManager : PanelManager
         GameObject _tmp;
         InstantiateObject insObj = new InstantiateObject();
         string miceName = _btnClick.transform.GetComponentInChildren<UISprite>().name;
-        GameObject bundle = (GameObject)assetLoader.GetAsset(miceName + "/", miceName);
+        GameObject bundle = (GameObject)assetLoader.GetAsset(miceName);
 
         if (bundle != null)                  // 已載入資產時
         {
@@ -387,9 +422,9 @@ public class StoreManager : PanelManager
     {
         for (int i = 0; i < 3; i++)
         {
-            if (assetLoader.GetAsset(folder + "/", folder + (i + 1).ToString()))                  // 已載入資產時
+            if (assetLoader.GetAsset(folder + (i + 1).ToString())!=null)                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(folder + "/", folder + (i + 1).ToString());
+                GameObject bundle = assetLoader.GetAsset(folder + (i + 1).ToString());
                 Transform parent = myParent.GetChild(1).GetChild(i).GetChild(0);
                 InstantiateObject insObj = new InstantiateObject();
 
@@ -410,12 +445,12 @@ public class StoreManager : PanelManager
     /// </summary>
     /// <param name="dictionary">資料字典</param>
     /// <param name="myParent">實體化父系位置</param>
-    void InstantiateItem(string[,] itemData, Transform itemPanel, int itemType)
+    void InstantiateItem(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
         if (itemPanel.transform.childCount == 0)
         {
             _lastStoreItemGroup = CreateEmptyGroup(itemPanel, itemType);
-            InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.GetLength(0));
+            InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.Count);
         }
         else
         {
@@ -428,8 +463,8 @@ public class StoreManager : PanelManager
             else if (_lastStoreItemGroup != itemPanel.FindChild(itemType.ToString()))
             {
                 _lastStoreItemGroup.SetActive(false);
-                _lastStoreItemGroup= CreateEmptyGroup(itemPanel, itemType);
-                InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.GetLength(0));
+                _lastStoreItemGroup = CreateEmptyGroup(itemPanel, itemType);
+                InstantiateItem2(itemData, _lastStoreItemGroup.transform, itemData.Count);
             }
         }
     }
@@ -437,50 +472,81 @@ public class StoreManager : PanelManager
 
 
 
-    void InstantiateItem2(string[,] itemData, Transform parent, int itemCount)
+    void InstantiateItem2(Dictionary<string, object> itemData, Transform parent, int itemCount)
     {
         Vector2 pos = new Vector2();
         string itemName = "Item", folderPath = "Panel/";
-        int count = parent.childCount;
+        int count = parent.childCount, i = 0;
 
-        for (int i = 0; i < itemCount; i++)
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            if (assetLoader.GetAsset(folderPath, itemName))                  // 已載入資產時
+            var nestedData = item.Value as Dictionary<string, object>;
+            if (assetLoader.GetAsset(itemName)!=null)                  // 已載入資產時
             {
-                pos = sortItemPos(9, 3,new Vector2(itemOffsetX,itemOffsetY), pos, count + i);
-                GameObject bundle = assetLoader.GetAsset(folderPath, itemName);
+                pos = sortItemPos(9, 3, new Vector2(itemOffsetX, itemOffsetY), pos, count + i);
+                GameObject bundle = assetLoader.GetAsset(itemName);
                 InstantiateObject insObj = new InstantiateObject();
-
-                _clone = insObj.Instantiate(bundle, parent, itemData[i, 1], new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                object bundleName;
+                nestedData.TryGetValue("ItemName", out bundleName);
+                assetLoader.LoadPrefab(folderPath, bundleName + "ICON");
+                _clone = insObj.Instantiate(bundle, parent, bundleName.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
                 pos.x += itemOffsetX;
             }
+            i++;
         }
     }
     #endregion
 
 
     #region LoadItemData
-    private void LoadItemData(string[,] itemData, Transform parent, int itemType)
+    private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
     {
-        for (int i = 0; i < itemData.GetLength(0); i++) // 載入商品資料
+        int i = 0, j = 0;
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            for (int j = 0; j < itemData.GetLength(1); j++) // 載入商品資料
+            var nestedData = item.Value as Dictionary<string, object>;
+            j = 0;
+            foreach (KeyValuePair<string, object> nested in nestedData)
             {
-                parent.GetChild(i).GetComponent<Item>().itemProperty[j] = itemData[i, j];
-                //Debug.Log("ITEM DATA " + i.ToString() + " :  " + itemData[i, j]);
+                parent.GetChild(i).GetComponent<Item>().itemProperty[j] = nested.Value.ToString();
+                j++;
             }
+            i++;
         }
 
         itemData = GetItemInfoFromType(Global.storeItem, _itemType);
-        Debug.Log("FFF" + itemData.GetLength(0));
-        for (int i = 0; i < itemData.GetLength(0); i++) // 載入商品資料
+        i = j = 0;
+
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            for (int j = 0; j < itemData.GetLength(1); j++) // 載入商品資料
+            var nestedData = item.Value as Dictionary<string, object>;
+            j = 0;
+            foreach (KeyValuePair<string, object> nested in nestedData)
             {
-                parent.GetChild(i).GetComponent<Item>().itemInfo[j] = itemData[i, j];
-                //Debug.Log("ITEM DATA " + i.ToString() + " :  " + itemData[i, j]);
+                parent.GetChild(i).GetComponent<Item>().itemInfo[j] = nested.Value.ToString();
+                j++;
             }
+            i++;
         }
+
+        //for (int i = 0; i < itemData.GetLength(0); i++) // 載入商品資料
+        //{
+        //    for (int j = 0; j < itemData.GetLength(1); j++) // 載入商品資料
+        //    {
+        //        parent.GetChild(i).GetComponent<Item>().itemProperty[j] = itemData[i, j];
+        //        //Debug.Log("ITEM DATA " + i.ToString() + " :  " + itemData[i, j]);
+        //    }
+        //}
+        //itemData = GetItemInfoFromType(Global.storeItem, _itemType);
+        //Debug.Log("FFF" + itemData.GetLength(0));
+        //for (int i = 0; i < itemData.GetLength(0); i++) // 載入商品資料
+        //{
+        //    for (int j = 0; j < itemData.GetLength(1); j++) // 載入商品資料
+        //    {
+        //        parent.GetChild(i).GetComponent<Item>().itemInfo[j] = itemData[i, j];
+        //        //Debug.Log("ITEM DATA " + i.ToString() + " :  " + itemData[i, j]);
+        //    }
+        //}
     }
     #endregion
 
@@ -491,30 +557,37 @@ public class StoreManager : PanelManager
     /// </summary>
     /// <param name="dictionary">資料字典</param>
     /// <param name="myParent">實體化父系位置</param>
-    void InstantiateItemIcon(string[,] itemData, Transform myParent)
+    void InstantiateItemIcon(Dictionary<string, object> itemData, Transform myParent)
     {
-
+        int i = 0;
+        selectItemData(_itemType);
         // to do check has icon object
-        for (int i = 0; i < itemData.GetLength(0); i++)
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            string bundleName = itemData[i, 1] + "ICON";
+            object itemName;
+            var nestedData = item.Value as Dictionary<string, object>;
+            nestedData.TryGetValue("ItemName", out itemName);
+            string bundleName = itemName.ToString() + "ICON";
 
-            if (assetLoader.GetAsset(folderString + "/", bundleName))                  // 已載入資產時
+            if (assetLoader.GetAsset(bundleName)!=null)                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(folderString + "/", bundleName);
+                GameObject bundle = assetLoader.GetAsset(bundleName);
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
                 if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                 {
                     InstantiateObject insObj = new InstantiateObject();
-                    insObj.Instantiate(bundle, imageParent, itemData[i, 1], Vector3.zero, Vector3.one, new Vector2(150, 150), 310);
+                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(150, 150), 310);
                 }
             }
             else
             {
                 Debug.LogError("Assetbundle reference not set to an instance.");
             }
+            i++;
         }
         _LoadedMice = true;
     }
     #endregion
+
+
 }

@@ -6,9 +6,12 @@ public class dem : MonoBehaviour
     public GameObject coll;
     public GameObject coll2;
     public UIAtlas atlas;
-
+    AssetLoader loader;
     void Start()
     {
+         loader = gameObject.AddComponent<AssetLoader>();
+        loader.LoadAsset("MiceICON/", "MiceICON");
+        loader.LoadPrefab("MiceICON/", "EggMiceICON");
         Vector3 a, b;
 
         Debug.Log("coll pos:" + coll.transform.position);
@@ -22,6 +25,16 @@ public class dem : MonoBehaviour
         coll.transform.localPosition += coll.transform.InverseTransformPoint(coll2.transform.position);
     }
 
+    void Update()
+    {/*
+        if (loader.loadedObj && !flag)
+        {
+            AssetBundleManager.LoadedBundle();
+            flag =!flag;
+            Instantiate(loader.GetAsset("EggMiceICON"));
+            Application.LoadLevel("test2");
+        }*/
+    }
     public void OnClick()
     {
         coll.transform.localPosition += coll.transform.InverseTransformPoint(coll2.transform.position);
@@ -38,4 +51,6 @@ public class dem : MonoBehaviour
         go.GetComponent<UISprite>().atlas = atlas;
         go.GetComponent<UISprite>().spriteName = "NGUI";
     }
+
+    public bool flag { get; set; }
 }

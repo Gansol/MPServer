@@ -5,6 +5,14 @@ public class SyncLoad : MonoBehaviour
 {
     public int nextLevel;
     // Use this for initialization
+
+
+    void Awake()
+    {
+        AssetBundleManager.UnloadUnusedAssets();
+        System.GC.Collect();
+    }
+
     void Start()
     {
         Global.loadScene = nextLevel;
