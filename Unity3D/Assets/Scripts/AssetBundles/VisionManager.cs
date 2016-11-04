@@ -24,20 +24,22 @@ public class VisionManager : MonoBehaviour
     void Start() //開始檢查版本
     {
         assetLoader = gameObject.AddComponent<AssetLoader>();
+        /*
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VisionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
         StartCoroutine(visionChecker.CheckVision());
+         * */
     }
 
     void Update() //等待完成
     {
-        Debug.Log(Global.ReturnMessage + "  visionChecker.visionChk: " + visionChecker.visionChk);
+        //Debug.Log(Global.ReturnMessage + "  visionChecker.visionChk: " + visionChecker.visionChk);
 
 
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log(assetLoader.ReturnMessage);
-
+        /*
         #region BundleCheck 檢查檔案
         if (visionChecker.visionChk)
         {
@@ -48,19 +50,33 @@ public class VisionManager : MonoBehaviour
             }
         }
         #endregion
+        */
+        //if (assetLoader.loadedObj && bLoadAsset)
+        //{/*
+        //    StartCoroutine(visionChecker.ReplaceVisionList());*/
+        //    syncLoad = gameObject.AddComponent<SyncLoad>();
+        //    syncLoad.LoadMainGame();
+        //}
 
-        if (assetLoader.loadedObj && bLoadAsset)
-        {
-            StartCoroutine(visionChecker.ReplaceVisionList());
-            syncLoad = gameObject.AddComponent<SyncLoad>();
-            syncLoad.LoadMainGame();
-        }
+        if (assetLoader.loadedObj && bLoadAsset){
+            Instantiate(assetLoader.GetAsset("Store"));
+    }
 
         #region Load MainGame 載入遊戲
-        if (Global.isCompleted && !bLoadAsset)
+        if (/*Global.isCompleted && */!bLoadAsset)
         {
-
+            assetLoader.LoadAsset("Panel/", "Panel");
+            assetLoader.LoadAsset("Panel/", "MainBack");
             assetLoader.LoadAsset("Panel/", "ComicFont");
+            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            assetLoader.LoadAsset("Panel/", "ShareObject");
+            assetLoader.LoadPrefab("Panel/", "Store");
+
+            
+            //assetLoader.LoadAsset("Panel/", "PanelUI");
+            //assetLoader.LoadAsset("Panel/", "ComicFont");
+            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            //assetLoader.LoadPrefab("Panel/", "MenuUI");
             bLoadAsset = !bLoadAsset;
         }
 

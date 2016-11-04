@@ -49,8 +49,7 @@ public class PanelManager : MPPanel
         //assetLoader.LoadAsset("Panel/", "PanelUI");
         //assetLoader.LoadAsset("Panel/", "MainBack");
         //assetLoader.LoadPrefab("Panel/", "Team");
-        assetLoader.LoadAsset("Panel/", "ComicFont");
-        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+        
         //assetLoader.LoadPrefab("Panel/", "MenuUI");
     }
 

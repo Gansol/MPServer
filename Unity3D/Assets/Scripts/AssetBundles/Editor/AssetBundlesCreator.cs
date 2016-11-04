@@ -231,6 +231,7 @@ public class AssetBundlesCreator : EditorWindow
             BuildAssetLZMA();
     }
 
+    #region BuildAssetLZMA
     private static void BuildAssetLZMA() // Build AssetBundle(Compressed) 建立壓縮的AssetBundle
     {
         // BuildAssetLZMA 和 BuildAssetNoLZMA 只差別在 BuildAssetBundleOptions.UncompressedAssetBundle
@@ -238,20 +239,20 @@ public class AssetBundlesCreator : EditorWindow
 
         if (!Directory.Exists(_targetDir))  // 如果資料夾不存在則建立
             Directory.CreateDirectory(_targetDir);
-
-        string[] folders = Directory.GetDirectories(_perfabDir);    // 取得目錄所有下資料夾
         
+        string[] folders = Directory.GetDirectories(_perfabDir);    // 取得目錄所有下資料夾
+
         foreach (string folder in folders)  // 尋遍所有資料夾
         {
-            string folderName = Path.GetFileName(Path.GetDirectoryName(folder+"/"));
-            if (!Directory.Exists(_targetDir+folderName))  // 如果資料夾不存在則建立
-                Directory.CreateDirectory(_targetDir  + folderName+"/");
-            string outputFolder = _targetDir + folderName+"/";
-            
+            string folderName = Path.GetFileName(Path.GetDirectoryName(folder + "/"));
+            if (!Directory.Exists(_targetDir + folderName))  // 如果資料夾不存在則建立
+                Directory.CreateDirectory(_targetDir + folderName + "/");
+            string outputFolder = _targetDir + folderName + "/";
+
             if (_dependent) // 如果是依賴資產型態
             {
                 string[] innFolder = Directory.GetDirectories(folder + "/");    // 取得目錄下所有子資料夾
-                
+
                 //共用資產
                 if (!File.Exists(innFolder[0] + "/" + "BundleInfo.json"))   // 如果找不到資產清單 報錯
                 {
@@ -316,8 +317,10 @@ public class AssetBundlesCreator : EditorWindow
 
             Debug.Log("*****Building AssetBundle Complete!*****");
         }
-    }
+    } 
+    #endregion
 
+    #region BuildAssetNoLZMA
     private static void BuildAssetNoLZMA()   // Build AssetNoLZMA 建立基本的的AssetBundle
     {
         // 說明同上
@@ -398,22 +401,38 @@ public class AssetBundlesCreator : EditorWindow
 
             Debug.Log("*****Building AssetBundle Complete!*****");
         }
-    }
+    } 
+    #endregion
 
-    private static bool LoadFile(string path)   // 載入JSON列表檔案
+    #region BundleUniqueAssetBundle
+    private static void BundleUniqueAssetBundle(string outputFolder)   // 打包獨立資產
     {
-        // path = 資料夾物件下BundleInfo.json
-        // 載入文字後並解析存入字典檔
-        string text = File.ReadAllText(path);
+        Object obj;
+        uint crc = 0;
 
-        if (text != null)
+        foreach (KeyValuePair<string, object> file in files)
         {
-            files = Json.Deserialize(text) as Dictionary<string, object>;
-            return true;
+            //獨立資產打包;
+            BuildPipeline.PushAssetDependencies();
+            obj = AssetDatabase.LoadMainAssetAtPath(file.Value.ToString());
+            Debug.Log("Building Unique Prefab:" + obj.name);
+            //Build;
+            if (_uncompressed)
+            {
+                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
+                    AssetDatabase.Refresh();
+            }
+            else
+            {
+                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
+                    AssetDatabase.Refresh();
+            }
+            BuildPipeline.PopAssetDependencies();
         }
-        return false;
     }
+    #endregion
 
+    #region BuildAssetHash
     private static void BuildAssetHash() // 建立AssetBundle Hash
     {
         string bundleFolderPath = Application.dataPath + exportFolder;  //輸出路徑
@@ -449,13 +468,31 @@ public class AssetBundlesCreator : EditorWindow
                             _hash = AssetBundlesHash.SHA512Complier(bytesFile);  // Hash bytes
                             break;
                     }
-                    dictBundles.Add(Path.GetFileName(Path.GetDirectoryName(file))+"/"+Path.GetFileName(file), _hash);//把hash過的值存入字典檔
+                    dictBundles.Add(Path.GetFileName(Path.GetDirectoryName(file)) + "/" + Path.GetFileName(file), _hash);//把hash過的值存入字典檔
                 }
             }
             CreateFile(Json.Serialize(dictBundles), bundleFolderPath, "BundleHash.json"); //建立 新 檔案列表
         }
         Debug.Log("*****Bundle Hash Completed!*****" + "  Path:" + bundleFolderPath);
     }
+    #endregion
+
+
+    private static bool LoadFile(string path)   // 載入JSON列表檔案
+    {
+        // path = 資料夾物件下BundleInfo.json
+        // 載入文字後並解析存入字典檔
+        string text = File.ReadAllText(path);
+
+        if (text != null)
+        {
+            files = Json.Deserialize(text) as Dictionary<string, object>;
+            return true;
+        }
+        return false;
+    }
+
+ 
 
     private static void InfoCreator() //Bunlde InfoCreator 負責建立 Bundle資訊(物件名稱、Assets路徑)
     {
@@ -522,29 +559,5 @@ public class AssetBundlesCreator : EditorWindow
         }
     }
 
-    private static void BundleUniqueAssetBundle(string outputFolder)   // 打包獨立資產
-    {
-        Object obj;
-        uint crc = 0;
 
-        foreach (KeyValuePair<string, object> file in files)
-        {
-            //獨立資產打包;
-            BuildPipeline.PushAssetDependencies();
-            obj = AssetDatabase.LoadMainAssetAtPath(file.Value.ToString());
-            Debug.Log("Building Unique Prefab:" + obj.name);
-            //Build;
-            if (_uncompressed)
-            {
-                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
-                    AssetDatabase.Refresh();
-            }
-            else
-            {
-                if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle, buildTarget))
-                    AssetDatabase.Refresh();
-            }
-            BuildPipeline.PopAssetDependencies();
-        }
-    }
 }
