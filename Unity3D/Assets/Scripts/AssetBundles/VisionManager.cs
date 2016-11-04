@@ -18,11 +18,12 @@ public class VisionManager : MonoBehaviour
     private AssetBundleChecker bundleChecker;
     private SyncLoad syncLoad;
     private VisionChecker visionChecker;
-
+    private AssetLoader assetLoader;
     private bool bundleCheckComplete = false;
 
     void Start() //開始檢查版本
     {
+        assetLoader = gameObject.AddComponent<AssetLoader>();
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VisionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
@@ -32,6 +33,10 @@ public class VisionManager : MonoBehaviour
     void Update() //等待完成
     {
         Debug.Log(Global.ReturnMessage + "  visionChecker.visionChk: " + visionChecker.visionChk);
+
+
+        if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+            Debug.Log(assetLoader.ReturnMessage);
 
         #region BundleCheck 檢查檔案
         if (visionChecker.visionChk)
@@ -44,13 +49,24 @@ public class VisionManager : MonoBehaviour
         }
         #endregion
 
-        #region Load MainGame 載入遊戲
-        if (Global.isCompleted)
+        if (assetLoader.loadedObj && bLoadAsset)
         {
             StartCoroutine(visionChecker.ReplaceVisionList());
             syncLoad = gameObject.AddComponent<SyncLoad>();
             syncLoad.LoadMainGame();
         }
+
+        #region Load MainGame 載入遊戲
+        if (Global.isCompleted && !bLoadAsset)
+        {
+
+            assetLoader.LoadAsset("Panel/", "ComicFont");
+            bLoadAsset = !bLoadAsset;
+        }
+
+
         #endregion
     }
+
+    public bool bLoadAsset { get; set; }
 }

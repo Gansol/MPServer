@@ -17,6 +17,7 @@ using System.Linq;
  * + pageVaule 還沒加入翻頁值
  * ***************************************************************
  *                           ChangeLog
+ * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
  * 20160914 v1.0.1b  2次重購，獨立實體化物件  
  * 20160711 v1.0.1a  1次重構，獨立AssetLoader                       
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
@@ -25,72 +26,71 @@ using System.Linq;
 public class TeamManager : PanelManager
 {
     #region 欄位
-    private AssetLoader assetLoader;
     public GameObject[] infoGroupsArea;                                             // 物件群組位置
     /// <summary>
     /// MiceIcon名稱、Mice按鈕
     /// </summary>
-    public static Dictionary<string, GameObject> dictLoadedMice { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
+    public Dictionary<string, GameObject> dictLoadedMice { get; set; }              // Icon名稱、Icon的按鈕
     /// <summary>
     /// TeamIcon名稱、Mice按鈕索引物件
     /// </summary>
-    public static Dictionary<string, GameObject> dictLoadedTeam { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
+    public Dictionary<string, GameObject> dictLoadedTeam { get; set; }              // Icon名稱、Icon的按鈕
     [Range(0.2f, 0.4f)]
-    public float delayBetween2Clicks = 0.3f;                                        // Change value in editor
-    public Vector3 actorScale;
-    public string iconPath = "MiceICON/";
-    private GameObject _miceActor, _tmpActor, _btnClick, _doubleClickChk;   // 克隆、老鼠角色、暫存角色、按下按鈕、雙擊檢查
-    private static Dictionary<string, object> dictMiceData, dictTeamData;         // Json老鼠、隊伍資料
-    private Dictionary<string, GameObject> _dictActor;                              // 已載入角色參考
+    public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
+    public Vector3 actorScale;                                                      // 角色縮放
+    public string iconPath = "MiceICON";                                            // 圖片資料夾位置
 
-    private int _page;                                                             // 材質數量、物件數量、翻一頁+10
-    private float _lastClickTime;
-    private bool _LoadedIcon, _LoadedActor, _bReload,_firstLoad;
+    private int _page;                                                              // 翻頁值(翻一頁+10)
+    private float _lastClickTime;                                                   // 點擊間距時間
+    private static bool _bFirstLoad;                                                // 是否第一次載入
+    private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
+
+    private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
+    private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
     #endregion
 
     void Awake()
     {
-        _firstLoad = true;
-        Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
-        actorScale = new Vector3(0.8f, 0.8f, 1);
-        _page = 0;
-        _miceActor = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
-        dictMiceData = Global.MiceAll;
-        dictTeamData = Global.Team;
-        _dictActor = new Dictionary<string, GameObject>();
+        _dictMiceData = new Dictionary<string, object>();
+        _dictTeamData = new Dictionary<string, object>();
+        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
 
-        assetLoader = gameObject.AddComponent<AssetLoader>();
+        _page = 0;
+        _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
+        actorScale = new Vector3(0.8f, 0.8f, 1);
+        _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
+
+        Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
     }
 
     void Update()
     {
-        if (!_LoadedActor || !_LoadedIcon)                                          // 除錯訊息
+        if (_bLoadedActor || _bLoadedIcon)                                          // 除錯訊息
             if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
                 Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (assetLoader.loadedObj && !_LoadedIcon)
+        if (assetLoader.loadedObj && _bLoadedIcon)
         {
-            _LoadedIcon = !_LoadedIcon;
+            _bLoadedIcon = !_bLoadedIcon;
             assetLoader.init();
-            InstantiateIcon(Global.MiceAll,dictLoadedMice, infoGroupsArea[0].transform);
-            InstantiateIcon(Global.Team,dictLoadedTeam, infoGroupsArea[2].transform);
+            InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
+            InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
             ActiveMice(Global.Team);
         }
 
-        if (assetLoader.loadedObj && !_LoadedActor)
+        if (assetLoader.loadedObj && _bLoadedActor)
         {
-            _LoadedActor = !_LoadedActor;
+            _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
-            InstantiateActor();
+            InstantiateActor(_btnClick.gameObject.GetComponentInChildren<UISprite>().name, _actorParent.transform, actorScale);
         }
     }
 
     #region -- OnMiceClick 當按下老鼠時 --
     public void OnMiceClick(GameObject btn_mice)
     {
-
         if (Time.time - _lastClickTime < delayBetween2Clicks && _doubleClickChk == btn_mice)    // Double Click
             btn_mice.SendMessage("Mice2Click");
         else
@@ -100,37 +100,20 @@ public class TeamManager : PanelManager
         _doubleClickChk = btn_mice;
     }
 
-    IEnumerator OnClickCoroutine(GameObject btn_mice)
+    IEnumerator OnClickCoroutine(GameObject btn_mice)   //Single Click
     {
         yield return new WaitForSeconds(delayBetween2Clicks);
-
         if (Time.time - _lastClickTime < delayBetween2Clicks)
             yield break;
 
-        LoadActor(btn_mice);
-        Debug.Log(btn_mice.transform.GetChild(0).name);
+        _bLoadedActor = LoadActor(btn_mice, _actorParent.transform, actorScale);
+        _btnClick = btn_mice;
+        
         LoadProperty loadProerty = new LoadProperty();
         loadProerty.LoadMiceProperty(btn_mice.transform.GetChild(0).gameObject, infoGroupsArea[1], 0);
+
+        //Debug.Log(btn_mice.transform.GetChild(0).name);
         //Debug.Log("Simple click");
-    }
-    #endregion
-
-    #region -- OnMessage 載入老鼠(外部呼叫) -- 這裡未來會錯 如果載入超過1張老鼠Icon圖
-    void OnMessage()
-    {/*
-        assetLoader.LoadAsset(iconPath, "MiceICON"); // 載入老鼠資產
-        LoadIconObject(dictMiceData);  // 載入老鼠物件
-      * */
-    }
-    #endregion
-
-    #region -- LoadIconObject 載入老鼠物件 --
-    void LoadIconObject(Dictionary<string, object> dictionary)    // 載入遊戲物件
-    {
-        foreach (KeyValuePair<string, object> item in dictionary)
-        {
-            assetLoader.LoadPrefab(iconPath, item.Value.ToString() + "ICON");
-        }
     }
     #endregion
 
@@ -138,9 +121,10 @@ public class TeamManager : PanelManager
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
     /// </summary>
-    /// <param name="dictionary">資料字典</param>
+    /// <param name="dictServerData">ServerData</param>
+    /// <param name="dictLoadedObject">Client Loaded Object</param>
     /// <param name="myParent">實體化父系位置</param>
-    void InstantiateIcon(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> dictLoadedData, Transform myParent)
+    void InstantiateIcon(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> dictLoadedObject, Transform myParent)
     {
         int i = 0;
         Dictionary<string, GameObject> tmp = new Dictionary<string, GameObject>();
@@ -150,14 +134,14 @@ public class TeamManager : PanelManager
             string bundleName = item.Value.ToString() + "ICON";
             GameObject bundle = assetLoader.GetAsset(bundleName);
 
-            if (assetLoader.GetAsset(bundleName)!=null)                  // 已載入資產時
+            if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
             {
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
                 if (miceBtn.childCount == 0)
                 {
                     bundle = assetLoader.GetAsset(bundleName);
-                    InstantiateObject insObj = new InstantiateObject();
-                    _clone = insObj.Instantiate(bundle, miceBtn, item.Value.ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
+                    ObjectFactory insObj = new ObjectFactory();
+                    insObj.Instantiate(bundle, miceBtn, item.Value.ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
 
                     Add2Refs(bundle, miceBtn);     // 加入物件參考
 
@@ -169,7 +153,7 @@ public class TeamManager : PanelManager
                     string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
 
                     tmp.Add(item.Value.ToString(), miceBtn.gameObject);
-                    dictLoadedData = tmp;
+                    dictLoadedObject = tmp;
                     miceBtn.GetChild(0).name = item.Value.ToString();
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;
                 }
@@ -177,153 +161,60 @@ public class TeamManager : PanelManager
             }
             else
             {
-                Debug.LogError("Assetbundle reference not set to an instance.");
+                Debug.LogError("Assetbundle reference not set to an instance. at InstantiateIcon (Line:154).");
             }
         }
-        _LoadedIcon = true;
+        _bLoadedIcon = false; // 實體化完成 關閉載入
     }
     #endregion
 
-    #region -- LoadActor 載入老鼠角色 --
-    private void LoadActor(GameObject btn_mice)
+    #region -- OnLoadPanel 載入面板--
+    public override void OnLoading()
     {
-        GameObject _miceImage;
-        string miceName = btn_mice.transform.GetChild(0).name;
-
-        _btnClick = btn_mice;
-
-        if (_tmpActor != null) _tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
-
-        if (_dictActor.TryGetValue(miceName, out _miceImage))       // 假如已經載入老鼠圖片了 直接顯示
-        {
-            _miceImage.SetActive(true);
-            _tmpActor = _miceImage;
-        }
-        else
-        {
-            string key = (int.Parse(btn_mice.name.Remove(0, 4)) + _page).ToString(); // + pageVaule 還沒加入翻頁值
-            string assetName = btn_mice.transform.GetChild(0).name;
-            if (assetLoader.GetAsset(assetName) != null)
-            {
-                InstantiateActor();
-            }
-            else
-            {
-                _LoadedActor = false;
-                assetLoader.LoadAsset(assetName + "/", assetName);
-                assetLoader.LoadPrefab(assetName + "/", assetName);
-            }
-
-            //LoadMiceAsset(btn_mice);
-        }
-    }
-    #endregion
-
-    #region -- InstantiateActor 實體化老鼠角色 --
-    private void InstantiateActor()
-    {
-        GameObject _tmp;
-        string miceName = _btnClick.transform.GetChild(0).name;
-        InstantiateObject insObj = new InstantiateObject();
-        GameObject bundle = (GameObject)assetLoader.GetAsset(miceName);
-
-        if (bundle != null)                  // 已載入資產時
-        {
-            _clone = insObj.InstantiateActor(bundle, _miceActor.transform, miceName, actorScale);
-        }
-        else
-        {
-            Debug.LogError("Assetbundle reference not set to an instance. at InstantiateActor.");
-        }
-
-        Destroy(_clone.transform.GetChild(0).GetComponent(_clone.name));    // 刪除Battle用腳本
-
-        if (_dictActor.TryGetValue(_clone.name, out _tmp) != false)
-            _dictActor.Add(_clone.name, _clone);
-
-        _tmpActor = _clone;
-        _LoadedActor = true;
-
-    }
-    #endregion
-
-
-
-    public void OnLoading()
-    {
-
         Global.photonService.LoadPlayerData(Global.Account);
-        //Global.isPlayerDataLoaded
     }
 
-    public void OnLoadPanel()
+    protected override void OnLoadPanel()
     {
-        if (transform.parent.gameObject.activeSelf)
+        if (transform.parent.gameObject.activeSelf)     // 如果Panel是啟動狀態 接收Event
         {
-            //TeamManager.dictMiceData = Global.MiceAll;
-            //TeamManager.dictTeamData = Global.Team;
-
-            //ExpectOutdataObjectByValue(dictLoadedMice, TeamManager.dictMiceData);
-            //ExpectOutdataObjectByValue(dictLoadedTeam, TeamManager.dictTeamData);
-
-            //var dictMiceData = new Dictionary<string, object>(TeamManager.dictMiceData);
-            //var dictTeamData = new Dictionary<string, object>(TeamManager.dictTeamData);
-            //Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
-
-            //dictMiceData = ExpectDuplicateObject(dictMiceData, dictLoadedMice);
-            //dictTeamData = ExpectDuplicateObject(dictTeamData, dictLoadedTeam);
-            //var buffer = new Dictionary<string, object>(dictMiceData);
-
-
             Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
 
-            if (_firstLoad)
+            if (_bFirstLoad)
             {
-                dictNotLoadedAsset = dictMiceData;
-                _firstLoad = !_firstLoad;
+                dictNotLoadedAsset = Global.MiceAll;
+                _bFirstLoad = false;
             }
             else
             {
-                dictNotLoadedAsset = fuckingNew(Global.MiceAll, dictMiceData);
-                fuckingDel(Global.MiceAll, dictMiceData, dictLoadedMice);
-                fuckingDel(Global.Team, dictMiceData, dictLoadedTeam);
+                ExpectOutdataObject(Global.MiceAll, _dictMiceData, dictLoadedMice);
+                ExpectOutdataObject(Global.Team, _dictMiceData, dictLoadedTeam);
+                _dictMiceData = SelectNewData(Global.MiceAll, _dictMiceData);
 
-                var buffer = new Dictionary<string, object>(dictNotLoadedAsset);
-
-                foreach (KeyValuePair<string, object> item in buffer)
-                {
-                    string imageName = item.Value.ToString() + "ICON";
-                    if (assetLoader.GetAsset(imageName) == null)
-                        dictNotLoadedAsset.Add(item.Value.ToString(), item.Value);
-                }
+                dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
             }
-
-
-
-            assetLoader.init();
-
-            if (dictNotLoadedAsset.Count != 0)
+   
+            if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
-                _LoadedIcon = false;
-                assetLoader.LoadAsset(iconPath, "MiceICON");
-                LoadIconObject(dictNotLoadedAsset);
-            }
+                assetLoader.init();
+                assetLoader.LoadAsset(iconPath + "/", "MiceICON");
+                _bLoadedIcon = LoadIconObject(dictNotLoadedAsset, iconPath);
+            }                                   // 已載入物件 實體化
             else
             {
                 InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
-                InstantiateIcon(Global.Team,dictLoadedTeam, infoGroupsArea[2].transform);
+                InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
                 ActiveMice(Global.Team);
-                
             }
-            dictMiceData = Global.MiceAll;
-            dictTeamData = Global.Team;
-            //}
+            _dictMiceData = Global.MiceAll;
+            _dictTeamData = Global.Team;
             Global.isPlayerDataLoaded = false;
         }
-    }
+    } 
+    #endregion
 
-    #region -- HideMice 隱藏老鼠 --
-    void ActiveMice(Dictionary<string, object> dictTeamData) // 把按鈕變成無法使用 如果老鼠已Team中
+    #region -- ActiveMice 隱藏/顯示老鼠 --
+    private void ActiveMice(Dictionary<string, object> dictTeamData) // 把按鈕變成無法使用 如果老鼠已Team中
     {
         foreach (KeyValuePair<string, object> item in dictTeamData)
         {
@@ -354,17 +245,6 @@ public class TeamManager : PanelManager
     #endregion
 
     #region --字典 檢查/取值 片段程式碼 --
-    public bool bLoadedTeam(string miceName)
-    {
-        GameObject obj;
-        return dictLoadedTeam.TryGetValue(miceName, out obj);
-    }
-
-    public bool bLoadedMice(string miceName)
-    {
-        GameObject obj;
-        return dictLoadedMice.TryGetValue(miceName, out obj);
-    }
 
     public GameObject GetLoadedMice(string miceName)
     {

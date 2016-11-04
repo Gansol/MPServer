@@ -15,58 +15,72 @@ using System.Collections;
  * 目前載入字體是測試
  * ***************************************************************
  *                          ChangeLog
+ * 20161102 v1.0.2  改變繼承至MPPanel
  * 20160711 v1.0.1  1次重構，獨立AssetLoader                            
- * 20160701 v1.0.0  0版完成 
+ * 20160701 v1.0.0  0版完成 FUCK
  * ****************************************************************/
-public class PanelManager : MonoBehaviour
+public class PanelManager : MPPanel
 {
     #region 欄位
-    AssetLoader _assetLoader;                                // 資源載入組件
-    public string folder;                                   // 資料夾路徑
-    public GameObject[] Panel;                              // 存放Panel位置
+    public static GameObject _lastEmptyItemGroup;
+    public GameObject[] Panel;                                      // 存放Panel位置
 
-    public GameObject _clone;                  // 存放克隆物件、已開起的Pnael
-    private static Dictionary<string, PanelState> dictPanelRefs;   // Panel參考
+    private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
+    private static GameObject _lastPanel;                           // 暫存Panel
+    private string _panelName;                                      // panel名稱
+    private bool _loadedPanel;                                      // 載入的Panel
+    private int _panelNo;                                           // Panel編號
+    
+    ObjectFactory insObj;
 
-    private string _panelName;                              // panel名稱
-    private bool _loadedPanel;                              // 載入的Panel
-    private int _panelNo;                                   // Panel編號
-
-    class PanelState                                        // 存放Pnael
+    public class PanelState                                         // 存放Pnael物件 狀態
     {
-        public bool onOff;                                  // Panel開關
-        public GameObject obj;                              // Panel物件
+        public bool onOff;                                          // Panel開關
+        public GameObject obj;                                      // Panel物件
     }
     #endregion
 
     void Awake()
     {
-        _assetLoader = gameObject.AddComponent<AssetLoader>();
-        dictPanelRefs = new Dictionary<string, PanelState>();
-        StartCoroutine(Test());
-    }
 
-    IEnumerator Test()
-    {
-        _assetLoader.LoadAsset("Panel/", "ComicFont");
-        yield return new WaitForSeconds(1f);
-        _assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
+        insObj = new ObjectFactory();
+        dictPanelRefs = new Dictionary<string, PanelState>();
+        //assetLoader.LoadAsset("Panel/", "PanelUI");
+        //assetLoader.LoadAsset("Panel/", "MainBack");
+        //assetLoader.LoadPrefab("Panel/", "Team");
+        assetLoader.LoadAsset("Panel/", "ComicFont");
+        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+        //assetLoader.LoadPrefab("Panel/", "MenuUI");
     }
 
     void Update()
     {
         if (!_loadedPanel)                                          // 除錯訊息
-            if (!string.IsNullOrEmpty(_assetLoader.ReturnMessage))
-                Debug.Log("訊息：" + _assetLoader.ReturnMessage);
+            if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+                Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (_assetLoader.loadedObj && !_loadedPanel)                 // 載入Panel完成時
+        if (assetLoader.loadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
             InstantiatePanel();
             PanelSwitch();
-            InitPanel(Panel[_panelNo]);
         }
     }
+
+
+    #region -- InstantiatePanel 實體化Panel--
+    private void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    {
+        PanelState panelState = new PanelState();
+        GameObject bundle = assetLoader.GetAsset(_panelName);
+        panelState.obj = insObj.Instantiate(bundle, Panel[_panelNo].transform, _panelName, Vector3.zero, Vector3.one, Vector3.zero, -1);
+        panelState.obj = panelState.obj.transform.parent.gameObject;
+        panelState.obj.layer = Panel[_panelNo].layer;
+        dictPanelRefs.Add(_panelName, panelState);
+        EventMaskSwitch.Switch(panelState.obj);
+    }
+    #endregion
 
     #region -- LoadPanel 載入Panel(外部呼叫用) --
     /// <summary>
@@ -77,7 +91,7 @@ public class PanelManager : MonoBehaviour
     public void LoadPanel(GameObject panel)
     {
         _panelNo = 0;
-        foreach (GameObject item in Panel)
+        foreach (GameObject item in Panel)  // 取得Panel編號
         {
             if (item == panel)
                 break;
@@ -86,15 +100,13 @@ public class PanelManager : MonoBehaviour
 
         _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
 
-        if (!dictPanelRefs.ContainsKey(_panelName))
-        {
-            _loadedPanel = false;
-            _assetLoader.init();
-
-            _assetLoader.LoadAsset("Panel/", "Panel");
-            _assetLoader.LoadPrefab("Panel/", _panelName);
-
-        }
+        if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
+        { 
+            assetLoader.init();
+            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadPrefab("Panel/", _panelName);
+            _loadedPanel = true;
+        }                                                   // 已載入AB 顯示Panel
         else
         {
             PanelSwitch();
@@ -102,227 +114,62 @@ public class PanelManager : MonoBehaviour
     }
     #endregion
 
-    #region -- InitPanel 開始載入Panel內容 --
-    void InitPanel(GameObject loadingPanel)
-    {
-        //loadingPanel.transform.GetChild(0).SendMessage("OnLoadPanel");
-        AssetBundleManager.UnloadUnusedAssets();
-        // InstantiatePanel(); // 實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
-    }
-    #endregion
-
-    #region -- PanelSwitch Panel 開/關 --
+    #region -- InstantiateItem 實體化背包物件背景--
     /// <summary>
-    /// Panel 開/關狀態
+    /// 實體化商店物件背景
     /// </summary>
-    /// <param name="panelNo">Panel編號</param>
-    void PanelSwitch()
+    /// <param name="itemData">資料字典</param>
+    /// <param name="itemPanel">實體化父系位置</param>
+    /// <param name="itemType">道具類別</param>
+    public void InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
-        if (Panel[_panelNo] != null)
+        itemData = GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+
+        if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
-            PanelState panelState = dictPanelRefs[_panelName];
-            if (!Panel[_panelNo].activeSelf)  // if closed
-            {
-                Panel[_panelNo].SetActive(true);
-                Panel[_panelNo].transform.GetChild(0).SendMessage("OnLoading");
-                panelState.onOff = !panelState.onOff;
-                EventMaskSwitch.Switch(Panel[_panelNo]);
-                EventMaskSwitch.lastPanel = Panel[_panelNo];
-            }
-            else
-            {
-                Panel[_panelNo].SetActive(false);
-                panelState.onOff = !panelState.onOff;
-                Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
-            }
-        }
+            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
+            InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+        }                                                       // 已建立道具時
         else
         {
-            Debug.LogError("PanelNo is unknow!");
+            if (itemPanel.FindChild(itemType.ToString()))       // 如果有對應道具類別
+            {
+                _lastEmptyItemGroup.SetActive(false);
+                _lastEmptyItemGroup = itemPanel.FindChild(itemType.ToString()).gameObject;
+                _lastEmptyItemGroup.SetActive(true);
+            }                                                   // 如果沒有對應道具類別資料 建立道具
+            else if (_lastEmptyItemGroup != itemPanel.FindChild(itemType.ToString()))
+            {
+                _lastEmptyItemGroup.SetActive(false);
+                _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
+                InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+            }
         }
     }
-    #endregion
 
-    #region ExpectOutdataObjectByValue 移除已載入且不存在資料庫中物件
-    /// <summary>
-    /// 移除已載入且不存在資料庫中物件
-    /// </summary>
-    /// <param name="dictLoadedObject">舊的已載入物件資料</param>
-    /// <param name="dictServerData">新的Server資料</param>
-    public void ExpectOutdataObjectByValue(Dictionary<string, GameObject> dictLoadedObject, Dictionary<string, object> dictServerData)
+    void InstantiateItem2(Dictionary<string, object> itemData, string itemName, int itemType, Transform parent, int itemCount, Vector2 offset, int tableCount, int rowCount)
     {
-        var buffer = new Dictionary<string, GameObject>(dictLoadedObject);
-        var bufferRefs = new Dictionary<int, string>();
+        Vector2 pos = new Vector2();
+        int count = parent.childCount, i = 0;
 
-        int i = 0;
+        ObjectFactory insObj = new ObjectFactory();
 
-        foreach (KeyValuePair<string, GameObject> item in buffer)
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            bufferRefs.Add(i, item.Key);
-            i++;
-        }
+            var nestedData = item.Value as Dictionary<string, object>;
+            object itemID;
+            nestedData.TryGetValue("ItemID", out itemID);
 
-        i = 0;
-        foreach (KeyValuePair<string, GameObject> item in buffer)
-        {
-            if (!dictServerData.ContainsValue(item.Key))
+            if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
             {
-                for (int j = 0; j < buffer.Count - i; j++)
-                {
-                    if (j + 1 == buffer.Count - i) // j+1 == next value
-                    {
-                        dictLoadedObject[bufferRefs[j + i]].GetComponentInChildren<UISprite>().spriteName = null;
-                        dictLoadedObject[bufferRefs[j + i]].SendMessage("DisableBtn");
-                    }
-                    else
-                    {
-                        dictLoadedObject[bufferRefs[j + i]].GetComponentInChildren<UISprite>().spriteName = dictLoadedObject[bufferRefs[j + i + 1]].GetComponentInChildren<UISprite>().spriteName;
-                    }
-                }
-                dictLoadedObject.Remove(item.Key);
+                pos = sortItemPos(tableCount, rowCount, offset, pos, count + i);
+                GameObject bundle = assetLoader.GetAsset(itemName);
+                string bundleName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
+                insObj.Instantiate(bundle, parent, bundleName, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                pos.x += offset.x;
             }
             i++;
         }
-    }
-    #endregion
-
-
-    #region ExpectOutdataObject 移除已載入且不存在資料庫中物件
-    /// <summary>
-    /// 移除已載入且不存在資料庫中物件
-    /// </summary>
-    /// <param name="dictLoadedObject">舊的已載入物件資料</param>
-    /// <param name="dictServerData">新的Server資料</param>
-    public void ExpectOutdataObjectByKey(Dictionary<string, GameObject> dictLoadedObject, Dictionary<string, object> dictServerData)
-    {
-        var buffer = new Dictionary<string, GameObject>(dictLoadedObject);
-        var bufferRefs = new Dictionary<int, string>();
-
-        int i = 0;
-
-        foreach (KeyValuePair<string, GameObject> item in buffer)
-        {
-            bufferRefs.Add(i, item.Key);
-            i++;
-        }
-
-        i = 0;
-        foreach (KeyValuePair<string, GameObject> item in buffer)
-        {
-            if (!dictServerData.ContainsKey(item.Key))
-            {
-                for (int j = 0; j < buffer.Count - i; j++)
-                {
-                    if (j + 1 == buffer.Count - i) // j+1 == next value
-                    {
-                        dictLoadedObject[bufferRefs[j + i]].GetComponentInChildren<UISprite>().spriteName = null;
-                        dictLoadedObject[bufferRefs[j + i]].SendMessage("DisableBtn");
-                    }
-                    else
-                    {
-                        dictLoadedObject[bufferRefs[j + i]].GetComponentInChildren<UISprite>().spriteName = dictLoadedObject[bufferRefs[j + i + 1]].GetComponentInChildren<UISprite>().spriteName;
-                    }
-                }
-                dictLoadedObject.Remove(item.Key);
-            }
-            i++;
-        }
-    }
-    #endregion
-
-    #region ExpectDuplicateObject
-    /// <summary>
-    /// 移除重複的物件值
-    /// </summary>
-    /// <param name="dictServerData">新的Server資料</param>
-    /// <param name="dictLoadedObject">舊的已載入物件資料</param>
-    /// <returns>不重複的字典資料</returns>
-    public Dictionary<string, object> ExpectDuplicateObject(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> dictLoadedObject)
-    {
-        foreach (KeyValuePair<string, GameObject> item in dictLoadedObject)
-        {
-            var buffer = new Dictionary<string, object>(dictServerData);
-
-            if (buffer.ContainsValue(item.Key))
-            {
-                //var key = dictServerData.FirstOrDefault(x => x.Value == objName).Key;
-                foreach (KeyValuePair<string, object> serverItem in buffer)
-                {
-                    if (serverItem.Value.ToString() == item.Key)
-                        dictServerData.Remove(serverItem.Key);
-                }
-            }
-        }
-        return dictServerData;
-    }
-    #endregion
-
-
-
-    public void fuckingDel(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData, Dictionary<string, GameObject> dicLoadedObject)
-    {
-        var delObject = new Dictionary<string, object>();
-        foreach (KeyValuePair<string, object> item in dicClinetData)
-        {
-            if (dicServerData.ContainsValue(item.Value)) // 如果Server有Client的物件
-            {
-                if (!dicServerData.ContainsKey(item.Key)) // 如果Server的KEY 和 Client的KEY 不同 移除舊的物件
-                {
-                    dicLoadedObject[item.Value.ToString()].GetComponentInChildren<UISprite>().spriteName = null;
-                    dicLoadedObject.Remove(item.Value.ToString());
-                }
-            }
-            else if (dicLoadedObject.ContainsKey(item.Value.ToString())) // 如果載入的物件
-            {
-                Debug.Log("BUG");
-                dicLoadedObject[item.Value.ToString()].GetComponentInChildren<UISprite>().spriteName = null;
-                dicLoadedObject.Remove(item.Value.ToString());
-            }
-        }
-    }
-
-
-    public Dictionary<string, object> fuckingNew(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData)
-    {
-        var newObject = new Dictionary<string, object>();
-        var buffer = new Dictionary<string, object>();
-
-        foreach (KeyValuePair<string, object> item in dicServerData)
-        {
-            if (!dicClinetData.ContainsValue(item.Value))
-                newObject.Add(item.Key, item.Value);
-            else if (dicClinetData.ContainsValue(item.Value) && !dicClinetData.ContainsKey(item.Key))
-            {
-                buffer = dicServerData;
-
-            }
-        }
-
-        return newObject;
-    }
-
-    #region -- 字典 檢查/取值 片段 --
-    public bool bLoadedPanel(string panelName)
-    {
-        return dictPanelRefs.ContainsKey(panelName) ? true : false;
-    }
-    #endregion
-
-    #region -- CreateEmptyGroup 建立空物件群組 --
-    /// <summary>
-    /// 建立空物件群組
-    /// </summary>
-    /// <param name="parent">上層物件</param>
-    /// <param name="itemType">群組類型(名稱)</param>
-    /// <returns></returns>
-    public GameObject CreateEmptyGroup(Transform parent, int itemType)
-    {
-        GameObject emptyGroup = new GameObject(itemType.ToString());   // 商品物件空群組
-        emptyGroup.transform.parent = parent;
-        emptyGroup.layer = parent.gameObject.layer;
-        emptyGroup.transform.localPosition = Vector3.zero;
-        emptyGroup.transform.localScale = Vector3.one;
-        return emptyGroup;
     }
     #endregion
 
@@ -353,121 +200,119 @@ public class PanelManager : MonoBehaviour
     }
     #endregion
 
-    #region -- GetItemInfoFromType --
-    public Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
-    {
-        Dictionary<string, object> data = new Dictionary<string, object>();
 
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemType;
-            nestedData.TryGetValue("ItemType", out itemType);
-            if (itemType != null)
-                if (itemType.ToString() == type.ToString())
-                {
-                    data.Add(nestedData["ItemID"].ToString(), nestedData);
-                }
-        }
-        return data;
-
-
-
-
-
-
-
-        //List<List<string>> b = new List<List<string>>();
-        //List<string> a;
-        ////        Debug.Log(itemData[0, 0]);
-        //for (int i = 0; i < itemData.GetLength(0); i++)
-        //{
-        //    string itemType = itemData[i, 0].Remove(1, itemData[i, 0].Length - 1); // 商品ID第一個字元為類別
-        //    //            Debug.Log(itemType);
-        //    if (itemType == type.ToString())
-        //    {
-        //        a = new List<string>();
-        //        for (int j = 0; j < itemData.GetLength(1); j++)
-        //        {
-        //            a.Add(itemData[i, j]);
-        //        }
-        //        b.Add(a);
-        //    }
-        //}
-        ////        Debug.Log(itemData.GetLength(0) + "  " + b.Count);
-        //itemData = new string[b.Count, b[0].Count];
-
-        //for (int i = 0; i < b.Count; i++)
-        //{
-        //    List<string> c = b[i];
-
-        //    for (int j = 0; j < c.Count; j++)
-        //    {
-        //        itemData[i, j] = c[j];
-        //    }
-        //}
-        //return itemData;
-    }
-    #endregion
-
+    #region -- PanelSwitch Panel 開/關 --
     /// <summary>
-    /// 從道具ID取得道具名稱
+    /// Panel 開/關狀態
     /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    #region -- GetItemNameFromID --
-    public string GetItemNameFromID(string itemID, Dictionary<string, object> itemData)
+    /// <param name="panelNo">Panel編號</param>
+    private void PanelSwitch()
     {
-        object objNested;
+        PanelState panelState = dictPanelRefs[_panelName];      // 取得目前Panel狀態
 
-        itemData.TryGetValue(itemID.ToString(), out objNested);
-        if (objNested != null)
+        if (panelState.obj != null)
         {
-            var dictNested = objNested as Dictionary<string, object>;
-            return dictNested["ItemName"].ToString();
-        }
-        return "";
-    }
-    #endregion
-
-    /// <summary>
-    /// 從道具名稱取得道具ID
-    /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    #region -- GetItemNameFromID --
-    public string GetItemIDFromName(string itemName, Dictionary<string, object> itemData)
-    {
-        object value;
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            nestedData.TryGetValue("ItemName", out value);
-            if (itemName == value.ToString())
+            if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
-                nestedData.TryGetValue("ItemID", out value);
-                return value.ToString();
+                if(_lastPanel!=null) _lastPanel.SetActive(false);
+                panelState.obj.SetActive(true);
+                panelState.obj.transform.GetChild(0).SendMessage("OnLoading");
+                panelState.onOff = !panelState.onOff;
+                _lastPanel = panelState.obj;
+
+                EventMaskSwitch.Switch(panelState.obj);
+                EventMaskSwitch.lastPanel = panelState.obj;
+            }                                                   // 如果Panel已開啟
+            else
+            {
+                panelState.obj.SetActive(false);
+                panelState.onOff = !panelState.onOff;
+                Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
             }
         }
-        return "";
+        else
+        {
+            Debug.LogError("PanelNo is unknow!");
+        }
     }
     #endregion
 
-    #region -- InstantiatePanel --
-    void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    #region -- 字典 檢查/取值 片段 --
+    public bool bLoadedPanel(string panelName)
     {
-        PanelState panelState = new PanelState();
-        panelState.obj = (GameObject)Instantiate(_assetLoader.GetAsset(_panelName));
-        panelState.obj.transform.parent = Panel[_panelNo].transform;
-        panelState.obj.transform.localPosition = Vector3.zero;
-        panelState.obj.transform.localScale = Vector3.one;
-        panelState.obj.name = _panelName;
-        panelState.obj.layer = Panel[_panelNo].layer;
-        dictPanelRefs.Add(_panelName, new PanelState());
-
-        EventMaskSwitch.Switch(panelState.obj);
+        return dictPanelRefs.ContainsKey(panelName) ? true : false;
     }
     #endregion
+
+    #region -- ExpectOutdataObject 移除非同步物件 --
+    /// <summary>
+    /// 移除非同步物件
+    /// </summary>
+    /// <param name="dicServerData">Server Data</param>
+    /// <param name="dicClinetData">Client Data</param>
+    /// <param name="dicLoadedObject">已載入物件</param>
+    public void ExpectOutdataObject(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData, Dictionary<string, GameObject> dicLoadedObject)
+    {
+        var delObject = new Dictionary<string, object>();
+
+        if (dicClinetData.Count != 0)
+        {
+            foreach (KeyValuePair<string, object> item in dicClinetData)
+            {
+                if (dicServerData.ContainsValue(item.Value)) // 如果Server有Client的物件
+                {
+                    if (!dicServerData.ContainsKey(item.Key)) // 如果Server的KEY 和 Client的KEY 不同 移除舊的物件
+                    {
+                        dicLoadedObject[item.Value.ToString()].GetComponentInChildren<UISprite>().spriteName = null;
+                        dicLoadedObject.Remove(item.Value.ToString());
+                    }
+                }
+                else if (dicLoadedObject.ContainsKey(item.Value.ToString())) // 如果載入的物件
+                {
+                    Debug.Log("BUG");
+                    dicLoadedObject[item.Value.ToString()].GetComponentInChildren<UISprite>().spriteName = null;
+                    dicLoadedObject.Remove(item.Value.ToString());
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region -- SelectNewData 獲得伺服器新增資料 --
+    /// <summary>
+    /// 獲得伺服器新增資料，排除重複
+    /// </summary>
+    /// <param name="dicServerData">Server Data</param>
+    /// <param name="dicClinetData">Client Data</param>
+    /// <returns></returns>
+    public Dictionary<string, object> SelectNewData(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData)
+    {
+        var newObject = new Dictionary<string, object>();           // 新資料
+        var buffer = new Dictionary<string, object>();              // buffer
+
+        foreach (KeyValuePair<string, object> item in dicServerData)
+        {
+            if (!dicClinetData.ContainsValue(item.Value))           // 如果在Clinet找不到Server資料 = 新資料           
+            {
+                newObject.Add(item.Key, item.Value);
+            }                                                       // 如果在Clinet找不到Server資料 且 如果Clinet和Server Key值不相等
+            else if (dicClinetData.ContainsValue(item.Value) && !dicClinetData.ContainsKey(item.Key))
+            {
+                //buffer = dicServerData;
+                Debug.LogError("SelectNewData 還沒寫好 Error!");
+            }
+        }
+        return newObject;
+    }
+    #endregion
+
+    public override void OnLoading()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void OnLoadPanel()
+    {
+        throw new System.NotImplementedException();
+    }
 }

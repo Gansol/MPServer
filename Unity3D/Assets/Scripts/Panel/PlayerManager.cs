@@ -14,58 +14,71 @@ using MiniJSON;
  * ***************************************************************
  * 125行 目前還沒載入載人圖片檔案 如要要載入需要移除 且須改寫部分程式
  * _dictEquipData 還沒寫 裝備排序
+ * 道具排序未照PlayerData排序(未寫)
  * ***************************************************************
  *                           ChangeLog
- *                     
+ * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
+ * 20160914 v1.0.1b  2次重構，獨立實體化物件                          
+ * 20160711 v1.0.1a  1次重構，獨立AssetLoader                       
+ * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改
  * ****************************************************************/
-
-// mice = item
-// team = equip
 
 public class PlayerManager : PanelManager
 {
+    #region 欄位
     /// <summary>
     /// MiceIcon名稱(非bundle)、Mice按鈕
     /// </summary>
-    public static Dictionary<string, GameObject> dictLoadedItem { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
+    public static Dictionary<string, GameObject> dictLoadedItem { get; set; }
     /// <summary>
     /// TeamIcon名稱、Mice按鈕索引物件
     /// </summary>
-    public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }       // <string, GameObject>Icon名稱、Icon的按鈕
-    private static Dictionary<string, object> _dictItemData, _dictEquipData;         // Json老鼠、隊伍資料
+    public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
+    private static Dictionary<string, object> _dictItemData, _dictEquipData;        // 道具資料、裝備資料
 
-    public GameObject[] infoGroupArea;
-    public GameObject _lastEmptyItemGroup;
-    public int itemOffset;
-    public string[] assetFolder;
-
-    AssetLoader assetLoader;
+    public GameObject[] infoGroupArea;      // 道具存放區
+    public string[] assetFolder;            // 資料夾
+    public Vector2 itemOffset;
+    /// <summary>
+    /// 每頁物件矩總量
+    /// </summary>
+    public int tablePageCount;
+    /// <summary>
+    /// 物件矩 每行物件數量
+    /// </summary>
+    public int tableRowCount;
+    /// <summary>
+    /// 角色縮放
+    /// </summary>     
+    public Vector3 actorScale;
 
     private int _itemType;
-    private float delayBetween2Clicks, _lastClickTime;
+    private float _delayBetween2Clicks, _lastClickTime;
+    private static bool _bFirstLoad;
     private bool _LoadedIcon, _LoadedItemData, _isLoadPlayerData, _isLoadPlayerItem, _isLoadEquip;
     private GameObject _tmpTab, _doubleClickChk;
-    private string folderString;
-    string[,] item, equip;
 
+    private ObjectFactory insObj;
+    #endregion
 
-    private InstantiateObject insObj;
-    // Use this for initialization
-    void Awake()
+    #region -- Init --
+    private void Awake()
     {
-        Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
+        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         dictLoadedItem = new Dictionary<string, GameObject>();
         dictLoadedEquiped = new Dictionary<string, GameObject>();
-        _dictItemData = Global.SortedItem;
-        //_dictEquipData = Global.Team;
-        insObj = new InstantiateObject();
-        assetLoader = gameObject.AddComponent<AssetLoader>();
-        _itemType = (int)StoreType.Item;
-        folderString = assetFolder[_itemType];
-    }
+        insObj = new ObjectFactory();
 
-    // Update is called once per frame
-    void Update()
+        _bFirstLoad = true;
+        _dictItemData = Global.SortedItem;
+        _itemType = (int)StoreType.Item;
+
+        Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
+    }
+    #endregion
+
+    #region -- Update --
+    private void Update()
     {
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log("訊息：" + assetLoader.ReturnMessage);
@@ -74,7 +87,7 @@ public class PlayerManager : PanelManager
         {
             _isLoadPlayerData = !_isLoadPlayerData;
             Global.isPlayerDataLoaded = false;
-            LoadPlayerData();
+            LoadPlayerInfo();
         }
 
         if (assetLoader.loadedObj && _LoadedIcon)
@@ -83,102 +96,25 @@ public class PlayerManager : PanelManager
             assetLoader.init();
             _tmpTab = infoGroupArea[_itemType];
 
-            InstantiateItem(_dictItemData, infoGroupArea[2].transform, _itemType);
-            InstantiateEquipIcon(Global.playerItem);
-            InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
-        }
+            InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
+            InstantiateEquipIcon(Global.playerItem, infoGroupArea[0].transform, (int)StoreType.Item);
+            InstantiateEquipIcon(Global.playerItem, infoGroupArea[1].transform, (int)StoreType.Armor);
+            InstantiateIcon(_dictItemData, PanelManager._lastEmptyItemGroup.transform, _itemType);
 
-    }
-
-    #region -- LoadIconObject 載入載入ICON物件 --
-    /// <summary>
-    /// 載入ICON物件
-    /// </summary>
-    /// <param name="itemData">物件陣列</param>
-    /// <param name="folder">資料夾</param>
-    public void LoadIconObject(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
-    {
-        if (itemData != null)
-        {
-            foreach (KeyValuePair<string, object> item in itemData)
-            {
-                if (!string.IsNullOrEmpty(item.Key)) assetLoader.LoadPrefab(folder + "/", item.Key);
-            }
-            _LoadedIcon = true;
-        }
-        else
-        {
-            Debug.Log("LoadIconObject:itemData is Null !!");
+            infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
+            infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
         }
     }
     #endregion
 
-    #region -- InstantiateItem 實體化商店物件--
-    /// <summary>
-    /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
-    /// </summary>
-    /// <param name="dictionary">資料字典</param>
-    /// <param name="myParent">實體化父系位置</param>
-    void InstantiateItem(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
-    {
-        if (itemPanel.transform.childCount == 0)
-        {
-            _lastEmptyItemGroup = CreateEmptyGroup(itemPanel, itemType);
-            InstantiateItem2(itemData, _lastEmptyItemGroup.transform, itemData.Count);
-        }
-        else
-        {
-            if (itemPanel.FindChild(itemType.ToString()))
-            {
-                _lastEmptyItemGroup.SetActive(false);
-                _lastEmptyItemGroup = itemPanel.FindChild(itemType.ToString()).gameObject;
-                _lastEmptyItemGroup.SetActive(true);
-            }
-            else if (_lastEmptyItemGroup != itemPanel.FindChild(itemType.ToString()))
-            {
-                _lastEmptyItemGroup.SetActive(false);
-                _lastEmptyItemGroup = CreateEmptyGroup(itemPanel, itemType);
-                InstantiateItem2(itemData, _lastEmptyItemGroup.transform, itemData.Count);
-            }
-        }
-        infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
-        infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
-    }
-
-    void InstantiateItem2(Dictionary<string, object> itemData, Transform parent, int itemCount)
-    {
-        Vector2 pos = new Vector2();
-        string itemName = "InvItem";
-        int count = parent.childCount, i = 0;
-
-        itemData = GetItemInfoFromType(itemData, _itemType);
-
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemID;
-            nestedData.TryGetValue("ItemID", out itemID);
-
-            if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
-            {
-                pos = sortItemPos(9, 3, new Vector2(itemOffset, itemOffset), pos, count + i);
-                GameObject bundle = assetLoader.GetAsset(itemName);
-                string bundleName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
-                _clone = insObj.Instantiate(bundle, parent, bundleName, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-                pos.x += itemOffset;
-            }
-            i++;
-        }
-    }
-    #endregion
-
-    #region -- InstantiateItemIcon 實體化背包道具物件--
+    #region -- InstantiateItemIcon 實體化背包道具 --
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
     /// </summary>
-    /// <param name="dictionary">資料字典</param>
-    /// <param name="myParent">實體化父系位置</param>
-    void InstantiateItemIcon(Dictionary<string, object> itemData, Transform myParent, int itemType)
+    /// <param name="itemData">資料字典</param>
+    /// <param name="itemPanel">實體化父系位置</param>
+    /// <param name="itemType">道具類別</param>
+    private void InstantiateIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
         itemData = GetItemInfoFromType(itemData, itemType);
 
@@ -198,12 +134,12 @@ public class PlayerManager : PanelManager
                 if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
                 {
                     GameObject bundle = assetLoader.GetAsset(bundleName);
-                    Transform imageParent = myParent.GetChild(i).GetChild(0);
+                    Transform imageParent = itemPanel.GetChild(i).GetChild(0);
 
                     if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                     {
                         imageParent.parent.name = itemID.ToString();
-                        _clone = insObj.Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
+                        GameObject _clone = insObj.Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
                         _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
 
                         object value;
@@ -232,12 +168,11 @@ public class PlayerManager : PanelManager
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
     /// </summary>
-    /// <param name="dictionary">資料字典</param>
-    /// <param name="myParent">實體化父系位置</param>
-    void InstantiateEquipIcon(Dictionary<string, object> itemData)
+    /// <param name="itemData">資料字典</param>
+    /// <param name="parent">圖片位置</param>
+    private void InstantiateEquipIcon(Dictionary<string, object> itemData, Transform myParent, int itemType)
     {
-        int itemCount = 0, armorCount = 0;
-        bool itemOrEquip;    // true = item false = equip
+        int i = 0;
 
         foreach (KeyValuePair<string, object> item in itemData)
         {
@@ -248,41 +183,27 @@ public class PlayerManager : PanelManager
             nestedData.TryGetValue("ItemID", out itemID);
             itemName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
 
-            if (!bLoadedEquip(itemName.ToString()))
+            if (!dictLoadedEquiped.ContainsKey(itemName))                                 // 如果道具不在裝備欄位 
             {
-                object value;
-                nestedData.TryGetValue("IsEquip", out value);
-                if (System.Convert.ToBoolean(value))
+                object isEquip, type;
+                nestedData.TryGetValue("IsEquip", out isEquip);
+                nestedData.TryGetValue("ItemType", out type);
+
+                if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                 {
                     string bundleName = itemName + "ICON";
-                    if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
+                    if (assetLoader.GetAsset(bundleName) != null)                   // 已載入資產時
                     {
-                        // 起始值是EquipItem的位置
-                        Transform myParent = infoGroupArea[0].transform;
-                        Transform imageParent = myParent.GetChild(itemCount).GetChild(0);
-                        itemOrEquip = true;
-
-                        // 如果是裝備位置
-                        nestedData.TryGetValue("ItemType", out value);
-                        if (int.Parse(value.ToString()) == (int)StoreType.Armor)
-                        {
-                            myParent = infoGroupArea[1].transform;
-                            imageParent = myParent.GetChild(armorCount).GetChild(0);
-                            itemOrEquip = false;
-                        }
-
+                        Transform imageParent = myParent.GetChild(i).GetChild(0);
                         if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                         {
-
                             imageParent.parent.name = itemID.ToString();
-                            GameObject bundle = assetLoader.GetAsset(bundleName);
+                            GameObject _clone, bundle = assetLoader.GetAsset(bundleName);
                             _clone = insObj.Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
                             _clone.GetComponentInParent<ButtonSwitcher>().enabled = true;
                             _clone.GetComponentInParent<ButtonSwitcher>().SendMessage("EnableBtn");
                             if (!dictLoadedEquiped.ContainsKey(itemID.ToString())) dictLoadedEquiped.Add(itemID.ToString(), imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
-                            //dictLoadedItem[imageName].SendMessage("DisableBtn");
-
-                            if (itemOrEquip) itemCount++; else armorCount++; // 判斷載入裝備物品類別遞增值
+                            i++;
                         }
                     }
                 }
@@ -291,40 +212,7 @@ public class PlayerManager : PanelManager
     }
     #endregion
 
-    #region -- Add2Refs 加入老鼠參考 --
-    /// <summary>
-    /// 加入老鼠參考
-    /// </summary>
-    /// <param name="bundle">AssetBundle</param>
-    /// <param name="myParent">參考按鈕</param>
-    void Add2Refs(GameObject bundle, Transform myParent, bool isEquip)
-    {
-        string btnArea = myParent.parent.name;                          //按鈕存放區域名稱 Team / Mice 區域
-        string itemName = bundle.name.Remove(bundle.name.Length - 4);
-
-
-
-
-    }
-    #endregion
-
-    public bool bLoadedEquip(string itemName)
-    {
-        GameObject obj;
-        if (!string.IsNullOrEmpty(itemName))
-            return dictLoadedEquiped.TryGetValue(itemName, out obj);
-
-        return false;
-    }
-
-    public bool bLoadedItem(string itemName)
-    {
-        GameObject obj;
-        if (!string.IsNullOrEmpty(itemName))
-            return dictLoadedItem.TryGetValue(itemName, out obj);
-        return false;
-    }
-
+    #region -- 取值程式碼片段 --
     public GameObject GetLoadedItem(string itemName)
     {
         GameObject obj;
@@ -340,11 +228,12 @@ public class PlayerManager : PanelManager
             return obj;
         return null;
     }
+    #endregion
 
     #region -- OnMiceClick 當按下老鼠時 --
     public void OnItemClick(GameObject item)
     {
-        if (Time.time - _lastClickTime < delayBetween2Clicks && _doubleClickChk == item)    // Double Click
+        if (Time.time - _lastClickTime < _delayBetween2Clicks && _doubleClickChk == item)    // Double Click
             item.SendMessage("Item2Click");
         else
             StartCoroutine(OnClickCoroutine(item));
@@ -355,16 +244,16 @@ public class PlayerManager : PanelManager
 
     IEnumerator OnClickCoroutine(GameObject item)
     {
-        yield return new WaitForSeconds(delayBetween2Clicks);
+        yield return new WaitForSeconds(_delayBetween2Clicks);
 
-        if (Time.time - _lastClickTime < delayBetween2Clicks)
+        if (Time.time - _lastClickTime < _delayBetween2Clicks)
             yield break;
 
         Debug.Log(item.transform.GetChild(0).name);
     }
     #endregion
 
-    #region OnTabClick
+    #region -- OnTabClick 當按下Tab時--
     public void OnTabClick(GameObject obj)
     {
         int value = int.Parse(obj.name.Remove(0, 3));
@@ -381,98 +270,66 @@ public class PlayerManager : PanelManager
                 Debug.LogError("Unknow Tab!");
                 break;
         }
-        OnLoadPanel();
+        InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
+        InstantiateIcon(_dictItemData, PanelManager._lastEmptyItemGroup.transform, _itemType);
+        infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
+        infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
     }
     #endregion
 
-    void OnLoading()
+    #region -- OnLoadPanel 載入面板時--
+    public override void OnLoading()
     {
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
-
     }
 
-    void OnLoadPanel()
+    protected override void OnLoadPanel()
     {
-        if (transform.parent.gameObject.activeSelf)
+        if (transform.parent.gameObject.activeSelf) // 如果Panel是啟動狀態 接收Event
         {
-            _dictItemData = Global.playerItem;
-
-            ExpectOutdataObjectByKey(dictLoadedItem, _dictItemData);
-            ExpectOutdataEquip(_dictItemData);
-
-            _dictItemData = ExpectDuplicateObject(_dictItemData, dictLoadedItem);
-
-            Dictionary<string, object> dictNotLoadedObject = new Dictionary<string, object>();
-
-            foreach (KeyValuePair<string, object> item in _dictItemData)
+            Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+            if (_bFirstLoad)                        // 取得未載入物件
             {
-                string imageName = GetItemNameFromID(item.Key, Global.itemProperty);
-                if (!string.IsNullOrEmpty(imageName))
-                {
-                    imageName += "ICON";
-                    if (assetLoader.GetAsset(imageName) == null)
-                        dictNotLoadedObject.Add(imageName, item.Value);
-                }
-            }
-
-            if (dictNotLoadedObject.Count != 0)
-            {
-                assetLoader.init();
-                assetLoader.LoadAsset(folderString + "/", folderString);
-                assetLoader.LoadPrefab("Panel/", "InvItem");
-                LoadIconObject(dictNotLoadedObject, folderString);
+                dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
+                _bFirstLoad = false;
             }
             else
             {
-                InstantiateItem(_dictItemData, infoGroupArea[2].transform, _itemType);
-                InstantiateEquipIcon(Global.playerItem);
-                InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
+                ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItem);
+                ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquiped);
+                _dictItemData = SelectNewData(Global.playerItem, _dictItemData);
+
+                dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
             }
 
+            if (dictNotLoadedAsset.Count != 0) // 如果 有未載入物件 載入AB
+            {
+                assetLoader.init();
+                assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
+                assetLoader.LoadPrefab("Panel/", "InvItem");
+                _LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
+            }                                   // 已載入物件 實體化
+            else
+            {
+                InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
+                InstantiateEquipIcon(Global.playerItem, infoGroupArea[0].transform, (int)StoreType.Item);
+                InstantiateEquipIcon(Global.playerItem, infoGroupArea[1].transform, (int)StoreType.Armor);
+                InstantiateIcon(_dictItemData, PanelManager._lastEmptyItemGroup.transform, _itemType);
+
+                infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
+                infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
+            }
+            _dictItemData = Global.playerItem;
             _tmpTab = infoGroupArea[_itemType];
         }
     }
+    #endregion
 
-
-    private void ExpectOutdataEquip(Dictionary<string, object> dictServerData)
+    #region -- LoadPlayerInfo 載入玩家資訊 --
+    private void LoadPlayerInfo()
     {
-        foreach (KeyValuePair<string, GameObject> equipObject in dictLoadedEquiped)
-        {
-            foreach (KeyValuePair<string, object> item in dictServerData)
-            {
-                var serverItem = item.Value as Dictionary<string, object>;
-                object value;
-                serverItem.TryGetValue("ItemID", out value);
-                if (value.ToString() == equipObject.Key)
-                {
-                    serverItem.TryGetValue("IsEquip", out value);
-                    if (!System.Convert.ToBoolean(value))
-                    {
-                        equipObject.Value.GetComponentInChildren<UISprite>().spriteName = null;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    void selectData()
-    {
-        switch (_itemType)
-        {
-            case (int)StoreType.Item:
-            case (int)StoreType.Armor:
-                folderString = assetFolder[_itemType];
-                _dictItemData = Global.playerItem;
-                break;
-        }
-    }
-
-    void LoadPlayerData()
-    {
-        // to do load property
         _isLoadPlayerData = !_isLoadPlayerData;
         Transform parent = infoGroupArea[3].transform;
         float winRate = ((float)Global.SumWin / (float)Global.SumBattle) * 100f;
@@ -483,11 +340,7 @@ public class PlayerManager : PanelManager
         parent.GetChild(4).GetComponent<UILabel>().text = Global.Gold.ToString();
         parent.GetChild(5).GetComponent<UILabel>().text = (winRate).ToString() + " %";
     }
-
-    void LoadItemStorage()
-    {
-        // to do load Storage
-    }
+    #endregion
 
     public void OnClosed()
     {

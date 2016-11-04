@@ -22,7 +22,7 @@ using System.Linq;
 public class PoolManager : MonoBehaviour
 {
     private AssetLoader assetLoader;
-    private InstantiateObject insObj;
+    private ObjectFactory insObj;
     private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictObject;
 
@@ -73,7 +73,7 @@ public class PoolManager : MonoBehaviour
     void Awake()
     {
         assetLoader = gameObject.AddComponent<AssetLoader>();
-        insObj = new InstantiateObject();
+        insObj = new ObjectFactory();
         _lastTime = 0;
         _currentTime = 0;
         clearTime = 10;
@@ -107,6 +107,9 @@ public class PoolManager : MonoBehaviour
     {
         if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log(assetLoader.ReturnMessage);
+
+
+
 
         if (assetLoader.loadedObj && !_poolingFlag)
         {
@@ -153,6 +156,8 @@ public class PoolManager : MonoBehaviour
 
                 Transform parent = ObjectPool.transform.FindChild(item.Value).transform;
                 clone = insObj.Instantiate(bundle, parent, item.Value, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                clone.transform.GetChild(0).gameObject.AddComponent<Mice>();
+                clone.transform.GetChild(0).gameObject.GetComponent<Mice>().Initialize(0.1f, 6, 60);
                 clone.transform.GetChild(0).gameObject.SetActive(false);    // 新版 子物件隱藏
             }
         }
@@ -168,7 +173,7 @@ public class PoolManager : MonoBehaviour
             if (bundle != null)
             {
                 Vector3 scale = Vector3.zero;
-                InstantiateObject insObj = new InstantiateObject();
+
                 clone = new GameObject();
                 Transform parent = skillArea.transform.GetChild(i);
 
@@ -176,7 +181,6 @@ public class PoolManager : MonoBehaviour
                 clone = insObj.Instantiate(bundle, parent, item.Value.ToString(), Vector3.zero, scale, Vector2.zero, -1);
                 clone.transform.GetChild(0).GetComponent<Animator>().enabled = false;
                 clone.transform.GetChild(0).GetComponent<BoxCollider2D>().enabled = false;
-                clone.transform.GetChild(0).GetComponent<MonoBehaviour>().enabled = false;
                 clone.layer = clone.transform.parent.gameObject.layer;
 
                 skillArea.transform.GetChild(i).transform.gameObject.SetActive(true);    // 新版 子物件隱藏
@@ -208,6 +212,8 @@ public class PoolManager : MonoBehaviour
             {
                 Transform parent = ObjectPool.transform.FindChild(objectName).transform;
                 clone = insObj.Instantiate(bundle, parent, objectName, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                clone.transform.GetChild(0).gameObject.AddComponent<Mice>();
+                clone.transform.GetChild(0).gameObject.GetComponent<Mice>().Initialize(0.1f, 6, 60);
                 return clone;
             }
 
@@ -242,8 +248,9 @@ public class PoolManager : MonoBehaviour
         foreach (KeyValuePair<string, object> item in Global.miceProperty)
         {
             var nestedData = item.Value as Dictionary<string, object>;
-            nestedData.TryGetValue("ItemName",out value);
-            if(miceName == value.ToString()){
+            nestedData.TryGetValue("ItemName", out value);
+            if (miceName == value.ToString())
+            {
                 nestedData.TryGetValue("ItemID", out value);
                 return int.Parse(value.ToString());
             }

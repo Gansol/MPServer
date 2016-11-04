@@ -1405,7 +1405,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             { (byte)BattleParameterCode.Score, gameScore },{ (byte)BattleParameterCode.OtherScore, otherScore },
             { (byte)BattleParameterCode.Time, gameTime },{ (byte)PlayerDataParameterCode.MaxCombo, Global.MaxCombo },
             { (byte)PlayerDataParameterCode.SumKill, killMice },{ (byte)PlayerDataParameterCode.SumLost, lostMice },
-            { (byte)PlayerDataParameterCode.SortedItem, Global.SortedItem },
+            { (byte)PlayerDataParameterCode.SortedItem, Json.Serialize(Global.SortedItem) },
             };
 
             this.peer.OpCustom((byte)BattleOperationCode.GameOver, parameter, true, 0, true); // operationCode is RoomSpeak

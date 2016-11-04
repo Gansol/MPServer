@@ -17,31 +17,31 @@ using System;
  * v0.0.2 20160629  fixbug: loaded bundle check.
  * v0.0.1 20150000  AssetbundleManager publish.    
  * ***************************************************************/
-public class AssetBundleManager
+public static class AssetBundleManager
 {
-    public AssetBundleRequest request { get { return _request; } }
-    public bool isLoadAtlas { get { return _isLoadAtlas; } }
-    public bool isLoadMat { get { return _isLoadMat; } }
-    public bool isLoadPrefab { get { return _isLoadPrefab; } }
-    public bool isLoadObject { get { return _isLoadObject; } set { _isLoadObject = value; } }
-    public bool isStartLoadAsset { get { return _isStartLoadAsset; } }
-    public string ReturnMessage { get { return _ReturnMessage; } }
-    public string Ret { get { return _Ret; } }
-    public int progress { get { return _progress; } }
-    public int loadedABCount { get { return _loadedABCount; } set { _loadedABCount = value; } }
-    public int loadedObjectCount { get { return _loadedObjectCount; } set { _loadedObjectCount = value; } }
+    public static AssetBundleRequest request { get { return _request; } }
+    public static bool isLoadAtlas { get { return _isLoadAtlas; } }
+    public static bool isLoadMat { get { return _isLoadMat; } }
+    public static bool isLoadPrefab { get { return _isLoadPrefab; } }
+    public static bool isLoadObject { get { return _isLoadObject; } set { _isLoadObject = value; } }
+    public static bool isStartLoadAsset { get { return _isStartLoadAsset; } }
+    public static string ReturnMessage { get { return _ReturnMessage; } }
+    public static string Ret { get { return _Ret; } }
+    public static int progress { get { return _progress; } }
+    public static int loadedABCount { get { return _loadedABCount; } set { _loadedABCount = value; } }
+    public static int loadedObjectCount { get { return _loadedObjectCount; } set { _loadedObjectCount = value; } }
 
-    private AssetBundleRequest _request = null;
-    private bool _isLoadAtlas = false;
-    private bool _isLoadMat = false;
-    private bool _isLoadPrefab = false;
-    private bool _isLoadObject = false;
-    private bool _isStartLoadAsset = false;
-    private string _ReturnMessage = "";
-    private string _Ret = "C000";
-    private int _progress = 0;
-    private int _loadedABCount = 0;
-    private int _loadedObjectCount = 0;
+    private static AssetBundleRequest _request;
+    private static bool _isLoadAtlas = false;
+    private static bool _isLoadMat = false;
+    private static bool _isLoadPrefab = false;
+    private static bool _isLoadObject = false;
+    private static bool _isStartLoadAsset = false;
+    private static string _ReturnMessage = "";
+    private static string _Ret = "C000";
+    private static int _progress = 0;
+    private static int _loadedABCount = 0;
+    private static int _loadedObjectCount = 0;
 
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
 
@@ -50,7 +50,7 @@ public class AssetBundleManager
         dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
     }
 
-    public void init()
+    public static void init()
     {
         _request = null;
         _isLoadAtlas = false;
@@ -62,6 +62,7 @@ public class AssetBundleManager
         _Ret = "C000";
         _progress = 0;
         _loadedABCount = 0;
+        loadedObjectCount = 0;
     }
 
     public class AssetBundleRef
@@ -69,7 +70,7 @@ public class AssetBundleManager
         public AssetBundle assetBundle = null;
     };
 
-    public IEnumerator LoadAtlas(string folder, string assetName, System.Type type)
+    public static IEnumerator LoadAtlas(string folder, string assetName, System.Type type)
     {
         AssetBundleRef abRef;
         string assetPath = folder + assetName;
@@ -109,6 +110,7 @@ public class AssetBundleManager
                 {
                     _Ret = "C002";
                     _ReturnMessage = "載入資源失敗！ : \n" + assetPath + "\n";
+                    Debug.Log(_ReturnMessage);
                     foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
                     {
                         Debug.LogError("AB DICT: " + item.Key.ToString());
@@ -148,7 +150,7 @@ public class AssetBundleManager
     }
 
 
-    public IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 錯誤 要加一個 floder
+    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 錯誤 要加一個 floder
     {
         //Debug.Log("( 1 ) :" + assetName);
         AssetBundleRef abRef;
@@ -169,7 +171,7 @@ public class AssetBundleManager
             {
                 _Ret = "C002";
                 _ReturnMessage = "載入遊戲物件失敗！ :" + assetPath + "\n" + www.error;
-                //Debug.Log("( 3 ) :" + assetName);
+                Debug.Log("( 3 ) :" + _ReturnMessage);
                 throw new Exception(www.error);
             }
             else if (www.isDone)
@@ -199,7 +201,7 @@ public class AssetBundleManager
     /// </summary>
     /// <param name="assetName"></param>
     /// <returns></returns>
-    public bool bLoadedAssetbundle(string assetName)
+    public static bool bLoadedAssetbundle(string assetName)
     {
         AssetBundleRef abRef;
         bool Loaded;

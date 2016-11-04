@@ -189,7 +189,7 @@ public class ButtonSwitcher : MPButton
                 EnDisableBtn(_clone, false);
 
                 GameObject invButton = PlayerManager.dictLoadedItem[itemID];
-                if (invButton.transform.parent.name != pm._lastEmptyItemGroup.name)
+                if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
                 {
                     invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
                     invButton.SendMessage("EnableBtn");

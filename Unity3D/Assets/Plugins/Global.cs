@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using MPProtocol;
 using System.Linq;
+using System.Diagnostics;
 
 public static class Global
 {
@@ -143,7 +144,7 @@ public static class Global
         MainCamera,
         HUDCamera,
     }
-
+    
     public static void RenameKey<TKey, TValue>(this IDictionary<TKey, TValue> dic,
                                   TKey fromKey, TKey toKey)
     {
@@ -181,12 +182,20 @@ public static class Global
     /// <param name="dict"></param>
     public static void SwapDictValueByKey(string key1, string key2, Dictionary<string, object> dict)
     {
-        object value1 = "",value2  = "";
+        object value1 = "", value2 = "";
 
-         dict.TryGetValue(key1, out value1);
-         dict.TryGetValue(key2, out value2);
+        dict.TryGetValue(key1, out value1);
+        dict.TryGetValue(key2, out value2);
 
         dict[key1] = value2;
         dict[key2] = value1;
+    }
+
+    public static TimeSpan Time(Action action)
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        action();
+        stopwatch.Stop();
+        return stopwatch.Elapsed;
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using MiniJSON;
 using MPProtocol;
 using System;
-
 /*
  * 這腳本只負責生東西 時間和控制器要另外寫在Global
  * 現在是測試版 完成後要把Intantiate改成poolManager.ActiveObject()

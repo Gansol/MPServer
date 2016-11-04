@@ -64,8 +64,6 @@ public class AssetBundlesCreator : EditorWindow
  "/_AssetBundles/Android/";
 #elif UNITY_IPHONE  || UNITY_IOS
     "/_AssetBundles/iOS/";
-#elif UNITY_WEBPLAYER
-    "/_AssetBundles/WebPlayer/";
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
     "/_AssetBundles/STANDALONE_WIN/";
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
@@ -285,15 +283,21 @@ public class AssetBundlesCreator : EditorWindow
 
                 //獨立資產
                 LoadFile(innFolder[1] + "/" + "BundleInfo.json");   // innFolder[1] = Unique資料夾 載入子資料夾下資產清單(獨立物件)
-                if (!File.Exists(innFolder[1] + "/" + "BundleInfo.json"))
+                if (innFolder[1] != null)
                 {
-                    Debug.LogError("BundleInfo.json exist folder! Please PreBuild BundleInfo." + "   Path Info:" + innFolder[1]);
+                    if (!File.Exists(innFolder[1] + "/" + "BundleInfo.json"))
+                    {
+                        Debug.LogError("BundleInfo.json exist folder! Please PreBuild BundleInfo." + "   Path Info:" + innFolder[1]);
+                    }
+                    else
+                    {
+                        BundleUniqueAssetBundle(outputFolder);  // 建立獨立資產
+                    }
                 }
                 else
                 {
-                    BundleUniqueAssetBundle(outputFolder);  // 建立獨立資產
+                    Debug.LogError("Dependencies Floder Error!");
                 }
-
 
                 BuildPipeline.PopAssetDependencies();   //共用資產打包結束;
             }

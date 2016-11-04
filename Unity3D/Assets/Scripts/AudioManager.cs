@@ -34,11 +34,12 @@ public class AudioManager : MonoBehaviour
         {
             if (flag)
             {
-                FadeOut();
+                audio.Stop();
+                audio.volume = 0.0f;
             }
             else
             {
-                
+                bFadeOut = false;
                 audio.Play();
                 audio.volume = 0.5f;
             }
@@ -52,19 +53,20 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         FadeIn();
-        
+
         if (audio.isPlaying == false)
         {
             audio.volume = 0;
             audio.Play();
             Debug.Log("REPLAY");
         }
-         
+
     }
 
     void FadeIn()
     {
-        if (audio.volume < 5)
+
+        if (audio.volume < 0.8f)
         {
             audio.volume += 0.1f * Time.deltaTime;
         }
@@ -73,9 +75,13 @@ public class AudioManager : MonoBehaviour
 
     void FadeOut()
     {
-        if (audio.volume > 0.1f)
-        {
-            audio.volume -= 0.1f * Time.deltaTime;
-        }
+
+            if (audio.volume > 0.1f)
+            {
+                audio.volume -= 0.1f * Time.deltaTime;
+            }
+
     }
+
+    public bool bFadeOut { get; set; }
 }

@@ -18,53 +18,65 @@ using System.Collections.Generic;
  * ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
-    AssetBundleManager assetBundleManager;
-    GameObject abm;
-    private int _matCount, _objCount;
+    private int _matCount, _objCount, _loadedCount;
     public bool loadedObj;
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;
 
-    void Awake()
+    private void Awake()
     {
-        assetBundleManager = new AssetBundleManager();
         init();
     }
 
-    void Update()
+    private void Update()
     {
-        if (assetBundleManager != null)
-        {
-            _returnMessage = assetBundleManager.ReturnMessage;
+        _returnMessage = AssetBundleManager.ReturnMessage;
 
-            if (assetBundleManager.loadedObjectCount == _objCount && _objCount != 0)
+        if (_objCount != 0)
+        {
+            if (AssetBundleManager.loadedObjectCount == _objCount) // 全部沒有載入的情況  如果AB載入完成數量=載入數量
             {
-                assetBundleManager.loadedObjectCount = _objCount = 0;
+                AssetBundleManager.loadedObjectCount = _objCount = 0;
                 loadedObj = true;
             }
-
-            if (assetBundleManager.isLoadPrefab)
-                assetBundleManager.init();
+            else if ((_objCount - _loadedCount) == AssetBundleManager.loadedObjectCount && AssetBundleManager.loadedObjectCount!=0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
+            {
+                AssetBundleManager.loadedObjectCount = _objCount = 0;
+                loadedObj = true;
+            }
+            else if(_objCount == _loadedCount)  // 全部已載入
+            {
+                AssetBundleManager.loadedObjectCount = _objCount = 0;
+                loadedObj = true;
+            }
         }
+
+        if (AssetBundleManager.isLoadPrefab)
+            AssetBundleManager.init();
+
     }
 
     public void LoadAsset(string folderPath, string assetName)
     {
-        assetBundleManager.init();
+        AssetBundleManager.init();
 
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(Texture)));
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(Material)));
-        StartCoroutine(assetBundleManager.LoadAtlas(folderPath , assetName, typeof(GameObject)));
+        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Texture)));
+        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Material)));
+        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
     }
 
     public void LoadPrefab(string folderPath, string assetName)    // 載入遊戲物件
     {
         loadedObj = false;
-        if (!assetBundleManager.bLoadedAssetbundle(assetName))
+        if (!AssetBundleManager.bLoadedAssetbundle(assetName))
         {
-            _objCount++;
-            StartCoroutine(assetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
+            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
         }
+        else
+        {
+            _loadedCount++;
+        }
+        _objCount++;
     }
 
     /// <summary>
@@ -74,16 +86,16 @@ public class AssetLoader : MonoBehaviour
     /// <returns>GameObject</returns>
     public GameObject GetAsset(string assetName)
     {
-        if (assetBundleManager.bLoadedAssetbundle(assetName))
+        if (AssetBundleManager.bLoadedAssetbundle(assetName))
             return AssetBundleManager.getAssetBundle(assetName).mainAsset as GameObject;
         return null;
     }
 
     public void init()
     {
-        _matCount = _objCount = 0;
+        _matCount = _objCount = _loadedCount = 0;
         loadedObj = false;
-        assetBundleManager.init();
+        AssetBundleManager.init();
     }
 
 

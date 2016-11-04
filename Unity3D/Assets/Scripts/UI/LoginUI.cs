@@ -98,94 +98,96 @@ public class LoginUI : MonoBehaviour
             {
                 GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
 
-                if (Global.LoginStatus) // 若已登入
+                if (!Global.isMatching)
                 {
-                    foreach (GameObject item in LoginObject)
+                    if (Global.LoginStatus) // 若已登入
                     {
-                        if (item!=null)
-                            item.SetActive(false);
-                    }
 
-                    GUI.Label(new Rect(30, 40, 400, 20), "Your Nickname : " + Global.Nickname); // 顯示暱稱
-                    GUI.Label(new Rect(30, 60, 400, 20), "Your Sex : " + Global.Sex); // 顯示性別
-                    GUI.Label(new Rect(30, 80, 400, 20), "Your Age : " + Global.Age); // 顯示性別
-                    GUI.Label(new Rect(100, 150, 200, 40), "Matching : " + Global.Age); // 顯示性別
-
-                    if (!Global.isMatching)
-                    {
-                        if (GUI.Button(new Rect(100, 200, 250, 100), "Matching Game"))
+                        foreach (GameObject item in LoginObject)
                         {
-                            Global.photonService.MatchGame(Global.PrimaryID, Global.Team);
-                            //Debug.Log("click");
-                            Global.isMatching = true;
+                            if (item != null)
+                                item.SetActive(false);
+                        }
+
+                        GUI.Label(new Rect(30, 40, 400, 20), "Your Nickname : " + Global.Nickname); // 顯示暱稱
+                        GUI.Label(new Rect(30, 60, 400, 20), "Your Sex : " + Global.Sex); // 顯示性別
+                        GUI.Label(new Rect(30, 80, 400, 20), "Your Age : " + Global.Age); // 顯示性別
+                        GUI.Label(new Rect(100, 150, 200, 40), "Matching : " + Global.Age); // 顯示性別
+
+                        if (!Global.isMatching)
+                        {
+                            if (GUI.Button(new Rect(100, 200, 250, 100), "Matching Game"))
+                            {
+                                Global.photonService.MatchGame(Global.PrimaryID, Global.Team);
+                                //Debug.Log("click");
+                                Global.isMatching = true;
+                            }
+                        }
+                    }
+                    else if (Global.isJoinMember)
+                    {
+                        // 顯示登入視窗
+                        GUI.Label(new Rect(30, 40, 200, 20), "Please Login");
+
+
+                        GUI.Label(new Rect(30, 70, 80, 20), "Account:");
+                        GUI.SetNextControlName("Account");
+                        getAccount = GUI.TextField(new Rect(110, 70, 400, 50), getAccount);
+
+                        GUI.Label(new Rect(30, 150, 80, 20), "Passowrd:");
+                        GUI.SetNextControlName("Password");
+                        getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
+
+
+                        if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)
+                        {
+                            isLoginBtn = true;
+                            Global.photonService.Login(getAccount, getPassowrd, MemberType.Gansol); // 登入
+                        }
+
+                        if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
+                            Global.isJoinMember = false;
+
+                        GUI.Label(new Rect(30, 160, 600, 20), loginResult); // 顯示登入回傳
+                        GUI.Label(new Rect(30, 190, 600, 20), joinResult); // 顯示登入回傳
+                    }
+                    else
+                    {
+                        GUI.Label(new Rect(30, 70, 80, 20), "Account:");
+                        getAccount = GUI.TextField(new Rect(110, 70, 100, 20), getAccount, 16);
+
+                        GUI.Label(new Rect(30, 100, 80, 20), "Passowrd:");
+                        getPassowrd = GUI.PasswordField(new Rect(110, 100, 100, 20), getPassowrd, '*');
+
+                        GUI.Label(new Rect(30, 130, 80, 20), "Nickname:");
+                        getNickname = GUI.TextField(new Rect(110, 130, 100, 20), getNickname, 12);
+
+                        GUI.Label(new Rect(30, 160, 80, 20), "Age:");
+                        getAge = GUI.TextField(new Rect(110, 160, 100, 20), getAge, 2);
+
+                        GUI.Label(new Rect(30, 190, 80, 20), "Sex:");
+                        getSex = GUI.TextField(new Rect(110, 190, 100, 20), getSex, 1);
+
+                        //Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, getAge, getSex);
+
+                        GUI.Label(new Rect(30, 210, 600, 20), joinResult); // 顯示登入回傳
+
+                        if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
+                        {
+                            // Debug.Log(getAge);
+                            byte age = Convert.ToByte(getAge);
+                            byte sex = Convert.ToByte(getSex);
+                            Debug.Log(getPassowrd);
+                            Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, age, sex, MemberType.Gansol);
                         }
                     }
                 }
-                else if (Global.isJoinMember)
-                {
-                    // 顯示登入視窗
-                    GUI.Label(new Rect(30, 40, 200, 20), "Please Login");
-
-
-                    GUI.Label(new Rect(30, 70, 80, 20), "Account:");
-                    GUI.SetNextControlName("Account");
-                    getAccount = GUI.TextField(new Rect(110, 70, 400, 50), getAccount);
-
-                    GUI.Label(new Rect(30, 150, 80, 20), "Passowrd:");
-                    GUI.SetNextControlName("Password");
-                    getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
-
-
-                    if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)
-                    {
-                        isLoginBtn = true;
-                        Global.photonService.Login(getAccount, getPassowrd, MemberType.Gansol); // 登入
-                    }
-
-                    if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
-                        Global.isJoinMember = false;
-
-                    GUI.Label(new Rect(30, 160, 600, 20), loginResult); // 顯示登入回傳
-                    GUI.Label(new Rect(30, 190, 600, 20), joinResult); // 顯示登入回傳
-                }
-                else
-                {
-                    GUI.Label(new Rect(30, 70, 80, 20), "Account:");
-                    getAccount = GUI.TextField(new Rect(110, 70, 100, 20), getAccount, 16);
-
-                    GUI.Label(new Rect(30, 100, 80, 20), "Passowrd:");
-                    getPassowrd = GUI.PasswordField(new Rect(110, 100, 100, 20), getPassowrd, '*');
-
-                    GUI.Label(new Rect(30, 130, 80, 20), "Nickname:");
-                    getNickname = GUI.TextField(new Rect(110, 130, 100, 20), getNickname, 12);
-
-                    GUI.Label(new Rect(30, 160, 80, 20), "Age:");
-                    getAge = GUI.TextField(new Rect(110, 160, 100, 20), getAge, 2);
-
-                    GUI.Label(new Rect(30, 190, 80, 20), "Sex:");
-                    getSex = GUI.TextField(new Rect(110, 190, 100, 20), getSex, 1);
-
-                    //Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, getAge, getSex);
-
-                    GUI.Label(new Rect(30, 210, 600, 20), joinResult); // 顯示登入回傳
-
-                    if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
-                    {
-                        // Debug.Log(getAge);
-                        byte age = Convert.ToByte(getAge);
-                        byte sex = Convert.ToByte(getSex);
-                        Debug.Log(getPassowrd);
-                        Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, age, sex, MemberType.Gansol);
-                    }
-                }
-
-
-
             }
             else
             {
                 GUI.Label(new Rect(130, 10, 200, 20), "Disconnect");
             }
+
         }
         catch (Exception e)
         {
@@ -354,7 +356,7 @@ public class LoginUI : MonoBehaviour
             return;
         }
         Global.MemberType = MemberType.Facebook;
-        
+
 
         FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
 
@@ -400,12 +402,12 @@ public class LoginUI : MonoBehaviour
 
                         DateTime birthday = Convert.ToDateTime(FBProfiler["birthday"]);
                         TimeSpan ts = DateTime.Now.Subtract(birthday);
-                        byte age =Convert.ToByte( Math.Floor(ts.TotalDays / 365));
+                        byte age = Convert.ToByte(Math.Floor(ts.TotalDays / 365));
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
                         Global.photonService.JoinMember(account, "12345678", name, Convert.ToByte(age), sex, MemberType.Facebook);
-                        Debug.Log("HAHA3 " + Convert.ToByte(age) +"  "  +sex);
+                        Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
                     catch (Exception e)
                     {

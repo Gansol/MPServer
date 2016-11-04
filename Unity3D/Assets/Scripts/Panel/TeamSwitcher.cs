@@ -211,9 +211,9 @@ public class TeamSwitcher : MonoBehaviour
 
                 TeamSequence(gameObject, false);
                 RemoveTeam(teamName);
-                TeamManager.dictLoadedMice[transform.GetChild(0).name].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
-                TeamManager.dictLoadedMice[transform.GetChild(0).name].SendMessage("EnableBtn");                    // 啟動按鈕
-                TeamManager.dictLoadedTeam.Remove(teamName);                                                        // 移除隊伍參考
+                tm.dictLoadedMice[transform.GetChild(0).name].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
+                tm.dictLoadedMice[transform.GetChild(0).name].SendMessage("EnableBtn");                    // 啟動按鈕
+                tm.dictLoadedTeam.Remove(teamName);                                                        // 移除隊伍參考
 
                 gameObject.transform.localPosition = _originPos;
                 Destroy(transform.GetChild(0).gameObject);
@@ -237,11 +237,11 @@ public class TeamSwitcher : MonoBehaviour
                 AddTeam(miceName, null);
 
             }
-            else if (_other.transform.childCount != 0 && !tm.bLoadedTeam(miceName)) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
+            else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(miceName) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
             {
                 string otherName = _other.transform.GetChild(0).name;
                 tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
-                TeamManager.dictLoadedTeam.Remove(otherName);                       // 之後移除參考
+                tm.dictLoadedTeam.Remove(otherName);                       // 之後移除參考
                 Mice2Team(miceName);
                 AddTeam(miceName, _other);
                 Destroy(_other.transform.GetChild(0).gameObject);
@@ -258,18 +258,6 @@ public class TeamSwitcher : MonoBehaviour
                 string myName = transform.GetChild(0).name;
                 string otherName = _other.transform.GetChild(0).name;
                 ExchangeObject(myName, otherName, Global.Team);
-
-                /*  //交換版本B 直接換按鈕
-                _other.GetComponent<TeamSwitcher>()._toPos = _originPos;            //交換座標和父系
-                _toPos = _other.transform.localPosition;
-                _other.GetComponent<TeamSwitcher>()._goTarget = true;
-                transform.GetChild(0).GetComponent<UISprite>().depth -= _depth;
-                    
-                string tmpName;         // 交換名稱
-                tmpName = _other.name;
-                _other.name = name;
-                name = tmpName;
-                */
 
                 GameObject tmp = _other.transform.GetChild(0).gameObject;
                 transform.GetChild(0).parent = _other.transform;
@@ -305,8 +293,8 @@ public class TeamSwitcher : MonoBehaviour
     /// <param name="miceName"></param>
     void Mice2Team(string miceName)
     {
-        TeamManager.dictLoadedTeam.Add(miceName, _clone);   // 要加Team的_clone才對
-        TeamManager.dictLoadedMice[miceName] = _clone;      //重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
+        tm.dictLoadedTeam.Add(miceName, _clone);   // 要加Team的_clone才對
+        tm.dictLoadedMice[miceName] = _clone;      //重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
 
         _other.GetComponent<TeamSwitcher>().enabled = true;
         _other.GetComponent<TeamSwitcher>().EnableBtn();
@@ -387,15 +375,15 @@ public class TeamSwitcher : MonoBehaviour
         {
             string miceName = transform.GetChild(0).name;
 
-            if (!TeamManager.dictLoadedTeam.ContainsKey(miceName) && TeamManager.dictLoadedTeam.Count != teamCountMax)  // full and same
+            if (!tm.dictLoadedTeam.ContainsKey(miceName) && tm.dictLoadedTeam.Count != teamCountMax)  // full and same
             {
                 Dictionary<string, object> team = Global.Team;
                 GameObject teamBtn = tm.infoGroupsArea[2].transform.GetChild(team.Count).gameObject;
 
                 Move2Clone();
 
-                TeamManager.dictLoadedTeam.Add(miceName, _clone);
-                TeamManager.dictLoadedMice[miceName] = _clone;
+                tm.dictLoadedTeam.Add(miceName, _clone);
+                tm.dictLoadedMice[miceName] = _clone;
                 AddTeam(miceName, null);
 
                 transform.GetChild(0).parent = teamBtn.transform;
@@ -449,7 +437,7 @@ public class TeamSwitcher : MonoBehaviour
                 Global.RenameKey(dictTeam, itemID, otherItemID);
                 Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, dictTeam);
 
-                TeamManager.dictLoadedMice[teamName].SendMessage("EnableBtn");
+                tm.dictLoadedMice[teamName].SendMessage("EnableBtn");
             }
         }
         else // 增加隊伍成員

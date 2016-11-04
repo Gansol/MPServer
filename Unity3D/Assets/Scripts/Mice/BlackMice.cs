@@ -45,7 +45,7 @@ public class BlackMice : MonoBehaviour
 
     void Awake()
     {
-        battleManager = GameObject.Find("GameManager").GetComponent<BattleManager>();
+        battleManager = GameObject.Find("BattleManager").GetComponent<BattleManager>();
         upFlag = true;
         dieFlag = false;
         isDisappear = false;
