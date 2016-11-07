@@ -46,11 +46,6 @@ public class PanelManager : MPPanel
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         insObj = new ObjectFactory();
         dictPanelRefs = new Dictionary<string, PanelState>();
-        //assetLoader.LoadAsset("Panel/", "PanelUI");
-        //assetLoader.LoadAsset("Panel/", "MainBack");
-        //assetLoader.LoadPrefab("Panel/", "Team");
-        
-        //assetLoader.LoadPrefab("Panel/", "MenuUI");
     }
 
     void Update()
@@ -102,7 +97,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         { 
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadAsset("Panel/", "Panel");
             assetLoader.LoadPrefab("Panel/", _panelName);
             _loadedPanel = true;
         }                                                   // 已載入AB 顯示Panel
