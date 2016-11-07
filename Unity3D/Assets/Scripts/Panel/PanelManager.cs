@@ -97,7 +97,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         { 
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "Panel");
+            assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadPrefab("Panel/", _panelName);
             _loadedPanel = true;
         }                                                   // 已載入AB 顯示Panel

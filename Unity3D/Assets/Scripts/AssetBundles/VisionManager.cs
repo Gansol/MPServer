@@ -24,10 +24,10 @@ public class VisionManager : MonoBehaviour
     void Start() //開始檢查版本
     {
         assetLoader = gameObject.AddComponent<AssetLoader>();
-        bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
-        visionChecker = new VisionChecker();
-        Global.ReturnMessage = "開始檢查遊戲資源. . .";
-        StartCoroutine(visionChecker.CheckVision());
+        //bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
+        //visionChecker = new VisionChecker();
+        //Global.ReturnMessage = "開始檢查遊戲資源. . .";
+        //StartCoroutine(visionChecker.CheckVision());
     }
 
     void Update() //等待完成
@@ -38,28 +38,30 @@ public class VisionManager : MonoBehaviour
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log(assetLoader.ReturnMessage);
         
-        #region BundleCheck 檢查檔案
-        if (visionChecker.visionChk)
-        {
-            if (!bundleCheckComplete)
-            {
-                bundleCheckComplete = true;
-                bundleChecker.StartCheck();
-            }
-        }
-        #endregion
+        //#region BundleCheck 檢查檔案
+        //if (visionChecker.visionChk)
+        //{
+        //    if (!bundleCheckComplete)
+        //    {
+        //        bundleCheckComplete = true;
+        //        bundleChecker.StartCheck();
+        //    }
+        //}
+        //#endregion
         
-        if (assetLoader.loadedObj && bLoadAsset)
-        {
-            StartCoroutine(visionChecker.ReplaceVisionList());
-            syncLoad = gameObject.AddComponent<SyncLoad>();
-            syncLoad.LoadMainGame();
-        }
+        //if (assetLoader.loadedObj && bLoadAsset)
+        //{
+        //    StartCoroutine(visionChecker.ReplaceVisionList());
+        //    syncLoad = gameObject.AddComponent<SyncLoad>();
+        //    syncLoad.LoadMainGame();
+        //    //Instantiate(assetLoader.GetAsset("Sprite"));
+        //}
+        
 
         #region Load MainGame 載入遊戲
-        if (Global.isCompleted && !bLoadAsset)
+        if (/*Global.isCompleted &&*/ !bLoadAsset)
         {
-            //assetLoader.LoadAsset("Panel/", "Panel");
+            //assetLoader.LoadAsset("Panel/", "PanelUI");
             //assetLoader.LoadAsset("Panel/", "MainBack");
             //assetLoader.LoadAsset("Panel/", "MainFront");
             //assetLoader.LoadAsset("Panel/", "ComicFont");
@@ -67,15 +69,22 @@ public class VisionManager : MonoBehaviour
             //assetLoader.LoadAsset("Panel/", "ShareObject");
             //assetLoader.LoadPrefab("Panel/", "MenuUI");
 
+            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadAsset("Panel/", "BattleHUD");
+            assetLoader.LoadAsset("Panel/", "ShareObject");
+            assetLoader.LoadAsset("Panel/", "GameScene");
+            assetLoader.LoadAsset("Panel/", "MainFront");
+            assetLoader.LoadAsset("Panel/", "ComicFont");
+            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            //assetLoader.LoadPrefab("Panel/", "TestA");
+            //assetLoader.LoadPrefab("Panel/", "TestB");
+            //assetLoader.LoadPrefab("Panel/", "GameUI");
+            assetLoader.LoadPrefab("Panel/", "MenuUI");
 
-            assetLoader.LoadAsset("Test/", "Panel");
-            assetLoader.LoadAsset("Test/", "MainBack");
-            assetLoader.LoadAsset("Test/", "MainFront");
-            assetLoader.LoadAsset("Test/", "ComicFont");
-            assetLoader.LoadAsset("Test/", "LiHeiProFont");
-            assetLoader.LoadAsset("Test/", "ShareObject");
-            //assetLoader.LoadPrefab("Panel/", "MenuUI");
-
+            //assetLoader.LoadAsset("New/", "LiHeiProFont");
+            //assetLoader.LoadAsset("New/", "BattleHUD");
+            //assetLoader.LoadAsset("New/", "PanelUI");
+            //assetLoader.LoadPrefab("New/", "Sprite");
 
             //assetLoader.LoadAsset("TEST/", "BattleHUD");
             //assetLoader.LoadAsset("TEST/", "GameScene");
