@@ -28,6 +28,21 @@ public class VisionManager : MonoBehaviour
         //visionChecker = new VisionChecker();
         //Global.ReturnMessage = "開始檢查遊戲資源. . .";
         //StartCoroutine(visionChecker.CheckVision());
+
+        assetLoader.LoadAsset("Panel/", "PanelUI");
+        assetLoader.LoadAsset("Panel/", "BattleHUD");
+        assetLoader.LoadAsset("Panel/", "ShareObject");
+        assetLoader.LoadAsset("Panel/", "GameScene");
+        assetLoader.LoadAsset("Panel/", "MainFront");
+        assetLoader.LoadAsset("Panel/", "MainBack");
+        assetLoader.LoadAsset("Panel/", "ComicFont");
+        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+        //assetLoader.LoadPrefab("Panel/", "TestA");
+        //assetLoader.LoadPrefab("Panel/", "TestB");
+        assetLoader.LoadPrefab("Panel/", "GameUI");
+        assetLoader.LoadPrefab("Panel/", "MenuUI");
+        bLoadAsset = !bLoadAsset;
+
     }
 
     void Update() //等待完成
@@ -48,14 +63,17 @@ public class VisionManager : MonoBehaviour
         //    }
         //}
         //#endregion
-        
-        //if (assetLoader.loadedObj && bLoadAsset)
-        //{
+
+        if (assetLoader.loadedObj && bLoadAsset)
+        {
         //    StartCoroutine(visionChecker.ReplaceVisionList());
         //    syncLoad = gameObject.AddComponent<SyncLoad>();
         //    syncLoad.LoadMainGame();
         //    //Instantiate(assetLoader.GetAsset("Sprite"));
-        //}
+            Instantiate(assetLoader.GetAsset("GameUI"));
+            Instantiate(assetLoader.GetAsset("MenuUI"));
+            bLoadAsset = !bLoadAsset;
+        }
         
 
         #region Load MainGame 載入遊戲
@@ -69,17 +87,17 @@ public class VisionManager : MonoBehaviour
             //assetLoader.LoadAsset("Panel/", "ShareObject");
             //assetLoader.LoadPrefab("Panel/", "MenuUI");
 
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadAsset("Panel/", "BattleHUD");
-            assetLoader.LoadAsset("Panel/", "ShareObject");
-            assetLoader.LoadAsset("Panel/", "GameScene");
-            assetLoader.LoadAsset("Panel/", "MainFront");
-            assetLoader.LoadAsset("Panel/", "ComicFont");
-            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-            //assetLoader.LoadPrefab("Panel/", "TestA");
-            //assetLoader.LoadPrefab("Panel/", "TestB");
-            //assetLoader.LoadPrefab("Panel/", "GameUI");
-            assetLoader.LoadPrefab("Panel/", "MenuUI");
+            //assetLoader.LoadAsset("Panel/", "PanelUI");
+            //assetLoader.LoadAsset("Panel/", "BattleHUD");
+            //assetLoader.LoadAsset("Panel/", "ShareObject");
+            //assetLoader.LoadAsset("Panel/", "GameScene");
+            //assetLoader.LoadAsset("Panel/", "MainFront");
+            //assetLoader.LoadAsset("Panel/", "ComicFont");
+            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            ////assetLoader.LoadPrefab("Panel/", "TestA");
+            ////assetLoader.LoadPrefab("Panel/", "TestB");
+            ////assetLoader.LoadPrefab("Panel/", "GameUI");
+            //assetLoader.LoadPrefab("Panel/", "MenuUI");
 
             //assetLoader.LoadAsset("New/", "LiHeiProFont");
             //assetLoader.LoadAsset("New/", "BattleHUD");
@@ -91,7 +109,7 @@ public class VisionManager : MonoBehaviour
             ////assetLoader.LoadAsset("TEST/", "ComicFont");
             ////assetLoader.LoadAsset("TEST/", "ShareObject");
             //assetLoader.LoadPrefab("Panel/", "MenuUI");
-            bLoadAsset = !bLoadAsset;
+//            bLoadAsset = !bLoadAsset;
         }
 
 
