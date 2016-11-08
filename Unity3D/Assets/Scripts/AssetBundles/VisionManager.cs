@@ -38,8 +38,13 @@ public class VisionManager : MonoBehaviour
         assetLoader.LoadAsset("Panel/", "ComicFont");
         assetLoader.LoadAsset("Panel/", "LiHeiProFont");
 
+        assetLoader.LoadPrefab("Panel/", "GameUI");
         assetLoader.LoadPrefab("Panel/", "MenuUI");
-
+        assetLoader.LoadPrefab("Panel/", "Item");
+        assetLoader.LoadPrefab("Panel/", "InvItem");
+        assetLoader.LoadPrefab("Panel/", "Player");
+        assetLoader.LoadPrefab("Panel/", "Team");
+        assetLoader.LoadPrefab("Panel/", "Store");
         bLoadAsset = !bLoadAsset;
 
     }
@@ -69,8 +74,13 @@ public class VisionManager : MonoBehaviour
         //    syncLoad = gameObject.AddComponent<SyncLoad>();
         //    syncLoad.LoadMainGame();
         //    //Instantiate(assetLoader.GetAsset("Sprite"));
+            Instantiate(assetLoader.GetAsset("GameUI"));
             Instantiate(assetLoader.GetAsset("MenuUI"));
-
+             Instantiate(assetLoader.GetAsset( "Item"));
+             Instantiate(assetLoader.GetAsset("InvItem"));
+             Instantiate(assetLoader.GetAsset("Player"));
+             Instantiate(assetLoader.GetAsset( "Team"));
+             Instantiate(assetLoader.GetAsset( "Store"));
             bLoadAsset = !bLoadAsset;
         }
         
