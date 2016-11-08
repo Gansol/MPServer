@@ -159,8 +159,16 @@ public class AssetBundleChecker : MonoBehaviour
             hashServerList.ExceptWith(hashDelorAdd);// hashServerList 新增檔案 = 伺服器檔案 - 已存在檔案
             bundleDownloader.fileCount = hashServerList.Count;
 
-            foreach (string item in hashServerList) // 下載檔案
-                bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
+            if (hashServerList.Count != 0)
+            {
+                foreach (string item in hashServerList) // 下載檔案
+                    bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
+            }
+            else
+            {
+                Global.ReturnMessage = "Nothing to update.";
+                Global.isCompleted = true;
+            }
             #endregion
             
         }
