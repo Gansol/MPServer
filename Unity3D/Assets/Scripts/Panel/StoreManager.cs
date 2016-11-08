@@ -206,15 +206,6 @@ public class StoreManager : PanelManager
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
-    /// <summary>
-    /// OnCloseWindows
-    /// </summary>
-    /// <param name="myPanel"></param>
-    public void OnCloseWindows(GameObject myPanel)
-    {
-        myPanel.SetActive(false);
-    }
-
     public void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
