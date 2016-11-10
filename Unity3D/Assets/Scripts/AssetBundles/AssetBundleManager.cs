@@ -82,7 +82,7 @@ public static class AssetBundleManager
         if (!chkAtlas && !chkMat && !chkPrefab)
         {
             string fileName = "";
-
+            /*
             if (type == typeof(Texture)) fileName = assetName + "Atlas";
 
             if (type == typeof(Material))
@@ -90,12 +90,12 @@ public static class AssetBundleManager
                 fileName = assetName + "Mat";
                 while (_isLoadAtlas == false)
                     yield return null;
-            }
+            }*/
             if (type == typeof(GameObject))
             {
                 fileName = assetName + "Prefab";
-                while (_isLoadMat == false)
-                    yield return null;
+                //while (_isLoadMat == false)
+                    //yield return null;
             }
             if (!bLoadedAssetbundle(fileName))
             {

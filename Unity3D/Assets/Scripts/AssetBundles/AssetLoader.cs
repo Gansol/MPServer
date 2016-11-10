@@ -60,8 +60,8 @@ public class AssetLoader : MonoBehaviour
     {
         AssetBundleManager.init();
 
-        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Texture)));
-        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Material)));
+        //StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Texture)));
+        //StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Material)));
         StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
     }
 

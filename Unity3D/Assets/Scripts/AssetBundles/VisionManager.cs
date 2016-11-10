@@ -24,28 +24,10 @@ public class VisionManager : MonoBehaviour
     void Start() //開始檢查版本
     {
         assetLoader = gameObject.AddComponent<AssetLoader>();
-        //bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
-        //visionChecker = new VisionChecker();
-        //Global.ReturnMessage = "開始檢查遊戲資源. . .";
-        //StartCoroutine(visionChecker.CheckVision());
-
-        assetLoader.LoadAsset("Panel/", "PanelUI");
-        assetLoader.LoadAsset("Panel/", "BattleHUD");
-        assetLoader.LoadAsset("Panel/", "ShareObject");
-        assetLoader.LoadAsset("Panel/", "GameScene");
-        assetLoader.LoadAsset("Panel/", "MainFront");
-        assetLoader.LoadAsset("Panel/", "MainBack");
-        assetLoader.LoadAsset("Panel/", "ComicFont");
-        assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-
-        assetLoader.LoadPrefab("Panel/", "GameUI");
-        assetLoader.LoadPrefab("Panel/", "MenuUI");
-        assetLoader.LoadPrefab("Panel/", "Item");
-        assetLoader.LoadPrefab("Panel/", "InvItem");
-        assetLoader.LoadPrefab("Panel/", "Player");
-        assetLoader.LoadPrefab("Panel/", "Team");
-        assetLoader.LoadPrefab("Panel/", "Store");
-        bLoadAsset = !bLoadAsset;
+        bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
+        visionChecker = new VisionChecker();
+        Global.ReturnMessage = "開始檢查遊戲資源. . .";
+        StartCoroutine(visionChecker.CheckVision());
 
     }
 
@@ -56,69 +38,47 @@ public class VisionManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log(assetLoader.ReturnMessage);
-        
-        //#region BundleCheck 檢查檔案
-        //if (visionChecker.visionChk)
-        //{
-        //    if (!bundleCheckComplete)
-        //    {
-        //        bundleCheckComplete = true;
-        //        bundleChecker.StartCheck();
-        //    }
-        //}
-        //#endregion
+
+        #region BundleCheck 檢查檔案
+        if (visionChecker.visionChk)
+        {
+            if (!bundleCheckComplete)
+            {
+                bundleCheckComplete = true;
+                bundleChecker.StartCheck();
+            }
+        }
+        #endregion
 
         if (assetLoader.loadedObj && bLoadAsset)
         {
-        //    StartCoroutine(visionChecker.ReplaceVisionList());
-        //    syncLoad = gameObject.AddComponent<SyncLoad>();
-        //    syncLoad.LoadMainGame();
-        //    //Instantiate(assetLoader.GetAsset("Sprite"));
-            Instantiate(assetLoader.GetAsset("GameUI"));
-            Instantiate(assetLoader.GetAsset("MenuUI"));
-             Instantiate(assetLoader.GetAsset( "Item"));
-             Instantiate(assetLoader.GetAsset("InvItem"));
-             Instantiate(assetLoader.GetAsset("Player"));
-             Instantiate(assetLoader.GetAsset( "Team"));
-             Instantiate(assetLoader.GetAsset( "Store"));
+            StartCoroutine(visionChecker.ReplaceVisionList());
+            syncLoad = gameObject.AddComponent<SyncLoad>();
+            syncLoad.LoadMainGame();
+
             bLoadAsset = !bLoadAsset;
         }
-        
+
 
         #region Load MainGame 載入遊戲
-        if (/*Global.isCompleted &&*/ !bLoadAsset)
+        if (Global.isCompleted && !bLoadAsset)
         {
-            //assetLoader.LoadAsset("Panel/", "PanelUI");
-            //assetLoader.LoadAsset("Panel/", "MainBack");
-            //assetLoader.LoadAsset("Panel/", "MainFront");
-            //assetLoader.LoadAsset("Panel/", "ComicFont");
-            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-            //assetLoader.LoadAsset("Panel/", "ShareObject");
-            //assetLoader.LoadPrefab("Panel/", "MenuUI");
 
-            //assetLoader.LoadAsset("Panel/", "PanelUI");
-            //assetLoader.LoadAsset("Panel/", "BattleHUD");
-            //assetLoader.LoadAsset("Panel/", "ShareObject");
-            //assetLoader.LoadAsset("Panel/", "GameScene");
-            //assetLoader.LoadAsset("Panel/", "MainFront");
-            //assetLoader.LoadAsset("Panel/", "ComicFont");
-            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-            ////assetLoader.LoadPrefab("Panel/", "TestA");
-            ////assetLoader.LoadPrefab("Panel/", "TestB");
-            ////assetLoader.LoadPrefab("Panel/", "GameUI");
-            //assetLoader.LoadPrefab("Panel/", "MenuUI");
+            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            assetLoader.LoadAsset("Panel/", "ComicFont");
 
-            //assetLoader.LoadAsset("New/", "LiHeiProFont");
-            //assetLoader.LoadAsset("New/", "BattleHUD");
-            //assetLoader.LoadAsset("New/", "PanelUI");
-            //assetLoader.LoadPrefab("New/", "Sprite");
+            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadAsset("Panel/", "GameScene");
+            assetLoader.LoadAsset("Panel/", "MainFront");
+            assetLoader.LoadAsset("Panel/", "MainBack");
+            assetLoader.LoadAsset("Panel/", "ShareObject");
 
-            //assetLoader.LoadAsset("TEST/", "BattleHUD");
-            //assetLoader.LoadAsset("TEST/", "GameScene");
-            ////assetLoader.LoadAsset("TEST/", "ComicFont");
-            ////assetLoader.LoadAsset("TEST/", "ShareObject");
-            //assetLoader.LoadPrefab("Panel/", "MenuUI");
-//            bLoadAsset = !bLoadAsset;
+
+
+            assetLoader.LoadPrefab("Panel/", "MenuUI");
+
+
+            bLoadAsset = !bLoadAsset;
         }
 
 
