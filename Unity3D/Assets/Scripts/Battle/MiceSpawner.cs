@@ -26,7 +26,7 @@ public class MiceSpawner : MonoBehaviour
     {
         poolManager = GetComponent<PoolManager>();
         Global.photonService.ApplyMissionEvent += OnApplyMission;
-        Global.photonService.ExitRoomEvent += OnExitRoom;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
     }
 
 
@@ -534,9 +534,9 @@ public class MiceSpawner : MonoBehaviour
         }
     }
 
-    void OnExitRoom()
+    void OnLoadScene()
     {
         Global.photonService.ApplyMissionEvent -= OnApplyMission;
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 }

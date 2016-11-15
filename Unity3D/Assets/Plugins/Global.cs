@@ -65,7 +65,8 @@ public static class Global
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
 
-    public static int loadScene;            // 要被載入的場景
+    public static int prevScene = (int)Scene.MainGame;  // 上一個場景
+    public static int nextScene = (int)Scene.MainGame;  // 要被載入的場景
 
     public static int maxConnTimes = 5;  // 重新連限次數
 
@@ -114,6 +115,8 @@ public static class Global
     public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();   // 道具屬性資料 
     public static Dictionary<string, object> storeItem = new Dictionary<string, object>();   // 商店屬性資料 
     public static Dictionary<string, object> playerItem = new Dictionary<string, object>();   // 商店屬性資料 
+
+    public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
     /*
     public class MiceProperty
     {
@@ -127,6 +130,14 @@ public static class Global
         int miceCost { get; set; }
     }
     */
+    public enum Scene : int
+    {
+        BundleCheck = 0,
+        MainGame = 1,
+        Battle = 2,
+        LoadScene = 3,
+    }
+
     public enum UILayer
     {
         Nothing = 0,

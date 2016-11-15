@@ -19,7 +19,9 @@ public class VisionManager : MonoBehaviour
     private SyncLoad syncLoad;
     private VisionChecker visionChecker;
     private AssetLoader assetLoader;
-    private bool bundleCheckComplete = false;
+
+    private bool bundleCheckComplete;
+    private bool bLoadAsset;
 
     void Start() //開始檢查版本
     {
@@ -28,7 +30,7 @@ public class VisionManager : MonoBehaviour
         visionChecker = new VisionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
         StartCoroutine(visionChecker.CheckVision());
-
+        Global.prevScene = Application.loadedLevel;
     }
 
     void Update() //等待完成
@@ -54,7 +56,7 @@ public class VisionManager : MonoBehaviour
         {
             StartCoroutine(visionChecker.ReplaceVisionList());
             syncLoad = gameObject.AddComponent<SyncLoad>();
-            syncLoad.LoadMainGame();
+            syncLoad.OnLoadScene();
 
             bLoadAsset = !bLoadAsset;
         }
@@ -85,5 +87,5 @@ public class VisionManager : MonoBehaviour
         #endregion
     }
 
-    public bool bLoadAsset { get; set; }
+
 }

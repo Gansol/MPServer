@@ -89,10 +89,10 @@ public class StoreManager : PanelManager
             InstantiateItem(_itemData, "Item", _itemType, infoGroupsArea[3].transform, itemOffset, tablePageCount, tableRowCount);
             Transform parent = infoGroupsArea[3].transform.FindChild(_itemType.ToString());
 
-            SelectItemProperty(_itemType);                              // 選擇道具資訊資料
+            SelectItemProperty(_itemType);
             LoadItemData(_itemData, parent, _itemType);                 // 載入道具資訊資料
 
-            SelectItemData(_itemType);                                  // 選擇道具資料
+            SelectStoreItemData(_itemType);                                  // 選擇商店資料
             InstantiateItemIcon(_itemData, parent);
             LoadPrice(_itemData, parent, _itemType);
         }
@@ -258,7 +258,7 @@ public class StoreManager : PanelManager
 
         if (_itemType != (int)StoreType.Gashapon)
         {
-            SelectItemData(_itemType);
+            SelectStoreItemData(_itemType);
             _itemData = GetItemInfoFromType(_itemData, _itemType);
             if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
             assetLoader.init();
@@ -296,7 +296,7 @@ public class StoreManager : PanelManager
     #region -- LoadBuyCountInfo 載入物件價格 --
     private void LoadBuyCountInfo(GameObject item, Transform parent)
     {
-        parent.GetChild(0).GetChild(1).GetComponent<UILabel>().text = item.GetComponent<Item>().itemProperty[(int)ItemProperty.ItemID];
+        parent.GetChild(0).GetChild(1).GetComponent<UILabel>().text = item.GetComponent<Item>().itemProperty[(int)StoreProperty.ItemName];
         parent.GetChild(0).GetChild(2).GetComponent<UILabel>().text = item.GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
     }
     #endregion
@@ -352,7 +352,7 @@ public class StoreManager : PanelManager
     private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
     {
         int i = 0, j = 0;
-        itemData = GetItemInfoFromType(itemData, _itemType);
+        itemData = GetItemInfoFromID(itemData, _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
         foreach (KeyValuePair<string, object> item in itemData)
         {
             var nestedData = item.Value as Dictionary<string, object>;
@@ -420,7 +420,7 @@ public class StoreManager : PanelManager
     }
     #endregion
 
-    private void SelectItemData(int _itemType)
+    private void SelectStoreItemData(int _itemType)
     {
         switch (_itemType)
         {

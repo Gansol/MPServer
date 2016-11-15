@@ -95,7 +95,7 @@ public static class AssetBundleManager
             {
                 fileName = assetName + "Prefab";
                 //while (_isLoadMat == false)
-                    //yield return null;
+                //yield return null;
             }
             if (!bLoadedAssetbundle(fileName))
             {
@@ -203,9 +203,14 @@ public static class AssetBundleManager
     /// <returns></returns>
     public static bool bLoadedAssetbundle(string assetName)
     {
-        AssetBundleRef abRef;
-        bool Loaded;
-        return Loaded = dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? Loaded = true : Loaded = false;
+        if (!string.IsNullOrEmpty(assetName))
+        {
+            AssetBundleRef abRef;
+            bool Loaded;
+            return Loaded = dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -42,10 +42,14 @@ public class PanelManager : MPPanel
 
     void Awake()
     {
-
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         insObj = new ObjectFactory();
         dictPanelRefs = new Dictionary<string, PanelState>();
+    }
+
+    void Start()
+    {
+
     }
 
     void Update()
@@ -158,8 +162,7 @@ public class PanelManager : MPPanel
             {
                 pos = sortItemPos(tableCount, rowCount, offset, pos, count + i);
                 GameObject bundle = assetLoader.GetAsset(itemName);
-                string bundleName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
-                insObj.Instantiate(bundle, parent, bundleName, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                insObj.Instantiate(bundle, parent, itemID.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
                 pos.x += offset.x;
             }
             i++;

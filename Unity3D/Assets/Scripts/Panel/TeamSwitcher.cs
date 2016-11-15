@@ -237,7 +237,7 @@ public class TeamSwitcher : MonoBehaviour
                 AddTeam(miceName, null);
 
             }
-            else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(miceName) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
+            else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(_other.transform.GetChild(0).name) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
             {
                 string otherName = _other.transform.GetChild(0).name;
                 tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能

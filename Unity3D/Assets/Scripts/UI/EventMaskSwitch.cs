@@ -6,6 +6,7 @@ public static class EventMaskSwitch
     public static GameObject lastPanel;
     public static GameObject openedPanel { get { return _openedPanel; } }
     private static GameObject _openedPanel;
+
     #region -- EventMaskSwtich --
     // 位元移位運算子<< >> 2近位 左移、右移  0 << 1(左移1)  --->  00 = 0
     // 1 << 1(左移1)  -->  001 = 1

@@ -6,13 +6,18 @@ public class InstantiatePanel : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        assetLoader = gameObject.AddComponent<AssetLoader>();
-        Instantiate(assetLoader.GetAsset("MenuUI"));
+        
+
+        if (Application.loadedLevelName == "MainGame")
+            Instantiate(assetLoader.GetAsset("MenuUI"));
+
+        if (Application.loadedLevelName == "Battle")
+            Instantiate(assetLoader.GetAsset("GameUI"));
+
         
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 }

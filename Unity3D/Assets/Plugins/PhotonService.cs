@@ -52,11 +52,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ScoreHandler OtherDamageEvent;
 
     //委派事件 離開房間、載入關卡
-    public delegate void RoomHandler();
-    public event RoomHandler ExitRoomEvent;
-    public event RoomHandler LoadSceneEvent;
-    public event RoomHandler GameStartEvent;
-    public event RoomHandler WaitingPlayerEvent;
+    public delegate void SceneHandler();
+    public event SceneHandler LoadSceneEvent;
+    public event SceneHandler GameStartEvent;
+    public event SceneHandler WaitingPlayerEvent;
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -180,11 +179,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.PrimaryID = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                 Global.OtherData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.Team]) as Dictionary<string, object>;
                 Global.OtherData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
-                Debug.Log(Global.RoomID);
-                Debug.Log(Global.OtherData.Nickname);
-                Debug.Log(Global.OtherData.PrimaryID);
-                Debug.Log(Global.OtherData.Team);
-                Debug.Log(Global.OtherData.RoomPlace);
+                Global.nextScene = (int)Global.Scene.Battle;
                 LoadSceneEvent();
                 break;
 
@@ -197,8 +192,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.KickOther:
                 if (Global.isGameStart)
                 {
-                    ExitRoomEvent();
+                    Global.nextScene = (int)Global.Scene.MainGame;
+                    LoadSceneEvent();
                     Global.isGameStart = false;
+                    Global.isMatching = false;
                     Debug.Log("Recive Kick!" + (string)eventResponse.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 }
                 break;
@@ -207,8 +204,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.Offline:
                 if (Global.isGameStart)
                 {
-                    ExitRoomEvent();
+                    Global.nextScene = (int)Global.Scene.MainGame;
+                    LoadSceneEvent();
                     Global.isGameStart = false;
+                    Global.isMatching = false;
                     Debug.Log("Recive Offline!" + (string)eventResponse.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 }
                 break;
@@ -341,8 +340,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 {
                     try
                     {
-                        ExitRoomEvent();
                         Global.isGameStart = false;
+                        Global.nextScene = (int)Global.Scene.MainGame;
+                        LoadSceneEvent();
                         Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
@@ -496,6 +496,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             string playerItem = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem];
                             string returnCode = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Ret];
+                            Debug.Log("UpdatedItem: " + operationResponse.DebugMessage);
                         }
                         else
                         {

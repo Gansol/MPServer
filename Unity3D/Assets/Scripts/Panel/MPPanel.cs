@@ -140,37 +140,29 @@ public abstract class MPPanel : MonoBehaviour
                 }
         }
         return data;
+    }
+    #endregion
 
-        //List<List<string>> b = new List<List<string>>();
-        //List<string> a;
-        ////        Debug.Log(itemData[0, 0]);
-        //for (int i = 0; i < itemData.GetLength(0); i++)
-        //{
-        //    string itemType = itemData[i, 0].Remove(1, itemData[i, 0].Length - 1); // 商品ID第一個字元為類別
-        //    //            Debug.Log(itemType);
-        //    if (itemType == type.ToString())
-        //    {
-        //        a = new List<string>();
-        //        for (int j = 0; j < itemData.GetLength(1); j++)
-        //        {
-        //            a.Add(itemData[i, j]);
-        //        }
-        //        b.Add(a);
-        //    }
-        //}
-        ////        Debug.Log(itemData.GetLength(0) + "  " + b.Count);
-        //itemData = new string[b.Count, b[0].Count];
 
-        //for (int i = 0; i < b.Count; i++)
-        //{
-        //    List<string> c = b[i];
+    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
+    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData,int type)
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>();
 
-        //    for (int j = 0; j < c.Count; j++)
-        //    {
-        //        itemData[i, j] = c[j];
-        //    }
-        //}
-        //return itemData;
+        foreach (KeyValuePair<string, object> item in itemData)
+        {
+            var nestedData = item.Value as Dictionary<string, object>;
+            object itemID;
+            nestedData.TryGetValue("ItemID", out itemID);
+            
+
+            char[] itemType = itemID.ToString().ToCharArray(0,1);
+            if (itemType[0].ToString() == type.ToString())
+                {
+                    data.Add(nestedData["ItemID"].ToString(), nestedData);
+                }
+        }
+        return data;
     }
     #endregion
 

@@ -8,12 +8,12 @@ public class LoadingBattle : MonoBehaviour
 
     void Awake()
     {
-        Global.loadScene = level;
+        Global.nextScene = level;
     }
 
     void Start()
     {
-        Global.loadScene = level;
+        Global.nextScene = level;
 //        Debug.Log(Global.loadScene);
     }
 
@@ -27,7 +27,7 @@ public class LoadingBattle : MonoBehaviour
 
     private IEnumerator LoadLevel()
     {
-        Application.LoadLevel(Global.loadScene);  //之後要改成LoadScene
+        Application.LoadLevel(Global.nextScene);  //之後要改成LoadScene
         yield return null;
     }
 
