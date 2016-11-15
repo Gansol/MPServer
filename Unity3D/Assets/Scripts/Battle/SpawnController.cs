@@ -59,7 +59,7 @@ public class SpawnController : MonoBehaviour
         battleManager = GetComponent<BattleManager>();
 
         Global.photonService.ApplySkillEvent += OnApplySkill;
-        Global.photonService.ExitRoomEvent += OnExitRoom;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
         Global.spawnFlag = true;
 
         Global.MiceCount = 0;
@@ -79,7 +79,7 @@ public class SpawnController : MonoBehaviour
 
         if (Global.isGameStart)
         {
-            Debug.Log("Game Start!");
+            // Debug.Log("Game Start!");
             #region   -- 隨機產生老鼠 --
             if (spawnMode != SpawnMode.EasyMode && Global.spawnFlag)
             {
@@ -560,10 +560,10 @@ public class SpawnController : MonoBehaviour
 
     }
 
-    void OnExitRoom()
+    void OnLoadScene()
     {
         Global.photonService.ApplySkillEvent -= OnApplySkill;
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 
     void OnGameStart()

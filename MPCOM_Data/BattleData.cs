@@ -29,5 +29,6 @@ namespace MPCOM
         public Int16 missionReward;         // 任務獎勵
         public Int16 sliverReward;          // 遊戲獎勵(銀幣(RICE))
         public byte expReward;             // 經驗獎勵
+        public byte battleResult;           // 戰鬥結果
     }
 }

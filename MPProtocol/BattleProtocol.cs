@@ -122,6 +122,7 @@
         GoldReward=17,                 // 金幣獎勵
         SliverReward=18,               // 銀幣獎勵(遊戲幣、糧食)
         EXPReward=19,                  // 經驗獎勵(遊戲幣、糧食)
+        BattleResult = 20,             // 戰鬥結果
     }
 
     public enum BattleResponseCode

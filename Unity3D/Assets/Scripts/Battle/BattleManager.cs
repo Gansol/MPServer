@@ -72,7 +72,6 @@ public class BattleManager : MonoBehaviour
         battleHUD = GetComponent<BattleHUD>();
         Global.isExitingRoom = false;
 
-        Global.photonService.ExitRoomEvent += OnExitRoom;
         Global.photonService.OtherScoreEvent += OnOtherScore;
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
         Global.photonService.ApplyMissionEvent += OnApplyRate;
@@ -80,6 +79,7 @@ public class BattleManager : MonoBehaviour
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
         Global.photonService.GameStartEvent += OnGameStart;
         Global.photonService.GameOverEvent += OnGameOver;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
 
         _isCombo = false;
         _combo = 0;
@@ -108,7 +108,7 @@ public class BattleManager : MonoBehaviour
                 _isHighScore = true;
             }
 
-            if (_gameTime > 180 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_gameTime > 5 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
                 Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_gameTime, _maxCombo, _killMice, _lostMice);
@@ -333,26 +333,32 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void OnGameOver(Int16 score, byte exp, Int16 sliverReward)
+    void OnGameOver(Int16 score, byte exp, Int16 sliverReward,byte battleResult)
     {
         bool result;
-        result = (_score > _otherScore) ? true : false;
+        result = (battleResult > 0) ? true : false;
         battleHUD.GoodGameMsg(score, result, exp, sliverReward, _combo, _killMice, _lostMice, _isHighScore, _isHighCombo);
     }
 
     void OnGameStart()
     {
         Global.isGameStart = true;
+        Debug.Log("Game Start!");
     }
 
-    void OnExitRoom()                       // 離開房間時
+    public void OnExitRoom()
+    {
+        Global.photonService.ExitRoom();
+        Debug.Log("ExitRoom");
+    }
+
+    private void OnLoadScene()                       // 離開房間時
     {
         Global.isExitingRoom = true;        // 離開房間了
         Global.isMatching = false;          // 無配對狀態
         Global.BattleStatus = false;        // 不在戰鬥中
 
         // 取消委派
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
         Global.photonService.OtherScoreEvent -= OnOtherScore;
         Global.photonService.MissionCompleteEvent -= OnMissionComplete;
         Global.photonService.ApplyMissionEvent -= OnApplyRate;
@@ -360,5 +366,6 @@ public class BattleManager : MonoBehaviour
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
         Global.photonService.GameStartEvent -= OnGameStart;
         Global.photonService.GameOverEvent -= OnGameOver;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 }

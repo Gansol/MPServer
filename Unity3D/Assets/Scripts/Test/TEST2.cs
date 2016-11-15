@@ -10,12 +10,21 @@ public class TEST2 : MonoBehaviour
         i = 0;
     }
 
-    public IEnumerator A(int a)
+    public IEnumerator A()
+    {
+        Debug.Log("-");
+        yield return new WaitForSeconds(2.0f);
+        Debug.Log("-");
+        
+    }
+
+    public IEnumerator B()
     {
         i++;
-        Debug.Log("times:"+a.ToString());
+        Debug.Log("---" );
+        Debug.Log("---");
 
-        Debug.Log("value:" + i);
         yield return null;
+
     }
 }

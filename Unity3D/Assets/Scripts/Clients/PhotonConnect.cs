@@ -4,7 +4,7 @@ using System.Collections;
 public class PhotonConnect : MonoBehaviour
 {
 
-    public string ServerIP = "192.168.1.2";
+    public string ServerIP = "192.168.88.77";
     public int ServerPort = 5055;
     public string ServerName = "MPServer";
 

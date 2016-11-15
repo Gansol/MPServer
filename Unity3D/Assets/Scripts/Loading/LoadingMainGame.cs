@@ -4,11 +4,10 @@ using System.Collections;
 public class LoadingMainGame : MonoBehaviour {
 
     public int level;
-    AsyncOperation Loader;
 
     void Start()
     {
-        Global.loadScene = level;
+        Global.nextScene = level;
     }
 
     void Update()
@@ -22,7 +21,7 @@ public class LoadingMainGame : MonoBehaviour {
     private IEnumerator LoadLevel()
     {
         Global.isExitingRoom = false;
-        Application.LoadLevel(Global.loadScene);  //之後要改成LoadScene
+        Application.LoadLevel(Global.nextScene);  //之後要改成LoadScene
         yield return null;
     }
 }

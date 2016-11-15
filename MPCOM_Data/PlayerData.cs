@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Data;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -30,15 +30,20 @@ namespace MPCOM
         public int SumScore;		// 總分數
         public Int16 SumLost;		// 總跑掉老鼠
         public int SumKill;		    // 總清除老鼠
+        public int SumWin;		    // 總勝場
+        public int SumBattle;		// 總場次
 
-        public string Item;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
+        public Int16 ItemID;
+        public Int16 ItemCount;
+        public byte ItemType;
+
+        public string SortedItem;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除
         public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string Team;			// 隊伍			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAmount;	// 老鼠數量		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string Friend;		// 好友			＊＊＊類型ＪＳＯＮ＊＊＊＊
-
-
-
+        public string playerProperty;   // 玩家資料
+        public string PlayerItem;   // 玩家道具資料
 
 
 

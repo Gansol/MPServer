@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using MiniJSON;
 using MPProtocol;
 using System;
-
 /*
  * 這腳本只負責生東西 時間和控制器要另外寫在Global
  * 現在是測試版 完成後要把Intantiate改成poolManager.ActiveObject()
@@ -18,16 +17,16 @@ public class MiceSpawner : MonoBehaviour
 {
     public GameObject[] hole;
     public GameObject[] micePanel;
-    private PoolManager poolManger;
+    private PoolManager poolManager;
     [Range(2, 5)]
     public float miceSize;
     private Vector3 _miceSize;
 
     void Start()
     {
-        poolManger = GetComponent<PoolManager>();
+        poolManager = GetComponent<PoolManager>();
         Global.photonService.ApplyMissionEvent += OnApplyMission;
-        Global.photonService.ExitRoomEvent += OnExitRoom;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
     }
 
 
@@ -60,7 +59,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[_rndPos[item] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceName);
+                GameObject clone = poolManager.ActiveObject(miceName);
                 if (clone != null)
                 {
                     clone.transform.gameObject.SetActive(false);
@@ -110,7 +109,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[holeArray[randomPos] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceName);
+                GameObject clone = poolManager.ActiveObject(miceName);
                 if (clone != null)
                 {
                     clone.transform.gameObject.SetActive(false);
@@ -170,7 +169,7 @@ public class MiceSpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnTime);
             if (hole[item - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
             {
-                GameObject clone = poolManger.ActiveObject(miceName);
+                GameObject clone = poolManager.ActiveObject(miceName);
                 if (clone != null)
                 {
                     clone.transform.gameObject.SetActive(false);
@@ -231,7 +230,7 @@ public class MiceSpawner : MonoBehaviour
                     yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
-                        GameObject clone = poolManger.ActiveObject(miceName);
+                        GameObject clone = poolManager.ActiveObject(miceName);
                         if (clone != null)
                         {
                             clone.transform.gameObject.SetActive(false);
@@ -300,7 +299,7 @@ public class MiceSpawner : MonoBehaviour
                 {
                     if (spawnCount > 0)
                     {
-                        GameObject clone = poolManger.ActiveObject(miceName);
+                        GameObject clone = poolManager.ActiveObject(miceName);
                         if (clone != null)
                         {
                             clone.transform.gameObject.SetActive(false);
@@ -374,7 +373,7 @@ public class MiceSpawner : MonoBehaviour
                     yield return new WaitForSeconds(spawnTime);
                     if (hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                     {
-                        GameObject clone = poolManger.ActiveObject(miceName);
+                        GameObject clone = poolManager.ActiveObject(miceName);
 
                         if (clone != null)
                         {
@@ -444,7 +443,7 @@ public class MiceSpawner : MonoBehaviour
                 yield return new WaitForSeconds(spawnTime);
                 if (hole[holeArray[i - 1][j - 1] - 1].GetComponent<HoleState>().holeState == HoleState.State.Open)
                 {
-                    GameObject clone = poolManger.ActiveObject(miceName);
+                    GameObject clone = poolManager.ActiveObject(miceName);
                     if (clone != null)
                     {
                         clone.transform.gameObject.SetActive(false);
@@ -508,7 +507,7 @@ public class MiceSpawner : MonoBehaviour
             hole[4].GetComponent<Animator>().Play("HoleScale");
 
             // 要等待 動畫結束再出現
-            GameObject clone = poolManger.ActiveObject(miceName);
+            GameObject clone = poolManager.ActiveObject(miceName);
             clone.transform.gameObject.SetActive(false);
             clone.transform.parent = hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
@@ -535,9 +534,9 @@ public class MiceSpawner : MonoBehaviour
         }
     }
 
-    void OnExitRoom()
+    void OnLoadScene()
     {
         Global.photonService.ApplyMissionEvent -= OnApplyMission;
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 }

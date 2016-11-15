@@ -1,9 +1,10 @@
 ﻿using ExitGames.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.EnterpriseServices;
-
+using MiniJSON;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -70,18 +71,33 @@ namespace MPCOM
 
                     // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand("SELECT * FROM MiceData2", sqlConn);
+                    adapter.SelectCommand = new SqlCommand("SELECT * FROM Monster_MiceData", sqlConn);
                     adapter.Fill(DS);
                 }
                 // 若有讀到則 取得所有資料
                 if (DS.Tables[0].Rows.Count > 0)
                 {
+                    int i = 0, j = 0;
+
                     foreach (DataTable table in DS.Tables)
                     {
+                        Dictionary<string, object> dictData = new Dictionary<string, object>();
+                        string itemID = "";
+
                         foreach (DataRow row in table.Rows)
                         {
-                            miceData.miceProperty = (string)row[0];
+                            j = 0;
+                            Dictionary<string, object> dictData2 = new Dictionary<string, object>();
+                            foreach (DataColumn col in table.Columns)
+                            {
+                                if (j == 0) itemID = table.Rows[i][col].ToString();
+                                    dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
+                                j++;
+                            }
+                            dictData.Add(itemID, dictData2);
+                            i++;
                         }
+                        miceData.miceProperty = Json.Serialize(dictData);
                     }
                     miceData.ReturnCode = "S801"; //true
                 }

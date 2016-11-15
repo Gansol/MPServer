@@ -101,7 +101,7 @@ namespace MPCOM
                         memberData.ReturnMessage = "已有相同的會員帳號！";
                     }
 
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //假如玩家資料中沒有資料 建立一份新玩家資料
@@ -114,7 +114,7 @@ namespace MPCOM
                     }
 
 
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //假如玩家貨幣資料中沒有資料 建立一份新玩家貨幣資料
@@ -194,7 +194,7 @@ namespace MPCOM
                         memberData.ReturnMessage = "已有相同的會員帳號！";
                     }
 
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //假如玩家資料中沒有資料 建立一份新玩家資料
@@ -207,7 +207,7 @@ namespace MPCOM
                     }
 
 
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
 
                     //假如玩家貨幣資料中沒有資料 建立一份新玩家貨幣資料

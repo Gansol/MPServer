@@ -34,7 +34,7 @@ public class BattleHUD : MonoBehaviour
         battleManager = GetComponent<BattleManager>();
 
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
-        Global.photonService.ExitRoomEvent += OnExitRoom;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
 
         _beautyEnergy = 0d;
         _energy = 0d;
@@ -432,9 +432,9 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    void OnExitRoom()
+    void OnLoadScene()
     {
         Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;
-        Global.photonService.ExitRoomEvent -= OnExitRoom;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 }

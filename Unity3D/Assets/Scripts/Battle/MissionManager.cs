@@ -59,7 +59,7 @@ public class MissionManager : MonoBehaviour
         Global.photonService.ApplyMissionEvent += OnApplyMission;               // 加入 接受任務 監聽事件
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;  // 加入 顯示對方 完成任務 監聽事件
         Global.photonService.MissionCompleteEvent += OnMissionComplete;         // 加入 完成任務 監聽事件
-        Global.photonService.ExitRoomEvent += OnExitRoom;                       // 移除 離開房間 監聽事件
+        Global.photonService.LoadSceneEvent += OnLoadScene;                       // 移除 離開房間 監聽事件
         battleManager = GetComponent<BattleManager>();
         battleHUD = GetComponent<BattleHUD>();
 
@@ -317,11 +317,11 @@ public class MissionManager : MonoBehaviour
         // to recive Host Last GameTime;
     }
 
-    void OnExitRoom()
+    void OnLoadScene()
     {
         Global.photonService.ApplyMissionEvent -= OnApplyMission;               // 移除 接受任務 監聽事件
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;  // 移除 顯示對方 完成任務 監聽事件
         Global.photonService.MissionCompleteEvent -= OnMissionComplete;         // 移除 完成任務 監聽事件
-        Global.photonService.ExitRoomEvent -= OnExitRoom;                       // 移除 離開房間 監聽事件
+        Global.photonService.LoadSceneEvent -= OnLoadScene;                       // 移除 離開房間 監聽事件
     }
 }
