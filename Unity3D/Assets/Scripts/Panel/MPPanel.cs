@@ -33,7 +33,7 @@ public abstract class MPPanel : MonoBehaviour
     public bool LoadActor(GameObject btn_click, Transform parent, Vector3 scale)
     {
         GameObject _miceImage;
-        string assetName = btn_click.transform.GetComponentInChildren<UISprite>().name;
+        string assetName = btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Remove(btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Length - 4);
         Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 
@@ -145,7 +145,7 @@ public abstract class MPPanel : MonoBehaviour
 
 
     #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData,int type)
+    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData, int type)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -154,13 +154,13 @@ public abstract class MPPanel : MonoBehaviour
             var nestedData = item.Value as Dictionary<string, object>;
             object itemID;
             nestedData.TryGetValue("ItemID", out itemID);
-            
 
-            char[] itemType = itemID.ToString().ToCharArray(0,1);
+
+            char[] itemType = itemID.ToString().ToCharArray(0, 1);
             if (itemType[0].ToString() == type.ToString())
-                {
-                    data.Add(nestedData["ItemID"].ToString(), nestedData);
-                }
+            {
+                data.Add(nestedData["ItemID"].ToString(), nestedData);
+            }
         }
         return data;
     }
@@ -254,7 +254,7 @@ public abstract class MPPanel : MonoBehaviour
             }
         }
         return dictNotLoadedAsset;
-    } 
+    }
     #endregion
 
     public void SetLoadedActor(GameObject actor)

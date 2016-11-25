@@ -67,7 +67,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event ShowMissionScoreHandler MissionCompleteEvent;
 
     //委派事件 GameOver
-    public delegate void GameOverHandler(Int16 score, byte exp, Int16 sliverReward, byte battleResult);
+    public delegate void GameOverHandler(int score, byte exp, Int16 sliverReward, byte battleResult);
     public event GameOverHandler GameOverEvent;
 
     //委派事件 UpdateCurrency
@@ -781,7 +781,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 {
                     if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                     {
-                        Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];     // 這是GameScore不含扣分
+                        int score = (int)operationResponse.Parameters[(byte)BattleParameterCode.Score];     // 這是GameScore不含扣分
                         byte exp = (byte)operationResponse.Parameters[(byte)BattleParameterCode.EXPReward];
                         Int16 sliverReward = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.SliverReward];
                         byte battleResult = (byte)operationResponse.Parameters[(byte)BattleParameterCode.BattleResult];
@@ -794,7 +794,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
                         GameOverEvent(score, exp, sliverReward, battleResult);
-                        Debug.Log("GameOver:" + (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]);
+                        Debug.Log("GameOver:" + (int)operationResponse.Parameters[(byte)BattleParameterCode.Score]);
                         Debug.Log("RECIVE GameOver !");
                     }
                     else

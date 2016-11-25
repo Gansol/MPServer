@@ -153,24 +153,24 @@ public class BattleHUD : MonoBehaviour
 
         #region Energy Bar動畫
 
-        if (battleManager.energy == Math.Round(_beautyEnergy, 6))
+        if (BattleManager.energy == Math.Round(_beautyEnergy, 6))
         {
-            EnergyBar.GetComponent<UISlider>().value = (float)(_beautyEnergy = battleManager.energy);
+            EnergyBar.GetComponent<UISlider>().value = (float)(_beautyEnergy = BattleManager.energy);
         }
 
-        if (battleManager.energy > _beautyEnergy)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
+        if (BattleManager.energy > _beautyEnergy)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
         {
             EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢減少
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)battleManager.energy, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
+            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)BattleManager.energy, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (battleManager.energy < _beautyEnergy)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
+        else if (BattleManager.energy < _beautyEnergy)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
         {
             EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢增加
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)battleManager.energy, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
+            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)BattleManager.energy, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
         else
         {
-            EnergyBar.GetComponent<UISlider>().value = (float)battleManager.energy;
+            EnergyBar.GetComponent<UISlider>().value = (float)BattleManager.energy;
         }
 
         #endregion
@@ -376,7 +376,7 @@ public class BattleHUD : MonoBehaviour
 
     public void EnergySilder(float value)
     {
-        EnergyBar.GetComponent<UISlider>().value = (float)battleManager.energy;
+        EnergyBar.GetComponent<UISlider>().value = (float)BattleManager.energy;
     }
 
 /// <summary>

@@ -35,7 +35,7 @@ public class BattleManager : MonoBehaviour
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
     private float _otherScore = 0;          // 對手分數
-    private double _energy = 0;             // 能量
+    private static double _energy = 0;             // 能量
 
     private Int16 _combo = 0;               // 連擊數
 
@@ -62,7 +62,7 @@ public class BattleManager : MonoBehaviour
     public int spawnCount { get { return _spawnCount; } }
     public float myDPS { get { return _myDPS; } }
     public float otherDPS { get { return _myDPS; } }
-    public double energy { get { return _energy; } }
+    public static double energy { get { return _energy; } }
 
     // Use this for initialization
     void Start()
@@ -95,6 +95,7 @@ public class BattleManager : MonoBehaviour
         _lostMice = 0;
         _killMice = 0;
         _spawnCount = 0;
+        _energy = 0;
     }
 
     void Update()
@@ -108,7 +109,7 @@ public class BattleManager : MonoBehaviour
                 _isHighScore = true;
             }
 
-            if (_gameTime > 5 && (_score == 0 || _otherScore == 0))  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_gameTime > 120 /*&& (_score == 0 || _otherScore == 0)*/)  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
                 Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_gameTime, _maxCombo, _killMice, _lostMice);
@@ -333,7 +334,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void OnGameOver(Int16 score, byte exp, Int16 sliverReward,byte battleResult)
+    void OnGameOver(int score, byte exp, Int16 sliverReward,byte battleResult)
     {
         bool result;
         result = (battleResult > 0) ? true : false;

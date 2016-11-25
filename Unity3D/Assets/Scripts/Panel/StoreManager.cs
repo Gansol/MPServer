@@ -357,6 +357,7 @@ public class StoreManager : PanelManager
         {
             var nestedData = item.Value as Dictionary<string, object>;
             j = 0;
+            parent.GetChild(i).GetComponent<Item>().itemProperty = new string[nestedData.Count];
             foreach (KeyValuePair<string, object> nested in nestedData)
             {
                 parent.GetChild(i).GetComponent<Item>().itemProperty[j] = nested.Value.ToString();
@@ -372,6 +373,7 @@ public class StoreManager : PanelManager
         {
             var nestedData = item.Value as Dictionary<string, object>;
             j = 0;
+            parent.GetChild(i).GetComponent<Item>().storeInfo = new string[nestedData.Count];
             foreach (KeyValuePair<string, object> nested in nestedData)
             {
                 parent.GetChild(i).GetComponent<Item>().storeInfo[j] = nested.Value.ToString();

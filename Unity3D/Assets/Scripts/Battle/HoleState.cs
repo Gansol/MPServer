@@ -28,7 +28,7 @@ public class HoleState : MonoBehaviour {
         }
         else
         {
-            holeState = State.Open;
+                holeState = State.Open;
         }
     }
 }

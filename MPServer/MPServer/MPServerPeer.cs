@@ -1234,21 +1234,30 @@ namespace MPServer
                                     Log.Debug("BattleUI OK");
                                     BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacMissionReward(mission, missionRate, customValue)); //計算分數
                                     Log.Debug("BattleData OK");
-                                    Int16 missionReward = battleData.missionReward;
+                                    
 
-                                    Log.Debug("\n\nMissionReward: " + missionReward + "  \n\n");
+                                    
                                     if (battleData.ReturnCode == "S503")//計算分數成功 回傳玩家資料
                                     {
                                         Log.Debug("battleData.ReturnCode == S503");
-
+                                        Int16 missionReward = battleData.missionReward;
+                                        Int16 otherReward = battleData.customValue;
 
                                         if (mission == (byte)Mission.WorldBoss) // 如果是 世界王任務 回傳給雙方任務完成
                                         {
-                                            Int16 otherReward = battleData.customValue;
-
-                                            _server.room.KillBoss(roomID);  // 世界王任務完成 把Server BOSS殺了
-                                            Log.Debug("\n\notherReward: " + otherReward + "  \n\n");
+                                            _server.room.KillBoss(roomID);  // 世界王任務完成 把Server BOSS殺了          
+                                 
                                             #region 自己
+                                            
+                                            // 儲存分數
+                                            Room.RoomActor roomActor;
+                                            roomActor = _server.room.GetActorFromGuid(peerGuid);
+                                            roomActor.gameScore += battleData.missionReward;
+
+
+                                            
+                                            if (roomActor.gameScore < 0) roomActor.gameScore = 0;
+
                                             // 回傳給原玩家
                                             // ResponseParameter
                                             Dictionary<byte, object> myResParameter = new Dictionary<byte, object> {
@@ -1261,10 +1270,17 @@ namespace MPServer
                                             #endregion
 
                                             #region 對方
+                                            
                                             // 回傳給另外一位玩家
                                             Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
                                             otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                             peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
+
+                                            // 儲存分數
+                                            otherActor.gameScore += otherReward;
+                                            if (otherActor.gameScore < 0) otherActor.gameScore = 0;
+
+
 
                                             // ResponseParameter
                                             Dictionary<byte, object> otherResParameter = new Dictionary<byte, object> {
@@ -1283,6 +1299,9 @@ namespace MPServer
                                             peerOther.SendEvent(otherScoreEventData, new SendParameters());    // 對方 接收我方 取得的分數
 
                                             #endregion
+                                            Log.Debug("World Boss roomActor.gameScore:" + roomActor.gameScore + "roomOtherActor.gameScore:"+ otherActor.gameScore);
+
+                                            Log.Debug("\n\nMissionReward: " + missionReward + "  \n\nOtherReward: " + otherReward + "  \n\n");
                                         }
                                         else // 如果是 其他任務 獨立回傳任務完成
                                         {
@@ -1386,7 +1405,7 @@ namespace MPServer
                                 try
                                 {
                                     Log.Debug("IN GameOver");
-
+                                    
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     Int16 score = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Score];
                                     Int16 otherScore = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.OtherScore];
@@ -1395,7 +1414,6 @@ namespace MPServer
                                     Int16 lostMice = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumLost];
                                     int killMice = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumKill];
                                     string item = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.SortedItem];
-
 
                                     Room.RoomActor otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                     peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
@@ -1415,7 +1433,7 @@ namespace MPServer
 
 
                                         PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
-                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdateGameOver(account, score, battleData.expReward, maxCombo, score, lostMice, killMice, battleData.battleResult, item));// 更新會員資料
+                                        PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdateGameOver(account, roomActor.gameScore, battleData.expReward, maxCombo, score, lostMice, killMice, battleData.battleResult, item));// 更新會員資料
 
                                         if (playerData.ReturnCode == "S403")
                                         {
@@ -1429,7 +1447,7 @@ namespace MPServer
                                         if (playerData.ReturnCode == "S401")
                                         {
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                                     { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, score },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },
+                                                     { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, roomActor.gameScore },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },
                                                      { (byte)BattleParameterCode.EXPReward, battleData.expReward },{ (byte)BattleParameterCode.BattleResult, battleData.battleResult },{ (byte)PlayerDataParameterCode.MaxScore, playerData.MaxScore } ,
                                                      { (byte)PlayerDataParameterCode.SumLost, playerData.SumLost },{ (byte)PlayerDataParameterCode.SumKill, playerData.SumKill },{ (byte)PlayerDataParameterCode.SortedItem, playerData.SortedItem },
                                                      { (byte)PlayerDataParameterCode.MaxCombo, playerData.MaxCombo },{ (byte)PlayerDataParameterCode.Rank, playerData.Rank },                                            };

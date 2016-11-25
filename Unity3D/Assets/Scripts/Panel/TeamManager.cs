@@ -84,7 +84,8 @@ public class TeamManager : PanelManager
         {
             _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
-            InstantiateActor(_btnClick.gameObject.GetComponentInChildren<UISprite>().name, _actorParent.transform, actorScale);
+            string bundleName= _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - 4);
+            InstantiateActor(bundleName, _actorParent.transform, actorScale);
         }
     }
 
@@ -134,16 +135,15 @@ public class TeamManager : PanelManager
             string bundleName = item.Value.ToString() + "ICON";
             GameObject bundle = assetLoader.GetAsset(bundleName);
 
-            if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
+            if (bundle != null)                  // 已載入資產時
             {
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
                 if (miceBtn.childCount == 0)
                 {
-                    bundle = assetLoader.GetAsset(bundleName);
                     ObjectFactory insObj = new ObjectFactory();
-                    insObj.Instantiate(bundle, miceBtn, item.Value.ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
+                    insObj.Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
 
-                    Add2Refs(bundle, miceBtn);     // 加入物件參考
+                    Add2Refs(item.Key, miceBtn);     // 加入物件參考
 
                     miceBtn.GetComponent<TeamSwitcher>().enabled = true;           // 開啟老鼠隊伍交換功能
                     miceBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn"); // 開啟按鈕功能
@@ -152,9 +152,9 @@ public class TeamManager : PanelManager
                 {
                     string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
 
-                    tmp.Add(item.Value.ToString(), miceBtn.gameObject);
+                    tmp.Add(item.Key, miceBtn.gameObject);
                     dictLoadedObject = tmp;
-                    miceBtn.GetChild(0).name = item.Value.ToString();
+                    miceBtn.GetChild(0).name = item.Key;
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;
                 }
                 i++;
@@ -218,10 +218,10 @@ public class TeamManager : PanelManager
     {
         foreach (KeyValuePair<string, object> item in dictTeamData)
         {
-            if (dictLoadedMice.ContainsKey(item.Value.ToString()))
-                dictLoadedMice[item.Value.ToString()].SendMessage("DisableBtn");
+            if (dictLoadedMice.ContainsKey(item.Key.ToString()))
+                dictLoadedMice[item.Key.ToString()].SendMessage("DisableBtn");
             else
-                dictLoadedMice[item.Value.ToString()].SendMessage("EnableBtn");
+                dictLoadedMice[item.Key.ToString()].SendMessage("EnableBtn");
         }
     }
     #endregion
@@ -232,15 +232,16 @@ public class TeamManager : PanelManager
     /// </summary>
     /// <param name="bundle">AssetBundle</param>
     /// <param name="myParent">參考按鈕</param>
-    void Add2Refs(GameObject bundle, Transform myParent)
+    void Add2Refs(string bundle, Transform myParent)
     {
         string btnArea = myParent.parent.name;                          //按鈕存放區域名稱 Team / Mice 區域
-        string miceName = bundle.name.Remove(bundle.name.Length - 4);
+        //string miceName = bundle.name.Remove(bundle.name.Length - 4);
+        //string miceName = bundle.name.Remove(bundle.name.Length - 4);
 
         if (btnArea == "Mice")
-            dictLoadedMice.Add(miceName, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置
+            dictLoadedMice.Add(bundle, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置
         else
-            dictLoadedTeam.Add(miceName, myParent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
+            dictLoadedTeam.Add(bundle, myParent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
     }
     #endregion
 

@@ -284,7 +284,7 @@ namespace MPCOM
                     // 如果找到玩家資料
                     if (DS.Tables[0].Rows.Count == 1)
                     {
-                        string query = @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,Friend=@friend WHERE Account=@account";
+                        string query = @"UPDATE Player_PlayerData WITH(ROWLOCK) SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,SumLost=@sumLost,SumKill=@sumKill,Item=@item,MiceAll=@miceAll,Team=@team,Friend=@friend WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
@@ -350,7 +350,7 @@ namespace MPCOM
                     if (DS.Tables[0].Rows.Count == 1)
                     {
                         string query =
-                                @"UPDATE Player_PlayerData SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
+                                @"UPDATE Player_PlayerData WITH(ROWLOCK) SET Rank=@rank,EXP=@exp,MaxCombo=@maxCombo,MaxScore=@maxScore,SumScore=@sumScore,
                                 SumLost=@sumLost,SumKill=@sumKill,SumWin=@sumWin,SumBattle=@sumBattle,Item=@item WHERE Account=@account";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();

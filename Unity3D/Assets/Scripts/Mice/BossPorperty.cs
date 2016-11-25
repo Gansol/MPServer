@@ -20,7 +20,7 @@ public class BossPorperty : MonoBehaviour
         otherHits = myHits = 0;
         isDead = false;
         flag = true;
-        battleHUD = GameObject.Find("GameManager").GetComponent<BattleHUD>();
+        battleHUD =GameObject.FindGameObjectWithTag("GM").GetComponent<BattleHUD>();
         Global.photonService.BossDamageEvent += OnBossDamage;
         Global.photonService.OtherDamageEvent += OnOtherDamage;
     }
@@ -38,7 +38,7 @@ public class BossPorperty : MonoBehaviour
         else
         {
             Debug.Log("BOSS DEAD:" + hp);
-            GetComponent<Animator>().Play("Die");
+            GetComponentInChildren<Animator>().Play("Die");
 
             if (Global.OtherData.RoomPlace != "Host" && flag)
             {//0*100=0
@@ -47,14 +47,14 @@ public class BossPorperty : MonoBehaviour
                 Global.photonService.MissionCompleted((byte)Mission.WorldBoss, 1, percent, "");
                 Debug.Log("percent:" + percent);
             }
-            transform.parent.parent.GetComponent<Animator>().Play("HoleScale_R");
+            transform.parent.GetComponentInChildren<Animator>().Play("HoleScale_R");
         }
     }
 
     void OnSpawn()
     {
         isDead = false;
-        battleHUD = GameObject.Find("GameManager").GetComponent<BattleHUD>();
+        battleHUD = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleHUD>();
     }
 
 

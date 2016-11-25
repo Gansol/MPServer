@@ -134,6 +134,7 @@ public class AssetBundleChecker : MonoBehaviour
                 hashLocalList.Add(localItem.Key); //把 本機 檔案列表存入HashSet等待比較
             }
             hashLocalList.ExceptWith(hashDelorAdd); // (hashLocalList)要刪除的檔案 = 本機檔案 - 要保存的檔案(無變動檔案)
+            Debug.Log(hashLocalList.Count);
             bundleDownloader.DeleteFile(hashLocalList); //刪除檔案  //目前狀態 檔案已刪除 LocalList還是舊的
 
             hashLocalList.Clear(); //清除 本機資料列表(要刪除的檔案，不能再比對，要重新再讀一次本機資料)

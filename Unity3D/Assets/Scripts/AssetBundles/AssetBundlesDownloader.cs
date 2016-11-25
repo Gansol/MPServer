@@ -84,16 +84,19 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// </summary>
     /// <param name="hashSet"></param>
     /// <returns></returns>
-    public IEnumerator DeleteFile(HashSet<string> hashSet)
+    public bool DeleteFile(HashSet<string> hashSet)
     {
+        Debug.Log(hashSet.Count);
         if (hashSet.Count != 0)
         {
             string localBundlesPath = Application.persistentDataPath + "/AssetBundles/"; //本機資源路徑
 
             foreach (string file in hashSet)
                 File.Delete(localBundlesPath + file); //刪除所有被修改 或 舊版本檔案
+
+            return true;
         }
-        yield return hashSet;
+         return false;
     }
     #endregion
 

@@ -20,28 +20,29 @@ public class PlayerInput : MonoBehaviour
 
 
 #if UNITY_EDITOR || UNITY_STANDALONE
-        
+
         Vector3 perPos;
         perPos = Input.mousePosition;
-        perPos.z =0.67f;
+        perPos.z = 0.67f;
         pos = (Camera.main.orthographic) ? UICamera.mainCamera.ScreenToWorldPoint(Input.mousePosition) : UICamera.mainCamera.ScreenToWorldPoint(perPos);
-         hit = (Camera.main.orthographic) ? Physics2D.Raycast(pos, Vector2.zero) : Physics2D.Raycast(pos, Vector2.zero);
-//        Debug.Log("pos:" + pos + "XX" + Input.mousePosition);
+        hit = (Camera.main.orthographic) ? Physics2D.Raycast(pos, Vector2.zero) : Physics2D.Raycast(pos, Vector2.zero);
+        //        Debug.Log("pos:" + pos + "XX" + Input.mousePosition);
         if (hit && hit.collider != null)
         {
             Debug.Log(hit.transform.name);
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Hit" + hit.transform.name);  
+                Debug.Log("Hit" + hit.transform.name);
 
-                if (hit.transform.name == "anims") hit.transform.SendMessage("OnHit");
+                if (hit.transform.childCount != 0)
+                    if (hit.transform.GetChild(0).name == "anims") hit.transform.SendMessage("OnHit");
 
                 if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
                     hit.transform.SendMessage("OnHit");
 
                 if (hit.transform.name == "Exit_Btn")
                     Global.photonService.ExitRoom();
-                
+
             }
         }
 
@@ -59,8 +60,8 @@ public class PlayerInput : MonoBehaviour
 
                 if (hit && hit.collider != null)
                 {
-                    if (hit.transform.name == "anims")
-                        hit.transform.SendMessage("OnHit");
+                    if(hit.transform.childCount!=0)
+                        if (hit.transform.GetChild(0).name == "anims") hit.transform.SendMessage("OnHit");
 
                     if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
                         hit.transform.SendMessage("OnHit");

@@ -440,7 +440,7 @@ namespace MPCOM
         #region UpdateGameOver 更新玩家(GameOver時)資料
 
         [AutoComplete]
-        public PlayerData UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
+        public PlayerData UpdateGameOver(string account, int score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -726,7 +726,7 @@ namespace MPCOM
             return playerData;
         }
 
-        private PlayerData ScoreChk(Int16 score)
+        private PlayerData ScoreChk(int score)
         {
             PlayerData playerData = new PlayerData();
 

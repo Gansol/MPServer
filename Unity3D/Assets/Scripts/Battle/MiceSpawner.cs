@@ -69,7 +69,7 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.localPosition = Vector2.zero;
                     clone.transform.localScale = hole[_rndPos[item] - 1].transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
                     clone.transform.gameObject.SetActive(true);
-                    clone.transform.GetChild(0).SendMessage("Play");
+                    clone.SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
 
@@ -121,7 +121,7 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.localScale = hole[holeArray[randomPos] - 1].transform.GetChild(0).localScale - _miceSize;
                     Debug.Log(clone.transform.localScale);
                     clone.transform.gameObject.SetActive(true);
-                    clone.transform.GetChild(0).SendMessage("Play");
+                    clone.transform.SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
 
@@ -180,7 +180,7 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.localScale = hole[item - 1].transform.GetChild(0).localScale - _miceSize;
                     Debug.Log(clone.transform.localScale);
                     clone.transform.gameObject.SetActive(true);
-                    clone.transform.GetChild(0).SendMessage("Play");
+                    clone.transform.SendMessage("Play");
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
                 }
@@ -241,7 +241,7 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i, j] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.GetChild(0).SendMessage("Play");
+                            clone.transform.SendMessage("Play");
                             _tmpCount++;
 
                             if (_tmpCount - spawnCount == 0) goto Finish;
@@ -310,7 +310,7 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i - 1, j - 1] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.GetChild(0).SendMessage("Play");
+                            clone.transform.SendMessage("Play");
                             _tmpCount++;
 
                             if (_tmpCount - spawnCount == 0)
@@ -384,7 +384,7 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i][j] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.GetChild(0).SendMessage("Play");
+                            clone.transform.SendMessage("Play");
                             _tmpCount++;
 
                             if ((_tmpCount - spawnCount) == 0)
@@ -453,7 +453,7 @@ public class MiceSpawner : MonoBehaviour
                         clone.transform.localPosition = Vector2.zero;
                         clone.transform.localScale = hole[holeArray[i - 1][j - 1] - 1].transform.GetChild(0).localScale - _miceSize;
                         clone.transform.gameObject.SetActive(true);
-                        clone.transform.GetChild(0).SendMessage("Play");
+                        clone.transform.SendMessage("Play");
                         _tmpCount++;
 
                         if ((_tmpCount - spawnCount) == 0)
@@ -501,7 +501,7 @@ public class MiceSpawner : MonoBehaviour
         {
             if (hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
             {
-                hole[4].transform.GetChild(3).GetChild(0).SendMessage("OnDied", 0.0f);
+                hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
             }
             hole[4].GetComponent<Animator>().enabled = true;
             hole[4].GetComponent<Animator>().Play("HoleScale");
@@ -513,11 +513,11 @@ public class MiceSpawner : MonoBehaviour
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
             clone.transform.localPosition = new Vector3(0, 0, 0);
             clone.transform.gameObject.SetActive(true);
-            clone.transform.GetChild(0).SendMessage("AsBoss", true);
-            clone.transform.GetChild(0).transform.gameObject.AddComponent<BossPorperty>();
+            clone.transform.SendMessage("AsBoss", true);
+            clone.AddComponent<BossPorperty>();
 
-            clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hp = hp;
-            clone.transform.GetChild(0).transform.GetComponent<BossPorperty>().hpMax = hp;
+            clone.GetComponent<BossPorperty>().hp = hp;
+            clone.GetComponent<BossPorperty>().hpMax = hp;
         }
         catch (Exception e)
         {

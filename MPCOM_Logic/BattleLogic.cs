@@ -44,7 +44,7 @@ namespace MPCOM
         private Int16 harvestReward = 100;
         private Int16 drivingMiceReward = 200;
         private Int16 harvestRateReward = 400;
-        private Int16 worldBossReward = 10000;
+        private Int16 worldBossReward = 1000;
 
         private struct EggMice
         {
@@ -266,16 +266,16 @@ namespace MPCOM
                                 {
                                     Int16 reward = (Int16)Math.Round((float)worldBossReward * percent);     // worldBossReward x 獲得百分比
                                     battleData.missionReward = reward;
-                                    battleData.customValue = (Int16)(reward / -10);                         // customValue 對手獎勵
+                                    battleData.customValue = (Int16)(reward / 2);                         // customValue 對手獎勵
                                     battleData.ReturnCode = "S503";
                                     battleData.ReturnMessage = "驗證任務獎勵成功！";
                                     return battleData;
                                 }
-                                else if (customValue < 50)  // (Host)失敗 獲得懲罰 
+                                else if (customValue < 50)  // (Host)失敗 獲得50%獎勵
                                 {
                                     float otherPercent = 1 - percent;
                                     Int16 reward = (Int16)Math.Round((float)worldBossReward * otherPercent);// worldBossReward x 獲得百分比
-                                    battleData.missionReward = (Int16)(reward / -10);
+                                    battleData.missionReward = (Int16)(reward / 2);
                                     battleData.customValue = reward;                                        // customValue 對手獎勵
                                     battleData.ReturnCode = "S503";
                                     battleData.ReturnMessage = "驗證任務獎勵成功！";

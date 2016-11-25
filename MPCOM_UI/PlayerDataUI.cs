@@ -25,7 +25,7 @@ namespace MPCOM
         byte[] LoadPlayerItem(string account);
         byte[] LoadPlayerItem(string account, Int16 itemID);
         byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team , string friend);
-        byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item);
+        byte[] UpdateGameOver(string account, int score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item);
         byte[] UpdatePlayerData(string account, string miceAll , string miceName, int amount);
         byte[] UpdatePlayerData(string account, string miceAll, string team );
         byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount);
@@ -142,7 +142,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家(GameOver時)資料
         /// </summary>
-        public byte[] UpdateGameOver(string account, Int16 score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
+        public byte[] UpdateGameOver(string account, int score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";

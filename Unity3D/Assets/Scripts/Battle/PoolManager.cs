@@ -140,26 +140,24 @@ public class PoolManager : MonoBehaviour
         }
     }
 
+    List<float> GetMiceProperty(string miceName)
+    {
+        List<float> data = new List<float>();
+
+        foreach (KeyValuePair<string, object> item in Global.miceProperty)
+        {
+
+        }
+
+        return data;
+    }
+
     void InstantiateObject(Dictionary<int, string> objectData)
     {
         foreach (KeyValuePair<int, string> item in objectData)
         {
             GameObject bundle = assetLoader.GetAsset(item.Value);
-            if (bundle != null)
-            {
-                clone = new GameObject();
-
-                clone.name = item.Value;
-                clone.transform.parent = ObjectPool.transform;
-                clone.layer = clone.transform.parent.gameObject.layer;
-                clone.transform.localScale = Vector3.one;
-
-                Transform parent = ObjectPool.transform.FindChild(item.Value).transform;
-                clone = insObj.Instantiate(bundle, parent, item.Value, Vector3.zero, Vector3.one, Vector2.zero, -1);
-                clone.transform.GetChild(0).gameObject.AddComponent<Mice>();
-                clone.transform.GetChild(0).gameObject.GetComponent<Mice>().Initialize(0.1f, 6, 60);
-                clone.transform.GetChild(0).gameObject.SetActive(false);    // 新版 子物件隱藏
-            }
+            if (bundle != null) Instantiate(item.Value.ToString(), bundle);
         }
     }
 
@@ -167,23 +165,27 @@ public class PoolManager : MonoBehaviour
     {
 
         int i = 0;
+        float lerpSpeed = 0.1f;
+        float upDistance = 30f;
+        float energyValue = 0.2f;
+
         foreach (KeyValuePair<string, object> item in objectData)
         {
             GameObject bundle = assetLoader.GetAsset(item.Value.ToString());
             if (bundle != null)
             {
                 Vector3 scale = Vector3.zero;
-
-                clone = new GameObject();
                 Transform parent = skillArea.transform.GetChild(i);
+                clone = new GameObject();
+
 
                 scale = (i == 4) ? bossScale : skillScale;
                 clone = insObj.Instantiate(bundle, parent, item.Value.ToString(), Vector3.zero, scale, Vector2.zero, -1);
-                clone.transform.GetChild(0).GetComponent<Animator>().enabled = false;
-                clone.transform.GetChild(0).GetComponent<BoxCollider2D>().enabled = false;
+                //clone.transform.GetComponentInChildren<Animator>().enabled = false;
+                clone.GetComponent<BoxCollider2D>().enabled = false;
+                parent.GetComponent<Skill>().init(lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
                 clone.layer = clone.transform.parent.gameObject.layer;
-
-                skillArea.transform.GetChild(i).transform.gameObject.SetActive(true);    // 新版 子物件隱藏
+                parent.transform.gameObject.SetActive(true);    // 新版 子物件隱藏
                 i++;
             }
             else
@@ -207,18 +209,7 @@ public class PoolManager : MonoBehaviour
         if (ObjectPool.transform.FindChild(objectName).childCount == 0)
         {
             GameObject bundle = assetLoader.GetAsset(objectName);
-
-            if (bundle != null)
-            {
-                Transform parent = ObjectPool.transform.FindChild(objectName).transform;
-                clone = insObj.Instantiate(bundle, parent, objectName, Vector3.zero, Vector3.one, Vector2.zero, -1);
-                clone.transform.GetChild(0).gameObject.AddComponent<Mice>();
-                clone.transform.GetChild(0).gameObject.GetComponent<Mice>().Initialize(0.1f, 6, 60);
-                return clone;
-            }
-
-            Debug.LogError("bundle is null !");
-            return null;
+            if (bundle != null) Instantiate(objectName, bundle);
         }
 
         for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
@@ -227,14 +218,37 @@ public class PoolManager : MonoBehaviour
 
             clone = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-            if (clone.name == objectName && !clone.transform.GetChild(0).gameObject.activeSelf)
+            if (clone.name == objectName && !clone.gameObject.activeSelf)
             {
-                clone.transform.GetChild(0).gameObject.SetActive(true);
+                clone.SetActive(true);
                 return clone;
             }
         }
         return null;
     }
+
+    void Instantiate(string itemName, GameObject bundle)
+    {
+
+        object miceProperty;
+        int itemID = GetItemIDFromName(itemName);
+        Global.miceProperty.TryGetValue(itemID.ToString(), out miceProperty);
+        Dictionary<string, object> dictMiceProperty = miceProperty as Dictionary<string, object>;
+        dictMiceProperty.TryGetValue("LifeTime", out miceProperty);
+
+        clone = new GameObject();
+        clone.name = itemName;
+        clone.transform.parent = ObjectPool.transform;
+        clone.layer = clone.transform.parent.gameObject.layer;
+        clone.transform.localScale = Vector3.one;
+
+        Transform parent = ObjectPool.transform.FindChild(itemName).transform;
+        clone = insObj.Instantiate(bundle, parent, itemName, Vector3.zero, Vector3.one, Vector2.zero, -1);
+        clone.AddComponent<Mice>();
+        clone.GetComponent<Mice>().Initialize(0.1f, 6, 60, float.Parse(miceProperty.ToString()));
+        clone.gameObject.SetActive(false);    // 新版 子物件隱藏
+    }
+
     /// <summary>
     /// 從道具名稱取得道具ID
     /// </summary>
@@ -277,48 +291,9 @@ public class PoolManager : MonoBehaviour
                 _dictObject.Add(GetItemIDFromName(item.Value.ToString()), item.Value.ToString());
         }
 
+        if (!_dictObject.ContainsKey(10001))
+            _dictObject.Add(10001, "EggMice");
         Debug.Log(_dictObject);
         _mergeFlag = true;
-        /*
-        //把自己的老鼠存入HashSet中等待比較，再把老鼠存入合併好的老鼠Dict中
-        foreach (KeyValuePair<string, object> item in _tmpDict)
-        {
-            _myMice.Add(Int16.Parse(item.Key));
-            _dictObject.Add(Int16.Parse(item.Key), item.Value.ToString());
-        }
-
-        if (!_dictObject.ContainsValue("EggMice"))
-        {
-            _dictObject.Add(1, "EggMice");
-        }
-
-        _tmpDict.Clear();
-        Debug.Log(Global.OtherData.Team);
-        _tmpDict = Json.Deserialize(Global.OtherData.Team) as Dictionary<string, object>;
-
-        //把對手的老鼠存入HashSet中等待比較
-        foreach (KeyValuePair<string, object> item in _tmpDict)
-        {
-            _otherMice.Add(Int16.Parse(item.Key));
-        }
-
-       _otherMice.ExceptWith(_myMice); // 把對手重複的老鼠丟掉
-
-        if (_otherMice.Count != 0)      // 如果對手老鼠有不重複的話
-        {
-            foreach (int item in _otherMice)    // 加入合併好的老鼠Dict
-            {
-                object miceName;
-                _tmpDict.TryGetValue(item.ToString(), out miceName);
-
-                _dictObject.Add(item, miceName.ToString());
-            }
-        }
-        _mergeFlag = true;
-        Debug.Log("Merge Mice Completed ! ");
-         * */
-
-
-
     }
 }

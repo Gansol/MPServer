@@ -196,17 +196,17 @@ public class SpawnController : MonoBehaviour
             case SpawnMode.EasyMode:
                 spawnMode = SpawnMode.EasyMode;
                 spawnCount = 6;
-                lerpTime = 0.01f;
-                spawnTime = 0.25f;
-                intervalTime = 1.5f;
+                lerpTime = 0.035f;
+                spawnTime = 0.35f;
+                intervalTime = 1f;
 
                 break;
 
             case SpawnMode.NormalMode:
                 spawnMode = SpawnMode.NormalMode;
                 spawnCount = 9;
-                lerpTime = 0.02f;
-                spawnTime = 0.4f;
+                lerpTime = 0.065f;
+                spawnTime = 0.5f;
                 intervalTime = 2f;
 
                 break;
@@ -214,8 +214,8 @@ public class SpawnController : MonoBehaviour
             case SpawnMode.HardMode:
                 spawnMode = SpawnMode.HardMode;
                 spawnCount = 12;
-                lerpTime = 0.05f;
-                spawnTime = 0.3f;
+                lerpTime = 0.055f;
+                spawnTime = 0.4f;
                 intervalTime = 3f;
 
                 break;
@@ -223,8 +223,8 @@ public class SpawnController : MonoBehaviour
             case SpawnMode.CarzyMode:
                 spawnMode = SpawnMode.CarzyMode;
                 spawnCount = 12;
-                lerpTime = 0.075f;
-                spawnTime = 0.25f;
+                lerpTime = 0.30f;
+                spawnTime = 0.35f;
                 intervalTime = 2f;
                 break;
 
