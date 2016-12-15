@@ -77,7 +77,7 @@ public class AssetBundlesCreator : EditorWindow
     static BuildTarget buildTarget = BuildTarget.WP8Player;
     static BuildAssetBundleOptions deterministicAssetBundle;
 
-    static Dictionary<string, object> files = new Dictionary<string, object>();
+    //static Dictionary<string, object> files = new Dictionary<string, object>();
     static List<string> ext = new List<string> { };
     static string[] hashType = new string[] { "SHA1", "MD5", "SHA512" };
 

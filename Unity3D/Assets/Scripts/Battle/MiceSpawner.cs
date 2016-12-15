@@ -69,7 +69,9 @@ public class MiceSpawner : MonoBehaviour
                     clone.transform.localPosition = Vector2.zero;
                     clone.transform.localScale = hole[_rndPos[item] - 1].transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
                     clone.transform.gameObject.SetActive(true);
-                    clone.SendMessage("Play");
+                    clone.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                    Global.dictBattleMice.Add(clone.transform.parent, clone);
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
 
@@ -90,7 +92,7 @@ public class MiceSpawner : MonoBehaviour
             }
         }
     Finish: ;
-        if (!isSkill) Global.spawnFlag = true;
+    if (!isSkill)  Global.spawnFlag = true; 
     }
 
     /// <summary>
@@ -114,14 +116,16 @@ public class MiceSpawner : MonoBehaviour
                 {
                     clone.transform.gameObject.SetActive(false);
                     hole[holeArray[randomPos] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
-                    _miceSize = hole[holeArray[randomPos] - 1].transform.GetChild(0).localScale / 10 * miceSize ;
+                    _miceSize = hole[holeArray[randomPos] - 1].transform.GetChild(0).localScale / 10 * miceSize;
 
                     clone.transform.parent = hole[holeArray[randomPos] - 1].transform;              // hole[-1]是因為起始值是0 
                     clone.transform.localPosition = Vector2.zero;
                     clone.transform.localScale = hole[holeArray[randomPos] - 1].transform.GetChild(0).localScale - _miceSize;
-                    Debug.Log(clone.transform.localScale);
+                   // Debug.Log(clone.transform.localScale);
                     clone.transform.gameObject.SetActive(true);
-                    clone.transform.SendMessage("Play");
+                    clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                    Global.dictBattleMice.Add(clone.transform.parent, clone);
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
 
@@ -138,7 +142,7 @@ public class MiceSpawner : MonoBehaviour
             }
             else
             {
-//                Debug.Log("Closed!");
+                //                Debug.Log("Closed!");
             }
 
 
@@ -174,13 +178,15 @@ public class MiceSpawner : MonoBehaviour
                 {
                     clone.transform.gameObject.SetActive(false);
                     hole[item - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
-                    _miceSize = hole[item - 1].transform.GetChild(0).localScale / 10 * miceSize ;
+                    _miceSize = hole[item - 1].transform.GetChild(0).localScale / 10 * miceSize;
                     clone.transform.parent = hole[item - 1].transform;                      // hole[-1] 是因為起始值是0 hole[-1]
                     clone.transform.localPosition = Vector2.zero;
                     clone.transform.localScale = hole[item - 1].transform.GetChild(0).localScale - _miceSize;
-                    Debug.Log(clone.transform.localScale);
+                    //Debug.Log(clone.transform.localScale);
                     clone.transform.gameObject.SetActive(true);
-                    clone.transform.SendMessage("Play");
+                    clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                    Global.dictBattleMice.Add(clone.transform.parent, clone);
                     spawnTime = Mathf.Lerp(spawnTime, 0f, lerpTime);
                     _tmpCount++;
                 }
@@ -236,12 +242,14 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.gameObject.SetActive(false);
                             hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
                             Debug.Log(hole[holeArray[i, j] - 1].GetComponent<HoleState>().holeState);
-                            _miceSize = hole[holeArray[i, j] - 1].transform.GetChild(0).localScale / 10 * miceSize ;
+                            _miceSize = hole[holeArray[i, j] - 1].transform.GetChild(0).localScale / 10 * miceSize;
                             clone.transform.parent = hole[holeArray[i, j] - 1].transform;                           //hole[-1] 是因為起始值是0
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i, j] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.SendMessage("Play");
+                            clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                            Global.dictBattleMice.Add(clone.transform.parent, clone);
                             _tmpCount++;
 
                             if (_tmpCount - spawnCount == 0) goto Finish;
@@ -310,7 +318,9 @@ public class MiceSpawner : MonoBehaviour
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i - 1, j - 1] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.SendMessage("Play");
+                            clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                            Global.dictBattleMice.Add(clone.transform.parent, clone);
                             _tmpCount++;
 
                             if (_tmpCount - spawnCount == 0)
@@ -379,12 +389,14 @@ public class MiceSpawner : MonoBehaviour
                         {
                             clone.transform.gameObject.SetActive(false);
                             hole[holeArray[i][j] - 1].GetComponent<HoleState>().holeState = HoleState.State.Closed;
-                            _miceSize = hole[holeArray[i][j] - 1].transform.GetChild(0).localScale / 10 * miceSize ;
+                            _miceSize = hole[holeArray[i][j] - 1].transform.GetChild(0).localScale / 10 * miceSize;
                             clone.transform.parent = hole[holeArray[i][j] - 1].transform;                           //hole[-1] 是因為起始值是0
                             clone.transform.localPosition = Vector2.zero;
                             clone.transform.localScale = hole[holeArray[i][j] - 1].transform.GetChild(0).localScale - _miceSize;
                             clone.transform.gameObject.SetActive(true);
-                            clone.transform.SendMessage("Play");
+                            clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                            Global.dictBattleMice.Add(clone.transform.parent, clone);
                             _tmpCount++;
 
                             if ((_tmpCount - spawnCount) == 0)
@@ -453,7 +465,9 @@ public class MiceSpawner : MonoBehaviour
                         clone.transform.localPosition = Vector2.zero;
                         clone.transform.localScale = hole[holeArray[i - 1][j - 1] - 1].transform.GetChild(0).localScale - _miceSize;
                         clone.transform.gameObject.SetActive(true);
-                        clone.transform.SendMessage("Play");
+                        clone.transform.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+                        Global.dictBattleMice.Add(clone.transform.parent, clone);
                         _tmpCount++;
 
                         if ((_tmpCount - spawnCount) == 0)
@@ -496,7 +510,8 @@ public class MiceSpawner : MonoBehaviour
          * */
     }
 
-    public void SpawnBoss(string miceName,float hp){
+    public void SpawnBoss(string miceName, int hp)
+    {
         try
         {
             if (hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
@@ -508,16 +523,33 @@ public class MiceSpawner : MonoBehaviour
 
             // 要等待 動畫結束再出現
             GameObject clone = poolManager.ActiveObject(miceName);
+            MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
+            
+
+            if (mice.enabled) mice.enabled =false;
             clone.transform.gameObject.SetActive(false);
             clone.transform.parent = hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
             clone.transform.localPosition = new Vector3(0, 0, 0);
             clone.transform.gameObject.SetActive(true);
-            clone.transform.SendMessage("AsBoss", true);
-            clone.AddComponent<BossPorperty>();
+            clone.AddComponent(miceName + "Boss");
 
-            clone.GetComponent<BossPorperty>().hp = hp;
-            clone.GetComponent<BossPorperty>().hpMax = hp;
+
+            // 取得老鼠存活時間
+            object miceProperty;
+            int itemID = ObjectFactory.GetItemIDFromName(miceName);
+            Global.miceProperty.TryGetValue(itemID.ToString(), out miceProperty);
+            Dictionary<string, object> dictMiceProperty = miceProperty as Dictionary<string, object>;
+            dictMiceProperty.TryGetValue("LifeTime", out miceProperty);
+
+
+            MiceBossBase boss = clone.GetComponent(typeof(MiceBossBase)) as MiceBossBase;
+            boss.Initialize(0.1f, 6, 60, float.Parse(miceProperty.ToString()));
+            boss.SetArribute(new MiceAttr(hp));
+            boss.SetSkill(new SkillCallMice());
+
+            Global.dictBattleMice.Add(clone.transform.parent, clone);
+            //clone.SendMessage("Play",)
         }
         catch (Exception e)
         {

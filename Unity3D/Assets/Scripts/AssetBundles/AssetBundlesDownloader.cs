@@ -25,7 +25,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     public bool fileDownloaded { get { return _fileDownloaded;} }
 
     private int _reConnTimes;
-    private bool _fileDownloaded;
+    private bool _fileDownloaded = false;
     #endregion
 
     #region -- DownloadListFile --

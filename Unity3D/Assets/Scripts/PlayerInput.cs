@@ -6,7 +6,7 @@ public class PlayerInput : MonoBehaviour
 {
     RaycastHit2D hit;
     Vector3 pos;
-    float i = 0;
+//    float i = 0;
 
     // Use this for initialization
     void Start()

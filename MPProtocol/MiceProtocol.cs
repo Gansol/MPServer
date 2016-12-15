@@ -1,5 +1,15 @@
 ﻿namespace MPProtocol
 {
+    public enum ENUM_MiceState
+    {
+        Alive,
+        Skilling,
+        Frie,
+        Frozen,
+        Dizzy,
+        Slow,
+        Dead,
+    }
 
     public enum MiceOperationCode
     {

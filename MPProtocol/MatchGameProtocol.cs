@@ -24,5 +24,7 @@
         Nickname,                   // 暱稱
         Team,                       // 隊伍資料
         RoomPlace,                  // 在房間中的位置(主機or客人)
+        ServerTime,                 // 遊戲開始時間
+        GameTime,                   // 遊戲時間
     }
 }

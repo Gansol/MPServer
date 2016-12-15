@@ -50,7 +50,7 @@ public class MissionManager : MonoBehaviour
 
     private bool missionFlag;                                   // 任務是否開啟
     private bool seesawFlag;                                    // 任務蹺蹺板 (A啟動B不啟動..etc)
-    private bool _isBadMice;                                    // 是否打到壞老鼠
+//    private bool _isBadMice;                                    // 是否打到壞老鼠
 
     #endregion
 
@@ -71,7 +71,7 @@ public class MissionManager : MonoBehaviour
 
         missionFlag = false;
         seesawFlag = true;
-        _isBadMice = false;
+       // _isBadMice = false;
 
         _mission = Mission.None;
         _missionMode = MissionMode.Closed;

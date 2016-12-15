@@ -7,7 +7,7 @@ public class UIlabelTest : MonoBehaviour {
 	// Use this for initialization
     void Start()
     {
-        UILabel label = aa.AddComponent<UILabel>();
+//        UILabel label = aa.AddComponent<UILabel>();
 //        label.bitmapFont = StartCoroutine(assetBundleManager.LoadAtlas("TeamPanel/comic", typeof(Font)));
 	}
 	

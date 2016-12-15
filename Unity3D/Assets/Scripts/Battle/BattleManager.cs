@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 using MPProtocol;
 
@@ -14,17 +15,19 @@ public class BattleManager : MonoBehaviour
 {
     MissionManager missionManager;          // 任務管理員
     BattleHUD battleHUD;                    // HUD
+    
+    public delegate void MiceState(AIState state);
+    public event MiceState AIStateEvent;
 
-    private static Int16 _maxCombo = 0;       // 最大連擊數
+    private static Int16 _maxCombo = 0;     // 最大連擊數
     private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
-    private double _gameTime = 0;            // 遊戲時間
-
+    private float _elapsedGameTime = 0;     // 經過時間
 
     private float _maxScore = 0;            // 最高得分
     private float _gameScore = 0;           // 遊戲進行時所得到的分數
     private static int _eggMiceUsage = 0;   // 老鼠使用量
-    private static int _energyUsage = 0;    // 能量使用量
-    private static Int16 _lostMice = 0;       // 失誤數           統計用
+    private static int _energyUsage = 0;    // 能量使用量    
+    private static Int16 _lostMice = 0;     // 失誤數           統計用
     private int _killMice = 0;              // 計算打了幾隻老鼠 統計用
     private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
 
@@ -35,11 +38,11 @@ public class BattleManager : MonoBehaviour
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
     private float _otherScore = 0;          // 對手分數
-    private static double _energy = 0;             // 能量
+    private static double _energy = 0;      // 能量
 
     private Int16 _combo = 0;               // 連擊數
 
-
+    private Dictionary<int, GameObject> dictSkillBossMice = new Dictionary<int, GameObject>();
 
     private bool _isCombo;                  // 是否連擊
     private bool _isHighScore;              // 是否破分數紀錄
@@ -50,7 +53,7 @@ public class BattleManager : MonoBehaviour
     public Int16 combo { get { return _combo; } }
     public Int16 maxCombo { get { return _maxCombo; } }
     public int tmpCombo { get { return _tmpCombo; } }
-    public double gameTime { get { return _gameTime; } }
+    public double gameTime { get { return _elapsedGameTime; } }
     public float score { get { return _score; } }
     public float gameScore { get { return _gameScore; } }
     public float otherScore { get { return _otherScore; } }
@@ -79,13 +82,13 @@ public class BattleManager : MonoBehaviour
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
         Global.photonService.GameStartEvent += OnGameStart;
         Global.photonService.GameOverEvent += OnGameOver;
-        Global.photonService.LoadSceneEvent += OnLoadScene;
+        Global.photonService.LoadSceneEvent += OnDestory;
 
         _isCombo = false;
         _combo = 0;
         _maxCombo = 0;
         _tmpCombo = 0;
-        _gameTime = 0;
+        _elapsedGameTime = 0;
         _score = 0;
         _gameScore = 0;
         _otherScore = 0;
@@ -109,16 +112,16 @@ public class BattleManager : MonoBehaviour
                 _isHighScore = true;
             }
 
-            if (_gameTime > 120 /*&& (_score == 0 || _otherScore == 0)*/)  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            if (_elapsedGameTime >= Global.GameTime /*&& (_score == 0 || _otherScore == 0)*/)  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
             {
                 Global.isGameStart = false;
-                Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_gameTime, _maxCombo, _killMice, _lostMice);
-                Debug.Log("GameOver!" + _gameTime);
+                Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_elapsedGameTime, _maxCombo, _killMice, _lostMice);
+                Debug.Log("GameOver!" + _elapsedGameTime);
             }
         }
         else
         {
-            _gameTime = 0;
+            _elapsedGameTime = 0;
         }
     }
 
@@ -130,9 +133,9 @@ public class BattleManager : MonoBehaviour
 
         if (Global.isGameStart)
         {
-            _gameTime += Time.fixedDeltaTime;
+            _elapsedGameTime += Time.fixedDeltaTime;
 
-            if (_gameTime % 5==0)
+            if (_elapsedGameTime % 5==0)
             {
                 _myDPS = _score / Time.timeSinceLevelLoad;
                 _otherDPS = _otherScore / Time.timeSinceLevelLoad;
@@ -208,7 +211,7 @@ public class BattleManager : MonoBehaviour
             battleHUD.ComboMsg(_combo);
     }
 
-    private void BreakCombo()
+    public void BreakCombo()
     {
         _isCombo = false;           // 結束 連擊
         _combo = 0;                 // 恢復0
@@ -353,7 +356,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("ExitRoom");
     }
 
-    private void OnLoadScene()                       // 離開房間時
+    private void OnDestory()                       // 離開房間時
     {
         Global.isExitingRoom = true;        // 離開房間了
         Global.isMatching = false;          // 無配對狀態
@@ -367,6 +370,10 @@ public class BattleManager : MonoBehaviour
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
         Global.photonService.GameStartEvent -= OnGameStart;
         Global.photonService.GameOverEvent -= OnGameOver;
-        Global.photonService.LoadSceneEvent -= OnLoadScene;
+        Global.photonService.LoadSceneEvent -= OnDestory;
+    }
+
+    public Dictionary<int,GameObject> GetSkillBossMice(){
+        return dictSkillBossMice;
     }
 }

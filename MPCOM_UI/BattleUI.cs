@@ -1,7 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
 using Gansol;
-
+using MPProtocol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -25,6 +25,7 @@ namespace MPCOM
         byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
         byte[] GameOver(Int16 score,Int16 otherScore, Int16 gameTime, Int16 lostMice);
+        byte[] UpdateScoreRate(ENUM_ScoreRate rate);
     }
 
     public class BattleUI : ServicedComponent, IBattleUI
@@ -33,6 +34,31 @@ namespace MPCOM
         {
             return true;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public byte[] UpdateScoreRate(ENUM_ScoreRate rate)
+        {
+            BattleData battleData = new BattleData();
+            battleData.ReturnCode = "S500";
+            battleData.ReturnMessage = "";
+
+            try
+            {
+                BattleLogic battleLogic = new BattleLogic();
+                battleData = battleLogic.UpdateScoreRate(rate);
+            }
+            catch (Exception e)
+            {
+                battleData.ReturnCode = "S599";
+                battleData.ReturnMessage = "(UI)對戰資料未知例外情況！　" + e.Message + " 於: " + e.StackTrace; ;
+            }
+            return TextUtility.SerializeToStream(battleData);
+        }
+
 
         #region ClacScore 計算老鼠命中分數
         /// <summary>

@@ -250,7 +250,7 @@ public class PanelManager : MPPanel
     /// <param name="dicLoadedObject">已載入物件</param>
     public void ExpectOutdataObject(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData, Dictionary<string, GameObject> dicLoadedObject)
     {
-        var delObject = new Dictionary<string, object>();
+       // var delObject = new Dictionary<string, object>();
 
         if (dicClinetData.Count != 0)
         {
@@ -285,7 +285,7 @@ public class PanelManager : MPPanel
     public Dictionary<string, object> SelectNewData(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData)
     {
         var newObject = new Dictionary<string, object>();           // 新資料
-        var buffer = new Dictionary<string, object>();              // buffer
+        //var buffer = new Dictionary<string, object>();              // buffer
 
         foreach (KeyValuePair<string, object> item in dicServerData)
         {

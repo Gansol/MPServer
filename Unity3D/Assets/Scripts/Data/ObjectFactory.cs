@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -66,6 +67,30 @@ public class ObjectFactory
         _clone.SetActive(true);
         
         return _clone;
+    }
+    #endregion
+
+    /// <summary>
+    /// 從道具名稱取得道具ID
+    /// </summary>
+    /// <param name="miceName">道具名稱</param>
+    /// <param name="itemData">2d Dictionary</param>
+    /// <returns>itemName</returns>
+    #region -- GetItemNameFromID --
+    public static int GetItemIDFromName(string miceName)
+    {
+        object value;
+        foreach (KeyValuePair<string, object> item in Global.miceProperty)
+        {
+            var nestedData = item.Value as Dictionary<string, object>;
+            nestedData.TryGetValue("ItemName", out value);
+            if (miceName == value.ToString())
+            {
+                nestedData.TryGetValue("ItemID", out value);
+                return int.Parse(value.ToString());
+            }
+        }
+        return -1;
     }
     #endregion
 }

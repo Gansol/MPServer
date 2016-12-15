@@ -23,11 +23,10 @@ using System.Linq;
 
 public class ObjectPool : MonoBehaviour
 {
-    private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictObject;
 
     private GameObject clone;
-    private byte objectID;          // 取得的ID 須自行改寫
+    //private byte objectID;          // 取得的ID 須自行改寫
     private string objectName;      // 取得的 物件名稱
 
     private float _lastTime;
@@ -56,7 +55,6 @@ public class ObjectPool : MonoBehaviour
         clearTime = 10;
         _poolingFlag = false;      // 初始化物件池
         _dictObject = new Dictionary<int, string>();
-        _tmpDict = new Dictionary<string, object>();
 
         Debug.Log(ObjectDeck.Length);
         // 加入字典

@@ -4,7 +4,7 @@ using System.Collections;
 public class LoadingBattle : MonoBehaviour
 {
     public int level;
-    AsyncOperation Loader;
+    //AsyncOperation Loader;
 
     void Awake()
     {

@@ -8,12 +8,10 @@ public class Coll : MonoBehaviour
 {
     public float delayBetween2Clicks = 2f;
     public float _lastClickTime = 0;
-    private GameObject lastClickObject;
 
 
     void Start()
     {
-        object x;
         Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));
         //AssetBundleManager.dictAssetBundleRefs.Remove("EggMiceICON");
         Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));

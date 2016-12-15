@@ -23,7 +23,6 @@ public class AssetBundleChecker : MonoBehaviour
     AssetBundlesDownloader bundleDownloader;
     private string localItemListText; //本機 檔案列表內容
     private int reConnTimes = 0;
-    private bool _bundleChk = false;
     #endregion
 
     void Start()

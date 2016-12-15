@@ -425,7 +425,8 @@ namespace MPServer
                                         Log.Debug("actor:" + actor.Nickname + "  guid:" + actor.guid);
                                         Log.Debug("otherActor:" + otherActor.Nickname + "  guid:" + otherActor.guid);
 
-                                        EventData eventData = new EventData((byte)MatchGameResponseCode.SyncGameStart);
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.ServerTime, DateTime.Now.ToString("yyyyMMddHHmmss") }, { (byte)MatchGameParameterCode.GameTime, 300 } };
+                                        EventData eventData = new EventData((byte)MatchGameResponseCode.SyncGameStart, parameter);
                                         peerOther.SendEvent(eventData, new SendParameters());    // 回傳給另外一位玩家
                                         this.SendEvent(eventData, new SendParameters());         // 回傳給自己
                                     }
@@ -616,6 +617,41 @@ namespace MPServer
                             }
                             break;
                         #endregion
+
+                        #region SkillBoss 發動技能老鼠技能
+                        case (byte)BattleOperationCode.SkillBoss:
+                            {
+                                Log.Debug("IN SkillBoss");
+
+                                int skillType = (int)operationRequest.Parameters[(byte)BattleParameterCode.SkillType];
+                                roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
+                                primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
+
+                                Room.RoomActor otherActor;
+                                otherActor = _server.room.GetOtherPlayer(roomID, primaryID);    // 找對手
+                                peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);    // 對手GUID找Peer
+
+                                SkillData skillData;
+                                SkillUI skillUI = new SkillUI();
+                                skillData = (SkillData)TextUtility.DeserializeFromStream(skillUI.GetSkillProperty(skillType));
+
+
+                                if (skillData.ReturnCode == "")
+                                {
+                                    switch (skillType)
+                                    {
+                                        case (int)ENUM_Skill.StealHarvest:
+                                            // 送給對手 技能傷害
+                                            Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.SkillType, skillType }, { (byte)BattleParameterCode.Damage, skillData.SkillProperty }, { (byte)BattleResponseCode.DebugMessage, skillData.ReturnMessage } };
+                                            EventData skillEventData = new EventData((byte)BattleResponseCode.Damage, skillParameter);
+                                            peerOther.SendEvent(skillEventData, new SendParameters());
+                                            break;
+                                    }
+                                }
+                            }
+                            break;
+                        #endregion
+
 
                         #region LoadPlayerData 載入玩家資料
                         case (byte)PlayerDataOperationCode.LoadPlayer:
@@ -838,10 +874,39 @@ namespace MPServer
                                 else// 失敗 傳空值+錯誤訊息
                                 {
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage};
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
 
+                            }
+                            break;
+                        #endregion
+
+                        #region UpdateScoreRate 更新分數倍率
+                        case (byte)BattleOperationCode.UpdateScoreRate:
+                            {
+                                Log.Debug("IN UpdateScoreRate");
+
+                                string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                int rate = (int)operationRequest.Parameters[(byte)BattleParameterCode.ScoreRate];
+
+                                BattleUI battleUI = new BattleUI();
+                                BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.UpdateScoreRate((ENUM_ScoreRate)rate));
+
+                                if (battleData.ReturnCode == "S508")
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }
+                                    };
+                                    OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdatedScoreRate, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage };
+                                    SendOperationResponse(response, new SendParameters());
+                                }
+                                else  // 失敗 傳空值+錯誤訊息
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = battleData.ReturnMessage };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
                             }
                             break;
                         #endregion
@@ -1234,9 +1299,9 @@ namespace MPServer
                                     Log.Debug("BattleUI OK");
                                     BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacMissionReward(mission, missionRate, customValue)); //計算分數
                                     Log.Debug("BattleData OK");
-                                    
 
-                                    
+
+
                                     if (battleData.ReturnCode == "S503")//計算分數成功 回傳玩家資料
                                     {
                                         Log.Debug("battleData.ReturnCode == S503");
@@ -1246,16 +1311,16 @@ namespace MPServer
                                         if (mission == (byte)Mission.WorldBoss) // 如果是 世界王任務 回傳給雙方任務完成
                                         {
                                             _server.room.KillBoss(roomID);  // 世界王任務完成 把Server BOSS殺了          
-                                 
+
                                             #region 自己
-                                            
+
                                             // 儲存分數
                                             Room.RoomActor roomActor;
                                             roomActor = _server.room.GetActorFromGuid(peerGuid);
                                             roomActor.gameScore += battleData.missionReward;
 
 
-                                            
+
                                             if (roomActor.gameScore < 0) roomActor.gameScore = 0;
 
                                             // 回傳給原玩家
@@ -1270,7 +1335,7 @@ namespace MPServer
                                             #endregion
 
                                             #region 對方
-                                            
+
                                             // 回傳給另外一位玩家
                                             Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
                                             otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
@@ -1299,7 +1364,7 @@ namespace MPServer
                                             peerOther.SendEvent(otherScoreEventData, new SendParameters());    // 對方 接收我方 取得的分數
 
                                             #endregion
-                                            Log.Debug("World Boss roomActor.gameScore:" + roomActor.gameScore + "roomOtherActor.gameScore:"+ otherActor.gameScore);
+                                            Log.Debug("World Boss roomActor.gameScore:" + roomActor.gameScore + "roomOtherActor.gameScore:" + otherActor.gameScore);
 
                                             Log.Debug("\n\nMissionReward: " + missionReward + "  \n\nOtherReward: " + otherReward + "  \n\n");
                                         }
@@ -1390,6 +1455,10 @@ namespace MPServer
                                         peerOther.SendEvent(bossEventData, new SendParameters());
 
                                     }
+                                    else
+                                    {
+                                        Log.Error("發生例外情況 Boss血量小於0: " + bossHP);
+                                    }
                                 }
                                 catch (Exception e)
                                 {
@@ -1405,7 +1474,7 @@ namespace MPServer
                                 try
                                 {
                                     Log.Debug("IN GameOver");
-                                    
+
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     Int16 score = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Score];
                                     Int16 otherScore = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.OtherScore];

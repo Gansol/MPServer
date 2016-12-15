@@ -126,7 +126,7 @@ public static class AssetBundleManager
                     abRef = new AssetBundleRef();
                     abRef.assetBundle = www.assetBundle;
                     dictAssetBundleRefs.Add(fileName, abRef);
-                    AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
+                    //AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
                     if (type == typeof(Texture)) _isLoadAtlas = true;
                     else if (type == typeof(Material)) _isLoadMat = true;
                     else if (type == typeof(GameObject)) _isLoadPrefab = true;
@@ -206,8 +206,7 @@ public static class AssetBundleManager
         if (!string.IsNullOrEmpty(assetName))
         {
             AssetBundleRef abRef;
-            bool Loaded;
-            return Loaded = dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
+            return dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
         }
 
         return false;

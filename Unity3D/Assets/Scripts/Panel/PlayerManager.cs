@@ -34,7 +34,7 @@ public class PlayerManager : PanelManager
     /// TeamIcon名稱、Mice按鈕索引物件
     /// </summary>
     public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
-    private static Dictionary<string, object> _dictItemData, _dictEquipData;        // 道具資料、裝備資料
+    private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
 
     public GameObject[] infoGroupArea;      // 道具存放區
     public string[] assetFolder;            // 資料夾
@@ -55,7 +55,7 @@ public class PlayerManager : PanelManager
     private int _itemType;
     private float _delayBetween2Clicks, _lastClickTime;
     private static bool _bFirstLoad;
-    private bool _LoadedIcon, _LoadedItemData, _isLoadPlayerData, _isLoadPlayerItem, _isLoadEquip;
+    private bool _LoadedIcon, _isLoadPlayerData;
     private GameObject _tmpTab, _doubleClickChk;
 
     private ObjectFactory insObj;

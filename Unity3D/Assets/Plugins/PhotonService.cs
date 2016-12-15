@@ -45,11 +45,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event UpdateScoreHandler UpdateScoreEvent;
 
 
-    //委派事件 接收對手分數、接收BOSS受傷
+    //委派事件 接收對手分數
     public delegate void ScoreHandler(Int16 Score);
     public event ScoreHandler OtherScoreEvent;
-    public event ScoreHandler BossDamageEvent;
-    public event ScoreHandler OtherDamageEvent;
+
+    //委派事件 接收對手BOSS傷害、接收BOSS受傷
+    public delegate void InjuredEvent(Int16 Score, bool isMe);
+    public event InjuredEvent BossInjuredEvent;
 
     //委派事件 離開房間、載入關卡
     public delegate void SceneHandler();
@@ -185,6 +187,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             //同步開始遊戲
             case (byte)MatchGameResponseCode.SyncGameStart:
+                string time = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.ServerTime];
+                Debug.Log(time);
+                Global.ServerTime = DateTime.ParseExact(time, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
+                Debug.Log(Global.ServerTime);
+                Global.GameTime = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.GameTime];
                 GameStartEvent();
                 break;
 
@@ -242,7 +249,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             //取得對方對BOSS傷害
             case (byte)BattleResponseCode.BossDamage:
                 Int16 damage = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Damage];
-                OtherDamageEvent(damage);
+                BossInjuredEvent(damage, false);
                 //Debug.Log("GET OTHER:" + damage);
                 break;
         }
@@ -633,7 +640,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
-                            Global.MiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string,object>;
+                            Global.MiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>;
                             Global.Team = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
                             Debug.Log("Updated Mice.");
                         }
@@ -655,7 +662,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
-                            Global.SortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string,object>;
+                            Global.SortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
                             Debug.Log("Sorted Item !");
                         }
                         else
@@ -730,7 +737,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
                             Int16 damage = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Damage];
-                            BossDamageEvent(damage);
+                            BossInjuredEvent(damage, true);
                             Debug.Log("RECIVE BossDamage !");
                         }
                         else
@@ -949,7 +956,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 開始配對遊戲
     /// </summary>
-    public void MatchGame(int PrimaryID, Dictionary<string,object> team)
+    public void MatchGame(int PrimaryID, Dictionary<string, object> team)
     {
         string dictTeam = Json.Serialize(team);
         try
@@ -967,7 +974,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
-    #region SendDamage 傳送技能攻擊
+    #region SendSkill 傳送技能攻擊
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
     /// </summary>
@@ -1431,6 +1438,46 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Json.Serialize(Global.MiceAll) },
             { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[0])},{ (byte)StoreParameterCode.ItemName,goods[1]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[2])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[3])},
             { (byte)StoreParameterCode.BuyCount,Int16.Parse(goods[4])}};
+            this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+    #endregion
+
+    #region UpdateScoreRate 更新分數倍率
+    /// <summary>
+    /// 更新分數倍率
+    /// </summary>
+    /// <param name="rate">倍率</param>
+    public void UpdateScoreRate(ENUM_ScoreRate rate)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)PlayerDataParameterCode.Account, Global.Account}, { (byte)BattleParameterCode.ScoreRate, rate}};
+            this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+    #endregion
+
+    #region SendSkillBoss 傳送技能老鼠技能
+    /// <summary>
+    /// 傳送技能老鼠技能
+    /// </summary>
+    /// <param name="rate">倍率</param>
+    public void SendSkillBoss(ENUM_Skill skill)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{(byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.SkillType, skill}};
             this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)

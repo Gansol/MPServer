@@ -334,7 +334,7 @@ public class TeamSwitcher : MonoBehaviour
     {
         Dictionary<string, object> team = new Dictionary<string, object>(Global.Team);
         int btnNo = int.Parse(teamRef.name.Remove(0, teamRef.name.Length - 1));
-        string miceName = teamRef.transform.GetChild(0).name;
+       // string miceName = teamRef.transform.GetChild(0).name;
 
         if (bDragOut)
         {

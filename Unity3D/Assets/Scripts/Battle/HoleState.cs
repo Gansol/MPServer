@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-public class HoleState : MonoBehaviour {
-
+public class HoleState : MonoBehaviour
+{
     public State holeState = State.Open;
 
-    public   enum State   // 老鼠洞狀態
+    public enum State   // 老鼠洞狀態
     {
         Open,
         Closed,
@@ -18,17 +18,20 @@ public class HoleState : MonoBehaviour {
 
     void Update()
     {
-        if (name=="Hole5" && this.transform.childCount == 4)
+        if (name == "Hole5" && this.transform.childCount == 4)
         {
+            GetComponent<BoxCollider>().enabled = false;
             holeState = State.Closed;
         }
         else if (this.transform.childCount == 2)
         {
+            GetComponent<BoxCollider>().enabled = false;
             holeState = State.Closed;
         }
         else
         {
-                holeState = State.Open;
+            GetComponent<BoxCollider>().enabled = true;
+            holeState = State.Open;
         }
     }
 }

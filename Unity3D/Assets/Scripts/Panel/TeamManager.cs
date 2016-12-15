@@ -150,7 +150,7 @@ public class TeamManager : PanelManager
                 }
                 else
                 {
-                    string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
+                    //string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
 
                     tmp.Add(item.Key, miceBtn.gameObject);
                     dictLoadedObject = tmp;

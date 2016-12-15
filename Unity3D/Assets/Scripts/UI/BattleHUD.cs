@@ -25,7 +25,7 @@ public class BattleHUD : MonoBehaviour
     public float _beautyHP;                // 美化血條用
 
     private double _beautyEnergy;
-    private double _energy;
+    //private double _energy;
     private BattleManager battleManager;
 
 
@@ -37,7 +37,7 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
         _beautyEnergy = 0d;
-        _energy = 0d;
+        //_energy = 0d;
     }
 
     void Update()

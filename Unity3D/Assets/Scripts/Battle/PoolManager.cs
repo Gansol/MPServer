@@ -23,16 +23,17 @@ public class PoolManager : MonoBehaviour
 {
     private AssetLoader assetLoader;
     private ObjectFactory insObj;
-    private Dictionary<string, object> _tmpDict;
+    //private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictObject;
 
-    private HashSet<int> _myMice;
-    private HashSet<int> _otherMice;
+    //private HashSet<int> _myMice;
+    //private HashSet<int> _otherMice;
 
     private GameObject clone;
 
     private float _lastTime;
     private float _currentTime;
+    static float lerpSpeed = 0.1f, upSpeed = 6, upDantance = 60;
 
     Dictionary<string, object> _dictSkillMice;
 
@@ -79,9 +80,9 @@ public class PoolManager : MonoBehaviour
         clearTime = 10;
         _poolingFlag = false;      // 初始化物件池
         _dictObject = new Dictionary<int, string>();
-        _myMice = new HashSet<int>();
-        _otherMice = new HashSet<int>();
-        _tmpDict = new Dictionary<string, object>();
+        //_myMice = new HashSet<int>();
+        //_otherMice = new HashSet<int>();
+       // _tmpDict = new Dictionary<string, object>();
         _dictSkillMice = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
 
@@ -139,7 +140,7 @@ public class PoolManager : MonoBehaviour
             _lastTime = _currentTime;
         }
     }
-
+/*
     List<float> GetMiceProperty(string miceName)
     {
         List<float> data = new List<float>();
@@ -151,7 +152,7 @@ public class PoolManager : MonoBehaviour
 
         return data;
     }
-
+    */
     void InstantiateObject(Dictionary<int, string> objectData)
     {
         foreach (KeyValuePair<int, string> item in objectData)
@@ -183,7 +184,7 @@ public class PoolManager : MonoBehaviour
                 clone = insObj.Instantiate(bundle, parent, item.Value.ToString(), Vector3.zero, scale, Vector2.zero, -1);
                 //clone.transform.GetComponentInChildren<Animator>().enabled = false;
                 clone.GetComponent<BoxCollider2D>().enabled = false;
-                parent.GetComponent<Skill>().init(lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
+                parent.GetComponent<SkillTeam>().init(lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
                 clone.layer = clone.transform.parent.gameObject.layer;
                 parent.transform.gameObject.SetActive(true);    // 新版 子物件隱藏
                 i++;
@@ -214,13 +215,18 @@ public class PoolManager : MonoBehaviour
 
         for (int i = 0; i < ObjectPool.transform.FindChild(objectName).childCount; i++)
         {
-            GameObject clone;
+            GameObject clone = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
+            MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
 
-            clone = ObjectPool.transform.FindChild(objectName).GetChild(i).gameObject;
+            if (!mice.enabled) { 
+                mice.enabled = true; 
+            }
 
             if (clone.name == objectName && !clone.gameObject.activeSelf)
             {
+                mice.SetArribute(new MiceAttr(1));
                 clone.SetActive(true);
+
                 return clone;
             }
         }
@@ -231,47 +237,32 @@ public class PoolManager : MonoBehaviour
     {
 
         object miceProperty;
-        int itemID = GetItemIDFromName(itemName);
+        int itemID = ObjectFactory.GetItemIDFromName(itemName);
         Global.miceProperty.TryGetValue(itemID.ToString(), out miceProperty);
         Dictionary<string, object> dictMiceProperty = miceProperty as Dictionary<string, object>;
         dictMiceProperty.TryGetValue("LifeTime", out miceProperty);
 
-        clone = new GameObject();
-        clone.name = itemName;
-        clone.transform.parent = ObjectPool.transform;
-        clone.layer = clone.transform.parent.gameObject.layer;
-        clone.transform.localScale = Vector3.one;
+        if (ObjectPool.transform.FindChild(itemName) == null)
+        {
+            clone = new GameObject();
+            clone.name = itemName;
+            clone.transform.parent = ObjectPool.transform;
+            clone.layer = clone.transform.parent.gameObject.layer;
+            clone.transform.localScale = Vector3.one;
+        }
 
         Transform parent = ObjectPool.transform.FindChild(itemName).transform;
         clone = insObj.Instantiate(bundle, parent, itemName, Vector3.zero, Vector3.one, Vector2.zero, -1);
-        clone.AddComponent<Mice>();
-        clone.GetComponent<Mice>().Initialize(0.1f, 6, 60, float.Parse(miceProperty.ToString()));
+
+        CreatureAttr attr = new MiceAttr(1);
+        Mice mice = clone.AddMissingComponent<Mice>();
+        mice.Initialize(lerpSpeed, upSpeed, upDantance, float.Parse(miceProperty.ToString()));
+        mice.SetArribute(attr);
+
         clone.gameObject.SetActive(false);    // 新版 子物件隱藏
     }
 
-    /// <summary>
-    /// 從道具名稱取得道具ID
-    /// </summary>
-    /// <param name="miceName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    #region -- GetItemNameFromID --
-    public int GetItemIDFromName(string miceName)
-    {
-        object value;
-        foreach (KeyValuePair<string, object> item in Global.miceProperty)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            nestedData.TryGetValue("ItemName", out value);
-            if (miceName == value.ToString())
-            {
-                nestedData.TryGetValue("ItemID", out value);
-                return int.Parse(value.ToString());
-            }
-        }
-        return -1;
-    }
-    #endregion
+
 
     public void MergeMice()
     {
@@ -282,13 +273,13 @@ public class PoolManager : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in dictMyMice)
         {
-            _dictObject.Add(GetItemIDFromName(item.Value.ToString()), item.Value.ToString());
+            _dictObject.Add(ObjectFactory.GetItemIDFromName(item.Value.ToString()), item.Value.ToString());
         }
 
         foreach (KeyValuePair<string, object> item in dictOtherMice)
         {
             if (!dictMyMice.ContainsValue(item.Value))
-                _dictObject.Add(GetItemIDFromName(item.Value.ToString()), item.Value.ToString());
+                _dictObject.Add(ObjectFactory.GetItemIDFromName(item.Value.ToString()), item.Value.ToString());
         }
 
         if (!_dictObject.ContainsKey(10001))

@@ -2,68 +2,80 @@
 {
     public enum SpawnStatus : byte
     {
-        // 1D 方式
-        LineL = 101,                        // 左到右 直線產生
-        LineR = 102,                        // 右到左 直線產生
-        LinkLineL = 103,                    // 左到右 > 右到左 接續產生
-        LinkLineR = 104,                    // 右到左 > 左到右 接續產生
-        CircleLD = 105,                     // 左下開始 繞圈方式產生
-        CircleRU = 106,                     // 右上開始 繞圈方式產生
-
-        // 1D 反向 
-        ReLineL = 151,                      // 左到右 直線產生
-        ReLineR = 152,                      // 右到左 直線產生
-        ReLinkLineL = 153,                  // 左到右 > 右到左 接續產生
-        ReLinkLineR = 154,                  // 右到左 > 左到右 接續產生
-        ReCircleLD = 155,                   // 左下開始 繞圈方式產生
-        ReCircleRU = 156,                   // 右上開始 繞圈方式產生
-
-
-
-        // 2D 方式
-        VerticalL = 201,                    // 左邊開始 水平產生
-        VerticalR = 202,                    // 右邊開始 水平產生
-        LinkVertL = 203,                    // 左邊開始 水平接續產生
-        LinkVertR = 204,                    // 右邊開始 水平接續產生
-        HorizontalD = 205,                  // 下方開始 垂直產生
-        HorizontalU = 206,                  // 上方開始 垂直產生
-        LinkHorD = 207,                     // 下方開始 垂直接續產生
-        LinkHorU = 208,                     // 上方開始 垂直接續產生
-        HorTwin = 209,                      // 垂直生2個
-        VertTwin = 210,                     // 水平生2個
-        LinkHorTwin = 211,                  // 垂直接續產生 每次2個 到最後
-        LinkVertTwin = 212,                 // 水平接續產生 每次2個 到最後
-
-        TriangleLD = 213,                   // 左下開始 三角形
-        TriangleRD = 214,                   // 右下開始 三角形
-        TriangleLU = 215,                   // 左上開始 三角形
-        TriangleRU = 216,                   // 右上開始 三角形
-        BevelL = 217,                       // 左邊開始 45度斜角
-        BevelR = 218,                       // 右邊開始 45度斜角
-
-        // 2D 反向
-        ReVerticalL = 227,                   // 左邊開始 水平產生
-        ReVerticalR = 228,                   // 右邊開始 水平產生
-        ReLinkVertL = 229,                   // 左邊開始 水平接續產生
-        ReLinkVertR = 230,                   // 右邊開始 水平接續產生
-        ReHorizontalD = 231,                 // 下方開始 垂直產生
-        ReHorizontalU = 232,                 // 上方開始 垂直產生
-        ReLinkHorD = 233,                    // 下方開始 垂直接續產生
-        ReLinkHorU = 234,                    // 上方開始 垂直接續產生
-        ReHorTwin = 235,                     // 垂直生2個
-        ReVertTwin = 236,                    // 水平生2個
-        ReLinkHorTwin = 237,                 // 垂直接續產生 每次2個 到最後
-        ReLinkVertTwin = 238,                // 水平接續產生 每次2個 到最後
-
-        ReTriangleLD = 239,                   // 左下開始 三角形
-        ReTriangleRD = 240,                   // 右下開始 三角形
-        ReTriangleLU = 241,                   // 左上開始 三角形
-        ReTriangleRU = 242,                   // 右上開始 三角形
-        ReBevelL = 243,                       // 左邊開始 45度斜角
-        ReBevelR = 244,                       // 右邊開始 45度斜角
 
         ByNum = 1,                        // 一次產生 多少數量
         Random = 2,                       // 隨機
+
+        // 1D 方式
+        SpawnData1D = 10,                   // 起始值
+        LineL = 11,                        // 左到右 直線產生
+        LineR = 12,                        // 右到左 直線產生
+        LinkLineL = 13,                    // 左到右 > 右到左 接續產生
+        LinkLineR = 14,                    // 右到左 > 左到右 接續產生
+        CircleLD = 15,                     // 左下開始 繞圈方式產生
+        CircleRU = 16,                     // 右上開始 繞圈方式產生
+        FourPoint = 17,                     // 上下左右 4個點
+
+        // 1D 反向 
+        SpawnDataRe1D = 50,                 // 起始值
+        ReLineL = 51,                      // 左到右 直線產生
+        ReLineR = 52,                      // 右到左 直線產生
+        ReLinkLineL = 53,                  // 左到右 > 右到左 接續產生
+        ReLinkLineR = 54,                  // 右到左 > 左到右 接續產生
+        ReCircleLD = 55,                   // 左下開始 繞圈方式產生
+        ReCircleRU = 56,                   // 右上開始 繞圈方式產生
+
+        // 2D 方式
+        SpawnData2D = 100,                  // 起始值
+        VerticalL = 101,                    // 左邊開始 水平產生
+        VerticalR = 102,                    // 右邊開始 水平產生
+        LinkVertL = 103,                    // 左邊開始 水平接續產生
+        LinkVertR = 104,                    // 右邊開始 水平接續產生
+        HorizontalD = 105,                  // 下方開始 垂直產生
+        HorizontalU = 106,                  // 上方開始 垂直產生
+        LinkHorD = 107,                     // 下方開始 垂直接續產生
+        LinkHorU = 108,                     // 上方開始 垂直接續產生
+        HorTwin = 109,                      // 垂直生2個
+        VertTwin = 110,                     // 水平生2個
+        LinkHorTwin = 111,                  // 垂直接續產生 每次2個 到最後
+        LinkVertTwin = 112,                 // 水平接續產生 每次2個 到最後
+
+        // 2D 反向
+        SpawnDataRe2D = 150,                // 起始值
+        ReVerticalL = 151,                   // 左邊開始 水平產生
+        ReVerticalR = 152,                   // 右邊開始 水平產生
+        ReLinkVertL = 153,                   // 左邊開始 水平接續產生
+        ReLinkVertR = 154,                   // 右邊開始 水平接續產生
+        ReHorizontalD = 155,                 // 下方開始 垂直產生
+        ReHorizontalU = 156,                 // 上方開始 垂直產生
+        ReLinkHorD = 157,                    // 下方開始 垂直接續產生
+        ReLinkHorU = 158,                    // 上方開始 垂直接續產生
+        ReHorTwin = 159,                     // 垂直生2個
+        ReVertTwin = 160,                    // 水平生2個
+        ReLinkHorTwin = 161,                 // 垂直接續產生 每次2個 到最後
+        ReLinkVertTwin = 162,                // 水平接續產生 每次2個 到最後
+
+        SpawnDataCustom = 200,              // 起始值
+        TriangleLD = 201,                   // 左下開始 三角形
+        TriangleRD = 202,                   // 右下開始 三角形
+        TriangleLU = 203,                   // 左上開始 三角形
+        TriangleRU = 204,                   // 右上開始 三角形
+        BevelL = 205,                       // 左邊開始 45度斜角
+        BevelR = 206,                       // 右邊開始 45度斜角
+
+        SpawnDataReCustom = 225,              // 起始值
+        ReTriangleLD = 226,                   // 左下開始 三角形
+        ReTriangleRD = 227,                   // 右下開始 三角形
+        ReTriangleLU = 228,                   // 左上開始 三角形
+        ReTriangleRU = 229,                   // 右上開始 三角形
+        ReBevelL = 230,                       // 左邊開始 45度斜角
+        ReBevelR = 231,                       // 右邊開始 45度斜角
+    }
+    public enum ENUM_ScoreRate
+    {
+        Normal = 0,
+        Low = 1,
+        High = 2,
     }
 
     public enum MissionMode : byte
@@ -77,7 +89,7 @@
 
     public enum Mission : byte
     {
-        None=0,                 // 沒任務
+        None = 0,                 // 沒任務
         Harvest = 1,            // 達成XX收穫
         Reduce = 2,             // 減少XX收穫
         DrivingMice = 3,        // 驅趕XX老鼠
@@ -95,34 +107,38 @@
         SendSkill = 44,             // 玩者A發動技能 攻擊 玩者B
         UpdateScore = 52,           // 更新分數
         Mission = 53,               // 任務
-        MissionCompleted=54,        // 任務完成
-        BossDamage=57,              // BOSS傷害
+        MissionCompleted = 54,        // 任務完成
+        BossDamage = 57,              // BOSS傷害
         GameOver = 58,              // 遊戲結束
+        UpdateScoreRate = 59,       // 更新分數倍率
+        SkillBoss = 60,               // 技能老鼠發動技能判斷
     }
 
     public enum BattleParameterCode
     {
-        Ret=0,                        // 回傳值
-        Damage=1,                     // 技能傷害
-        RoomID=2,                     // 房間ID
-        PrimaryID=3,                  // 主索引
-        Account=4,                    // 帳號
-        OtherScore=5,                 // 另一位玩家分數
-        Score=6,                      // 分數
-        Time=7,                       // 時間
-        MiceID=8,                     // 老鼠ID
-        MiceName=9,                   // 老鼠名稱
-        EatingRate=10,                 // 咀嚼頻率
-        Mission=11,                    // 任務
-        MissionRate=12,                // 任務倍率
-        MissionScore=13,               // 任務目標
-        CustomValue=14,                // 自訂參數1(整數)
-        CustomString=15,                // 自訂參數2(字串)
-        MissionReward=16,              // 任務獎勵
-        GoldReward=17,                 // 金幣獎勵
-        SliverReward=18,               // 銀幣獎勵(遊戲幣、糧食)
-        EXPReward=19,                  // 經驗獎勵(遊戲幣、糧食)
+        Ret = 0,                        // 回傳值
+        Damage = 1,                     // 技能傷害
+        RoomID = 2,                     // 房間ID
+        PrimaryID = 3,                  // 主索引
+        Account = 4,                    // 帳號
+        OtherScore = 5,                 // 另一位玩家分數
+        Score = 6,                      // 分數
+        Time = 7,                       // 時間
+        MiceID = 8,                     // 老鼠ID
+        MiceName = 9,                   // 老鼠名稱
+        EatingRate = 10,                 // 咀嚼頻率
+        Mission = 11,                    // 任務
+        MissionRate = 12,                // 任務倍率
+        MissionScore = 13,               // 任務目標
+        CustomValue = 14,                // 自訂參數1(整數)
+        CustomString = 15,                // 自訂參數2(字串)
+        MissionReward = 16,              // 任務獎勵
+        GoldReward = 17,                 // 金幣獎勵
+        SliverReward = 18,               // 銀幣獎勵(遊戲幣、糧食)
+        EXPReward = 19,                  // 經驗獎勵(遊戲幣、糧食)
         BattleResult = 20,             // 戰鬥結果
+        ScoreRate = 21,                 // 分數倍率
+        SkillType = 22,                  // 技能類型
     }
 
     public enum BattleResponseCode
@@ -142,5 +158,7 @@
         Reward = 56,                // 獎勵
         BossDamage = 57,            // BOSS傷害
         GameOver = 58,              // 遊戲結束
+        UpdatedScoreRate = 59,      // 更新分數倍率
+        SkillBoss = 60,               // 技能老鼠發動技能判斷
     }
 }

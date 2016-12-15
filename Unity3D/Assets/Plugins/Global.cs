@@ -68,7 +68,9 @@ public static class Global
     public static int prevScene = (int)Scene.MainGame;  // 上一個場景
     public static int nextScene = (int)Scene.MainGame;  // 要被載入的場景
 
-    public static int maxConnTimes = 5;  // 重新連限次數
+    public static int maxConnTimes = 5;                         // 重新連限次數
+    public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
+    public static int GameTime = 999;
 
     public static string Ret = "";          // 回傳值
     public static int PrimaryID = 0;       // 主索引
@@ -117,6 +119,11 @@ public static class Global
     public static Dictionary<string, object> playerItem = new Dictionary<string, object>();   // 商店屬性資料 
 
     public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
+
+    public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBossMice = new Dictionary<Transform, GameObject>();
+
     /*
     public class MiceProperty
     {

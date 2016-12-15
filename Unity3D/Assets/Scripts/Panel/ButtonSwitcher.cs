@@ -26,22 +26,21 @@ public class ButtonSwitcher : MPButton
 
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
-    private GameObject _clone, _other, _miceTarget, _pressingIcon;           // 複製物件、碰撞時對方物件、原老鼠位置
+    private GameObject _clone, _other, _pressingIcon;           // 複製物件、碰撞時對方物件、原老鼠位置
     private int _depth, teamCountMax;                          // UISprite深度
     private float _distance;                                  // 兩物件間距離
-    private bool _goTarget, _isPress, _destroy;   // 是否觸發、移動目標、是否按下、是否摧毀
+    private bool _isPress;   // 是否觸發、移動目標、是否按下、是否摧毀
     private Vector3 _originPos, _toPos;                       // 原始座標、目標作標
-    private PlayerManager pm;
+    //private PlayerManager pm;
 
     public Collider coll;
     #endregion
 
     void Awake()
     {
-        pm = GetComponentInParent<PlayerManager>();
+        //pm = GetComponentInParent<PlayerManager>();
         coll = GetComponent<Collider>();
         _originPos = transform.localPosition;
-        _goTarget = false;
         _activeBtn = false;
         _other = gameObject;
         teamCountMax = 5;
@@ -136,7 +135,7 @@ public class ButtonSwitcher : MPButton
     #region -- RetOrSwitch 交換或返回選擇 --
     void RetOrSwitch()
     {
-        pm = GetComponentInParent<PlayerManager>();
+        //pm = GetComponentInParent<PlayerManager>();
         if (_activeBtn)
         {
             if (!_isTrigged && _other != gameObject && _other.tag != tag && transform.parent.name == _other.transform.parent.name)    // 按下時發生碰撞 且 放開時 交換物件   OnPress>RetOrSwitch 所以已經放開了
@@ -164,7 +163,7 @@ public class ButtonSwitcher : MPButton
     void RetOrigin()
     {
         _distance = Vector3.Distance(transform.localPosition, _originPos);
-        GameObject image = transform.GetComponentInChildren<UISprite>().gameObject;
+        //GameObject image = transform.GetComponentInChildren<UISprite>().gameObject;
 
         if (tag == "Inventory")
         {

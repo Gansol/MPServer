@@ -5,13 +5,12 @@ public class AudioManager : MonoBehaviour
 {
 
     public AudioClip BGSound;
-    float audio1Volume = 1.0f;
-    bool track2Playing = false;
+    float audio1Volume = 0f;
     bool flag;
 
     void Awake()
     {
-        audio.volume = 0;
+        audio.volume = audio1Volume;
         audio.loop = true;
     }
 

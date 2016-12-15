@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class InstantiatePanel : MonoBehaviour {
-    AssetLoader assetLoader;
+    AssetLoader assetLoader = null;
 
 	// Use this for initialization
 	void Start () {

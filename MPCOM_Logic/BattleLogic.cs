@@ -38,21 +38,30 @@ namespace MPCOM
         #region variable 變數區
         private Int16 harvest = 200;
         private Int16 drivingMice = 50;
-        private Int16 harvestRate = 10;               // 分數倍率
+        private Int16 harvestRate = 2;               // 分數倍率
         private Int16 reduce = -500;                  // 減少分數
 
         private Int16 harvestReward = 100;
         private Int16 drivingMiceReward = 200;
         private Int16 harvestRateReward = 400;
-        private Int16 worldBossReward = 1000;
+        private Int16 worldBossReward = 2000;
+
+        private static float scoreRate = 1;
+
+        private struct ScoreRate
+        {
+            public readonly static float mormal = 1;
+            public readonly static float low = 0.8f;
+            public readonly static float high = 1.2f;
+        }
 
         private struct EggMice
         {
-            public static int eatFull = 10;    // 2.5s = 4
-            public static float perEat = 1;
-            public static float eatingRate = 0.25f;
-            public static float hp = 25f;
-            public static int skill = 1;
+            public readonly static int eatFull = 10;    // 2.5s = 4
+            public readonly static float perEat = 1;
+            public readonly static float eatingRate = 0.25f;
+            public readonly static float hp = 25f;
+            public readonly static int skill = 1;
         }
 
         private struct BlackMice
@@ -84,6 +93,32 @@ namespace MPCOM
         }
         #endregion
 
+
+        [AutoComplete]
+        public BattleData UpdateScoreRate(ENUM_ScoreRate rate)
+        {
+            battleData.ReturnCode = "S508";
+            battleData.ReturnMessage = "更新分數倍率成功！";
+
+            switch ((int)rate)
+            {
+                case (int)ENUM_ScoreRate.Normal:
+                    scoreRate = ScoreRate.mormal;
+                    break;
+                case (int)ENUM_ScoreRate.Low:
+                    scoreRate = ScoreRate.low;
+                    break;
+                case (int)ENUM_ScoreRate.High:
+                    scoreRate = ScoreRate.high;
+                    break;
+                default:
+                    battleData.ReturnCode = "S509";
+                    battleData.ReturnMessage = "更新分數倍率失敗！";
+                    break;
+            }
+            return battleData;
+        }
+
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
@@ -103,11 +138,11 @@ namespace MPCOM
 
                             if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
-                                score -= Convert.ToInt16(EggMice.eatFull);
+                                score -= Convert.ToInt16(EggMice.eatFull * scoreRate);
                             }
                             else
                             {
-                                score = Convert.ToInt16(EggMice.eatFull - EggMice.perEat * ateTimes);
+                                score = Convert.ToInt16(EggMice.eatFull - (EggMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
@@ -117,11 +152,11 @@ namespace MPCOM
 
                             if (BlackMice.perEat * ateTimes >= BlackMice.eatFull)
                             {
-                                score = Convert.ToInt16(BlackMice.eatFull * -1);
+                                score = Convert.ToInt16(BlackMice.eatFull * scoreRate * -1);
                             }
                             else
                             {
-                                score = Convert.ToInt16(BlackMice.eatFull - BlackMice.perEat * ateTimes);
+                                score = Convert.ToInt16(BlackMice.eatFull - (BlackMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
@@ -131,11 +166,11 @@ namespace MPCOM
 
                             if (CandyMice.perEat * ateTimes >= CandyMice.eatFull)
                             {
-                                score = Convert.ToInt16(CandyMice.eatFull * -1);
+                                score = Convert.ToInt16(CandyMice.eatFull * scoreRate * -1);
                             }
                             else
                             {
-                                score = Convert.ToInt16(CandyMice.eatFull - CandyMice.perEat * ateTimes);
+                                score = Convert.ToInt16(CandyMice.eatFull -( CandyMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
@@ -145,11 +180,11 @@ namespace MPCOM
 
                             if (RabbitMice.perEat * ateTimes >= RabbitMice.eatFull)
                             {
-                                score = Convert.ToInt16(RabbitMice.eatFull * -1);
+                                score = Convert.ToInt16(RabbitMice.eatFull * scoreRate * -1);
                             }
                             else
                             {
-                                score = Convert.ToInt16(RabbitMice.eatFull - RabbitMice.perEat * ateTimes);
+                                score = Convert.ToInt16(RabbitMice.eatFull -( RabbitMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
@@ -159,11 +194,11 @@ namespace MPCOM
 
                             if (NinjaMice.perEat * ateTimes >= NinjaMice.eatFull)
                             {
-                                score = Convert.ToInt16(NinjaMice.eatFull * -1);
+                                score = Convert.ToInt16(NinjaMice.eatFull * scoreRate * -1);
                             }
                             else
                             {
-                                score = Convert.ToInt16(NinjaMice.eatFull - NinjaMice.perEat * ateTimes);
+                                score = Convert.ToInt16(NinjaMice.eatFull - (NinjaMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }

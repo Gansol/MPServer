@@ -187,7 +187,7 @@ public class StoreManager : PanelManager
     public void OnQuantity(GameObject obj)
     {
         int price = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(2).GetComponent<UILabel>().text);
-        int sum = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text);
+        //int sum = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text);
         int count = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text);
 
         count += (obj.name == "Add") ? 1 : -1;
@@ -335,7 +335,6 @@ public class StoreManager : PanelManager
             {
                 GameObject bundle = assetLoader.GetAsset(folder + (i + 1).ToString());
                 Transform parent = myParent.GetChild(1).GetChild(i).GetChild(0);
-                ObjectFactory insObj = new ObjectFactory();
 
                 insObj.Instantiate(bundle, parent, folder + (i + 1).ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
             }
@@ -408,7 +407,6 @@ public class StoreManager : PanelManager
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
                 if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                 {
-                    ObjectFactory insObj = new ObjectFactory();
                     insObj.Instantiate(bundle, imageParent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(150, 150), 310);
                 }
             }
