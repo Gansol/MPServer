@@ -15,9 +15,7 @@ public class DataUI : MonoBehaviour {
         if (Global.LoginStatus && !Global.isPlayerDataLoaded && doOnce)
         {
             doOnce = false;
-            Global.photonService.LoadPlayerData(Global.Account);
-            Global.photonService.LoadCurrency(Global.Account);
-            Global.photonService.LoadMiceData();
+
         }
        
 

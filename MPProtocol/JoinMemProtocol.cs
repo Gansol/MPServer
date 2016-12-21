@@ -24,6 +24,7 @@
         IP,                             // IP
         JoinDate,                       // 加入會員日期
         MemberType,                     // 會員類型
+        Email,                          // Email
     }
 
     public enum JoinMemberResponseCode

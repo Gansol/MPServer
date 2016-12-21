@@ -39,6 +39,8 @@ public class Mice : MiceBase
     {
         if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
+            Debug.Log("Hit");
+            Global.dictBattleMice.Remove(transform.parent);
             collider2D.enabled = false;
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
@@ -62,7 +64,6 @@ public class Mice : MiceBase
                 battleManager.UpadateScore(name, _survivalTime);  // 增加分數
             else
                 battleManager.LostScore(name, lifeTime);  // 增加分數
-
             Global.dictBattleMice.Remove(transform.parent);
             Global.MiceCount--;
         }

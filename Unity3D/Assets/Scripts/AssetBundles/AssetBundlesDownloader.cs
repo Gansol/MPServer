@@ -59,7 +59,7 @@ public class AssetBundlesDownloader : MonoBehaviour
             else if (wwwDownloadList.isDone)
             {
                 Dictionary<string, object> dictDownloadFile = Json.Deserialize(wwwDownloadList.text) as Dictionary<string, object>;
-
+                
                 _reConnTimes = 0;
                 fileCount = dictDownloadFile.Count;
 
@@ -86,7 +86,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// <returns></returns>
     public bool DeleteFile(HashSet<string> hashSet)
     {
-        Debug.Log(hashSet.Count);
+//        Debug.Log(hashSet.Count);
         if (hashSet.Count != 0)
         {
             string localBundlesPath = Application.persistentDataPath + "/AssetBundles/"; //本機資源路徑
@@ -184,7 +184,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     #region -- ReplaceItemList --
     private IEnumerator ReplaceItemList() //取代 檔案列表
     {
-        using (WWW wwwItemList = new WWW(Global.serverListPath + Global.sItemList))
+        using (WWW wwwItemList = new WWW(Global.serverListPath + Global.itemListFile))
         {
             yield return wwwItemList;
 
@@ -198,7 +198,7 @@ public class AssetBundlesDownloader : MonoBehaviour
             else if (wwwItemList.isDone)//開始檢查 檔案列表
             {
                 _reConnTimes = 0;
-                File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.sItemList, System.Text.Encoding.UTF8.GetBytes(wwwItemList.text)); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
+                File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.itemListFile, System.Text.Encoding.UTF8.GetBytes(wwwItemList.text)); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
                 wwwItemList.Dispose();
                 Global.isCompleted = true;
             }

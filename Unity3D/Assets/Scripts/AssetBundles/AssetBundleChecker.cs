@@ -35,8 +35,41 @@ public class AssetBundleChecker : MonoBehaviour
     #region -- CompareAssetBundles --
     public void StartCheck() //開始檢查檔案
     {
-        StartCoroutine(CompareAssetBundle(Application.persistentDataPath + "/List/" + Global.sItemList, Global.serverListPath + Global.sItemList));
+        StartCoroutine(DownloadBundleVersion(Application.persistentDataPath + "/List/" + Global.bundleVersionFile, Global.serverListPath + Global.bundleVersionFile));
+        StartCoroutine(CompareAssetBundle(Application.persistentDataPath + "/List/" + Global.itemListFile, Global.serverListPath + Global.itemListFile));
     }
+
+    private IEnumerator DownloadBundleVersion(string localPathFile, string serverPathFile) //比對 檔案
+    {
+        Global.ReturnMessage = "開始檢查遊戲資產...";
+        createJSON.AssetBundlesJSON(); //建立最新 檔案列表
+
+        using (WWW wwwVersionList = new WWW(serverPathFile))
+        { // 下載 伺服器 檔案列表
+            yield return wwwVersionList;
+
+            if (wwwVersionList.error != null && reConnTimes < Global.maxConnTimes)
+            {
+                reConnTimes++;
+                Global.ReturnMessage = "Download Bundle Version List Error !   " + wwwVersionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
+                Debug.LogError("Download Item List Error !   " + wwwVersionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
+                yield return new WaitForSeconds(1.0f);
+            }
+            if (wwwVersionList.isDone)
+            {
+                Global.bundleVersion = System.Convert.ToInt16(wwwVersionList.text);
+                Debug.Log("Global.bundleVersion:"+Global.bundleVersion);
+                reConnTimes = 0;
+                Global.ReturnMessage = "Bundle Version List Downloaded!";
+            }
+            else if (reConnTimes == Global.maxConnTimes)
+            {
+                Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
+                //Debug.Log("Can't connecting to Server! Please check your network status.");
+            }
+        }
+    }
+
 
     private IEnumerator CompareAssetBundle(string localPathFile, string serverPathFile) //比對 檔案
     {
@@ -113,7 +146,7 @@ public class AssetBundleChecker : MonoBehaviour
         
         if (localItemListText == "{}" || localItemListText == "") //本機檔案 被砍光光了 下載全部檔案
         {
-            bundleDownloader.DownloadListFile(Global.sFullPackage);
+            bundleDownloader.DownloadListFile(Global.fullPackageFile);
         }
         else if ((localItemListText != wwwText))  // 如果 檔案不同 就儲存 進 HashSet 比對資料
         {
@@ -133,7 +166,7 @@ public class AssetBundleChecker : MonoBehaviour
                 hashLocalList.Add(localItem.Key); //把 本機 檔案列表存入HashSet等待比較
             }
             hashLocalList.ExceptWith(hashDelorAdd); // (hashLocalList)要刪除的檔案 = 本機檔案 - 要保存的檔案(無變動檔案)
-            Debug.Log(hashLocalList.Count);
+            //Debug.Log(hashLocalList.Count);
             bundleDownloader.DeleteFile(hashLocalList); //刪除檔案  //目前狀態 檔案已刪除 LocalList還是舊的
 
             hashLocalList.Clear(); //清除 本機資料列表(要刪除的檔案，不能再比對，要重新再讀一次本機資料)

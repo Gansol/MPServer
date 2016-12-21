@@ -68,7 +68,7 @@ public class BattleManager : MonoBehaviour
     public static double energy { get { return _energy; } }
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         Debug.Log("Battle Start");
         missionManager = GetComponent<MissionManager>();
@@ -217,6 +217,7 @@ public class BattleManager : MonoBehaviour
         _combo = 0;                 // 恢復0
         _tmpCombo = 0;
         battleHUD.ComboMsg(_combo);
+        gameObject.GetComponent<SpawnController>().OnBreakCombo();
     }
 
     void OnUpdateScore(Int16 value)    // 更新分數時

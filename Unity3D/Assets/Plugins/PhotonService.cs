@@ -28,7 +28,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event JoinMemberHandler JoinMemberEvent;
 
     //委派事件 登入
-    public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode, int primaryID, string account, string nickname, byte sex, byte age, MemberType memberType);
+    public delegate void LoginHandler(bool loginStatus, string nessage, string returnCode);
     public event LoginHandler LoginEvent;
 
     //委派事件 重複登入、取得個人資料
@@ -58,6 +58,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event SceneHandler LoadSceneEvent;
     public event SceneHandler GameStartEvent;
     public event SceneHandler WaitingPlayerEvent;
+    public event SceneHandler ExitWaitingEvent;
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -288,27 +289,29 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 {
                     try
                     {
-                        MemberType memberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
-
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                         {
                             Debug.Log("login");
-                            string getReturn = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
-                            string getMemberID = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
-                            string getNickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
-                            byte getSex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
-                            byte getAge = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
-                            int getPirmaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
+                            Global.Ret = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
+                            Global.Account = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
+                            Global.Nickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
+                            Global.Sex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
+                            Global.Age = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
+                            Global.PrimaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
+                            Global.MemberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
 
+                            Global.LoginStatus = true;
 
-                            LoginEvent(true, "", getReturn, getPirmaryID, getMemberID, getNickname, getSex, getAge, memberType); // send member data to loginEvent
+                            Global.photonService.LoadPlayerData(Global.Account);
+                            Global.photonService.LoadMiceData();
+                            LoginEvent(true, operationResponse.DebugMessage, operationResponse.ReturnCode.ToString()); // send member data to loginEvent
 
                         }
                         else//假如登入失敗 傳空值
                         {
                             Debug.Log("login fail :" + operationResponse.OperationCode);
                             DebugReturn(0, operationResponse.DebugMessage.ToString());
-                            LoginEvent(false, operationResponse.DebugMessage.ToString(), operationResponse.ReturnCode.ToString(), 0, "", "", 0, 0, memberType); // send error message to loginEvent
+                            LoginEvent(false, operationResponse.DebugMessage.ToString(), operationResponse.ReturnCode.ToString()); // send error message to loginEvent
                         }
 
                     }
@@ -368,6 +371,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     try
                     {
                         Global.isMatching = false;
+                        ExitWaitingEvent();
                         Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
@@ -420,9 +424,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.SortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
                             Global.Friend = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend]) as Dictionary<string, object>;
 
-                            Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
+                            Global.photonService.LoadCurrency(Global.Account);      // 載入玩家資料時一起載入貨幣資料
+
+                            //Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
                             Global.isPlayerDataLoaded = true;
                             LoadPlayerDataEvent();
+
                         }
                     }
                     catch (Exception e)
@@ -864,17 +871,18 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 加入會員 
     /// </summary>
-    public void JoinMember(string Account, string Password, string Nickname, byte Age, byte Sex, MemberType memberType)
+    public void JoinMember(string Email, string Password, string Nickname, byte Age, byte Sex, string IP, MemberType memberType)
     {
         try
         {
             byte age = Convert.ToByte(Age);
             byte sex = Convert.ToByte(Sex);
-
+            char[] splitText = { '@' };
+            string[] Account = Email.Split(splitText);
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
-                             { (byte)JoinMemberParameterCode.Account,Account },   { (byte)JoinMemberParameterCode.Password, Password }  ,{ (byte)JoinMemberParameterCode.Nickname, Nickname }  ,
-                             { (byte)JoinMemberParameterCode.Age, age }  ,{ (byte)JoinMemberParameterCode.Sex, sex }  , { (byte)JoinMemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)JoinMemberParameterCode.MemberType, memberType }  
+                           { (byte)JoinMemberParameterCode.Email,Email },  { (byte)JoinMemberParameterCode.Account,Account[0] },   { (byte)JoinMemberParameterCode.Password, Password }  ,{ (byte)JoinMemberParameterCode.Nickname, Nickname }  ,
+                             { (byte)JoinMemberParameterCode.Age, age }  ,{ (byte)JoinMemberParameterCode.Sex, sex }  , { (byte)JoinMemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)JoinMemberParameterCode.IP, IP}, { (byte)JoinMemberParameterCode.MemberType, memberType }  
                         };
 
             this.peer.OpCustom((byte)JoinMemberOperationCode.JoinMember, parameter, true, 0, true); // operationCode is 21

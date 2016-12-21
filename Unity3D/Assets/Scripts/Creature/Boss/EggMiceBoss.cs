@@ -53,8 +53,8 @@ public class EggMiceBoss : MiceBossBase
 
         if (!bDisplaySkill)
         {
-            bDisplaySkill = !bDisplaySkill;
-            Debug.Log("m_Skill:" + m_Skill);
+            bDisplaySkill = true;
+            //  Debug.Log("m_Skill:" + m_Skill);
             m_Skill.Display(gameObject, m_Arribute, m_AIState);
         }
     }
@@ -64,12 +64,17 @@ public class EggMiceBoss : MiceBossBase
     /// </summary>
     protected override void OnHit()
     {
-        if (Global.isGameStart && enabled)
+        if (Global.isGameStart && enabled && m_Arribute.GetHP() != 0)
         {
-            GetComponent<BoxCollider2D>().enabled = true;                   // ＊＊＊不知道為什麼collider擊中後會關閉，再打開一次＊＊＊
+            Debug.Log("Hit");
+            if (m_Arribute.GetHP() - 1 == 0)
+                GetComponent<BoxCollider2D>().enabled = false;
+            else
+                GetComponent<BoxCollider2D>().enabled = true;                   // ＊＊＊不知道為什麼collider擊中後會關閉，再打開一次＊＊＊
+            
             AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
 
-            if (m_Arribute.GetHP() != 0 && m_Arribute.GetShield() == 0)
+            if (m_Arribute.GetShield() == 0)
             {
                 Global.photonService.BossDamage(1);  // 傷害1是錯誤的 需要由Server判定、技能等級
             }

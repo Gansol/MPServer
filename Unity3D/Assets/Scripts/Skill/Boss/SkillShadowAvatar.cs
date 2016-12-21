@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ShadowAvatarSkill : ISkillBoss
 {
-    SpawnController spawner = new SpawnController();
+    MiceSpawner spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MiceSpawner>();
 	// Use this for initialization
 	void Start () {
 	
@@ -21,6 +21,7 @@ public class ShadowAvatarSkill : ISkillBoss
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-        spawner.Spawn(MPProtocol.SpawnStatus.FourPoint, obj.name, 0.1f, 0.1f, 0.1f, 1, false);
+        sbyte[][] data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.FourPoint) as sbyte[][];
+        spawner.SpawnByCustom(obj.name, data, 0.1f, 0.1f, 0.1f, 1, false, false);
     }
 }

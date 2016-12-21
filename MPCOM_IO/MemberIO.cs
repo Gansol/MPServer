@@ -107,7 +107,7 @@ namespace MPCOM
                     //假如玩家資料中沒有資料 建立一份新玩家資料
                     if (DS.Tables[0].Rows.Count == 0)
                     {
-                        string query = "INSERT INTO PlayerData (Account) VALUES (@account) ";
+                        string query = "INSERT INTO Player_PlayerData (Account) VALUES (@account) ";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         int ExecuteNonQuery = command.ExecuteNonQuery();
@@ -120,7 +120,7 @@ namespace MPCOM
                     //假如玩家貨幣資料中沒有資料 建立一份新玩家貨幣資料
                     if (DS.Tables[0].Rows.Count == 0)
                     {
-                        string query = "INSERT INTO GameCurrency (Account) VALUES (@account) ";
+                        string query = "INSERT INTO Player_GameCurrency (Account) VALUES (@account) ";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         int ExecuteNonQuery = command.ExecuteNonQuery();
@@ -200,7 +200,7 @@ namespace MPCOM
                     //假如玩家資料中沒有資料 建立一份新玩家資料
                     if (DS.Tables[0].Rows.Count == 0)
                     {
-                        string query = "INSERT INTO PlayerData (Account) VALUES (@account) ";
+                        string query = "INSERT INTO Player_PlayerData (Account) VALUES (@account) ";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         int ExecuteNonQuery = command.ExecuteNonQuery();
@@ -213,7 +213,7 @@ namespace MPCOM
                     //假如玩家貨幣資料中沒有資料 建立一份新玩家貨幣資料
                     if (DS.Tables[0].Rows.Count == 0)
                     {
-                        string query = "INSERT INTO GameCurrency (Account) VALUES (@account) ";
+                        string query = "INSERT INTO Player_GameCurrency (Account) VALUES (@account) ";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
                         int ExecuteNonQuery = command.ExecuteNonQuery();

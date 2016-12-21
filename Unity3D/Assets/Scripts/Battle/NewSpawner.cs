@@ -131,6 +131,7 @@ public class NewSpawner : MonoBehaviour
 
             count++;
         }
+        Global.spawnFlag = true;
     }
 
     /// <summary>
@@ -167,6 +168,7 @@ public class NewSpawner : MonoBehaviour
             i += (reSpawn) ? -1 : 1;
             SetDefaultValue(i, holeArray.GetLength(1), reSpawn);
         }
+        Global.spawnFlag = true;
     }
 
 
@@ -193,6 +195,7 @@ public class NewSpawner : MonoBehaviour
             intervalTime = Mathf.Lerp(intervalTime, 0f, lerpTime);
             yield return new WaitForSeconds(intervalTime / 5);
         }
+        Global.spawnFlag = true;
     }
 
     public void SpawnBoss(string miceName, int hp)

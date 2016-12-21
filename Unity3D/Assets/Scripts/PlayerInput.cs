@@ -29,10 +29,10 @@ public class PlayerInput : MonoBehaviour
         //        Debug.Log("pos:" + pos + "XX" + Input.mousePosition);
         if (hit && hit.collider != null)
         {
-            Debug.Log(hit.transform.name);
+            //Debug.Log(hit.transform.name);
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Hit" + hit.transform.name);
+//                Debug.Log("Hit" + hit.transform.name);
 
                 if (hit.transform.childCount != 0)
                     if (hit.transform.GetChild(0).name == "anims") hit.transform.SendMessage("OnHit");

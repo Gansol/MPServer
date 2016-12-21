@@ -4,7 +4,7 @@ using System.Collections;
 public class MiceAnimState : AnimatorState
 {
 
-   // private BattleManager battleManager = null;
+    // private BattleManager battleManager = null;
 
     void Update()
     {
@@ -35,6 +35,7 @@ public class MiceAnimState : AnimatorState
             else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
             {
                 _animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
+                _upFlag = false;
 
                 if (!_bDead)       // 限制執行一次
                 {
@@ -69,6 +70,7 @@ public class MiceAnimState : AnimatorState
             {
                 _animTime = currentState.normalizedTime;
                 animState = ENUM_AnimatorState.OnHit;
+
                 if (_animTime >= .5f && _isBoss)                       // 動畫撥放完畢時
                 {
                     animState = ENUM_AnimatorState.Idle;

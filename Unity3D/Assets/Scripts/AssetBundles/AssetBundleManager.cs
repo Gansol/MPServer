@@ -101,8 +101,10 @@ public static class AssetBundleManager
             {
                 assetPath = folder + fileName;
                 _isStartLoadAsset = true;
+                while (!Caching.ready)
+                    yield return null;
                 //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
-                WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, 1);
+                WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext,Global.bundleVersion);
                 yield return www;
 
                 _ReturnMessage = "正再載入資源... ( " + assetPath + Global.ext + " )";
@@ -159,9 +161,12 @@ public static class AssetBundleManager
         {
             while (_isLoadPrefab == false)
                 yield return null;
+
+            while (!Caching.ready)
+                yield return null;
             _isStartLoadAsset = true;
             //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
-            WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, 1);
+            WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, Global.bundleVersion);
             _progress = (int)www.progress * 100;
             yield return www;
 

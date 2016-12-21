@@ -204,7 +204,7 @@ public class PoolManager : MonoBehaviour
     /// <returns>回傳 ( GameObject / null )</returns>
     public GameObject ActiveObject(string objectName)
     {
-        Debug.Log("_dictObject.Count:" + _dictObject.Count);
+        //Debug.Log("_dictObject.Count:" + _dictObject.Count);
         //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
 
         if (ObjectPool.transform.FindChild(objectName).childCount == 0)

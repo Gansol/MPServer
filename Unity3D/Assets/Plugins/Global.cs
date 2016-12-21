@@ -9,6 +9,7 @@ using System.Diagnostics;
 public static class Global
 {
     public static readonly string serverPath = "http://49.159.128.17:58767/MicePow";//Server路徑
+
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
@@ -20,6 +21,7 @@ public static class Global
 #else
  string.Empty;
 #endif
+
     //Android or iOS or Win 伺服器中的 檔案路徑
     public static readonly string assetBundlesPath = serverPath +
 #if UNITY_ANDROID
@@ -34,10 +36,11 @@ public static class Global
 
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務
 
-    public static readonly string sItemList = "ItemList.json";          // 道具列表
-    public static readonly string sVisionList = "VisionList.json";      // 版本列表
-    public static readonly string sDownloadList = "DownloadList.json";  // 下載列表
-    public static readonly string sFullPackage = "FullPackageList.json";// 完整下載列表
+    public static readonly string itemListFile = "ItemList.json";          // 道具列表
+    public static readonly string visionListFile = "VisionList.json";      // 版本列表
+    public static readonly string downloadListFile = "DownloadList.json";  // 下載列表
+    public static readonly string fullPackageFile = "FullPackageList.json";// 完整下載列表
+    public static readonly string bundleVersionFile = "BundleVersion.json"; // 資源版本
 
     public static bool isCheckBundle = false;       // 是否檢查資源
     public static bool isNewlyVision = true;        // 是否為新版本
@@ -92,7 +95,7 @@ public static class Global
     public static int SumKill = 0;          // 總除掉的老鼠
     public static int SumWin = 0;          // 總勝場
     public static int SumBattle = 0;          // 總場次
-
+    public static int bundleVersion = 1;    // 資產版本
     public static int MeunObjetDepth = 10000; // 主選單物件深度
     public static Dictionary<string, object> SortedItem = new Dictionary<string, object>();         // 全部老鼠 JSON資料;         // 漏掉的老鼠
     public static Dictionary<string, object> MiceAll = new Dictionary<string, object>();         // 全部老鼠 JSON資料

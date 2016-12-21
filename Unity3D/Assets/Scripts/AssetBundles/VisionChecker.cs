@@ -37,11 +37,11 @@ public class VisionChecker
     {
 
         string localListPath = Application.persistentDataPath + "/List/";
-        string localVisionListFile = localListPath + Global.sVisionList;
+        string localVisionListFile = localListPath + Global.visionListFile;
         if(!Directory.Exists(localListPath)) Directory.CreateDirectory(localListPath);
         Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
         // Debug.LogError("Eclipse Debug : " + localVisionListFile);
-        using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.sVisionList))
+        using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.visionListFile))
         {
 
             yield return wwwVisionList;
@@ -111,7 +111,7 @@ public class VisionChecker
     /// <returns></returns>
     public IEnumerator ReplaceVisionList()
     {
-        File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.sVisionList, _bVisionFile); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
+        File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.visionListFile, _bVisionFile); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
         Global.ReturnMessage = "Vision List Updated!";
         Debug.Log("Vision List Updated!");
         yield return new WaitForSeconds(1.0f);

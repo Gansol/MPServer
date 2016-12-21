@@ -107,12 +107,6 @@ public class BattleHUD : MonoBehaviour
 
     void OnGUI()
     {
-        if (GUI.Button(new Rect(10, 10, 100, 100), "ExitRoom"))
-        {
-            Global.photonService.KickOther();
-            Global.photonService.ExitRoom();
-        }
-
         BlueScore.GetComponent<UILabel>().text = battleManager.score.ToString();         // 畫出分數值
         RedScore.GetComponent<UILabel>().text = battleManager.otherScore.ToString();     // 畫出分數值
 

@@ -137,7 +137,7 @@ namespace Gansol
         /// EMail字串格式是否正確
         /// </summary>
         /// <param name="EMail"></param>
-        /// <returns></returns>
+        /// <returns>1:正確,2:有空白,3:沒有@符號,4:@不能是第一碼,5:超過一個@或沒有@,6:沒有「.」</returns>
         public int EMailChk(string EMail)
         {
             try
