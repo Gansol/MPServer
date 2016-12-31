@@ -4,33 +4,27 @@ using System.Collections.Generic;
 using System;
 using MPProtocol;
 
-/*
- * UpadateScore亂打的!!! 直接更新自己分數沒到Server驗證
- * 
- * 
- * 
- */
-
 public class BattleManager : MonoBehaviour
 {
-    MissionManager missionManager;          // 任務管理員
-    BattleHUD battleHUD;                    // HUD
-    
-    public delegate void MiceState(AIState state);
-    public event MiceState AIStateEvent;
+    public BattleAIState battleAIState;           // 產生AI狀態 正式版要改private
 
+    private PoolManager poolManager;        // 物件池     
+    private MiceSpawner miceSpawner;        // 老鼠生產者
+    private MissionManager missionManager;  // 任務管理員
+    private BattleHUD battleHUD;            // HUD
+
+    private static Int16 _eggMiceUsage = 0; // 老鼠使用量
+    private static Int16 _energyUsage = 0;  // 能量使用量    
+    private static Int16 _lostMice = 0;     // 失誤數           統計用
+    private static Int16 _spawnCount = 0;   // 產生了多少老鼠   統計用
     private static Int16 _maxCombo = 0;     // 最大連擊數
-    private static int _tmpCombo = 0;       // 達到多少連擊 用來判斷連擊中
-    private float _elapsedGameTime = 0;     // 經過時間
+    private static Int16 _tmpCombo = 0;     // 達到多少連擊 用來判斷連擊中
+    private Int16 _killMice = 0;            // 計算打了幾隻老鼠 統計用
+    private Int16 _combo = 0;               // 連擊數
 
+    private static double _energy = 0;      // 能量
     private float _maxScore = 0;            // 最高得分
     private float _gameScore = 0;           // 遊戲進行時所得到的分數
-    private static int _eggMiceUsage = 0;   // 老鼠使用量
-    private static int _energyUsage = 0;    // 能量使用量    
-    private static Int16 _lostMice = 0;     // 失誤數           統計用
-    private int _killMice = 0;              // 計算打了幾隻老鼠 統計用
-    private static int _spawnCount = 0;     // 產生了多少老鼠   統計用
-
     private float _myDPS = 0;               // 我的平均輸出
     private float _otherDPS = 0;            // 對手的平均輸出
     private float _scoreRate = 1;           // 分數倍率
@@ -38,42 +32,41 @@ public class BattleManager : MonoBehaviour
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
     private float _otherScore = 0;          // 對手分數
-    private static double _energy = 0;      // 能量
-
-    private Int16 _combo = 0;               // 連擊數
-
-    private Dictionary<int, GameObject> dictSkillBossMice = new Dictionary<int, GameObject>();
+    private float _elapsedGameTime = 0;     // 經過時間
 
     private bool _isCombo;                  // 是否連擊
     private bool _isHighScore;              // 是否破分數紀錄
     private bool _isHighCombo;              // 是否破Combo紀錄
+    private bool isSyncStart;               // 同步開始
 
-    // 外部取用 戰鬥資料
+    private Dictionary<int, GameObject> dictSkillBossMice = new Dictionary<int, GameObject>();
 
-    public Int16 combo { get { return _combo; } }
-    public Int16 maxCombo { get { return _maxCombo; } }
-    public int tmpCombo { get { return _tmpCombo; } }
-    public double gameTime { get { return _elapsedGameTime; } }
-    public float score { get { return _score; } }
-    public float gameScore { get { return _gameScore; } }
-    public float otherScore { get { return _otherScore; } }
-    public float maxScore { get { return _maxScore; } }
-    public int eggMiceUsage { get { return _eggMiceUsage; } }
-    public int energyUsage { get { return _energyUsage; } }
-    public Int16 lostMice { get { return _lostMice; } }
-    public int hitMice { get { return _killMice; } }
-    public int spawnCount { get { return _spawnCount; } }
-    public float myDPS { get { return _myDPS; } }
-    public float otherDPS { get { return _myDPS; } }
-    public static double energy { get { return _energy; } }
+    public SpawnMode spawnMode = SpawnMode.EasyMode;        // 正式版 要改private
+    public SpawnStatus spawnStatus = SpawnStatus.LineL;  // 測試用
+    public bool tSpawnFlag { get; set; }
+
+    public enum SpawnMode : byte
+    {
+        Random = 0,
+        EasyMode = 1,
+        NormalMode = 2,
+        HardMode = 3,
+        CarzyMode = 4,
+        MissionMode = 5,
+        EndTimeMode = 6,
+        HelpMode = 7,
+    }
 
     // Use this for initialization
     void Awake()
     {
         Debug.Log("Battle Start");
+
+        poolManager = GetComponent<PoolManager>();
+        miceSpawner = GetComponent<MiceSpawner>();
         missionManager = GetComponent<MissionManager>();
         battleHUD = GetComponent<BattleHUD>();
-        Global.isExitingRoom = false;
+        SetSpawnState(new EasyBattleAIState());
 
         Global.photonService.OtherScoreEvent += OnOtherScore;
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
@@ -83,36 +76,42 @@ public class BattleManager : MonoBehaviour
         Global.photonService.GameStartEvent += OnGameStart;
         Global.photonService.GameOverEvent += OnGameOver;
         Global.photonService.LoadSceneEvent += OnDestory;
+        Global.photonService.ApplySkillEvent += OnApplySkill;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
 
+        Global.isExitingRoom = false;
         _isCombo = false;
-        _combo = 0;
-        _maxCombo = 0;
-        _tmpCombo = 0;
-        _elapsedGameTime = 0;
-        _score = 0;
-        _gameScore = 0;
-        _otherScore = 0;
-        _maxScore = 0;
-        _eggMiceUsage = 0;
-        _energyUsage = 0;
-        _lostMice = 0;
-        _killMice = 0;
-        _spawnCount = 0;
+        isSyncStart = true;
+
+        _combo = _maxCombo = _tmpCombo  = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
+        _elapsedGameTime = _score = _maxScore = _gameScore = _otherScore = 0;
         _energy = 0;
     }
 
     void Update()
     {
-        if (Global.isGameStart)
+        // 同步開始遊戲
+        if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart)
         {
+            isSyncStart = false;
+            Global.photonService.SyncGameStart();
+        }
+
+        if (Global.isGameStart && tSpawnFlag)
+        {
+            _elapsedGameTime = Time.time - _lastTime;    // 這裡怪怪的 為什麼用 fixedDeltaTime
+
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
+
+            // 更新最高分
             if (_score > _maxScore)
             {
-                _maxScore = _score;     // 假如目前分數 大於 _maxScore  更新 _maxScore
+                _maxScore = _score;
                 _isHighScore = true;
             }
 
-            if (_elapsedGameTime >= Global.GameTime /*&& (_score == 0 || _otherScore == 0)*/)  // ＊＊＊＊＊＊＊＊＊這裡還是亂寫的 需要回傳Server遊戲玩成的資料才完成＊＊＊＊＊＊＊＊＊
+            // 遊戲結束判斷
+            if (_elapsedGameTime >= Global.GameTime)
             {
                 Global.isGameStart = false;
                 Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_elapsedGameTime, _maxCombo, _killMice, _lostMice);
@@ -121,21 +120,20 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            _elapsedGameTime = 0;
+            _lastTime = Time.time; // 沒作用
         }
     }
 
     void FixedUpdate()
     {
-        // Debug.Log("(Update)_score"+_score);
-        if (!Global.isGameStart)
-            _lastTime = Time.fixedTime;
 
-        if (Global.isGameStart)
+        if (Global.isGameStart && tSpawnFlag)
         {
-            _elapsedGameTime += Time.fixedDeltaTime;
 
-            if (_elapsedGameTime % 5==0)
+            battleAIState.UpdateState();   // 更新State邏輯 這裡寫時間 Time + lastime + 間隔
+
+
+            if (_elapsedGameTime % 5 == 0)
             {
                 _myDPS = _score / Time.timeSinceLevelLoad;
                 _otherDPS = _otherScore / Time.timeSinceLevelLoad;
@@ -217,7 +215,7 @@ public class BattleManager : MonoBehaviour
         _combo = 0;                 // 恢復0
         _tmpCombo = 0;
         battleHUD.ComboMsg(_combo);
-        gameObject.GetComponent<SpawnController>().OnBreakCombo();
+        battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() + .1f, 0);
     }
 
     void OnUpdateScore(Int16 value)    // 更新分數時
@@ -294,7 +292,7 @@ public class BattleManager : MonoBehaviour
                 _score = (this.score + missionReward < 0) ? 0 : _score += missionReward;
             }
 
-            Debug.Log("(Battle)_score:" + _score);
+//            Debug.Log("(Battle)_score:" + _score);
         }
     }
 
@@ -310,7 +308,7 @@ public class BattleManager : MonoBehaviour
             {
                 _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
             }
-            Debug.Log("(Battle)_otherScore:" + _otherScore);
+//            Debug.Log("(Battle)_otherScore:" + _otherScore);
         }
     }
 
@@ -338,7 +336,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void OnGameOver(int score, byte exp, Int16 sliverReward,byte battleResult)
+    void OnGameOver(int score, byte exp, Int16 sliverReward, byte battleResult)
     {
         bool result;
         result = (battleResult > 0) ? true : false;
@@ -348,7 +346,7 @@ public class BattleManager : MonoBehaviour
     void OnGameStart()
     {
         Global.isGameStart = true;
-        Debug.Log("Game Start!");
+        Debug.Log(" ----  Game Start!  ---- ");
     }
 
     public void OnExitRoom()
@@ -374,7 +372,91 @@ public class BattleManager : MonoBehaviour
         Global.photonService.LoadSceneEvent -= OnDestory;
     }
 
-    public Dictionary<int,GameObject> GetSkillBossMice(){
+    public Dictionary<int, GameObject> GetSkillBossMice()
+    {
         return dictSkillBossMice;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    public void SetSpawnState(BattleAIState spawnState)
+    {
+        this.battleAIState = spawnState;
+        this.battleAIState.SetAIController(this);
+    }
+
+
+    void OnApplySkill(string miceName)     // 收到技能攻擊 
+    {
+        Debug.Log("OnApplySkill miceName:" + miceName);
+
+        //   0.OnApplySkill需要改寫，接收數量、參數
+        miceSpawner.SpawnByRandom(miceName, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
+    }
+
+    void OnLoadScene()
+    {
+        Global.photonService.ApplySkillEvent -= OnApplySkill;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
+    }
+
+    public void OnHighCombo()
+    {
+        battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() - .1f, 0);
+    }
+
+    /// <summary>
+    /// 限測試使用
+    /// </summary>
+    /// <param name="lerpTime"></param>
+    /// <param name="spawnTime"></param>
+    /// <param name="intervalTime"></param>
+    /// <param name="spawnCount"></param>
+    public void SetValue(float lerpTime, float spawnTime, float intervalTime, int spawnCount)
+    {
+        battleAIState.SetValue(lerpTime, spawnTime, intervalTime, spawnCount);
+    }
+
+
+
+    // 外部取用 戰鬥資料
+    public Int16 combo { get { return _combo; } }
+    public Int16 maxCombo { get { return _maxCombo; } }
+    public int tmpCombo { get { return _tmpCombo; } }
+    public double gameTime { get { return _elapsedGameTime; } }
+    public float score { get { return _score; } }
+    public float gameScore { get { return _gameScore; } }
+    public float otherScore { get { return _otherScore; } }
+    public float maxScore { get { return _maxScore; } }
+    public int eggMiceUsage { get { return _eggMiceUsage; } }
+    public int energyUsage { get { return _energyUsage; } }
+    public Int16 lostMice { get { return _lostMice; } }
+    public int hitMice { get { return _killMice; } }
+    public int spawnCount { get { return _spawnCount; } }
+    public float myDPS { get { return _myDPS; } }
+    public float otherDPS { get { return _myDPS; } }
+    public static double energy { get { return _energy; } }
+    public bool isCombo { get { return _isCombo; } }
+
+    /* 超亂亂數
+* using System;
+public Guid RNGGuid() // 超亂亂數
+{
+var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+var data = new byte[16];
+rng.GetBytes(data);
+return new Guid(data);
+}
+*/
+
+   
 }

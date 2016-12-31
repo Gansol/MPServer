@@ -106,8 +106,8 @@ public class PoolManager : MonoBehaviour
 
     void Update()
     {
-        if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log(assetLoader.ReturnMessage);
+        //if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log(assetLoader.ReturnMessage);
 
 
 
@@ -118,7 +118,7 @@ public class PoolManager : MonoBehaviour
             InstantiateObject(_dictObject);
             InstantiateSkillMice(_dictSkillMice);
             _poolingFlag = true;
-            Debug.Log("pooling Mice Completed ! ");
+//            Debug.Log("pooling Mice Completed ! ");
         }
 
 
@@ -266,8 +266,6 @@ public class PoolManager : MonoBehaviour
 
     public void MergeMice()
     {
-        Debug.Log("Team:" + Global.Team);
-        Debug.Log("ITEM2:" + Global.SortedItem);
         Dictionary<string, object> dictMyMice = Global.Team;
         Dictionary<string, object> dictOtherMice = Global.OtherData.Team;
 
@@ -284,7 +282,7 @@ public class PoolManager : MonoBehaviour
 
         if (!_dictObject.ContainsKey(10001))
             _dictObject.Add(10001, "EggMice");
-        Debug.Log(_dictObject);
+      //  Debug.Log(_dictObject);
         _mergeFlag = true;
     }
 }

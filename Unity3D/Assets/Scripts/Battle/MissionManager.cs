@@ -147,7 +147,7 @@ public class MissionManager : MonoBehaviour
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     balanceTimes--;
-                    Debug.Log("我方或對方 分數<10%之間 啟動高平衡機制");
+                   // Debug.Log("我方或對方 分數<10%之間 啟動高平衡機制");
 
                 }// 如果 我方或對方 分數再10~25%之間 啟動低平衡機制，只觸發限制次數
                 else if ((myPercent < lowerPercent && myPercent > lowestPercent) || (myPercent < lowerPercent && myPercent > lowestPercent && _otherScore != 0 && _score != 0)
@@ -158,7 +158,7 @@ public class MissionManager : MonoBehaviour
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     balanceTimes--;
-                    Debug.Log("我方或對方 分數再10~25%之間 啟動低平衡機制");
+                   // Debug.Log("我方或對方 分數再10~25%之間 啟動低平衡機制");
                 }
 
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
@@ -170,9 +170,9 @@ public class MissionManager : MonoBehaviour
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     seesawFlag = false;
-                    Debug.Log("如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)");
+                   // Debug.Log("如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)");
 
-                    Debug.Log("gameTime" + gameTime + "lastGameTime" + lastGameTime + "activeTime" + activeTime);
+                   // Debug.Log("gameTime" + gameTime + "lastGameTime" + lastGameTime + "activeTime" + activeTime);
                 }
 
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
@@ -184,7 +184,7 @@ public class MissionManager : MonoBehaviour
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
                     seesawFlag = true;
-                    Debug.Log("// 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)");
+                  //  Debug.Log("// 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)");
                 }
 
                 // 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS
@@ -193,7 +193,7 @@ public class MissionManager : MonoBehaviour
                     _mission = Mission.WorldBoss;
                     _missionMode = MissionMode.Open;
                     missionFlag = true;
-                    Debug.Log("// 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS");
+                  //  Debug.Log("// 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS");
                 }
             }
 

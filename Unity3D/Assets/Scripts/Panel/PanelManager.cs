@@ -54,9 +54,9 @@ public class PanelManager : MPPanel
 
     void Update()
     {
-        if (!_loadedPanel)                                          // 除錯訊息
-            if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-                Debug.Log("訊息：" + assetLoader.ReturnMessage);
+        //if (!_loadedPanel)                                          // 除錯訊息
+        //    if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //        Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
         if (assetLoader.loadedObj && _loadedPanel)                 // 載入Panel完成時
         {

@@ -52,9 +52,9 @@ public class PlayerInput : MonoBehaviour
 
     if(Input.touchCount>0){
 
-        for(int i=0; i<Input.touchCount; i++)
+        for(int i=0; i<Input.touchCount && i<=2; i++)
         {
-            if(Input.GetTouch(0).phase == TouchPhase.Ended){
+            if(Input.GetTouch(i).phase == TouchPhase.Ended){    // GetTouch(i) 越多 觸控點越多
                 pos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
                 hit = Physics2D.Raycast(pos, Vector2.zero);
 

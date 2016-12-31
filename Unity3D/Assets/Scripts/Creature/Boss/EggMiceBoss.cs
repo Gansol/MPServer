@@ -57,6 +57,9 @@ public class EggMiceBoss : MiceBossBase
             //  Debug.Log("m_Skill:" + m_Skill);
             m_Skill.Display(gameObject, m_Arribute, m_AIState);
         }
+
+        if (m_Arribute.GetHP() == 0)
+            OnDead(0);
     }
 
     /// <summary>
@@ -66,7 +69,7 @@ public class EggMiceBoss : MiceBossBase
     {
         if (Global.isGameStart && enabled && m_Arribute.GetHP() != 0)
         {
-            Debug.Log("Hit");
+//            Debug.Log("Hit");
             if (m_Arribute.GetHP() - 1 == 0)
                 GetComponent<BoxCollider2D>().enabled = false;
             else
@@ -129,12 +132,12 @@ public class EggMiceBoss : MiceBossBase
             if (isMe)
             {
                 myHits++;
-                Debug.Log("myHits" + myHits);
+//                Debug.Log("myHits" + myHits);
             }
             else
             {
                 otherHits++;
-                Debug.Log("otherHits" + otherHits);
+  //              Debug.Log("otherHits" + otherHits);
             }
         }
         else
@@ -144,7 +147,7 @@ public class EggMiceBoss : MiceBossBase
             {//0*100=0
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
                 Global.photonService.MissionCompleted((byte)Mission.WorldBoss, 1, percent, "");
-                Debug.Log("percent:" + percent);
+//                Debug.Log("percent:" + percent);
             }
             transform.parent.GetComponentInChildren<Animator>().Play("HoleScale_R");
         }

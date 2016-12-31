@@ -71,6 +71,34 @@ public class ObjectFactory
     #endregion
 
     /// <summary>
+    /// 產生老鼠 還不完整
+    /// </summary>
+    /// <param name="miceName"></param>
+    /// <param name="hole"></param>
+    public void InstantiateMice(PoolManager poolManager,string miceName,float miceSize, GameObject hole)
+    {
+        Vector3 _miceSize;
+        if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open)
+        {
+            if (Global.dictBattleMice.ContainsKey(hole.transform))
+                Global.dictBattleMice.Remove(hole.transform);
+
+            GameObject clone = poolManager.ActiveObject(miceName);
+            clone.transform.gameObject.SetActive(false);
+            hole.GetComponent<HoleState>().holeState = HoleState.State.Closed;
+            _miceSize = hole.transform.GetChild(0).localScale / 10 * miceSize;   // Scale 版本
+            clone.transform.parent = hole.transform;              // hole[-1]是因為起始值是0 
+            clone.transform.localPosition = Vector2.zero;
+            clone.transform.localScale = hole.transform.GetChild(0).localScale  - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
+            clone.transform.gameObject.SetActive(true);
+            clone.SendMessage("Play", AnimatorState.ENUM_AnimatorState.Hello);
+
+            Global.dictBattleMice.Add(clone.transform.parent, clone);
+        }
+
+    }
+
+    /// <summary>
     /// 從道具名稱取得道具ID
     /// </summary>
     /// <param name="miceName">道具名稱</param>

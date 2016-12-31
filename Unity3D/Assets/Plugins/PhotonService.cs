@@ -189,7 +189,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             //同步開始遊戲
             case (byte)MatchGameResponseCode.SyncGameStart:
                 string time = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.ServerTime];
-                Debug.Log(time);
+//                Debug.Log(time);
                 Global.ServerTime = DateTime.ParseExact(time, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
                 Debug.Log(Global.ServerTime);
                 Global.GameTime = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.GameTime];
@@ -738,14 +738,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             case (byte)BattleResponseCode.BossDamage:// 接收BOSS受傷
                 {
-                    Debug.Log("GET!");
+//                    Debug.Log("GET!");
                     try
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
                             Int16 damage = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Damage];
                             BossInjuredEvent(damage, true);
-                            Debug.Log("RECIVE BossDamage !");
+//                            Debug.Log("RECIVE BossDamage !");
                         }
                         else
                         {

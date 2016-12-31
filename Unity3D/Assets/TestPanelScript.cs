@@ -11,29 +11,40 @@ public class TestPanelScript : MonoBehaviour
     public UILabel lb_betweenLerp;
     public UILabel lb_spawnTime;
     public UILabel lb_spawnCount;
+    public UIScrollBar scrollBar;
 
-    private SpawnController sc;
+    private BattleManager battleManager;
     // Use this for initialization
     void Start()
     {
-        sc = GameObject.FindGameObjectWithTag("GM").GetComponent<SpawnController>();
+        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
 
-        lb_status.text = sc.spawnStatus.ToString();
-        lb_spawnLerp.text = sc._spawnIntervalTime.ToString();
-        lb_betweenLerp.text = sc.lerpTime.ToString();
-        lb_spawnCount.text = sc.spawnCount.ToString();
-        lb_spawnTime.text = sc.spawnTime.ToString();
+        lb_status.text = battleManager.spawnStatus.ToString();
+        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
+        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
+        lb_spawnTime.text = battleManager.battleAIState.GetSpawnOffset().ToString();
+        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        lb_status.text = battleManager.spawnStatus.ToString();
+        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
+        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
+        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
+        lb_spawnTime.text = battleManager.battleAIState.GetSpawnTime().ToString();
+    }
 
+    public void OnScroll()
+    {
+        battleManager.battleAIState.SetSpeed(scrollBar.value * 2);
     }
 
     public void OnOFF()
     {
-        sc.tSpawnFlag = !sc.tSpawnFlag;
+        battleManager.tSpawnFlag = !battleManager.tSpawnFlag;
     }
 
     public void OnOpenTestPanel()
@@ -52,70 +63,73 @@ public class TestPanelScript : MonoBehaviour
         Global.photonService.ExitRoom();
     }
 
+    // 現在無法調整了 spawnStatus 已由Spawner控制
     public void OnStatus(GameObject obj)
     {
         if (obj.name == "+")
         {
-            sc.spawnStatus = (SpawnStatus)((int)sc.spawnState.GetSpawnStatus() + 1);
+            Debug.Log("已無法調整");
+            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.battleAIState.GetSpawnStatus() + 1);
         }
         else
         {
-            sc.spawnStatus = (SpawnStatus)((int)sc.spawnState.GetSpawnStatus() - 1);
+            Debug.Log("已無法調整");
+            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.battleAIState.GetSpawnStatus() - 1);
         }
 
-        lb_status.text = sc.spawnStatus.ToString();
+        // lb_status.text = battleManager.spawnStatus.ToString();
     }
 
     public void OnSpawnLerp(GameObject obj)
     {
         if (obj.name == "+")
         {
-            sc._spawnIntervalTime += .05f;
+            battleManager.SetValue(0, 0, battleManager.battleAIState.GetIntervalTime() + 0.5f, 0);
         }
         else
         {
-            sc._spawnIntervalTime -= .05f;
+            battleManager.SetValue(0, 0, battleManager.battleAIState.GetIntervalTime() - 0.5f, 0);
         }
-        lb_spawnLerp.text = sc._spawnIntervalTime.ToString();
+        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
     }
 
     public void OnMiceLerp(GameObject obj)
     {
         if (obj.name == "+")
         {
-            sc.lerpTime += .05f;
+            battleManager.battleAIState.SetValue(battleManager.battleAIState.GetLerpTime() + .05f, 0, 0, 0);
         }
         else
         {
-            sc.lerpTime -= .05f;
+            battleManager.battleAIState.SetValue(battleManager.battleAIState.GetLerpTime() - .05f, 0, 0, 0);
         }
-        lb_betweenLerp.text = sc.lerpTime.ToString();
+        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
     }
 
     public void OnCount(GameObject obj)
     {
         if (obj.name == "+")
         {
-            sc.spawnCount += 1;
+            battleManager.battleAIState.SetValue(0, 0, 0, battleManager.battleAIState.GetSpawnCount() + 1);
         }
         else
         {
-            sc.spawnCount -= 1;
+            battleManager.battleAIState.SetValue(0, 0, 0, battleManager.battleAIState.GetSpawnCount() - 1);
         }
 
-        lb_spawnCount.text = sc.spawnCount.ToString();
+        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
     }
 
     public void OnMiceSpawnTime(GameObject obj)
     {
         if (obj.name == "+")
         {
-            sc.spawnTime += .05f;
+            battleManager.battleAIState.SetValue(0, battleManager.battleAIState.GetSpawnTime() + .05f, 0, 0);
         }
         else
         {
-            sc.spawnTime -= .05f;
+            battleManager.battleAIState.SetValue(0, battleManager.battleAIState.GetSpawnTime() - .05f, 0, 0);
         }
-        lb_spawnTime.text = sc.spawnTime.ToString();
+        lb_spawnTime.text = battleManager.battleAIState.GetSpawnTime().ToString();
     }
 }

@@ -6,6 +6,14 @@
         ByNum = 1,                        // 一次產生 多少數量
         Random = 2,                       // 隨機
 
+        LineHorA = 3,
+        LineHorB = 4,
+        LineHorC = 5,
+        LineHorD = 6,
+        LineVertA = 7,
+        LineVertB = 8,
+        LineVertC = 9,
+
         // 1D 方式
         SpawnData1D = 10,                   // 起始值
         LineL = 11,                        // 左到右 直線產生
@@ -14,16 +22,10 @@
         LinkLineR = 14,                    // 右到左 > 左到右 接續產生
         CircleLD = 15,                     // 左下開始 繞圈方式產生
         CircleRU = 16,                     // 右上開始 繞圈方式產生
-        FourPoint = 17,                     // 上下左右 4個點
-
-        // 1D 反向 
-        SpawnDataRe1D = 50,                 // 起始值
-        ReLineL = 51,                      // 左到右 直線產生
-        ReLineR = 52,                      // 右到左 直線產生
-        ReLinkLineL = 53,                  // 左到右 > 右到左 接續產生
-        ReLinkLineR = 54,                  // 右到左 > 左到右 接續產生
-        ReCircleLD = 55,                   // 左下開始 繞圈方式產生
-        ReCircleRU = 56,                   // 右上開始 繞圈方式產生
+        BevelL = 17,                       // 左邊開始 45度斜角
+        BevelR = 18,                       // 右邊開始 45度斜角
+        FourPoint = 19,                    // 上下左右 4個點
+        STwin = 20,                        // S產生 2組
 
         // 2D 方式
         SpawnData2D = 100,                  // 起始值
@@ -37,45 +39,51 @@
         LinkHorU = 108,                     // 上方開始 垂直接續產生
         HorTwin = 109,                      // 垂直生2個
         VertTwin = 110,                     // 水平生2個
-        LinkHorTwin = 111,                  // 垂直接續產生 每次2個 到最後
-        LinkVertTwin = 112,                 // 水平接續產生 每次2個 到最後
 
-        // 2D 反向
-        SpawnDataRe2D = 150,                // 起始值
-        ReVerticalL = 151,                   // 左邊開始 水平產生
-        ReVerticalR = 152,                   // 右邊開始 水平產生
-        ReLinkVertL = 153,                   // 左邊開始 水平接續產生
-        ReLinkVertR = 154,                   // 右邊開始 水平接續產生
-        ReHorizontalD = 155,                 // 下方開始 垂直產生
-        ReHorizontalU = 156,                 // 上方開始 垂直產生
-        ReLinkHorD = 157,                    // 下方開始 垂直接續產生
-        ReLinkHorU = 158,                    // 上方開始 垂直接續產生
-        ReHorTwin = 159,                     // 垂直生2個
-        ReVertTwin = 160,                    // 水平生2個
-        ReLinkHorTwin = 161,                 // 垂直接續產生 每次2個 到最後
-        ReLinkVertTwin = 162,                // 水平接續產生 每次2個 到最後
+        //// 不規則
+        //SpawnDataCustom = 200,              // 起始值
+        //TriangleLD = 201,                   // 左下開始 三角形
+        //TriangleRD = 202,                   // 右下開始 三角形
+        //TriangleLU = 203,                   // 左上開始 三角形
+        //TriangleRU = 204,                   // 右上開始 三角形
 
-        SpawnDataCustom = 200,              // 起始值
-        TriangleLD = 201,                   // 左下開始 三角形
-        TriangleRD = 202,                   // 右下開始 三角形
-        TriangleLU = 203,                   // 左上開始 三角形
-        TriangleRU = 204,                   // 右上開始 三角形
-        BevelL = 205,                       // 左邊開始 45度斜角
-        BevelR = 206,                       // 右邊開始 45度斜角
 
-        SpawnDataReCustom = 225,              // 起始值
-        ReTriangleLD = 226,                   // 左下開始 三角形
-        ReTriangleRD = 227,                   // 右下開始 三角形
-        ReTriangleLU = 228,                   // 左上開始 三角形
-        ReTriangleRU = 229,                   // 右上開始 三角形
-        ReBevelL = 230,                       // 左邊開始 45度斜角
-        ReBevelR = 231,                       // 右邊開始 45度斜角
     }
+
+
+
+    public enum ENUM_SpawnMethod
+    {
+        CrossHor = 0,
+        CrossVert = 1,
+        Feather = 2,
+        Door = 3,
+
+        STwin = 4,
+        Fish = 5,
+        Snake = 6,
+        Swim = 7,
+
+        LoopCricle = 8,
+        Cross = 9,
+        BillingHV = 10,
+        BillingX = 11,
+    }
+
     public enum ENUM_ScoreRate
     {
         Normal = 0,
         Low = 1,
         High = 2,
+    }
+
+    public enum ENUM_Difficulty
+    {
+        Easy = 0,
+        Normal = 1,
+        Hard = 2,
+        Carzy = 3,
+        Endless = 4,
     }
 
     public enum MissionMode : byte

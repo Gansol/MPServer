@@ -269,32 +269,32 @@ public class BattleHUD : MonoBehaviour
             case Mission.Harvest:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                Debug.Log("Mission : Completed! 取得: " + missionReward + " 糧食");
+//                Debug.Log("Mission : Completed! 取得: " + missionReward + " 糧食");
                 break;
             case Mission.HarvestRate:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫倍率復原";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                Debug.Log("Mission 收穫倍率復原 = 1");
+//                Debug.Log("Mission 收穫倍率復原 = 1");
                 break;
             case Mission.Exchange:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務結束:不再交換糧食";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                Debug.Log("Mission 任務結束:不再交換糧食");
+//                Debug.Log("Mission 任務結束:不再交換糧食");
                 break;
             case Mission.Reduce:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "豐收祭典任務結束";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                Debug.Log("Mission : Reduce! 豐收祭典 花費: " + missionReward + " 糧食");
+ //               Debug.Log("Mission : Reduce! 豐收祭典 花費: " + missionReward + " 糧食");
                 break;
             case Mission.DrivingMice:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
+//                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
                 break;
             case Mission.WorldBoss:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
+//                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
                 break;
         }
         MissionObject.transform.GetChild(2).GetComponent<UILabel>().text = "Completed!";

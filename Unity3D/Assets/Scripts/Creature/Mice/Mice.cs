@@ -22,6 +22,7 @@ public class Mice : MiceBase
 
     void OnEnable()
     {
+        collider2D.enabled = true;
         _lastTime = Time.fixedTime; // 出生時間
     }
 
@@ -39,7 +40,7 @@ public class Mice : MiceBase
     {
         if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
-            Debug.Log("Hit");
+//            Debug.Log("Hit");
             Global.dictBattleMice.Remove(transform.parent);
             collider2D.enabled = false;
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
