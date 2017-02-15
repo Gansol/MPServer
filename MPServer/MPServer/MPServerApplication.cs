@@ -33,6 +33,7 @@ namespace MPServer
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         public ActorCollection Actors = new ActorCollection();
+        public PeerBase peer = null;
         public Room room = new Room();
         public Dictionary<int,object> MiceData = new Dictionary<int,object>();      // 待測試
 
@@ -80,7 +81,7 @@ namespace MPServer
         // 伺服器關閉時 實作釋放資源
         protected override void TearDown()
         {
-            throw new NotImplementedException();
+            Log.Debug("Shutdown MPServer Server ...");
         }
         /*
         // 序列化物件

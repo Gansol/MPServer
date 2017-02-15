@@ -40,13 +40,13 @@ public class TeamManager : PanelManager
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
 
-    private int _page;                                                              // 翻頁值(翻一頁+10)
+    //private int _page;                                                              // 翻頁值(翻一頁+10)
     private float _lastClickTime;                                                   // 點擊間距時間
     private static bool _bFirstLoad;                                                // 是否第一次載入
     private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
 
     private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
-    private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
+    private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
     #endregion
 
     void Awake()
@@ -54,10 +54,10 @@ public class TeamManager : PanelManager
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
-        _dictTeamData = new Dictionary<string, object>();
+        //_dictTeamData = new Dictionary<string, object>();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
 
-        _page = 0;
+        //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
@@ -75,9 +75,9 @@ public class TeamManager : PanelManager
         {
             _bLoadedIcon = !_bLoadedIcon;
             assetLoader.init();
-            InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
-            InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
-            ActiveMice(Global.Team);
+            InstantiateIcon(Global.dictMiceAll, dictLoadedMice, infoGroupsArea[0].transform);
+            InstantiateIcon(Global.dictTeam, dictLoadedTeam, infoGroupsArea[2].transform);
+            ActiveMice(Global.dictTeam);
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)
@@ -182,14 +182,14 @@ public class TeamManager : PanelManager
 
             if (_bFirstLoad)
             {
-                dictNotLoadedAsset = Global.MiceAll;
+                dictNotLoadedAsset = Global.dictMiceAll;
                 _bFirstLoad = false;
             }
             else
             {
-                ExpectOutdataObject(Global.MiceAll, _dictMiceData, dictLoadedMice);
-                ExpectOutdataObject(Global.Team, _dictMiceData, dictLoadedTeam);
-                _dictMiceData = SelectNewData(Global.MiceAll, _dictMiceData);
+                ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, dictLoadedMice);
+                ExpectOutdataObject(Global.dictTeam, _dictMiceData, dictLoadedTeam);
+                _dictMiceData = SelectNewData(Global.dictMiceAll, _dictMiceData);
 
                 dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
             }
@@ -202,12 +202,12 @@ public class TeamManager : PanelManager
             }                                   // 已載入物件 實體化
             else
             {
-                InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
-                InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
-                ActiveMice(Global.Team);
+                InstantiateIcon(Global.dictMiceAll, dictLoadedMice, infoGroupsArea[0].transform);
+                InstantiateIcon(Global.dictTeam, dictLoadedTeam, infoGroupsArea[2].transform);
+                ActiveMice(Global.dictTeam);
             }
-            _dictMiceData = Global.MiceAll;
-            _dictTeamData = Global.Team;
+            _dictMiceData = Global.dictMiceAll;
+            //_dictTeamData = Global.Team;
             Global.isPlayerDataLoaded = false;
         }
     } 
@@ -247,18 +247,18 @@ public class TeamManager : PanelManager
 
     #region --字典 檢查/取值 片段程式碼 --
 
-    public GameObject GetLoadedMice(string miceName)
+    public GameObject GetLoadedMice(string miceID)
     {
         GameObject obj;
-        if (dictLoadedMice.TryGetValue(miceName, out obj))
+        if (dictLoadedMice.TryGetValue(miceID, out obj))
             return obj;
         return null;
     }
 
-    public GameObject GetLoadedTeam(string miceName)
+    public GameObject GetLoadedTeam(string miceID)
     {
         GameObject obj;
-        if (dictLoadedTeam.TryGetValue(miceName, out obj))
+        if (dictLoadedTeam.TryGetValue(miceID, out obj))
             return obj;
         return null;
     }

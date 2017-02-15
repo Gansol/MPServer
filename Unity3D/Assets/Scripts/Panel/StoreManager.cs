@@ -259,7 +259,7 @@ public class StoreManager : PanelManager
         if (_itemType != (int)StoreType.Gashapon)
         {
             SelectStoreItemData(_itemType);
-            _itemData = GetItemInfoFromType(_itemData, _itemType);
+            _itemData =ObjectFactory. GetItemInfoFromType(_itemData, _itemType);
             if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
             assetLoader.init();
             assetLoader.LoadAsset(_folderString + "/", _folderString);
@@ -285,7 +285,7 @@ public class StoreManager : PanelManager
     #region -- LoadPrice 載入物件價格 --
     private void LoadPrice(Dictionary<string, object> itemData, Transform parent, int itemType)
     {
-        itemData = GetItemInfoFromType(itemData, itemType);
+        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
         for (int i = 0; i < itemData.Count; i++)
         {
             parent.GetChild(i).GetComponentInChildren<UILabel>().text = parent.GetChild(i).GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
@@ -351,7 +351,7 @@ public class StoreManager : PanelManager
     private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
     {
         int i = 0, j = 0;
-        itemData = GetItemInfoFromID(itemData, _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
+        itemData = ObjectFactory.GetItemInfoFromID(itemData, "ItemID", _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
         foreach (KeyValuePair<string, object> item in itemData)
         {
             var nestedData = item.Value as Dictionary<string, object>;
@@ -365,7 +365,7 @@ public class StoreManager : PanelManager
             i++;
         }
 
-        itemData = GetItemInfoFromType(Global.storeItem, _itemType);
+        itemData = ObjectFactory.GetItemInfoFromType(Global.storeItem, _itemType);
         i = j = 0;
 
         foreach (KeyValuePair<string, object> item in itemData)
@@ -392,7 +392,7 @@ public class StoreManager : PanelManager
     private void InstantiateItemIcon(Dictionary<string, object> itemData, Transform myParent)
     {
         int i = 0;
-        itemData = GetItemInfoFromType(itemData, _itemType);
+        itemData = ObjectFactory.GetItemInfoFromType(itemData, _itemType);
         // to do check has icon object
         foreach (KeyValuePair<string, object> item in itemData)
         {
@@ -407,7 +407,7 @@ public class StoreManager : PanelManager
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
                 if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                 {
-                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(150, 150), 310);
+                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(150, 150), 400);
                 }
             }
             else

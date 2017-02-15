@@ -39,25 +39,15 @@ namespace MPCOM
         #region LoadSkillProperty
 
         [AutoComplete]
-        public SkillData GetSkillProperty(int skillType)
+        public SkillData LoadSkillProperty()
         {
-            skillData.ReturnCode = "(Logic)S500";
+            skillData.ReturnCode = "(Logic)S1000";
             skillData.ReturnMessage = "";
 
             try
             {
-                switch (skillType)
-                {
-                    case (int)ENUM_Skill.StealHarvest:
-                        skillData.SkillProperty = "-50";
-                        skillData.ReturnCode = "S510";
-                        skillData.ReturnMessage = "取得技能屬性成功！";
-                        break;
-                    default:
-                        skillData.ReturnCode = "S511";
-                        skillData.ReturnMessage = "取得技能屬性失敗！";
-                        break;
-                }
+                SkillsIO skillsIO = new SkillsIO();
+                skillData = skillsIO.LoadSkillData();
             }
             catch (Exception e)
             {

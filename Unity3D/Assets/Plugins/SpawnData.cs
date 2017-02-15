@@ -44,7 +44,7 @@ public static class SpawnData
                 spawnData = aLinkLineL;
                 break;
             case SpawnStatus.LinkLineR:
-                spawnData = aLinkLineL;
+                spawnData = aLinkLineR;
                 break;
             case SpawnStatus.CircleLD:
                 spawnData = aCircleLD;
@@ -155,7 +155,7 @@ public static class SpawnData
     private static readonly sbyte[,] aVertTwin2D = { { 0, 1 }, { 3, 4 }, { 2, 5 }, { 8, 7 }, { 11, 10 }, { 9, 6 } };
 
     
-    private static readonly sbyte[,] aSnakeCircle2D = { { 1, 0 }, { 3, 4 }, { 7, 6 }, { 9, 10 }, { 11, 8 }, { 5, 2 } };
+   // private static readonly sbyte[,] aSnakeCircle2D = { { 1, 0 }, { 3, 4 }, { 7, 6 }, { 9, 10 }, { 11, 8 }, { 5, 2 } };
 
 
     ///// <summary>

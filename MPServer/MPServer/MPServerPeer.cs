@@ -598,12 +598,12 @@ namespace MPServer
 
                         #endregion
 
-                        #region SendSkill 發動技能傷害
-                        case (byte)BattleOperationCode.SendSkill:
+                        #region SendSkillMice 發動老鼠技能傷害
+                        case (byte)BattleOperationCode.SendSkillMice:
                             {
                                 Log.Debug("IN SendSkill");
 
-                                string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceName];
+                                short miceID = (short)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
                                 roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
                                 primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
 
@@ -612,43 +612,64 @@ namespace MPServer
                                 peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);    // 對手GUID找Peer
 
                                 // 送給對手 技能傷害
-                                Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MiceName, miceName }, { (byte)BattleResponseCode.DebugMessage, "" } };
-                                EventData skillEventData = new EventData((byte)BattleResponseCode.ApplySkill, skillParameter);
+                                Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MiceID, miceID }, { (byte)BattleResponseCode.DebugMessage, "" } };
+                                EventData skillEventData = new EventData((byte)BattleResponseCode.ApplySkillMice, skillParameter);
                                 peerOther.SendEvent(skillEventData, new SendParameters());
                             }
                             break;
                         #endregion
 
-                        #region SkillBoss 發動技能老鼠技能
-                        case (byte)BattleOperationCode.SkillBoss:
+                        #region SendSkillItem 發動道具技能傷害
+                        case (byte)BattleOperationCode.SendSkillItem:
                             {
-                                Log.Debug("IN SkillBoss");
 
-                                int skillType = (int)operationRequest.Parameters[(byte)BattleParameterCode.SkillType];
+
+                                short itemID = (short)operationRequest.Parameters[(byte)ItemParameterCode.ItemID];
+                                short skillType = (short)operationRequest.Parameters[(byte)SkillParameterCode.SkillType];
                                 roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
                                 primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
 
+                                Log.Debug("IN SendSkillItem ID: " + itemID + "   Type: " + skillType);
+
+                                Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)ItemParameterCode.ItemID, itemID }, { (byte)BattleResponseCode.DebugMessage, "" } };
+                                EventData skillEventData = new EventData((byte)BattleResponseCode.ApplySkillItem, skillParameter);
+
+                                // 如果是傷害技能 傳送給對手
+                                if (skillType == 2)
+                                {
+                                    Room.RoomActor otherActor;
+                                    otherActor = _server.room.GetOtherPlayer(roomID, primaryID);    // 找對手
+                                    peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);    // 對手GUID找Peer
+
+                                    // 送給對手 技能傷害
+                                    peerOther.SendEvent(skillEventData, new SendParameters());
+                                }
+                                else
+                                {
+                                    // 回傳給自己
+                                    this.SendEvent(skillEventData, new SendParameters());
+                                }
+                            }
+                            break;
+                        #endregion
+
+                        #region SkillBoss 發動技能BOSS老鼠技能
+                        case (byte)BattleOperationCode.SkillBoss:
+                            {
+                                Log.Debug("IN Send BOSS Skill");
+
+                                int skill = (int)operationRequest.Parameters[(byte)SkillParameterCode.SkillID];
+                                roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
+                                primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
+                                
                                 Room.RoomActor otherActor;
                                 otherActor = _server.room.GetOtherPlayer(roomID, primaryID);    // 找對手
                                 peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);    // 對手GUID找Peer
 
-                                SkillData skillData;
-                                SkillUI skillUI = new SkillUI();
-                                skillData = (SkillData)TextUtility.DeserializeFromStream(skillUI.GetSkillProperty(skillType));
-
-
-                                if (skillData.ReturnCode == "")
-                                {
-                                    switch (skillType)
-                                    {
-                                        case (int)ENUM_Skill.StealHarvest:
-                                            // 送給對手 技能傷害
-                                            Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.SkillType, skillType }, { (byte)BattleParameterCode.Damage, skillData.SkillProperty }, { (byte)BattleResponseCode.DebugMessage, skillData.ReturnMessage } };
-                                            EventData skillEventData = new EventData((byte)BattleResponseCode.Damage, skillParameter);
-                                            peerOther.SendEvent(skillEventData, new SendParameters());
-                                            break;
-                                    }
-                                }
+                                // 送給對手 技能傷害
+                                Dictionary<byte, object> skillParameter = new Dictionary<byte, object>() { { (byte)SkillParameterCode.SkillID, skill }, { (byte)BattleResponseCode.DebugMessage, "" } };
+                                EventData skillEventData = new EventData((byte)BattleResponseCode.SkillBoss, skillParameter);
+                                peerOther.SendEvent(skillEventData, new SendParameters());
                             }
                             break;
                         #endregion
@@ -893,13 +914,48 @@ namespace MPServer
 
                                 BattleUI battleUI = new BattleUI();
                                 BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.UpdateScoreRate((ENUM_ScoreRate)rate));
+                                
+                                Room.RoomActor rActor = _server.room.GetActorFromGuid(peerGuid);
+                                rActor.scoreRate = battleData.scoreRate;
 
                                 if (battleData.ReturnCode == "S508")
                                 {
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.ScoreRate, battleData.scoreRate }
                                     };
                                     OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdatedScoreRate, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage };
+                                    SendOperationResponse(response, new SendParameters());
+                                }
+                                else  // 失敗 傳空值+錯誤訊息
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = battleData.ReturnMessage };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+                            }
+                            break;
+                        #endregion
+
+                        #region UpdateScoreRate 更新分數倍率
+                        case (byte)BattleOperationCode.UpdateEnergyRate:
+                            {
+                                Log.Debug("IN UpdateEnergyRate");
+
+                                string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                int rate = (int)operationRequest.Parameters[(byte)BattleParameterCode.ScoreRate];
+
+                                BattleUI battleUI = new BattleUI();
+                                BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.UpdateScoreRate((ENUM_ScoreRate)rate));
+
+                                Room.RoomActor rActor = _server.room.GetActorFromGuid(peerGuid);
+                                rActor.energyRate = battleData.scoreRate;
+
+                                if (battleData.ReturnCode == "S508")
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.ScoreRate, battleData.scoreRate }
+                                    };
+                                    OperationResponse response = new OperationResponse((byte)BattleResponseCode.UpdatedEnergyRate, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage };
                                     SendOperationResponse(response, new SendParameters());
                                 }
                                 else  // 失敗 傳空值+錯誤訊息
@@ -1027,14 +1083,16 @@ namespace MPServer
                                     primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
 
-                                    string miceName = (string)operationRequest.Parameters[(byte)BattleParameterCode.MiceName];
+                                    short miceID = (short)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
                                     float aliveTime = (float)operationRequest.Parameters[(byte)BattleParameterCode.Time];
-                                    if (_server.room.GetActorFromGuid(peerGuid) != null)
+
+                                    Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
+                                    if (roomActor != null)
                                     {
 
                                         BattleUI battleUI = new BattleUI(); //初始化 UI 
-                                        Log.Debug("BattleUI OK:" + miceName + "actor:" + _server.room.GetActorFromGuid(peerGuid).Nickname);
-                                        BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceName, aliveTime)); //計算分數
+                                        Log.Debug("BattleUI OK:" + miceID + "actor:" + _server.room.GetActorFromGuid(peerGuid).Nickname);
+                                        BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.ClacScore(miceID, aliveTime, roomActor.scoreRate, roomActor.energyRate)); //計算分數
                                         Log.Debug("BattleData OK : " + battleData.score);
 
 
@@ -1042,21 +1100,17 @@ namespace MPServer
 
                                         if (battleData.ReturnCode == "S501")//計算分數成功 回傳玩家資料
                                         {
-                                            Room.RoomActor roomActor;
-                                            roomActor = _server.room.GetActorFromGuid(peerGuid);
                                             Log.Debug("peerGuid:" + peerGuid);
                                             Log.Debug("roomActor Nickname:" + roomActor.Nickname + "  " + roomActor.gameScore);
 
                                             roomActor.gameScore += battleData.score;
-
+                                            roomActor.energy += battleData.energy;
                                             if (roomActor.gameScore < 0) roomActor.gameScore = 0;
-
-
 
                                             //回傳給原玩家
                                             //Log.Debug("battleData.ReturnCode == S501");
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } 
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } , { (byte)BattleParameterCode.Energy, battleData.energy} 
                                     };
 
 
@@ -1067,7 +1121,7 @@ namespace MPServer
                                             Room.RoomActor otherActor = new Room.RoomActor(actor.guid, actor.PrimaryID, actor.Account, actor.Nickname, actor.Age, actor.Sex, actor.IP); //這裡為了不要再增加變數 所以偷懶使用 actor.XX 正確是沒有actor.
                                             otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                             peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
-                                            Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.OtherScore, battleData.score }, { (byte)BattleResponseCode.DebugMessage, "取得對方分數資料" } };
+                                            Dictionary<byte, object> parameter2 = new Dictionary<byte, object>() { { (byte)BattleParameterCode.OtherScore, battleData.score }, { (byte)BattleParameterCode.Energy, battleData.energy }, { (byte)BattleResponseCode.DebugMessage, "取得對方分數資料" } };
                                             EventData getScoreEventData = new EventData((byte)BattleResponseCode.GetScore, parameter2);
 
                                             peerOther.SendEvent(getScoreEventData, new SendParameters());
@@ -1115,6 +1169,44 @@ namespace MPServer
                                     {
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
                                         OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = miceData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+
+                            }
+                            break;
+                        #endregion
+
+                        #region LoadMice 載入老鼠資料
+                        case (byte)SkillOperationCode.LoadSkill:
+                            {
+                                try
+                                {
+                                    Log.Debug("IN LoadSkill");
+
+                                    SkillUI skillUI = new SkillUI(); //實體化 IO (連結資料庫拿資料)
+                                    Log.Debug("LoadSkill IO OK");
+                                    SkillData skillData = (SkillData)TextUtility.DeserializeFromStream(skillUI.LoadSkillProperty()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("LoadSkill Data OK");
+                                    //Log.Debug("Server Data: " + miceData.miceProperty);
+                                    if (skillData.ReturnCode == "S1001")//取得老鼠資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug("skillData.ReturnCode == S1001");
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)MiceParameterCode.Ret, skillData.ReturnCode }, { (byte)MiceParameterCode.MiceData,skillData.skillProperty } 
+                                    };
+
+                                        OperationResponse response = new OperationResponse((byte)SkillResponseCode.LoadSkill, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = skillData.ReturnMessage.ToString() };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = skillData.ReturnMessage.ToString() };
                                         SendOperationResponse(actorResponse, new SendParameters());
                                     }
                                 }

@@ -7,11 +7,15 @@ using MPProtocol;
 public class BattleManager : MonoBehaviour
 {
     public BattleAIState battleAIState;           // 產生AI狀態 正式版要改private
+    public PlayerAIState playerAIState;             // Player狀態
 
     private PoolManager poolManager;        // 物件池     
-    private MiceSpawner miceSpawner;        // 老鼠生產者
+    private MPFactory mpFactory;            // 老鼠生產者
+    private SkillFactory skillFactory;      // 技能工廠
     private MissionManager missionManager;  // 任務管理員
     private BattleHUD battleHUD;            // HUD
+
+    public Dictionary<GameObject, GameObject> mice = new Dictionary<GameObject, GameObject>();
 
     private static Int16 _eggMiceUsage = 0; // 老鼠使用量
     private static Int16 _energyUsage = 0;  // 能量使用量    
@@ -22,28 +26,32 @@ public class BattleManager : MonoBehaviour
     private Int16 _killMice = 0;            // 計算打了幾隻老鼠 統計用
     private Int16 _combo = 0;               // 連擊數
 
-    private static double _energy = 0;      // 能量
+    private static float _energy = 0, _tmpEnergy;       // 能量
     private float _maxScore = 0;            // 最高得分
     private float _gameScore = 0;           // 遊戲進行時所得到的分數
     private float _myDPS = 0;               // 我的平均輸出
     private float _otherDPS = 0;            // 對手的平均輸出
-    private float _scoreRate = 1;           // 分數倍率
+    private static float _scoreRate = 1;           // 分數倍率
     private float _otherRate = 1;           // 對手分數倍率
     private float _lastTime;                // 我的平均輸出
     private float _score = 0;               // 分數
     private float _otherScore = 0;          // 對手分數
-    private float _elapsedGameTime = 0;     // 經過時間
+    private float _otherEnergy = 0;        // 對手能量
+    private static float _elapsedGameTime = 0;     // 經過時間
 
     private bool _isCombo;                  // 是否連擊
-    private bool _isHighScore;              // 是否破分數紀錄
-    private bool _isHighCombo;              // 是否破Combo紀錄
+    private bool _isHighScore = false;              // 是否破分數紀錄
+    private bool _isHighCombo = false;              // 是否破Combo紀錄
     private bool isSyncStart;               // 同步開始
-
+    private static bool _isPropected = false;   // 錯誤 保護 要在伺服器判斷 偷懶亂寫 
+    private static bool _isReflection = false;  // 錯誤 反射 要在伺服器判斷 偷懶亂寫 
+    private static bool _isInvincible = false;  // 錯誤 無敵 要在伺服器判斷 偷懶亂寫 
     private Dictionary<int, GameObject> dictSkillBossMice = new Dictionary<int, GameObject>();
 
     public SpawnMode spawnMode = SpawnMode.EasyMode;        // 正式版 要改private
     public SpawnStatus spawnStatus = SpawnStatus.LineL;  // 測試用
     public bool tSpawnFlag { get; set; }
+
 
     public enum SpawnMode : byte
     {
@@ -63,10 +71,12 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle Start");
 
         poolManager = GetComponent<PoolManager>();
-        miceSpawner = GetComponent<MiceSpawner>();
+        mpFactory = GetComponent<MPFactory>();
         missionManager = GetComponent<MissionManager>();
         battleHUD = GetComponent<BattleHUD>();
         SetSpawnState(new EasyBattleAIState());
+        playerAIState = new PlayerAIState(this);
+        skillFactory = new SkillFactory();
 
         Global.photonService.OtherScoreEvent += OnOtherScore;
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
@@ -76,14 +86,15 @@ public class BattleManager : MonoBehaviour
         Global.photonService.GameStartEvent += OnGameStart;
         Global.photonService.GameOverEvent += OnGameOver;
         Global.photonService.LoadSceneEvent += OnDestory;
-        Global.photonService.ApplySkillEvent += OnApplySkill;
+        Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
+        Global.photonService.ApplySkillItemEvent += OnApplySkillItem;
         Global.photonService.LoadSceneEvent += OnLoadScene;
-
+        Global.photonService.BossSkillEvent += OnBossSkill;
         Global.isExitingRoom = false;
         _isCombo = false;
         isSyncStart = true;
 
-        _combo = _maxCombo = _tmpCombo  = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
+        _combo = _maxCombo = _tmpCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
         _elapsedGameTime = _score = _maxScore = _gameScore = _otherScore = 0;
         _energy = 0;
     }
@@ -130,7 +141,8 @@ public class BattleManager : MonoBehaviour
         if (Global.isGameStart && tSpawnFlag)
         {
 
-            battleAIState.UpdateState();   // 更新State邏輯 這裡寫時間 Time + lastime + 間隔
+            battleAIState.UpdateState();            // 更新SpawnState邏輯 這裡寫時間 Time + lastime + 間隔
+            playerAIState.UpdatePlayerState();      // 更新PlayerState邏輯
 
 
             if (_elapsedGameTime % 5 == 0)
@@ -144,49 +156,45 @@ public class BattleManager : MonoBehaviour
 
 
     #region UpadateScore 更新分數
-    public void UpadateScore(string name, float aliveTime)
+    public void UpadateScore(short miceID, float aliveTime)
     {
-        if (name != null)
+        if (miceID != -1)
         {
             UpadateCombo();
             _spawnCount++;
             _killMice++;
             Global.MiceCount--;
-            Global.photonService.UpdateScore(name, aliveTime);
+            Global.photonService.UpdateScore(miceID, aliveTime);
         }
     }
     #endregion
 
     #region LostScore 失去分數
-    public void LostScore(string name, float aliveTime)
+    public void LostScore(short miceID, float aliveTime)
     {
-        //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
-        if (name != null)
+        if (!_isInvincible)
         {
-            BreakCombo();
-            Global.photonService.UpdateScore(name, aliveTime);
-            _spawnCount++;
-            _lostMice++;
-            Global.MiceCount--;
+            //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
+            if (miceID != -1)
+            {
+                BreakCombo();
+                Global.photonService.UpdateScore(miceID, aliveTime);
+                _spawnCount++;
+                _lostMice++;
+                Global.MiceCount--;
+            }
         }
     }
     #endregion
 
     #region UpadateEnergy 更新能量
-    public void UpadateEnergy(double value)
+    public void UpadateEnergy(float value)
     {
-        if (_energy + value > 1)
-        {
-            _energy = 1.0d;
-        }
-        else if (_energy + value < 0)
-        {
-            _energy = 0.0d;
-        }
-        else
-        {
-            _energy = Math.Round(_energy += Math.Round(value, 2), 3);
-        }
+        _energy += value;
+
+        _energy = Math.Min(_energy, 1);
+        _energy = Math.Max(_energy, 0);
+//        Debug.Log(_energy);
     }
     #endregion
 
@@ -211,29 +219,37 @@ public class BattleManager : MonoBehaviour
 
     public void BreakCombo()
     {
-        _isCombo = false;           // 結束 連擊
-        _combo = 0;                 // 恢復0
-        _tmpCombo = 0;
-        battleHUD.ComboMsg(_combo);
-        battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() + .1f, 0);
+        if (!_isInvincible || !_isPropected)
+        {
+            _isCombo = false;           // 結束 連擊
+            _combo = 0;                 // 恢復0
+            _tmpCombo = 0;
+            battleHUD.ComboMsg(_combo);
+            battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() + .1f, 0);
+        }
     }
 
-    void OnUpdateScore(Int16 value)    // 更新分數時
+    void OnUpdateScore(Int16 score, Int16 energy)    // 更新分數時
     {
+        _tmpEnergy = energy * 20;
+
+        if (_isPropected || _isInvincible)
+            score = Math.Max((short)0, score);
         //        Debug.Log("(Update)OnUpdateScore" + value);
         if (Global.isGameStart)
         {
-            Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+            Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
             // 如果再交換分數任務下，則不取得自己增加的分數
             if (missionManager.missionMode == MissionMode.Opening)
             {
-                if (missionManager.mission == Mission.Exchange && value > 0)
+                if (missionManager.mission == Mission.Exchange && score > 0)
                 {
                     _otherScore += _tmpScore;
-                    if (_combo >= 5) UpadateEnergy(0.01d);
+                    if (_combo >= 5)
+                        UpadateEnergy(_tmpEnergy / 100);
                 }
 
-                if (missionManager.mission == Mission.Exchange && value < 0)    // 如果再交換分數任務下，則取得自己減少的分數
+                if (missionManager.mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
                     _score = (this.score + _tmpScore > 0) ? (_score += _tmpScore) : 0;
             }
 
@@ -243,13 +259,15 @@ public class BattleManager : MonoBehaviour
                 if (_tmpScore > 0) _gameScore += _tmpScore;
             }
 
-            if (_combo >= 5) UpadateEnergy(0.01d);
+            if (_combo >= 5)
+                UpadateEnergy(_tmpEnergy / 100);
         }
+//        Debug.Log(_tmpEnergy);
     }
 
 
 
-    void OnOtherScore(Int16 value)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
+    void OnOtherScore(Int16 value, Int16 energy)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
     {
         if (Global.isGameStart)
         {
@@ -275,6 +293,10 @@ public class BattleManager : MonoBehaviour
 
             if (missionManager.mission != Mission.Exchange && missionManager.mission != Mission.HarvestRate)
                 _otherScore = (this.otherScore + _tmpScore < 0) ? 0 : _otherScore += _tmpScore;
+
+
+            _otherEnergy = Math.Min(_otherEnergy + (energy / 100), 1f); //   1/100  1%
+
         }
     }
 
@@ -292,7 +314,7 @@ public class BattleManager : MonoBehaviour
                 _score = (this.score + missionReward < 0) ? 0 : _score += missionReward;
             }
 
-//            Debug.Log("(Battle)_score:" + _score);
+            //            Debug.Log("(Battle)_score:" + _score);
         }
     }
 
@@ -308,7 +330,7 @@ public class BattleManager : MonoBehaviour
             {
                 _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
             }
-//            Debug.Log("(Battle)_otherScore:" + _otherScore);
+            //            Debug.Log("(Battle)_otherScore:" + _otherScore);
         }
     }
 
@@ -335,6 +357,12 @@ public class BattleManager : MonoBehaviour
             }
         }
     }
+
+    void OnBossSkill(ENUM_Skill skill)
+    {
+        SetPlayerState((short)skill);
+    }
+
 
     void OnGameOver(int score, byte exp, Int16 sliverReward, byte battleResult)
     {
@@ -378,14 +406,25 @@ public class BattleManager : MonoBehaviour
     }
 
 
+    public AssetLoader GetAssetLoader()
+    {
+        return poolManager.gameObject.GetComponent<AssetLoader>();
+    }
 
 
 
 
 
 
-
-
+    private void SetPlayerState(short skillID)
+    {
+        Debug.Log("SetPlayerState:" + skillID);
+        // BattleHUD show skill image
+        SkillItem skill = (SkillItem)skillFactory.GetSkill(Global.dictSkills, skillID);
+        skill.SetAIController(playerAIState);
+        playerAIState.SetPlayerAIState(skill.GetPlayerState(), skill);
+        skill.Display();
+    }
 
 
     public void SetSpawnState(BattleAIState spawnState)
@@ -395,17 +434,33 @@ public class BattleManager : MonoBehaviour
     }
 
 
-    void OnApplySkill(string miceName)     // 收到技能攻擊 
+
+
+    void OnApplySkillMice(short miceID)     // 收到技能攻擊 
     {
-        Debug.Log("OnApplySkill miceName:" + miceName);
+        Debug.Log("OnApplySkill miceID:" + miceID);
 
         //   0.OnApplySkill需要改寫，接收數量、參數
-        miceSpawner.SpawnByRandom(miceName, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
+        mpFactory.SpawnByRandom(miceID, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
+    }
+
+    void OnApplySkillItem(short itemID)     // 收到技能攻擊 
+    {
+        if (!_isReflection || !_isPropected)
+        {
+            Debug.Log("OnApplySkillItem itemID:" + itemID);
+
+            short skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "SkillID", itemID.ToString()));
+
+            SetPlayerState(skillID);
+            // to do Display Skill
+        }
     }
 
     void OnLoadScene()
     {
-        Global.photonService.ApplySkillEvent -= OnApplySkill;
+        Global.photonService.ApplySkillMiceEvent -= OnApplySkillMice;
+        Global.photonService.ApplySkillItemEvent -= OnApplySkillItem;
         Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 
@@ -428,14 +483,32 @@ public class BattleManager : MonoBehaviour
 
 
 
+    //---亂寫區域 ---
+    public static void SetInvincible(bool value)
+    {
+        _isInvincible = value;
+    }
+    public static void SetPropected(bool value)
+    {
+        _isPropected = value;
+    }
+    public static void SetRefelcetion(bool value)
+    {
+        _isReflection = value;
+    }
+
+    //---亂寫區域 ---
+
     // 外部取用 戰鬥資料
     public Int16 combo { get { return _combo; } }
     public Int16 maxCombo { get { return _maxCombo; } }
     public int tmpCombo { get { return _tmpCombo; } }
-    public double gameTime { get { return _elapsedGameTime; } }
+    public static float gameTime { get { return _elapsedGameTime; } }
     public float score { get { return _score; } }
     public float gameScore { get { return _gameScore; } }
     public float otherScore { get { return _otherScore; } }
+    public float otherEnergy { get { return _otherEnergy; } }
+    public float Energy { get { return _energy; } }
     public float maxScore { get { return _maxScore; } }
     public int eggMiceUsage { get { return _eggMiceUsage; } }
     public int energyUsage { get { return _energyUsage; } }
@@ -443,7 +516,7 @@ public class BattleManager : MonoBehaviour
     public int hitMice { get { return _killMice; } }
     public int spawnCount { get { return _spawnCount; } }
     public float myDPS { get { return _myDPS; } }
-    public float otherDPS { get { return _myDPS; } }
+    public float otherDPS { get { return _otherDPS; } }
     public static double energy { get { return _energy; } }
     public bool isCombo { get { return _isCombo; } }
 
@@ -458,5 +531,5 @@ return new Guid(data);
 }
 */
 
-   
+
 }

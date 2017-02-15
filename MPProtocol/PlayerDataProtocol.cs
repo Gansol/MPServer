@@ -1,5 +1,18 @@
 ﻿namespace MPProtocol
 {
+    public enum ENUM_PlayerState
+    {
+        None = 0,
+        ScorePlus = 1 << 0,
+        EnergyPlus = 1 << 1,
+        Freeze = 1 << 2,
+        Burn = 1 << 3,
+        Protected = 1 << 4,
+        Reflection = 1 << 5,
+        Invincible = 1 << 6,
+        All = -1,
+    }
+
     public enum PlayerItem : short
     {
         ItemID = 0,
@@ -11,12 +24,12 @@
 
     public enum PlayerDataOperationCode
     {
-        LoadPlayer = 61,          // 載入玩家資料
-        UpdatePlayer = 62,        // 更新玩家資料
-        UpdateMice = 63,        // 更新老鼠資料
-        LoadItem = 64,          // 載入道具資料
-        UpdateItem = 65,        // 更新道具資料
-        SortItem = 66,          // 排序道具資料
+        LoadPlayer = 121,          // 載入玩家資料
+        UpdatePlayer = 122,        // 更新玩家資料
+        UpdateMice = 123,        // 更新老鼠資料
+        LoadItem = 124,          // 載入道具資料
+        UpdateItem = 125,        // 更新道具資料
+        SortItem = 126,          // 排序道具資料
     }
 
     public enum PlayerDataParameterCode
@@ -45,11 +58,11 @@
 
     public enum PlayerDataResponseCode
     {
-        LoadedPlayer = 61,          // 載入玩家資料完成
-        UpdatedPlayer = 62,         // 更新玩家資料完成
-        UpdatedMice = 63,           // 更新老鼠資料完成
-        LoadedItem = 64,            // 載入道具資料完成
-        UpdatedItem = 65,           // 更新道具資料完成
-        SortedItem = 66,            // 排序道具資料完成
+        LoadedPlayer = 121,          // 載入玩家資料完成
+        UpdatedPlayer = 122,         // 更新玩家資料完成
+        UpdatedMice = 123,           // 更新老鼠資料完成
+        LoadedItem = 124,            // 載入道具資料完成
+        UpdatedItem = 125,           // 更新道具資料完成
+        SortedItem = 126,            // 排序道具資料完成
     }
 }

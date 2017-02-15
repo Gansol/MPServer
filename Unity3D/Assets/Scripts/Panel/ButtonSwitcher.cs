@@ -27,10 +27,10 @@ public class ButtonSwitcher : MPButton
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
     private GameObject _clone, _other, _pressingIcon;           // 複製物件、碰撞時對方物件、原老鼠位置
-    private int _depth, teamCountMax;                          // UISprite深度
+    private int _depth/*, teamCountMax*/;                          // UISprite深度
     private float _distance;                                  // 兩物件間距離
     private bool _isPress;   // 是否觸發、移動目標、是否按下、是否摧毀
-    private Vector3 _originPos, _toPos;                       // 原始座標、目標作標
+    private Vector3 _originPos;                       // 原始座標、目標作標
     //private PlayerManager pm;
 
     public Collider coll;
@@ -43,7 +43,7 @@ public class ButtonSwitcher : MPButton
         _originPos = transform.localPosition;
         _activeBtn = false;
         _other = gameObject;
-        teamCountMax = 5;
+//        teamCountMax = 5;
     }
 
     void Update()
@@ -96,7 +96,7 @@ public class ButtonSwitcher : MPButton
         if (_isPress && triggedObject != gameObject)            // 撞到的不是自己 _isTrigger =true
         {
             _other = triggedObject.gameObject;
-            _toPos = triggedObject.transform.localPosition;     // 要移動的位置 為 對方物件位置
+            //_toPos = triggedObject.transform.localPosition;     // 要移動的位置 為 對方物件位置
             _isTrigged = true;
         }
     }
@@ -187,17 +187,21 @@ public class ButtonSwitcher : MPButton
                 _clone.name = "Item";
                 EnDisableBtn(_clone, false);
 
-                GameObject invButton = PlayerManager.dictLoadedItem[itemID];
-                if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
+                if (PlayerManager.dictLoadedItem.ContainsKey(itemID))
                 {
-                    invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
-                    invButton.SendMessage("EnableBtn");
-                    invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法
+                    GameObject invButton = PlayerManager.dictLoadedItem[itemID];
+                    if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
+                    {
+                        invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
+                        invButton.SendMessage("EnableBtn");
+                        invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法
+                    }
+                    else
+                    {
+                        invButton.SendMessage("EnableBtn");
+                    }
                 }
-                else
-                {
-                    invButton.SendMessage("EnableBtn");
-                }
+
                 PlayerManager.dictLoadedEquiped.Remove(itemID);
 
                 Global.photonService.UpdatePlayerItem(short.Parse(itemID), false);
@@ -272,7 +276,7 @@ public class ButtonSwitcher : MPButton
                 string otherName = _other.name;
                 string spriteName = GetComponentInChildren<UISprite>().spriteName;
 
-                Dictionary<string, object> playerItem = new Dictionary<string, object>(Global.SortedItem);
+                Dictionary<string, object> playerItem = new Dictionary<string, object>(Global.dictSortedItem);
 
                 Global.SwapDictValueByKey(itemID, otherName, playerItem);   // 交換值
 

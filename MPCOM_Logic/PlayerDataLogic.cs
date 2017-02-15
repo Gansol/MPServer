@@ -510,7 +510,7 @@ namespace MPCOM
                     var dictMiceAll = Json.Deserialize(playerData2.MiceAll) as Dictionary<string, object>;
                     if (!dictMiceAll.ContainsValue(itemName))
                     {
-                        dictMiceAll.Add((dictMiceAll.Count + 1).ToString(), itemName);
+                        dictMiceAll.Add(itemID.ToString(), itemName);
                         string miceAll = Json.Serialize(dictMiceAll);
                         playerDataIO.UpdatePlayerData(account, miceAll);
                     }

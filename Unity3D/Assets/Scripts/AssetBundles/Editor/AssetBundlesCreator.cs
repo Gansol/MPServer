@@ -72,6 +72,20 @@ public class AssetBundlesCreator : EditorWindow
     "/_AssetBundles/STANDALONE_OSX/";
 #endif
 
+    public static string publishFolder =
+#if UNITY_ANDROID
+ "C:/inetpub/wwwroot/MicePow/AndroidBundles/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    "C:/inetpub/wwwroot/MicePow/iOSBundles/";
+#endif
+
+    public static string publishHashFolder =
+#if UNITY_ANDROID
+ "C:/inetpub/wwwroot/MicePow/AndroidList/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    "C:/inetpub/wwwroot/MicePow/iOSList/";
+#endif
+
     static string fileExtension = ".unity3d";
 
     static BuildTarget buildTarget = BuildTarget.WP8Player;
@@ -81,24 +95,13 @@ public class AssetBundlesCreator : EditorWindow
     static List<string> ext = new List<string> { };
     static string[] hashType = new string[] { "SHA1", "MD5", "SHA512" };
 
-    Rect baseWindowRect = new Rect(10, 25, 400, 50);
-    Rect buildWindowRect = new Rect(10, 290, 400, 50);
-    Rect hashWindowsRect = new Rect(10, 500, 400, 50);
+    Rect baseWindowRect = new Rect(10, 10, 450, 50);
+    Rect buildWindowRect = new Rect(10, 300, 450, 50);
+    Rect hashWindowsRect = new Rect(10, 500, 450, 50);
 
-    static bool _uncompressed;
-    static bool _dependent;
-    static bool _otherPlatform;
-    static bool _bPrefab;
-    static bool _bMat;
-    static bool _bPng;
-    static bool _bJpge;
+    static bool _uncompressed, _dependent, _otherPlatform, _bPublish, _bFullPackage,
+                _bPrefab, _bMat, _bPng, _bJpge, _bMp3, _bWav, _bOgg, _bAnim, _bController;
     static int _hashIndex;
-    static bool _bMp3;
-    static bool _bWav;
-    static bool _bOgg;
-    static bool _bAnim;
-    static bool _bController;
-
     static string _hash;
     static string _targetDir = Application.dataPath + exportFolder; // 建置目錄
     static string _perfabDir = Application.dataPath + perfabFolder; // 預置物件目錄
@@ -128,6 +131,8 @@ public class AssetBundlesCreator : EditorWindow
         // unusedWindowID = 視窗ID
         perfabFolder = EditorGUILayout.TextField("AssetBundles folder: ", perfabFolder);
         exportFolder = EditorGUILayout.TextField("Export folder: ", exportFolder);
+        publishFolder = EditorGUILayout.TextField("Publish folder: ", publishFolder);
+        publishHashFolder = EditorGUILayout.TextField("Publish hash folder: ", publishHashFolder);
         fileExtension = EditorGUILayout.TextField("Bundle file ext: ", fileExtension);
         EditorGUILayout.LabelField("Bundle Type");
         GUILayout.BeginHorizontal();
@@ -203,6 +208,12 @@ public class AssetBundlesCreator : EditorWindow
         EditorGUILayout.LabelField("Hash Type");
         _hashIndex = EditorGUILayout.Popup(_hashIndex, hashType);   // ListBox 下拉式選單(只能用字串陣列當選項值)
         EditorGUILayout.LabelField("");
+
+        GUILayout.BeginHorizontal();
+        _bPublish = GUILayout.Toggle(_bPublish, "Publish Hash"); // CheckBox 核取欄位
+        _bFullPackage = GUILayout.Toggle(_bFullPackage, "Publish Full Hash"); // CheckBox 核取欄位
+        GUILayout.EndHorizontal();
+
         if (GUILayout.Button("Build AssetBundle Hash"))
         {
             BuildAssetHash();
@@ -263,7 +274,7 @@ public class AssetBundlesCreator : EditorWindow
 
         string[] folders = Directory.GetDirectories(_perfabDir);    // 取得目錄所有下資料夾
 
-       
+
 
         foreach (string folder in folders)  // 尋遍所有資料夾
         {
@@ -307,7 +318,7 @@ public class AssetBundlesCreator : EditorWindow
 
                 BundleShareAssetBundle(innFolder[0], outputFolder);
 
-                
+
 
 
 
@@ -341,7 +352,7 @@ public class AssetBundlesCreator : EditorWindow
         Object obj;
         uint crc = 0;   // crc檢驗碼
 
-        if (File.Exists(innFolder + "/" + "BundleInfo.json")) 
+        if (File.Exists(innFolder + "/" + "BundleInfo.json"))
         {
             Dictionary<string, object> files = LoadFile(innFolder + "/" + "BundleInfo.json");   // innFolder[0] = Share資料夾 載入子資料夾下資產清單(共用物件)
 
@@ -355,7 +366,7 @@ public class AssetBundlesCreator : EditorWindow
                 Debug.Log("Building Share Prefab:" + obj.name);
 
                 if (File.Exists(filePath)) File.Delete(filePath);                               // 如果輸出資料夾下已經有舊檔案，刪除檔案
-                    
+
                 Object[] depenObj = SelectDenpendenices(file.Value.ToString());
 
                 //Build;
@@ -371,7 +382,7 @@ public class AssetBundlesCreator : EditorWindow
         {
             Debug.LogError("BundleInfo.json exist folder! Please PreBuild BundleInfo." + "   Path Info:" + innFolder);
         }
-    } 
+    }
     #endregion
 
     #region BundleUniqueAssetBundle
@@ -379,7 +390,7 @@ public class AssetBundlesCreator : EditorWindow
     {
         Object obj;
         uint crc = 0;
-        
+
         // 歷遍所有要打包的物件
         foreach (KeyValuePair<string, object> file in dictUniquePaths)
         {
@@ -392,12 +403,12 @@ public class AssetBundlesCreator : EditorWindow
             //Object[] uniqueDepenObjs = SelectDenpendenices(file.Value.ToString());
             string[] paths = new string[] { file.Value.ToString() };
             string[] uniqueDependPaths = AssetDatabase.GetDependencies(paths);
-            
+
             List<Object> equalPrefabs = new List<Object>();
 
             for (int i = 0; i < uniqueDependPaths.Length; i++)
             {
-                if(dictSharePaths.ContainsValue(uniqueDependPaths[i]))
+                if (dictSharePaths.ContainsValue(uniqueDependPaths[i]))
                     equalPrefabs.Add(AssetDatabase.LoadMainAssetAtPath(uniqueDependPaths[i]));
             }
 
@@ -421,12 +432,12 @@ public class AssetBundlesCreator : EditorWindow
 
 
             //獨立資產打包;
-            
-             if (_uncompressed) bundleOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
-             BuildPipeline.PushAssetDependencies();
-             if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, bundleOptions, buildTarget))
-                    AssetDatabase.Refresh();
-             BuildPipeline.PopAssetDependencies();
+
+            if (_uncompressed) bundleOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
+            BuildPipeline.PushAssetDependencies();
+            if (BuildPipeline.BuildAssetBundle(obj, null, outputFolder + file.Key + fileExtension, out crc, bundleOptions, buildTarget))
+                AssetDatabase.Refresh();
+            BuildPipeline.PopAssetDependencies();
 
             BuildPipeline.PopAssetDependencies();
             AssetDatabase.Refresh();
@@ -475,13 +486,25 @@ public class AssetBundlesCreator : EditorWindow
                 }
             }
             CreateFile(Json.Serialize(dictBundles), bundleFolderPath, "BundleHash.json"); //建立 新 檔案列表
+
+            if (_bPublish)
+            {
+                if (_bFullPackage)
+                    CreateFile(Json.Serialize(dictBundles), publishHashFolder, "FullPackageList.json"); //建立 新 檔案列表
+
+                CreateFile(Json.Serialize(dictBundles), publishHashFolder, "ItemList.json"); //建立 新 檔案列表
+
+                string vision = LoadTxt(publishHashFolder + "BundleVersion.json");
+                CreateFile((int.Parse(vision) + 1).ToString(), publishHashFolder, "BundleVersion.json"); //建立 新 檔案列表
+            }
+
         }
         Debug.Log("*****Bundle Hash Completed!*****" + "  Path:" + bundleFolderPath);
     }
     #endregion
 
 
-    private static Dictionary<string,object> LoadFile(string path)   // 載入JSON列表檔案
+    private static Dictionary<string, object> LoadFile(string path)   // 載入JSON列表檔案
     {
         Dictionary<string, object> files = new Dictionary<string, object>();
 
@@ -497,6 +520,19 @@ public class AssetBundlesCreator : EditorWindow
         return null;
     }
 
+    private static string LoadTxt(string path)   // 載入JSON列表檔案
+    {
+        Dictionary<string, object> files = new Dictionary<string, object>();
+
+        // path = 資料夾物件下BundleInfo.json
+        // 載入文字後並解析存入字典檔
+        string text = File.ReadAllText(path);
+
+        if (text != null)
+            return text;
+
+        return null;
+    }
 
 
     private static void InfoCreator() //Bunlde InfoCreator 負責建立 Bundle資訊(物件名稱、Assets路徑)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
 using MPProtocol;
+using ExitGames.Logging;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -30,7 +31,7 @@ namespace MPCOM
     public class BattleLogic : ServicedComponent// ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
         BattleData battleData = new BattleData();
-
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         protected override bool CanBePooled()
         {
             return true;
@@ -57,6 +58,7 @@ namespace MPCOM
 
         private struct EggMice
         {
+            public readonly static int ID = 10001;    // ID
             public readonly static int eatFull = 10;    // 2.5s = 4
             public readonly static float perEat = 1;
             public readonly static float eatingRate = 0.25f;
@@ -103,13 +105,13 @@ namespace MPCOM
             switch ((int)rate)
             {
                 case (int)ENUM_ScoreRate.Normal:
-                    scoreRate = ScoreRate.mormal;
+                    battleData.scoreRate = ScoreRate.mormal;
                     break;
                 case (int)ENUM_ScoreRate.Low:
-                    scoreRate = ScoreRate.low;
+                    battleData.scoreRate = ScoreRate.low;
                     break;
                 case (int)ENUM_ScoreRate.High:
-                    scoreRate = ScoreRate.high;
+                    battleData.scoreRate = ScoreRate.high;
                     break;
                 default:
                     battleData.ReturnCode = "S509";
@@ -122,7 +124,7 @@ namespace MPCOM
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-        public BattleData ClacScore(string miceName, float aliveTime)
+        public BattleData ClacScore(short miceID, float aliveTime,float scoreRate,float energyRate)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -130,12 +132,15 @@ namespace MPCOM
 
             try
             {
-                switch (miceName) //用老鼠ID來判斷 取得的分數是否異常
+                switch (miceID) //用老鼠ID來判斷 取得的分數是否異常
                 {
-                    case "EggMice": //EggMice
+
+                    case 10001: //EggMice 錯誤
                         {
+
                             int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / EggMice.eatingRate));
 
+                            Log.Debug("aliveTime:" + aliveTime + "EggMice.eatingRate: " + EggMice.eatingRate + "EggMice.eatFull: " + EggMice.eatFull + "All Eat: " + ateTimes * EggMice.perEat);
                             if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
                                 score -= Convert.ToInt16(EggMice.eatFull * scoreRate);
@@ -146,7 +151,7 @@ namespace MPCOM
                             }
                             break;
                         }
-                    case "BlackMice": //EggMice
+                    case 10002: //Black 錯誤
                         {
                             int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / BlackMice.eatingRate));
 
@@ -160,7 +165,7 @@ namespace MPCOM
                             }
                             break;
                         }
-                    case "CandyMice": //EggMice
+                    case 10003: //Candy 錯誤
                         {
                             int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / CandyMice.eatingRate));
 
@@ -170,11 +175,11 @@ namespace MPCOM
                             }
                             else
                             {
-                                score = Convert.ToInt16(CandyMice.eatFull -( CandyMice.perEat * ateTimes * scoreRate));
+                                score = Convert.ToInt16(CandyMice.eatFull - (CandyMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
-                    case "RabbitMice": //EggMice
+                    case 10004: //Rabbit 錯誤
                         {
                             int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / RabbitMice.eatingRate));
 
@@ -184,11 +189,11 @@ namespace MPCOM
                             }
                             else
                             {
-                                score = Convert.ToInt16(RabbitMice.eatFull -( RabbitMice.perEat * ateTimes * scoreRate));
+                                score = Convert.ToInt16(RabbitMice.eatFull - (RabbitMice.perEat * ateTimes * scoreRate));
                             }
                             break;
                         }
-                    case "NinjaMice": //EggMice
+                    case 10005: //Njnja 錯誤
                         {
                             int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / NinjaMice.eatingRate));
 
@@ -208,6 +213,8 @@ namespace MPCOM
             {
                 throw e;
             }
+
+            battleData.energy = (Int16)((score > 0) ? 1 : 0);   // 打死老鼠增加能量
             battleData.score = score;
             battleData.ReturnCode = "S501";
             battleData.ReturnMessage = "驗證分數成功！";
@@ -385,7 +392,7 @@ namespace MPCOM
                     case Mission.WorldBoss: // BOSS
                         {
                             // missionRate 是老鼠ID
-                            battleData.missionScore = (Int16)EggMice.hp;
+                            battleData.missionScore = (Int16)EggMice.ID;
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;

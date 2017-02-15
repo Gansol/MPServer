@@ -55,7 +55,6 @@ public class CreateJSON : MonoBehaviour
         using (FileStream fs = File.Create(path + fileName)) //using 會自動關閉Stream 建立檔案
         {
             fs.Write(new UTF8Encoding(true).GetBytes(contant), 0, contant.Length); //寫入檔案
-            fs.Dispose(); //避免錯誤 在寫一次關閉
         }
     }
 

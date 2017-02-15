@@ -27,7 +27,7 @@ public abstract class MiceBossBase : Creature
         m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
     }
 
-    public override void SetSkill(Skill skill)
+    public override void SetSkill(SkillBase skill)
     {
         if (this.m_Skill != null)
             this.m_Skill.Release();
@@ -46,5 +46,12 @@ public abstract class MiceBossBase : Creature
         if (this.m_Arribute != null)
             this.m_Arribute = null;
         this.m_Arribute = arribute;
+    }
+
+    public override void SetAnimState(AnimatorState state)
+    {
+        if (this.m_AnimState != null)
+            this.m_AnimState = null;
+        this.m_AnimState = state;
     }
 }

@@ -21,7 +21,7 @@ namespace MPCOM
 {
     public interface ISkillUI   // 使用介面 可以提供給不同程式語言繼承使用      
     {
-        byte[] GetSkillProperty(int skillType);
+        byte[] LoadSkillProperty();
     }
 
     public class SkillUI : ServicedComponent, ISkillUI
@@ -32,20 +32,20 @@ namespace MPCOM
         }
 
         #region GetSkillProperty 載入技能資料
-        public byte[] GetSkillProperty(int skillType)
+        public byte[] LoadSkillProperty()
         {
             SkillData skillData = new SkillData();
-            skillData.ReturnCode = "S800";
+            skillData.ReturnCode = "S1000";
             skillData.ReturnMessage = "";
 
             try
             {
                 SkillLogic skillLogic = new SkillLogic();
-                skillData = skillLogic.GetSkillProperty(skillType);
+                skillData = skillLogic.LoadSkillProperty();
             }
             catch (Exception e)
             {
-                skillData.ReturnCode = "S800";
+                skillData.ReturnCode = "S1002";
                 skillData.ReturnMessage = e.Message;
             }
             return TextUtility.SerializeToStream(skillData);

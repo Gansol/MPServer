@@ -39,7 +39,7 @@ public class VisionChecker
         string localListPath = Application.persistentDataPath + "/List/";
         string localVisionListFile = localListPath + Global.visionListFile;
         if(!Directory.Exists(localListPath)) Directory.CreateDirectory(localListPath);
-        Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
+//        Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
         // Debug.LogError("Eclipse Debug : " + localVisionListFile);
         using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.visionListFile))
         {

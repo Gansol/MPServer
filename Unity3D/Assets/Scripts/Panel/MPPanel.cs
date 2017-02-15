@@ -67,7 +67,7 @@ public abstract class MPPanel : MonoBehaviour
         if (bundle != null)                  // 已載入資產時
         {
             if (!GetLoadedActor(bundle.name))
-                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale);
+                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale,500); // 老鼠Depth是手動輸入的!! 錯誤
             SetLoadedActor(_clone);
             return false;
         }
@@ -123,94 +123,6 @@ public abstract class MPPanel : MonoBehaviour
     }
     #endregion
 
-    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
-    {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemType;
-            nestedData.TryGetValue("ItemType", out itemType);
-            if (itemType != null)
-                if (itemType.ToString() == type.ToString())
-                {
-                    data.Add(nestedData["ItemID"].ToString(), nestedData);
-                }
-        }
-        return data;
-    }
-    #endregion
-
-
-    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData, int type)
-    {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemID;
-            nestedData.TryGetValue("ItemID", out itemID);
-
-
-            char[] itemType = itemID.ToString().ToCharArray(0, 1);
-            if (itemType[0].ToString() == type.ToString())
-            {
-                data.Add(nestedData["ItemID"].ToString(), nestedData);
-            }
-        }
-        return data;
-    }
-    #endregion
-
-    #region -- GetItemNameFromID 從道具ID取得道具名稱 --
-    /// <summary>
-    /// 從道具ID取得道具名稱
-    /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    public string GetItemNameFromID(string itemID, Dictionary<string, object> itemData)
-    {
-        object objNested;
-
-        itemData.TryGetValue(itemID.ToString(), out objNested);
-        if (objNested != null)
-        {
-            var dictNested = objNested as Dictionary<string, object>;
-            return dictNested["ItemName"].ToString();
-        }
-        return "";
-    }
-    #endregion
-
-    #region -- GetItemNameFromID 從道具名稱取得道具ID --
-    /// <summary>
-    /// 從道具名稱取得道具ID
-    /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    public string GetItemIDFromName(string itemName, Dictionary<string, object> itemData)
-    {
-        object value;
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            nestedData.TryGetValue("ItemName", out value);
-            if (itemName == value.ToString())
-            {
-                nestedData.TryGetValue("ItemID", out value);
-                return value.ToString();
-            }
-        }
-        return "";
-    }
-    #endregion
-
     #region -- GetDontNotLoadAsset 取得未載入Asset --
     /// <summary>
     /// 取得未載入Asset
@@ -246,7 +158,7 @@ public abstract class MPPanel : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
         {
-            string imageName = GetItemNameFromID(item.Key, itemNameData);
+            string imageName =ObjectFactory.GetColumnsDataFromID( itemNameData,"ItemID",item.Key.ToString()).ToString();
 
             if (!string.IsNullOrEmpty(imageName) && assetLoader.GetAsset(imageName) == null)
             {

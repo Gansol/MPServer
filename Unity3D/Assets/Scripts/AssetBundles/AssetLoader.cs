@@ -18,7 +18,7 @@ using System.Collections.Generic;
  * ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
-    private int _matCount, _objCount, _loadedCount;
+    private int  _objCount = 0, _loadedCount = 0;
     public bool loadedObj;
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;
@@ -39,12 +39,12 @@ public class AssetLoader : MonoBehaviour
                 AssetBundleManager.loadedObjectCount = _objCount = 0;
                 loadedObj = true;
             }
-            else if ((_objCount - _loadedCount) == AssetBundleManager.loadedObjectCount && AssetBundleManager.loadedObjectCount!=0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
+            else if ((_objCount - _loadedCount) == AssetBundleManager.loadedObjectCount && AssetBundleManager.loadedObjectCount != 0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
             {
                 AssetBundleManager.loadedObjectCount = _objCount = 0;
                 loadedObj = true;
             }
-            else if(_objCount == _loadedCount)  // 全部已載入
+            else if (_objCount == _loadedCount)  // 全部已載入
             {
                 AssetBundleManager.loadedObjectCount = _objCount = 0;
                 loadedObj = true;
@@ -93,7 +93,7 @@ public class AssetLoader : MonoBehaviour
 
     public void init()
     {
-        _matCount = _objCount = _loadedCount = 0;
+        _objCount = _loadedCount = 0;
         loadedObj = false;
         AssetBundleManager.init();
     }

@@ -17,6 +17,14 @@
     {
         Ret=0,
         ItemData=88,
+        ItemID = 1,
+        ItemName = 2,
+        EatingRate = 3,
+        MiceSpeed = 4,
+        EatFull = 5,
+        BossSkill = 6,
+        HP = 7,
+        MiceCost = 8,
     }
 
     public enum ItemProperty

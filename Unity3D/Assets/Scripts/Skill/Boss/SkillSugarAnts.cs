@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SugarAntsSkill : ISkillBoss
+public class SugarAntsSkill : SkillBoss
 {
+    public SugarAntsSkill(SkillAttr skill)
+        : base(skill)
+    {
+    }
+
     CreatureAttr arribute = null;
     private int _tmpHp = 0;
     // Use this for initialization
@@ -32,8 +37,23 @@ public class SugarAntsSkill : ISkillBoss
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_ScoreRate.Low);
     }
 
-    public override void Display2(GameObject obj, CreatureAttr arribute, AIState state)
+    //public override void Display()
+    //{
+    //    arribute.SetHP(arribute.GetHP() + System.Convert.ToInt32(_tmpHp / 3));
+    //}
+
+    public override void UpdateEffect()
     {
-        arribute.SetHP(arribute.GetHP() + System.Convert.ToInt32(_tmpHp / 3));
+        throw new System.NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Display()
+    {
+        throw new System.NotImplementedException();
     }
 }

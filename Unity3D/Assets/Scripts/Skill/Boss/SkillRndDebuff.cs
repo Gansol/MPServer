@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RndDebuffSkill : ISkillBoss
+public class RndDebuffSkill : SkillBoss
 {
+    public RndDebuffSkill(SkillAttr skill)
+        : base(skill)
+    {
+    }
 
 	// Use this for initialization
 	void Start () {
@@ -20,6 +24,21 @@ public class RndDebuffSkill : ISkillBoss
     }
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void UpdateEffect()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Display()
     {
         throw new System.NotImplementedException();
     }

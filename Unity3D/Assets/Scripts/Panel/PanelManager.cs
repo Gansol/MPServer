@@ -121,7 +121,7 @@ public class PanelManager : MPPanel
     /// <param name="itemType">道具類別</param>
     public void InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
-        itemData = GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {

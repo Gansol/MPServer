@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SkillShield : ISkillBoss
+public class SkillShield : SkillBoss
 {
+    public SkillShield(SkillAttr skill)
+        : base(skill)
+    {
+    }
+
     public override void Initialize()
     {
         throw new System.NotImplementedException();
@@ -10,6 +15,22 @@ public class SkillShield : ISkillBoss
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-        arribute.SetShield(50);
+        Debug.Log(skillData.Attr);
+        arribute.SetShield(skillData.Attr);
+    }
+
+    public override void UpdateEffect()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Display()
+    {
+        throw new System.NotImplementedException();
     }
 }

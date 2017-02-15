@@ -9,30 +9,30 @@ using MPProtocol;
 using GooglePlayGames;
 using MiniJSON;
 using Gansol;
+using System.Data;
 
 public class LoginUI : MonoBehaviour
 {
     public GameObject LoginPanel;
     public GameObject JoinPanel;
     public GameObject MatchGame;
+    public UILabel LoginMessageBox;
 
     public GameObject[] ErrorText;
 
     TextUtility textUtility = new TextUtility();
 
     private Dictionary<string, object> FBProfiler = null;
-    private string _defaultAccout = "請輸入帳號(8~16英文數字)";
-    private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
+    //private string _defaultAccout = "請輸入帳號(8~16英文數字)";
+    //private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
 
-    private string getAccount = "";
-    private string getPassowrd = "";
-    private string getNickname = "";
-    private string getAge = "0";
-    private string getSex = "0";
+    //private string getAccount = "";
+    //private string getPassowrd = "";
+    //private string getNickname = "";
+    //private string getAge = "0";
+    //private string getSex = "0";
     private string getIP = "";
 
-    private string joinResult = "";
-    private string loginResult = "";
     //private string JoinRoomResult = "";
     //private bool macthing = false;
     private float ckeckTime;
@@ -43,7 +43,8 @@ public class LoginUI : MonoBehaviour
 
     void OnEnable()
     {
-      if(Global.LoginStatus)  ShowMatchGame();
+        if (Global.LoginStatus) ShowMatchGame();
+        LoginMessageBox.gameObject.SetActive(false);
     }
     // 在Start裡建立好Login的回應事件
     void Start()
@@ -179,7 +180,7 @@ public class LoginUI : MonoBehaviour
         {
             Global.isMatching = true;
             ShowMatchGame();
-            Global.photonService.MatchGame(Global.PrimaryID, Global.Team);
+            Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
         }
     }
 
@@ -219,7 +220,7 @@ public class LoginUI : MonoBehaviour
                 obj.SetActive(false);
             }
 
-            Global.photonService.JoinMember(email.text, password.value, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex,GetPublicIP(), MemberType.Gansol);
+            Global.photonService.JoinMember(email.text, password.value, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
             OpenLoginPanel(JoinPanel, LoginPanel);
         }
         else
@@ -230,13 +231,52 @@ public class LoginUI : MonoBehaviour
         }
     }
 
+    private Dictionary<string, object> GetSkillData(DataTable dt)
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>();
+
+        if (dt != null)
+        {
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                Dictionary<string, string> tmp = new Dictionary<string, string>();
+                string id = dt.Rows[i]["SkillID"].ToString();
+                string type = dt.Rows[i]["SkillType"].ToString();
+                string name = dt.Rows[i]["SkillName"].ToString();
+                string level = dt.Rows[i]["SkillLevel"].ToString();
+                string time = dt.Rows[i]["SkillTime"].ToString();
+                string coldDown = dt.Rows[i]["ColdDown"].ToString();
+                string energy = dt.Rows[i]["Energy"].ToString();
+                string dealy = dt.Rows[i]["Delay"].ToString();
+                string attr = dt.Rows[i]["Attr"].ToString();
+
+                tmp.Add("SkillType", type);
+                tmp.Add("ItemName", name);
+                tmp.Add("SkillLevel", level);
+                tmp.Add("SkillTime", time);
+                tmp.Add("ColdDown", coldDown);
+                tmp.Add("Energy", dealy);
+                tmp.Add("Delay", dealy);
+                tmp.Add("Attr", attr);
+                data.Add(id, tmp);
+            }
+        }
+        else
+        {
+            Debug.LogError("DataTable is Null !");
+        }
+
+        return data;
+    }
 
     // Login Event
     private void OnJoinMember(bool joinStatus, string returnCode, string message)
     {
-        joinResult = message;
         Global.isJoinMember = joinStatus;
         Global.Ret = returnCode;
+        LoginMessageBox.gameObject.SetActive(true);
+        LoginMessageBox.color = Color.green;
+        LoginMessageBox.text = "O  " + message;
     }
 
     private void OnLogin(bool loginStatus, string message, string returnCode)
@@ -244,12 +284,15 @@ public class LoginUI : MonoBehaviour
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
             ShowMatchGame();
+            Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
         }
         else // 若登入失敗，取得錯誤回傳字串
         {
             isLoginBtn = false;
-            loginResult = message;
+            LoginMessageBox.gameObject.SetActive(true);
+            LoginMessageBox.color = Color.red;
+            LoginMessageBox.text = "X  " + message;
         }
     }
 
@@ -409,12 +452,12 @@ public class LoginUI : MonoBehaviour
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
-                        Global.photonService.JoinMember(account, "12345678", name, Convert.ToByte(age), sex,GetPublicIP(), MemberType.Facebook);
+                        Global.photonService.JoinMember(account, "12345678", name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
                     catch (Exception e)
                     {
-                        throw e;
+                        throw ;
                     }
                     break;
                 }
@@ -473,6 +516,6 @@ public class LoginUI : MonoBehaviour
         */
         IPAddress ip = System.Net.Dns.GetHostEntry(strHostName).AddressList[0];
         getIP = ip.ToString();
-        Debug.Log("ip:"+getIP);
+        Debug.Log("ip:" + getIP);
     }
 }

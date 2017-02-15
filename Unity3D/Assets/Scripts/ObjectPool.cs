@@ -69,7 +69,7 @@ public class ObjectPool : MonoBehaviour
         {
             clone = new GameObject();
 
-            clone.name = item.Value;
+            clone.name = item.Key.ToString();
             clone.transform.parent = Pool.transform;
             clone.layer = clone.transform.parent.gameObject.layer;
             clone.transform.localScale = Vector3.one;
@@ -77,8 +77,8 @@ public class ObjectPool : MonoBehaviour
             for (int i = 0; i < spawnCount; i++)
             {
                 clone = (GameObject)Instantiate(ObjectDeck[item.Key]);   //　等傳老鼠ID名稱近來這要改
-                clone.name = item.Value;
-                clone.transform.parent = Pool.transform.FindChild(item.Value).transform;
+                clone.name = item.Key.ToString();
+                clone.transform.parent = Pool.transform.FindChild(item.Key.ToString()).transform;
                 clone.transform.localScale = Vector3.one;
                 clone.transform.gameObject.SetActive(false);    // 新版 子物件隱藏
             }
@@ -93,9 +93,11 @@ public class ObjectPool : MonoBehaviour
     /// </summary>
     /// <param name="objectID">使用ID找Object</param>
     /// <returns>回傳 ( GameObject / null )</returns>
-    public GameObject ActiveObject(int objectID)
+    public GameObject ActiveObject(short objectID)
     {
-        _dictObject.TryGetValue(objectID, out objectName);//等傳老鼠ID名稱近來這要改miceName
+        //_dictObject.TryGetValue(objectID, out objectName);//等傳老鼠ID名稱近來這要改
+
+        objectName = objectID.ToString();
 
         if (Pool.transform.FindChild(objectName).childCount == 0)
         {
@@ -121,38 +123,38 @@ public class ObjectPool : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
-    /// </summary>
-    /// <param name="objectName">使用Name找Object</param>
-    /// <returns>回傳 ( GameObject / null )</returns>
-    public GameObject ActiveObject(string objectName)
-    {
-        int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
+    ///// <summary>
+    ///// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
+    ///// </summary>
+    ///// <param name="objectName">使用Name找Object</param>
+    ///// <returns>回傳 ( GameObject / null )</returns>
+    //public GameObject ActiveObject(string objectName)
+    //{
+    //    int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
 
-        if (Pool.transform.FindChild(objectName).childCount == 0)
-        {
-            clone = (GameObject)Instantiate(ObjectDeck[objectID], Vector3.zero, Quaternion.identity);
-            clone.name = objectName;
-            clone.transform.parent = Pool.transform.FindChild(objectName).transform;
-            clone.transform.localScale = Vector3.one;
-            return clone;
-        }
+    //    if (Pool.transform.FindChild(objectName).childCount == 0)
+    //    {
+    //        clone = (GameObject)Instantiate(ObjectDeck[objectID], Vector3.zero, Quaternion.identity);
+    //        clone.name = objectName;
+    //        clone.transform.parent = Pool.transform.FindChild(objectName).transform;
+    //        clone.transform.localScale = Vector3.one;
+    //        return clone;
+    //    }
 
-        for (int i = 0; i < Pool.transform.FindChild(objectName).childCount; i++)
-        {
-            GameObject obj;
+    //    for (int i = 0; i < Pool.transform.FindChild(objectName).childCount; i++)
+    //    {
+    //        GameObject obj;
 
-            obj = Pool.transform.FindChild(objectName).GetChild(i).gameObject;
+    //        obj = Pool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-            if (obj.name == objectName && !obj.transform.gameObject.activeSelf)
-            {
-                obj.transform.gameObject.SetActive(true);
-                return obj;
-            }
-        }
-        return null;
-    }
+    //        if (obj.name == objectName && !obj.transform.gameObject.activeSelf)
+    //        {
+    //            obj.transform.gameObject.SetActive(true);
+    //            return obj;
+    //        }
+    //    }
+    //    return null;
+    //}
 
     void Update()
     {

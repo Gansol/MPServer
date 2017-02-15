@@ -8,28 +8,33 @@ public class Mice : MiceBase
 
     public override void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        m_AIState = null;
-        m_Arribute = null;
-
-        AnimState = gameObject.AddMissingComponent<MiceAnimState>();
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
-        AnimState.Initialize(gameObject, false, lerpSpeed, upSpeed, upDistance, lifeTime);
+
+        // m_AIState = null;
+        // m_Arribute = null;
+        // m_AnimState = null;
 
         transform.localPosition = new Vector3(0, 0);
-        collider2D.enabled = true;
+        GetComponent<BoxCollider2D>().enabled = true;
     }
-
 
     void OnEnable()
     {
-        collider2D.enabled = true;
+        GetComponent<BoxCollider2D>().enabled = true;
         _lastTime = Time.fixedTime; // 出生時間
     }
 
 
     public void Update()
     {
-       if (!Global.isGameStart) gameObject.SetActive(false);
+        if (Global.isGameStart)
+        {
+            m_AnimState.UpdateAnimation();
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
 
@@ -38,14 +43,18 @@ public class Mice : MiceBase
     /// </summary>
     protected override void OnHit()
     {
+        //        Debug.Log("Hit1");
         if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
-//            Debug.Log("Hit");
-            Global.dictBattleMice.Remove(transform.parent);
-            collider2D.enabled = false;
-            _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            // Debug.Log("Hit2");
             OnInjured(1);
+            Global.dictBattleMice.Remove(transform.parent);
+            _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
+            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+        }
+        else
+        {
+            Debug.Log("enabled: " + enabled + "   Collider: " + GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
         }
     }
 
@@ -58,15 +67,23 @@ public class Mice : MiceBase
     {
         if (Global.isGameStart)
         {
-            this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
-            gameObject.SetActive(false);
-
             if (m_Arribute.GetHP() == 0)
-                battleManager.UpadateScore(name, _survivalTime);  // 增加分數
+                battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
             else
-                battleManager.LostScore(name, lifeTime);  // 增加分數
+                battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
             Global.dictBattleMice.Remove(transform.parent);
             Global.MiceCount--;
+
+            gameObject.SetActive(false);
+            this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
         }
+    }
+
+    public override void OnEffect(string name, object value)
+    {
+        if (name == "Scorched")
+            OnHit();
+        if (name == "Snow")
+            m_AnimState.SetMotion((bool)value);
     }
 }

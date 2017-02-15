@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static readonly string serverPath = "http://49.159.128.17:58767/MicePow";//Server路徑
+    public static readonly string serverPath = "http://180.218.164.232:58767/MicePow";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
@@ -53,6 +53,7 @@ public static class Global
     public static bool isPlayerItemLoaded = false;  // 是否載入玩家資料
     public static bool isCurrencyLoaded = false;    // 是否載入玩家資料
     public static bool isMiceLoaded = false;        // 是否載入老鼠資料
+    public static bool isLoadedSkill = false;       // 是否載入技能資料
     public static bool isStoreLoaded = false;        // 是否載入老鼠資料
     public static bool isItemLoaded = false;        // 是否載入老鼠資料
     public static bool isArmorLoaded = false;        // 是否載入老鼠資料
@@ -97,10 +98,12 @@ public static class Global
     public static int SumBattle = 0;          // 總場次
     public static int bundleVersion = 1;    // 資產版本
     public static int MeunObjetDepth = 10000; // 主選單物件深度
-    public static Dictionary<string, object> SortedItem = new Dictionary<string, object>();         // 全部老鼠 JSON資料;         // 漏掉的老鼠
-    public static Dictionary<string, object> MiceAll = new Dictionary<string, object>();         // 全部老鼠 JSON資料
-    public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
-    public static Dictionary<string, object> Friend = new Dictionary<string, object>();       // 好友列表 JSON資料
+    public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();         // 全部老鼠 JSON資料;         // 漏掉的老鼠
+    public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();         // 全部老鼠 JSON資料
+    public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
+    public static Dictionary<string, object> dictFriends = new Dictionary<string, object>();       // 好友列表 JSON資料
+    public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();       // 技能列表 JSON資料
+
     public static string ReturnMessage = "";       // 回傳訊息
 
     public static string ext = ".unity3d";       // AB副檔名
@@ -183,7 +186,7 @@ public static class Global
     public static void SwapDictKeyByValue(string vaule1, string value2, Dictionary<string, object> dict)
     {
         string myKey = "", otherKey = "";
-        object myValue = "", otherValue = "";
+        //object myValue = "", otherValue = "";
 
         myKey = dict.FirstOrDefault(x => x.Value.ToString() == vaule1).Key;
         otherKey = dict.FirstOrDefault(x => x.Value.ToString() == value2).Key;
@@ -219,4 +222,6 @@ public static class Global
         stopwatch.Stop();
         return stopwatch.Elapsed;
     }
+
+    
 }

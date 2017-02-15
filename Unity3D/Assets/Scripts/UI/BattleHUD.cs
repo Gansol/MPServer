@@ -7,10 +7,16 @@ public class BattleHUD : MonoBehaviour
 {
     float ckeckTime;
 
+    public UILabel myName;
+    public UILabel otherName;
+    public UISprite myImage;
+    public UISprite otherImage;
     public GameObject HPBar;
     public GameObject ComboLabel;
     public GameObject BlueScore;
     public GameObject RedScore;
+    public GameObject BlueEnergyBar;
+    public GameObject RedEnergyBar;
     public GameObject EnergyBar;
     public GameObject Combo;
     public GameObject MissionObject;
@@ -20,6 +26,7 @@ public class BattleHUD : MonoBehaviour
     public GameObject OtherPlusObject;
     public GameObject GGObject;
     public GameObject BossHPBar;
+    public GameObject[] StateICON;
 
     [Range(0.1f, 1.0f)]
     public float _beautyHP;                // 美化血條用
@@ -36,8 +43,13 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
+
         _beautyEnergy = 0d;
         //_energy = 0d;
+
+        myName.text = Global.Nickname;
+        otherName.text = Global.OtherData.Nickname;
+
     }
 
     void Update()
@@ -110,6 +122,10 @@ public class BattleHUD : MonoBehaviour
         BlueScore.GetComponent<UILabel>().text = battleManager.score.ToString();         // 畫出分數值
         RedScore.GetComponent<UILabel>().text = battleManager.otherScore.ToString();     // 畫出分數值
 
+        #region -- HUD Energy --
+        BlueEnergyBar.GetComponent<UISlider>().value = battleManager.Energy;
+        RedEnergyBar.GetComponent<UISlider>().value = battleManager.otherEnergy;
+        #endregion
 
         #region Score Bar動畫
         float value = battleManager.score / (battleManager.score + battleManager.otherScore);                      // 得分百分比 兩邊都是0會 NaN

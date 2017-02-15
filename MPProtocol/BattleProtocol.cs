@@ -97,14 +97,14 @@
 
     public enum Mission : byte
     {
-        None = 0,                 // 沒任務
+        None = 0,               // 沒任務
         Harvest = 1,            // 達成XX收穫
         Reduce = 2,             // 減少XX收穫
         DrivingMice = 3,        // 驅趕XX老鼠
-        HarvestRate = 4,          // 收穫倍率
-        BadMice = 5,              // 壞老鼠(不能打)
-        Exchange = 6,             // 交換收穫
-        WorldBoss = 7,            // 區域王
+        HarvestRate = 4,        // 收穫倍率
+        BadMice = 5,            // 壞老鼠(不能打)
+        Exchange = 6,           // 交換收穫
+        WorldBoss = 7,          // 區域王
     }
 
     public enum BattleOperationCode
@@ -112,14 +112,16 @@
         ExitRoom = 41,              // 戰鬥中途離開房間
         KickOther = 42,             // 踢人
         CheckStatus = 43,           // 檢查玩家遊戲狀態
-        SendSkill = 44,             // 玩者A發動技能 攻擊 玩者B
+        SendSkillMice = 44,         // 發動老鼠技能
+        SendSkillItem = 45,         // 發動道具技能
         UpdateScore = 52,           // 更新分數
         Mission = 53,               // 任務
-        MissionCompleted = 54,        // 任務完成
-        BossDamage = 57,              // BOSS傷害
+        MissionCompleted = 54,      // 任務完成
+        BossDamage = 57,            // BOSS傷害
         GameOver = 58,              // 遊戲結束
         UpdateScoreRate = 59,       // 更新分數倍率
-        SkillBoss = 60,               // 技能老鼠發動技能判斷
+        UpdateEnergyRate = 60,      // 更新分數倍率
+        SkillBoss = 61,             // 技能老鼠發動技能判斷
     }
 
     public enum BattleParameterCode
@@ -134,19 +136,20 @@
         Time = 7,                       // 時間
         MiceID = 8,                     // 老鼠ID
         MiceName = 9,                   // 老鼠名稱
-        EatingRate = 10,                 // 咀嚼頻率
-        Mission = 11,                    // 任務
-        MissionRate = 12,                // 任務倍率
-        MissionScore = 13,               // 任務目標
-        CustomValue = 14,                // 自訂參數1(整數)
-        CustomString = 15,                // 自訂參數2(字串)
-        MissionReward = 16,              // 任務獎勵
-        GoldReward = 17,                 // 金幣獎勵
-        SliverReward = 18,               // 銀幣獎勵(遊戲幣、糧食)
-        EXPReward = 19,                  // 經驗獎勵(遊戲幣、糧食)
-        BattleResult = 20,             // 戰鬥結果
+        EatingRate = 10,                // 咀嚼頻率
+        Mission = 11,                   // 任務
+        MissionRate = 12,               // 任務倍率
+        MissionScore = 13,              // 任務目標
+        CustomValue = 14,               // 自訂參數1(整數)
+        CustomString = 15,              // 自訂參數2(字串)
+        MissionReward = 16,             // 任務獎勵
+        GoldReward = 17,                // 金幣獎勵
+        SliverReward = 18,              // 銀幣獎勵(遊戲幣、糧食)
+        EXPReward = 19,                 // 經驗獎勵(遊戲幣、糧食)
+        BattleResult = 20,              // 戰鬥結果
         ScoreRate = 21,                 // 分數倍率
-        SkillType = 22,                  // 技能類型
+        SkillType = 22,                 // 技能類型
+        Energy = 23,                    // 能量
     }
 
     public enum BattleResponseCode
@@ -157,7 +160,8 @@
         Online = 46,                // 線上
         Offline = 47,               // 離線
         Damage = 48,                // 造成傷害
-        ApplySkill = 49,            // 接收 技能攻擊
+        ApplySkillMice = 49,        // 接收 老鼠技能攻擊
+        ApplySkillItem = 50,        // 接收 道具技能攻擊
         GetScore = 51,              // 取得另一位玩家分數
         UpdateScore = 52,           // 更新分數
         Mission = 53,               // 任務
@@ -167,6 +171,7 @@
         BossDamage = 57,            // BOSS傷害
         GameOver = 58,              // 遊戲結束
         UpdatedScoreRate = 59,      // 更新分數倍率
-        SkillBoss = 60,               // 技能老鼠發動技能判斷
+        UpdatedEnergyRate = 60,     // 更新能量倍率
+        SkillBoss = 61,             // 技能老鼠發動技能判斷
     }
 }

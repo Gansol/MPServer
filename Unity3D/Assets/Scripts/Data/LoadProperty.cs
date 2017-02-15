@@ -16,7 +16,7 @@ public class LoadProperty
         {
             var nestedData = mice.Value as Dictionary<string, object>;
             object value;
-            nestedData.TryGetValue("ItemID", out value);
+            nestedData.TryGetValue("MiceID", out value);
 
             if (item.name == value.ToString())
             {
@@ -45,7 +45,7 @@ public class LoadProperty
     #endregion
 
     #region LoadPrice
-    public void LoadPrice(GameObject item, GameObject parent ,int itemType)
+    public void LoadPrice(GameObject item, GameObject parent, int itemType)
     {
         int i = 0;
         foreach (KeyValuePair<string, object> mice in Global.storeItem)

@@ -53,11 +53,11 @@ public class PlayerManager : PanelManager
     public Vector3 actorScale;
 
     private int _itemType;
-    private float _delayBetween2Clicks, _lastClickTime;
+    private float _delayBetween2Clicks = 0f, _lastClickTime = 0f;
     private static bool _bFirstLoad;
-    private bool _LoadedIcon, _isLoadPlayerData;
-    private GameObject _tmpTab, _doubleClickChk;
-
+    private bool _LoadedIcon, _isLoadPlayerData, _bTabClick;
+    private GameObject _doubleClickChk, _tabClick;
+    static object xx;
     private ObjectFactory insObj;
     #endregion
 
@@ -70,7 +70,7 @@ public class PlayerManager : PanelManager
         insObj = new ObjectFactory();
 
         _bFirstLoad = true;
-        _dictItemData = Global.SortedItem;
+        _dictItemData = Global.dictSortedItem;
         _itemType = (int)StoreType.Item;
 
         Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
@@ -94,7 +94,7 @@ public class PlayerManager : PanelManager
         {
             _LoadedIcon = !_LoadedIcon;
             assetLoader.init();
-            _tmpTab = infoGroupArea[_itemType];
+            //_tmpTab = infoGroupArea[_itemType];
 
             InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
             InstantiateEquipIcon(Global.playerItem, infoGroupArea[0].transform, (int)StoreType.Item);
@@ -116,7 +116,7 @@ public class PlayerManager : PanelManager
     /// <param name="itemType">道具類別</param>
     private void InstantiateIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
-        itemData = GetItemInfoFromType(itemData, itemType);
+        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
 
         if (itemData.Count != 0)
         {
@@ -128,7 +128,7 @@ public class PlayerManager : PanelManager
                 string itemName = "", bundleName = "";
 
                 nestedData.TryGetValue("ItemID", out itemID);
-                itemName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
+                itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty,"ItemID" ,itemID.ToString()).ToString();
                 bundleName = itemName + "ICON";
 
                 if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
@@ -181,7 +181,7 @@ public class PlayerManager : PanelManager
             string itemName = "";
 
             nestedData.TryGetValue("ItemID", out itemID);
-            itemName = GetItemNameFromID(itemID.ToString(), Global.itemProperty);
+            itemName =ObjectFactory.GetColumnsDataFromID( Global.itemProperty,"ItemID",itemID.ToString()).ToString();
 
             if (!dictLoadedEquiped.ContainsKey(itemName))                                 // 如果道具不在裝備欄位 
             {
@@ -256,8 +256,16 @@ public class PlayerManager : PanelManager
     #region -- OnTabClick 當按下Tab時--
     public void OnTabClick(GameObject obj)
     {
-        int value = int.Parse(obj.name.Remove(0, 3));
+        _bTabClick = true;
+        _tabClick = obj;
+        Global.photonService.LoadPlayerItem(Global.Account);
+    }
 
+    private void OnTabClicked()
+    {
+
+        int value = int.Parse(_tabClick.name.Remove(0, 3));
+        Debug.Log(value);
         switch (value)
         {
             case 1:
@@ -280,49 +288,67 @@ public class PlayerManager : PanelManager
     #region -- OnLoadPanel 載入面板時--
     public override void OnLoading()
     {
+
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
+
     }
 
     protected override void OnLoadPanel()
     {
-        if (transform.parent.gameObject.activeSelf) // 如果Panel是啟動狀態 接收Event
+        Debug.Log("FUCK1");
+        if (!_bTabClick)
         {
-            Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
-            if (_bFirstLoad)                        // 取得未載入物件
+            if (transform.parent.gameObject.activeSelf) // 如果Panel是啟動狀態 接收Event
             {
-                dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
-                _bFirstLoad = false;
-            }
-            else
-            {
-                ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItem);
-                ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquiped);
-                _dictItemData = SelectNewData(Global.playerItem, _dictItemData);
+                Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+                if (_bFirstLoad)                        // 取得未載入物件
+                {
+                    dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
+                    _bFirstLoad = false;
+                }
+                else
+                {
+                    ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItem);
+                    ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquiped);
+                    _dictItemData = SelectNewData(Global.playerItem, _dictItemData);
 
-                dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
-            }
+                    dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
+                }
 
-            if (dictNotLoadedAsset.Count != 0) // 如果 有未載入物件 載入AB
-            {
-                assetLoader.init();
-                assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
-                assetLoader.LoadPrefab("Panel/", "InvItem");
-                _LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
-            }                                   // 已載入物件 實體化
-            else
-            {
-                InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
-                InstantiateEquipIcon(Global.playerItem, infoGroupArea[0].transform, (int)StoreType.Item);
-                InstantiateEquipIcon(Global.playerItem, infoGroupArea[1].transform, (int)StoreType.Armor);
-                InstantiateIcon(_dictItemData, PanelManager._lastEmptyItemGroup.transform, _itemType);
+                if (dictNotLoadedAsset.Count != 0) // 如果 有未載入物件 載入AB
+                {
+                    assetLoader.init();
+                    assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
+                    assetLoader.LoadPrefab("Panel/", "InvItem");
+                    _LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
+                }                                   // 已載入物件 實體化
+                else
+                {
+                    InstantiateItem(_dictItemData, "InvItem", _itemType, infoGroupArea[2].transform, itemOffset, tablePageCount, tableRowCount);
+                    InstantiateEquipIcon(Global.playerItem, infoGroupArea[0].transform, (int)StoreType.Item);
+                    InstantiateEquipIcon(Global.playerItem, infoGroupArea[1].transform, (int)StoreType.Armor);
+                    InstantiateIcon(_dictItemData, PanelManager._lastEmptyItemGroup.transform, _itemType);
 
-                infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
-                infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
+                    infoGroupArea[2].GetComponent<BoxCollider>().enabled = false;   // 開關防止Item按鈕失效
+                    infoGroupArea[2].GetComponent<BoxCollider>().enabled = true;
+                }
+                _dictItemData = Global.playerItem;
+
+
+            //_tmpTab = infoGroupArea[_itemType];
             }
-            _dictItemData = Global.playerItem;
-            _tmpTab = infoGroupArea[_itemType];
+        }
+        else
+        {
+            Debug.Log("FUCK2");
+            ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItem);
+            ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquiped);
+            _dictItemData = SelectNewData(Global.playerItem, _dictItemData);
+
+            OnTabClicked();
+            _bTabClick = false;
         }
     }
     #endregion

@@ -42,6 +42,20 @@ public static class AssetBundleManager
     private static int _progress = 0;
     private static int _loadedABCount = 0;
     private static int _loadedObjectCount = 0;
+//    private static char[] trimString = new char[] {
+//    // SpaceSeparator category
+//    '\u0020', '\u1680', '\u180E', '\u2000', '\u2001', '\u2002', '\u2003', 
+//    '\u2004', '\u2005', '\u2006', '\u2007', '\u2008', '\u2009', '\u200A', 
+//    '\u202F', '\u205F', '\u3000',
+//    // LineSeparator category
+//    '\u2028',
+//    // ParagraphSeparator category
+//    '\u2029',
+//    // Latin1 characters
+//    '\u0009', '\u000A', '\u000B', '\u000C', '\u000D', '\u0085', '\u00A0',
+//    // ZERO WIDTH SPACE (U+200B) & ZERO WIDTH NO-BREAK SPACE (U+FEFF)
+//    '\u200B', '\uFEFF'
+//};
 
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
 
@@ -72,6 +86,7 @@ public static class AssetBundleManager
 
     public static IEnumerator LoadAtlas(string folder, string assetName, System.Type type)
     {
+        assetName = assetName.Replace(" ", "");
         AssetBundleRef abRef;
         string assetPath = folder + assetName;
         bool chkAtlas, chkMat, chkPrefab;
@@ -152,9 +167,9 @@ public static class AssetBundleManager
     }
 
 
-    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 錯誤 要加一個 floder
+    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 載入遊戲物件
     {
-        //Debug.Log("( 1 ) :" + assetName);
+        assetName = assetName.Replace(" ","");
         AssetBundleRef abRef;
         string assetPath = folder + assetName;
         if (!bLoadedAssetbundle(assetName))
@@ -208,6 +223,7 @@ public static class AssetBundleManager
     /// <returns></returns>
     public static bool bLoadedAssetbundle(string assetName)
     {
+        assetName = assetName.Replace(" ", "");
         if (!string.IsNullOrEmpty(assetName))
         {
             AssetBundleRef abRef;
@@ -224,6 +240,7 @@ public static class AssetBundleManager
     /// <returns></returns>
     public static AssetBundle getAssetBundle(string assetName)
     {
+        assetName = assetName.Replace(" ", "");
         AssetBundleRef abRef;
         if (dictAssetBundleRefs.TryGetValue(assetName, out abRef))
             return abRef.assetBundle;
@@ -253,7 +270,7 @@ public static class AssetBundleManager
     public static void Unload(string assetName, System.Type type, bool unloadAllObject)  // 錯誤 assetName 應該是URL
     {
         string fileName = "";
-
+        assetName = assetName.Replace(" ", "");
         if (type == typeof(Texture)) fileName = assetName + "Atlas";
         else if (type == typeof(Material)) fileName = assetName + "Mat";
         else if (type == typeof(GameObject)) fileName = assetName + "Prefab";

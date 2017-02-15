@@ -1,32 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class BX
+public class BX : MonoBehaviour
 {
-    AX ax = null;
+    public delegate IEnumerator CoroutineMethod();
 
-    public void Test(AX aax)
+    IEnumerator RunCoroutine(CoroutineMethod coroutineMethod)
     {
-        ax = aax;
-        Debug.Log(ax);
-    }
-    public void Get()
-    {
-        Debug.Log(ax);
+        return coroutineMethod();
     }
 
-    void OnEnable()
+    public void StartCoroutineDelegate(CoroutineMethod coroutineMethod)
     {
-        Debug.Log(aa());
+        StartCoroutine("RunCoroutine", coroutineMethod);
     }
-
-    float aa()
-    {
-        return (float)1 / (float)2;
-    }
-    void Update()
-    {
-
-    }
-
 }
