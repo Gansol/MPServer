@@ -157,7 +157,7 @@ public class StoreManager : PanelManager
         _bLoadedActor = LoadActor(obj, infoGroupsArea[4].transform.GetChild(0).GetChild(0), actorScale);   // 錯誤 暫時道具沒有動畫物件
 
         infoGroupsArea[4].SetActive(true);
-        EventMaskSwitch.Switch(infoGroupsArea[4]);
+        EventMaskSwitch.Switch(infoGroupsArea[4],true);
     }
 
     public void OnBuyClick(GameObject myPanel)
@@ -166,7 +166,7 @@ public class StoreManager : PanelManager
         infoGroupsArea[5].SetActive(true);
         BuyWindowsInit();
         LoadBuyCountInfo(_lastItem, infoGroupsArea[5].transform);
-        EventMaskSwitch.Switch(infoGroupsArea[5]);
+        EventMaskSwitch.Switch(infoGroupsArea[5], true);
     }
 
     private void BuyWindowsInit()
@@ -216,13 +216,13 @@ public class StoreManager : PanelManager
         _tmpTab = infoGroupsArea[2];
 
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
-        EventMaskSwitch.Switch(root);
+       // EventMaskSwitch.Prev();
     }
 
     public void OnReturn(GameObject obj)
     {
         EventMaskSwitch.openedPanel.SetActive(false);
-        EventMaskSwitch.Switch(obj);
+        EventMaskSwitch.Switch(obj, true);
     }
 
     public void OnTabClick(GameObject obj)

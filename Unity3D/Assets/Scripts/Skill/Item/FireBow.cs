@@ -48,8 +48,9 @@ public class FireBow : SkillItem
         AssetLoader assetLoader = playerAIState.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
         ObjectFactory objFactory = new ObjectFactory();
-
-        effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
+        
+       // effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
+        effects.Add(objFactory.Instantiate(bundle, GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>().hole[0].transform.parent.transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Effect1");
 
         startTime = Time.time;

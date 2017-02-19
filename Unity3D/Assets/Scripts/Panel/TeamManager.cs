@@ -213,6 +213,13 @@ public class TeamManager : PanelManager
     } 
     #endregion
 
+    public void OnClosed(GameObject obj)
+    {
+        EventMaskSwitch.lastPanel = null;
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        // EventMaskSwitch.Prev();
+    }
+
     #region -- ActiveMice 隱藏/顯示老鼠 --
     private void ActiveMice(Dictionary<string, object> dictTeamData) // 把按鈕變成無法使用 如果老鼠已Team中
     {

@@ -368,10 +368,11 @@ public class PlayerManager : PanelManager
     }
     #endregion
 
-    public void OnClosed()
+    public void OnClosed(GameObject obj)
     {
-        // to do click out close
-        Debug.Log("Close");
+        EventMaskSwitch.lastPanel = null;
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        // EventMaskSwitch.Prev();
     }
 
     void ExpBar()

@@ -5,7 +5,7 @@ using MPProtocol;
 public class EggMiceBoss : MiceBossBase
 {
     private BattleHUD battleHUD = null;
-
+    UICamera cam;
     private bool bDisplaySkill;
     private int myHits, otherHits;              // 打擊紀錄
     //private float _lastTime, _survivalTime;     // 上次,存活時間
@@ -31,7 +31,7 @@ public class EggMiceBoss : MiceBossBase
         m_Arribute = null;
         m_Skill = null;
         bDisplaySkill = false;
-
+        cam = Camera.main.GetComponent<UICamera>();
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
     }
@@ -63,7 +63,7 @@ public class EggMiceBoss : MiceBossBase
     /// </summary>
     protected override void OnHit()
     {
-        if (Global.isGameStart && enabled && m_Arribute.GetHP() != 0)
+        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() != 0)
         {
             //            Debug.Log("Hit");
             if (m_Arribute.GetHP() - 1 == 0)

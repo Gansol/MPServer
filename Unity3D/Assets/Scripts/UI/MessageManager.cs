@@ -20,11 +20,12 @@ public class MessageManager : MonoBehaviour
         messagePanel.SetActive(true);
         messageBox.GetComponentInChildren<UILabel>().text = "Complete !";
 
-        EventMaskSwitch.Switch(messagePanel);
+        EventMaskSwitch.Switch(messagePanel,true);
     }
 
     public void  OnClosed(){
         EventMaskSwitch.openedPanel.SetActive(false);
-        EventMaskSwitch.Switch(EventMaskSwitch.lastPanel);
+        //EventMaskSwitch.Switch(EventMaskSwitch.lastPanel);
+        EventMaskSwitch.Prev();
     }
 }

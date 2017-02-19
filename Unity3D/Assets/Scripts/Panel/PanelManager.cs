@@ -30,7 +30,7 @@ public class PanelManager : MPPanel
     private string _panelName;                                      // panel名稱
     private bool _loadedPanel;                                      // 載入的Panel
     private int _panelNo;                                           // Panel編號
-    
+
     ObjectFactory insObj;
 
     public class PanelState                                         // 存放Pnael物件 狀態
@@ -76,7 +76,6 @@ public class PanelManager : MPPanel
         panelState.obj = panelState.obj.transform.parent.gameObject;
         panelState.obj.layer = Panel[_panelNo].layer;
         dictPanelRefs.Add(_panelName, panelState);
-        EventMaskSwitch.Switch(panelState.obj);
     }
     #endregion
 
@@ -99,7 +98,7 @@ public class PanelManager : MPPanel
         _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
 
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
-        { 
+        {
             assetLoader.init();
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadPrefab("Panel/", _panelName);
@@ -211,17 +210,18 @@ public class PanelManager : MPPanel
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
-                if(_lastPanel!=null) _lastPanel.SetActive(false);
+                if (_lastPanel != null) _lastPanel.SetActive(false);
                 panelState.obj.SetActive(true);
                 panelState.obj.transform.GetChild(0).SendMessage("OnLoading");
                 panelState.onOff = !panelState.onOff;
                 _lastPanel = panelState.obj;
 
-                EventMaskSwitch.Switch(panelState.obj);
+                EventMaskSwitch.Switch(panelState.obj, false);
                 EventMaskSwitch.lastPanel = panelState.obj;
             }                                                   // 如果Panel已開啟
             else
             {
+                EventMaskSwitch.Resume();
                 panelState.obj.SetActive(false);
                 panelState.onOff = !panelState.onOff;
                 Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
@@ -250,7 +250,7 @@ public class PanelManager : MPPanel
     /// <param name="dicLoadedObject">已載入物件</param>
     public void ExpectOutdataObject(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData, Dictionary<string, GameObject> dicLoadedObject)
     {
-       // var delObject = new Dictionary<string, object>();
+        // var delObject = new Dictionary<string, object>();
 
         if (dicClinetData.Count != 0)
         {

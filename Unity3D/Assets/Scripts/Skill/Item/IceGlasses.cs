@@ -3,6 +3,10 @@ using System.Collections;
 
 public class IceGlasses : SkillItem
 {
+    TapBorad tap;
+    private int attr, clickTimes;
+    private float animTime;
+
     public IceGlasses(SkillAttr attr)
         : base(attr)
     {
@@ -15,13 +19,15 @@ public class IceGlasses : SkillItem
 
     public override void UpdateEffect()
     {
+        clickTimes = tap.GetTimes();
+        animTime = tap.gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime;
         if (Time.time - startTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - startTime > skillData.SkillTime || clickTimes == attr && animTime > .6f)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -30,6 +36,7 @@ public class IceGlasses : SkillItem
 
     public override void Release()
     {
+        EventMaskSwitch.Resume();
         foreach (GameObject go in effects)
             GameObject.Destroy(go);
 
@@ -49,10 +56,12 @@ public class IceGlasses : SkillItem
         ObjectFactory objFactory = new ObjectFactory();
 
         bundle = objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1);
-        bundle.AddComponent<TapBorad>().SetTimes(skillData.Attr + skillData.AttrDice);
+        attr = skillData.Attr + Random.Range(0, skillData.AttrDice);
+        bundle.AddComponent<TapBorad>().SetTimes(attr);
+        tap = bundle.GetComponent<TapBorad>();
         effects.Add(bundle);
         effects[0].GetComponent<Animator>().Play("Effect1");
-
+        EventMaskSwitch.Switch(bundle, false);
         startTime = Time.time;
     }
 }

@@ -5,11 +5,12 @@ public class Mice : MiceBase
 {
     private BattleManager battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
+    UICamera cam;
 
     public override void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
-
+        cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
@@ -43,8 +44,7 @@ public class Mice : MiceBase
     /// </summary>
     protected override void OnHit()
     {
-        //        Debug.Log("Hit1");
-        if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
         {
             // Debug.Log("Hit2");
             OnInjured(1);

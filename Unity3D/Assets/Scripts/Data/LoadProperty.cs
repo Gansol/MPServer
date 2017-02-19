@@ -23,7 +23,8 @@ public class LoadProperty
                 int i = 0;
                 foreach (KeyValuePair<string, object> property in nestedData)
                 {
-                    if (i != 0) parent.transform.GetChild(i).GetComponent<UILabel>().text = property.Value.ToString();
+                    if (property.Key != "MiceID" || property.Key != "ItemID" && i != 0)
+                        parent.transform.GetChild(i).GetComponent<UILabel>().text = property.Value.ToString();
                     i++;
                 }
             }

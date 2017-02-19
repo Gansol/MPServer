@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class Snow : SkillItem {
 
+    private bool animFlag;
+
     public Snow(SkillAttr attr)
         : base(attr)
     {
@@ -17,13 +19,13 @@ public class Snow : SkillItem {
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - startTime > skillData.SkillTime - 1 && !animFlag)
         {
-            // battleHUD shing
-            // playerAIState.ShingICON();
+            effects[0].GetComponent<Animator>().Play("Effect1");
+            animFlag = true;
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - startTime > skillData.SkillTime )
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -55,7 +57,7 @@ public class Snow : SkillItem {
         ObjectFactory objFactory = new ObjectFactory();
 
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
-        //  effects[0].GetComponent<Animator>().Play("Freeze");
+        effects[0].GetComponent<Animator>().Play("Effect1");
 
         // stop motion
         foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMice)

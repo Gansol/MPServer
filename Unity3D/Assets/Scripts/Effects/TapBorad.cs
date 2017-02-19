@@ -6,8 +6,15 @@ public class TapBorad : MonoBehaviour
 
     private int clickTime, maxTimes;
 
-    void OnClick()
+    void Start()
     {
+
+    }
+
+    public void OnClick()
+    {
+        clickTime++;
+        Debug.Log("Click :" + clickTime + "  MaxTimes:"+ maxTimes);
         if (clickTime >= maxTimes / 2 && clickTime != 0)
             Play("Effect2");
 
@@ -18,6 +25,11 @@ public class TapBorad : MonoBehaviour
     public void SetTimes(int value)
     {
         maxTimes = value;
+    }
+
+    public int GetTimes()
+    {
+        return clickTime;
     }
 
     private void Play(string animHash)
