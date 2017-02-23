@@ -73,12 +73,15 @@ public class PlayerAIState
         // 如果已有舊的狀態 移除 後 覆蓋
         if ((this.State & (short)state) > 0)
         {
-            skill.Release();
+            SkillBase oldSkill;
+            _dictSkills.TryGetValue(state, out oldSkill);   // 找出重複且已存在技能 (舊的技能)
+            oldSkill.Release();
             Release(state);
         }
 
         this.State ^= (short)state;
-        _dictSkills.Add(state, skill);
+        if (!_dictSkills.ContainsKey(state))
+            _dictSkills.Add(state, skill);
     }
 
 

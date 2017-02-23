@@ -111,7 +111,7 @@ public class TeamManager : PanelManager
         _btnClick = btn_mice;
         
         LoadProperty loadProerty = new LoadProperty();
-        loadProerty.LoadMiceProperty(btn_mice.transform.GetChild(0).gameObject, infoGroupsArea[1], 0);
+        loadProerty.LoadItemProperty(btn_mice.transform.GetChild(0).gameObject, infoGroupsArea[1], Global.miceProperty, (int)MPProtocol.StoreType.Mice);
 
         //Debug.Log(btn_mice.transform.GetChild(0).name);
         //Debug.Log("Simple click");

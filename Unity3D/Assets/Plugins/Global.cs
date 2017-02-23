@@ -98,11 +98,20 @@ public static class Global
     public static int SumBattle = 0;          // 總場次
     public static int bundleVersion = 1;    // 資產版本
     public static int MeunObjetDepth = 10000; // 主選單物件深度
-    public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();         // 全部老鼠 JSON資料;         // 漏掉的老鼠
-    public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();         // 全部老鼠 JSON資料
-    public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
-    public static Dictionary<string, object> dictFriends = new Dictionary<string, object>();       // 好友列表 JSON資料
-    public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();       // 技能列表 JSON資料
+
+    public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
+    public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料
+    public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();                       // 隊伍老鼠 JSON資料
+    public static Dictionary<string, object> dictFriends = new Dictionary<string, object>();                    // 好友列表 JSON資料
+    public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();                     // 技能列表 JSON資料
+    public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();                   // 老鼠屬性資料 
+    public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();                   // 道具屬性資料 
+    public static Dictionary<string, object> storeItem = new Dictionary<string, object>();                      // 商店屬性資料 
+    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 商店屬性資料 
+    public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBossMice = new Dictionary<Transform, GameObject>();
 
     public static string ReturnMessage = "";       // 回傳訊息
 
@@ -119,16 +128,7 @@ public static class Global
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
-    public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();   // 老鼠屬性資料 
-    public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();   // 道具屬性資料 
-    public static Dictionary<string, object> storeItem = new Dictionary<string, object>();   // 商店屬性資料 
-    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();   // 商店屬性資料 
 
-    public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
-
-    public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
-    public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
-    public static Dictionary<Transform, GameObject> dictBossMice = new Dictionary<Transform, GameObject>();
 
     /*
     public class MiceProperty

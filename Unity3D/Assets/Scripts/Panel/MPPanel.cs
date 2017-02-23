@@ -67,7 +67,7 @@ public abstract class MPPanel : MonoBehaviour
         if (bundle != null)                  // 已載入資產時
         {
             if (!GetLoadedActor(bundle.name))
-                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale,500); // 老鼠Depth是手動輸入的!! 錯誤
+                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale, 500); // 老鼠Depth是手動輸入的!! 錯誤
             SetLoadedActor(_clone);
             return false;
         }
@@ -158,11 +158,11 @@ public abstract class MPPanel : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
         {
-            string imageName =ObjectFactory.GetColumnsDataFromID( itemNameData,"ItemID",item.Key.ToString()).ToString();
+            string imageName = ObjectFactory.GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString();
 
-            if (!string.IsNullOrEmpty(imageName) && assetLoader.GetAsset(imageName) == null)
+            if (!string.IsNullOrEmpty(imageName) && imageName != "-1" && assetLoader.GetAsset(imageName) == null)
             {
-                dictNotLoadedAsset.Add(imageName, imageName);
+                dictNotLoadedAsset.Add(item.Key.ToString(), imageName);
             }
         }
         return dictNotLoadedAsset;

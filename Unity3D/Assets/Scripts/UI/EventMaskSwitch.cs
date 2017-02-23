@@ -9,6 +9,7 @@ public static class EventMaskSwitch
     private static GameObject _openedPanel;
     private static List<LayerMask> defalutLayerMask = new List<LayerMask>();
     private static List<LayerMask> prevLayerMask = new List<LayerMask>();
+    private static int _level;
     #region -- EventMaskSwtich --
     // 位元移位運算子<< >> 2近位 左移、右移  0 << 1(左移1)  --->  00 = 0
     // 1 << 1(左移1)  -->  001 = 1
@@ -20,13 +21,17 @@ public static class EventMaskSwitch
     /// </summary>
     /// <param name="obj">指定物件圖層</param>
     /// /// <param name="nextPanel">是否開啟下一個階層</param>
-    public static void Switch(GameObject obj,bool nextPanel)
+    public static void Switch(GameObject obj, bool nextPanel)
     {
+        if (!nextPanel) defalutLayerMask.Clear();
         foreach (Camera c in Camera.allCameras)
         {
-            if (!nextPanel)
+            if (!nextPanel) 
                 defalutLayerMask.Add(c.GetComponent<UICamera>().eventReceiverMask);
-            prevLayerMask.Add(c.GetComponent<UICamera>().eventReceiverMask);
+
+            if (nextPanel) 
+                prevLayerMask.Add(c.GetComponent<UICamera>().eventReceiverMask);
+
             c.GetComponent<UICamera>().eventReceiverMask = 1 << obj.layer;
         }
         _openedPanel = obj;
@@ -34,18 +39,41 @@ public static class EventMaskSwitch
     #endregion
 
     /// <summary>
-    /// 回復上一動事件遮罩
+    /// 回復N動事件遮罩
     /// </summary>
-    public static void Prev()
+    public static void Prev(int level)
     {
-        int i = prevLayerMask.Count - Camera.allCamerasCount;
-        foreach (Camera c in Camera.allCameras)
+        while (level > 0 && prevLayerMask.Count != 0)
         {
-            LayerMask mask = c.GetComponent<UICamera>().eventReceiverMask;
-            c.GetComponent<UICamera>().eventReceiverMask = prevLayerMask[i];
-            prevLayerMask.Remove(prevLayerMask[i]);
+            int i = prevLayerMask.Count - Camera.allCamerasCount;
+            foreach (Camera c in Camera.allCameras)
+            {
+                c.GetComponent<UICamera>().eventReceiverMask = prevLayerMask[i];
+                prevLayerMask.Remove(prevLayerMask[i]);
+            }
+            _level--;
+            Prev(_level);
         }
     }
+
+    /// <summary>
+    /// 回復N動事件遮罩
+    /// </summary>
+    public static void PrevToFirst()
+    {
+        int i = 0;
+
+        if (prevLayerMask.Count != 0)
+        { 
+            foreach (Camera c in Camera.allCameras)
+            {
+                c.GetComponent<UICamera>().eventReceiverMask = prevLayerMask[i];
+                i++;
+            }
+            prevLayerMask.Clear();
+        }
+    }
+
     /// <summary>
     /// 回復初始事件遮罩
     /// </summary>
@@ -58,7 +86,6 @@ public static class EventMaskSwitch
             c.GetComponent<UICamera>().eventReceiverMask = defalutLayerMask[i];
             i++;
         }
-        defalutLayerMask.Clear();
     }
     private static GameObject GetPanel()
     {

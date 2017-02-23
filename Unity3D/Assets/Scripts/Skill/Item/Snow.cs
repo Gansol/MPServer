@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Snow : SkillItem {
+public class Snow : SkillItem
+{
 
     private bool animFlag;
 
@@ -25,7 +26,7 @@ public class Snow : SkillItem {
             animFlag = true;
         }
 
-        if (Time.time - startTime > skillData.SkillTime )
+        if (Time.time - startTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -62,7 +63,8 @@ public class Snow : SkillItem {
         // stop motion
         foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMice)
         {
-            item.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, false);
+            if (item.Value != null)
+                item.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, false);
         }
 
         startTime = Time.time;

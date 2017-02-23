@@ -35,7 +35,7 @@ public class PlayerManager : PanelManager
     /// </summary>
     public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
-
+    private Dictionary<string, object> _dictItemDataByType;
     public GameObject[] infoGroupArea;      // 道具存放區
     public string[] assetFolder;            // 資料夾
     public Vector2 itemOffset;
@@ -64,6 +64,7 @@ public class PlayerManager : PanelManager
     #region -- Init --
     private void Awake()
     {
+        _dictItemDataByType = new Dictionary<string,object> ();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         dictLoadedItem = new Dictionary<string, GameObject>();
         dictLoadedEquiped = new Dictionary<string, GameObject>();
@@ -128,7 +129,7 @@ public class PlayerManager : PanelManager
                 string itemName = "", bundleName = "";
 
                 nestedData.TryGetValue("ItemID", out itemID);
-                itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty,"ItemID" ,itemID.ToString()).ToString();
+                itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
                 bundleName = itemName + "ICON";
 
                 if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
@@ -181,7 +182,7 @@ public class PlayerManager : PanelManager
             string itemName = "";
 
             nestedData.TryGetValue("ItemID", out itemID);
-            itemName =ObjectFactory.GetColumnsDataFromID( Global.itemProperty,"ItemID",itemID.ToString()).ToString();
+            itemName =ObjectFactory.GetColumnsDataFromID( Global.itemProperty,"ItemName",itemID.ToString()).ToString();
 
             if (!dictLoadedEquiped.ContainsKey(itemName))                                 // 如果道具不在裝備欄位 
             {
@@ -305,6 +306,7 @@ public class PlayerManager : PanelManager
                 Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
                 if (_bFirstLoad)                        // 取得未載入物件
                 {
+                    
                     dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
                     _bFirstLoad = false;
                 }
@@ -379,5 +381,19 @@ public class PlayerManager : PanelManager
     {
         // to show exp bar
     }
+
+    //private void SelectItemData(int _itemType)
+    //{
+    //    switch (_itemType)
+    //    {
+    //        case (int)StoreType.Mice:
+    //            _dictItemDataByType = Global.storeItem;
+    //            break;
+    //        case (int)StoreType.Item:
+    //        case (int)StoreType.Armor:
+    //            _dictItemDataByType = Global.storeItem;
+    //            break;
+    //    }
+    //}
 
 }

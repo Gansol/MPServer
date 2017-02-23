@@ -60,8 +60,12 @@ public class Lighting : SkillItem
         // insantiate effect and play
         for (int i = 0; i < count; i++)
         {
-            effects.Add(objFactory.Instantiate(bundle, rndHole[i], skillData.SkillName+"Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
-            effects[i].GetComponent<Animator>().Play("Effect1");
+            // 如果在動上的老鼠已經消失 則不顯示技能
+            if (rndHole[i] != null)
+            {
+                effects.Add(objFactory.Instantiate(bundle, rndHole[i], skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
+                effects[i].GetComponent<Animator>().Play("Effect1");
+            }
         }
         startTime = Time.time;
     }

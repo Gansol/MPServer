@@ -25,7 +25,7 @@ public class MessageManager : MonoBehaviour
 
     public void  OnClosed(){
         EventMaskSwitch.openedPanel.SetActive(false);
-        //EventMaskSwitch.Switch(EventMaskSwitch.lastPanel);
-        EventMaskSwitch.Prev();
+        EventMaskSwitch.PrevToFirst();
+        //EventMaskSwitch.Prev();
     }
 }

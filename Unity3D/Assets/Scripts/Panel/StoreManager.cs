@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
@@ -33,7 +34,7 @@ public class StoreManager : PanelManager
     /// <summary>
     /// 物件矩 每行物件數量
     /// </summary>
-    public int tableRowCount;  
+    public int tableRowCount;
     /// <summary>
     /// 角色縮放
     /// </summary>     
@@ -50,12 +51,15 @@ public class StoreManager : PanelManager
     private Dictionary<string, object> _itemData;               // 道具資料
 
     private ObjectFactory insObj;
+
+    private Dictionary<string, GameObject> dictItemRefs;
     #endregion
 
     private void Awake()
     {
         insObj = new ObjectFactory();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
+        dictItemRefs = new Dictionary<string, GameObject>();
 
         _itemType = -1;
         tablePageCount = 9;
@@ -86,15 +90,19 @@ public class StoreManager : PanelManager
             _bLoadedIcon = !_bLoadedIcon;
             assetLoader.init();
             //itemData = Global.storeItem;
-            InstantiateItem(_itemData, "Item", _itemType, infoGroupsArea[3].transform, itemOffset, tablePageCount, tableRowCount);
+
+            Dictionary<string, GameObject> tmpDict;
+            tmpDict = InstantiateItem(_itemData, "Item", _itemType, infoGroupsArea[3].transform, itemOffset, tablePageCount, tableRowCount);
+
+            if (tmpDict != null) dictItemRefs = dictItemRefs.Concat(tmpDict).GroupBy(d => d.Key).ToDictionary(d => d.Key, d => d.First().Value);
             Transform parent = infoGroupsArea[3].transform.FindChild(_itemType.ToString());
 
             SelectItemProperty(_itemType);
-            LoadItemData(_itemData, parent, _itemType);                 // 載入道具資訊資料
+            //LoadItemData(_itemData, parent, _itemType);                 // 載入道具資訊資料
 
             SelectStoreItemData(_itemType);                                  // 選擇商店資料
             InstantiateItemIcon(_itemData, parent);
-            LoadPrice(_itemData, parent, _itemType);
+            LoadPrice(_itemData, _itemType);
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)                     // 載入角色完成後 實體化 角色
@@ -143,21 +151,39 @@ public class StoreManager : PanelManager
 
     public void OnItemClick(GameObject obj)
     {
-        int itemType = int.Parse(obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemType]);
+        // object itemType;
+
+
+        // Dictionary<string, object> itemData = Global.storeItem[obj.name] as Dictionary<string, object>;
+
+        //itemData.TryGetValue("ItemType", out itemType);
         _lastItem = obj;
 
-        buyingGoodsData[0] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemID];
-        buyingGoodsData[1] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemName];
-        buyingGoodsData[2] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemType];
+
+
+        SelectItemProperty(_itemType);
+
+
+
+
+
+
+
+
+        //buyingGoodsData[0] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemID];
+        //buyingGoodsData[1] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemName];
+        //buyingGoodsData[2] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemType];
 
         LoadProperty loadProperty = new LoadProperty();
-        loadProperty.LoadMiceProperty(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, 0);
-        loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, itemType);
+        loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, _itemData, _itemType);
+        loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, _itemType);
 
         _bLoadedActor = LoadActor(obj, infoGroupsArea[4].transform.GetChild(0).GetChild(0), actorScale);   // 錯誤 暫時道具沒有動畫物件
 
         infoGroupsArea[4].SetActive(true);
-        EventMaskSwitch.Switch(infoGroupsArea[4],true);
+        infoGroupsArea[4].transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+        infoGroupsArea[4].layer = LayerMask.NameToLayer("ItemInfo");
+        EventMaskSwitch.Switch(infoGroupsArea[4], true);
     }
 
     public void OnBuyClick(GameObject myPanel)
@@ -166,18 +192,29 @@ public class StoreManager : PanelManager
         infoGroupsArea[5].SetActive(true);
         BuyWindowsInit();
         LoadBuyCountInfo(_lastItem, infoGroupsArea[5].transform);
+        infoGroupsArea[5].layer = LayerMask.NameToLayer("ItemInfo");
         EventMaskSwitch.Switch(infoGroupsArea[5], true);
     }
 
     private void BuyWindowsInit()
     {
-        buyingGoodsData[0] = _lastItem.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemID];
-        buyingGoodsData[1] = _lastItem.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemName];
-        buyingGoodsData[2] = _lastItem.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemType];
-        buyingGoodsData[3] = _lastItem.GetComponent<Item>().storeInfo[(int)StoreProperty.CurrencyType];
+        Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItem.name] as Dictionary<string, object>;
+        object value;
+        //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
+
+        dictItemProperty.TryGetValue("ItemID", out value);
+        buyingGoodsData[0] = value.ToString();
+        dictItemProperty.TryGetValue("ItemName", out value);
+        buyingGoodsData[1] = value.ToString();
+        dictItemProperty.TryGetValue("ItemType", out value);
+        buyingGoodsData[2] = value.ToString();
+        dictItemProperty.TryGetValue("CurrencyType", out value);
+        buyingGoodsData[3] = value.ToString();
         buyingGoodsData[4] = "1";
-        infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = "1";  // count = 1
-        infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = _lastItem.GetComponent<Item>().storeInfo[(int)StoreProperty.Price]; // price
+        infoGroupsArea[5].transform.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
+        dictItemProperty.TryGetValue("Price", out value);
+        infoGroupsArea[5].transform.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = value.ToString(); // price
+        infoGroupsArea[5].transform.GetChild(0).FindChild("Price").GetComponent<UILabel>().text = value.ToString(); // price
     }
 
     /// <summary>
@@ -186,14 +223,14 @@ public class StoreManager : PanelManager
     /// <param name="obj"></param>
     public void OnQuantity(GameObject obj)
     {
-        int price = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(2).GetComponent<UILabel>().text);
-        //int sum = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text);
-        int count = int.Parse(infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text);
+        int price = int.Parse(infoGroupsArea[5].transform.GetChild(0).FindChild("Price").GetComponent<UILabel>().text);
+        int sum = int.Parse(infoGroupsArea[5].transform.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text);
+        int count = int.Parse(infoGroupsArea[5].transform.GetChild(0).FindChild("Count").GetComponent<UILabel>().text);
 
         count += (obj.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
-        buyingGoodsData[4] = infoGroupsArea[5].transform.GetChild(0).GetChild(4).GetComponent<UILabel>().text = count.ToString();
-        infoGroupsArea[5].transform.GetChild(0).GetChild(3).GetComponent<UILabel>().text = (price * count).ToString();
+        buyingGoodsData[4] = infoGroupsArea[5].transform.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = count.ToString();
+        infoGroupsArea[5].transform.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = (price * count).ToString();
     }
 
     /// <summary>
@@ -216,13 +253,15 @@ public class StoreManager : PanelManager
         _tmpTab = infoGroupsArea[2];
 
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
-       // EventMaskSwitch.Prev();
+        EventMaskSwitch.Resume();
     }
 
     public void OnReturn(GameObject obj)
     {
+        int level = int.Parse(obj.name);
         EventMaskSwitch.openedPanel.SetActive(false);
-        EventMaskSwitch.Switch(obj, true);
+        EventMaskSwitch.Prev(level);
+
     }
 
     public void OnTabClick(GameObject obj)
@@ -259,7 +298,7 @@ public class StoreManager : PanelManager
         if (_itemType != (int)StoreType.Gashapon)
         {
             SelectStoreItemData(_itemType);
-            _itemData =ObjectFactory. GetItemInfoFromType(_itemData, _itemType);
+            _itemData = ObjectFactory.GetItemInfoFromType(_itemData, _itemType);
             if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
             assetLoader.init();
             assetLoader.LoadAsset(_folderString + "/", _folderString);
@@ -283,12 +322,25 @@ public class StoreManager : PanelManager
     #endregion
 
     #region -- LoadPrice 載入物件價格 --
-    private void LoadPrice(Dictionary<string, object> itemData, Transform parent, int itemType)
+    /// <summary>
+    /// 載入物件價格
+    /// </summary>
+    /// <param name="itemData">道具資料</param>
+    /// <param name="itemType">道具類別</param>
+    private void LoadPrice(Dictionary<string, object> itemData, int itemType)
     {
+        Dictionary<string, object> diceItemProperty;
+        object price;
+
+        // 取得分類好的道具資料
         itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
-        for (int i = 0; i < itemData.Count; i++)
+
+        // 載入資料
+        foreach (KeyValuePair<string, object> item in itemData)
         {
-            parent.GetChild(i).GetComponentInChildren<UILabel>().text = parent.GetChild(i).GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
+            diceItemProperty = Global.storeItem[item.Key] as Dictionary<string, object>;
+            diceItemProperty.TryGetValue("Price", out price);
+            dictItemRefs[item.Key].transform.FindChild("Price").GetComponent<UILabel>().text = price.ToString();
         }
     }
     #endregion
@@ -296,8 +348,8 @@ public class StoreManager : PanelManager
     #region -- LoadBuyCountInfo 載入物件價格 --
     private void LoadBuyCountInfo(GameObject item, Transform parent)
     {
-        parent.GetChild(0).GetChild(1).GetComponent<UILabel>().text = item.GetComponent<Item>().itemProperty[(int)StoreProperty.ItemName];
-        parent.GetChild(0).GetChild(2).GetComponent<UILabel>().text = item.GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
+        //parent.GetChild(0).GetChild(1).GetComponent<UILabel>().text = item.GetComponent<Item>().itemProperty[(int)StoreProperty.ItemName];
+        //parent.GetChild(0).GetChild(2).GetComponent<UILabel>().text = item.GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
     }
     #endregion
 
@@ -347,41 +399,41 @@ public class StoreManager : PanelManager
     }
     #endregion
 
-    #region -- LoadItemData 載入道具資訊 --
-    private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
-    {
-        int i = 0, j = 0;
-        itemData = ObjectFactory.GetItemInfoFromID(itemData, "ItemID", _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            j = 0;
-            parent.GetChild(i).GetComponent<Item>().itemProperty = new string[nestedData.Count];
-            foreach (KeyValuePair<string, object> nested in nestedData)
-            {
-                parent.GetChild(i).GetComponent<Item>().itemProperty[j] = nested.Value.ToString();
-                j++;
-            }
-            i++;
-        }
+    //#region -- LoadItemData 載入道具資訊 --
+    //private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
+    //{
+    //    int i = 0, j = 0;
+    //    itemData = ObjectFactory.GetItemInfoFromID(itemData, "ItemID", _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
+    //    foreach (KeyValuePair<string, object> item in itemData)
+    //    {
+    //        var nestedData = item.Value as Dictionary<string, object>;
+    //        j = 0;
+    //        parent.GetChild(i).GetComponent<Item>().itemProperty = new string[nestedData.Count];
+    //        foreach (KeyValuePair<string, object> nested in nestedData)
+    //        {
+    //            parent.GetChild(i).GetComponent<Item>().itemProperty[j] = nested.Value.ToString();
+    //            j++;
+    //        }
+    //        i++;
+    //    }
 
-        itemData = ObjectFactory.GetItemInfoFromType(Global.storeItem, _itemType);
-        i = j = 0;
+    //    itemData = ObjectFactory.GetItemInfoFromType(Global.storeItem, _itemType);
+    //    i = j = 0;
 
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            j = 0;
-            parent.GetChild(i).GetComponent<Item>().storeInfo = new string[nestedData.Count];
-            foreach (KeyValuePair<string, object> nested in nestedData)
-            {
-                parent.GetChild(i).GetComponent<Item>().storeInfo[j] = nested.Value.ToString();
-                j++;
-            }
-            i++;
-        }
-    }
-    #endregion
+    //    foreach (KeyValuePair<string, object> item in itemData)
+    //    {
+    //        var nestedData = item.Value as Dictionary<string, object>;
+    //        j = 0;
+    //        parent.GetChild(i).GetComponent<Item>().storeInfo = new string[nestedData.Count];
+    //        foreach (KeyValuePair<string, object> nested in nestedData)
+    //        {
+    //            parent.GetChild(i).GetComponent<Item>().storeInfo[j] = nested.Value.ToString();
+    //            j++;
+    //        }
+    //        i++;
+    //    }
+    //}
+    //#endregion
 
     #region -- InstantiateItemIcon 實體化道具圖片--
     /// <summary>

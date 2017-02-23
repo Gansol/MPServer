@@ -26,29 +26,36 @@ public class DepthManager : MonoBehaviour
     /// <returns></returns>
     public static int SwitchDepthLayer(GameObject go, Transform parent, int depth)  //使用遞迴改變老鼠圖片深度  ※※注意遞迴※※
     {
-        if (go.GetComponent<UISprite>() != null)
+        if (go != null && parent != null)
         {
-            UISprite sprite = go.GetComponent<UISprite>();
-            if (sprite != null)
+            if (go.GetComponent<UISprite>() != null)
             {
-                if (depth != -1) sprite.depth += depth;
-                go.gameObject.layer = parent.gameObject.layer;
-            }
-        }
-        go.gameObject.layer = parent.gameObject.layer;
-
-        foreach (Transform child in go.transform)
-        {
-            //Debug.Log("Layer : " + child.name);
-            UISprite sprite = child.GetComponent<UISprite>();
-            if (sprite != null)
-            {
-                if (depth != -1) sprite.depth += depth;
+                UISprite sprite = go.GetComponent<UISprite>();
+                if (sprite != null && parent != null)
+                {
+                    if (depth != -1) sprite.depth += depth;
+                    go.gameObject.layer = parent.gameObject.layer;
+                }
             }
 
-            child.gameObject.layer = parent.gameObject.layer;
-            SwitchDepthLayer(child.gameObject, parent, depth);  // 遞迴
+
+            go.gameObject.layer = parent.gameObject.layer;
+
+
+            foreach (Transform child in go.transform)
+            {
+                //Debug.Log("Layer : " + child.name);
+                UISprite sprite = child.GetComponent<UISprite>();
+                if (sprite != null)
+                {
+                    if (depth != -1) sprite.depth += depth;
+                }
+
+                child.gameObject.layer = parent.gameObject.layer;
+                SwitchDepthLayer(child.gameObject, parent, depth);  // 遞迴
+            }
         }
+
         return depth;
     }
 }

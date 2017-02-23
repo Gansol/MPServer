@@ -118,14 +118,14 @@ public class PanelManager : MPPanel
     /// <param name="itemData">資料字典</param>
     /// <param name="itemPanel">實體化父系位置</param>
     /// <param name="itemType">道具類別</param>
-    public void InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    public Dictionary<string, GameObject> InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
         itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
             _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
-            InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+            return InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
         }                                                       // 已建立道具時
         else
         {
@@ -139,14 +139,17 @@ public class PanelManager : MPPanel
             {
                 _lastEmptyItemGroup.SetActive(false);
                 _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
-                InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+                return InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
             }
         }
+
+        return null;
     }
 
-    void InstantiateItem2(Dictionary<string, object> itemData, string itemName, int itemType, Transform parent, int itemCount, Vector2 offset, int tableCount, int rowCount)
+    private Dictionary<string, GameObject> InstantiateItem2(Dictionary<string, object> itemData, string itemName, int itemType, Transform parent, int itemCount, Vector2 offset, int tableCount, int rowCount)
     {
         Vector2 pos = new Vector2();
+        Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
         int count = parent.childCount, i = 0;
 
         ObjectFactory insObj = new ObjectFactory();
@@ -161,11 +164,15 @@ public class PanelManager : MPPanel
             {
                 pos = sortItemPos(tableCount, rowCount, offset, pos, count + i);
                 GameObject bundle = assetLoader.GetAsset(itemName);
-                insObj.Instantiate(bundle, parent, itemID.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+
+                bundle = insObj.Instantiate(bundle, parent, itemID.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                if (bundle != null) dictItem.Add(itemID.ToString(), bundle);    // 存入道具資料索引
                 pos.x += offset.x;
             }
             i++;
         }
+
+        return dictItem;
     }
     #endregion
 
