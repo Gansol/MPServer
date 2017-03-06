@@ -6,9 +6,9 @@ public class Scorched : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.GetComponent<MiceBase>())
+        if (col.gameObject.GetComponent<Mice>())
         {
-            col.gameObject.GetComponent<MiceBase>().OnEffect("Scorched", null);
+            col.gameObject.GetComponent<Mice>().OnEffect("Scorched", null);
         }
         else
         {

@@ -80,7 +80,7 @@ public class BattleManager : MonoBehaviour
 
         Global.photonService.OtherScoreEvent += OnOtherScore;
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
-        Global.photonService.ApplyMissionEvent += OnApplyRate;
+        Global.photonService.ApplyMissionEvent += OnApplyMission;
         Global.photonService.UpdateScoreEvent += OnUpdateScore;
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
         Global.photonService.GameStartEvent += OnGameStart;
@@ -99,10 +99,12 @@ public class BattleManager : MonoBehaviour
         _energy = 0;
     }
 
+
+
     void Update()
     {
         // 同步開始遊戲
-        if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart)
+        if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart && poolManager.dataFlag)
         {
             isSyncStart = false;
             Global.photonService.SyncGameStart();
@@ -110,7 +112,7 @@ public class BattleManager : MonoBehaviour
 
         if (Global.isGameStart && tSpawnFlag)
         {
-            _elapsedGameTime = Time.time - _lastTime;    // 這裡怪怪的 為什麼用 fixedDeltaTime
+            _elapsedGameTime = Time.time - _lastTime;    // 遊戲經過時間
 
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
 
@@ -194,7 +196,7 @@ public class BattleManager : MonoBehaviour
 
         _energy = Math.Min(_energy, 1);
         _energy = Math.Max(_energy, 0);
-//        Debug.Log(_energy);
+        //        Debug.Log(_energy);
     }
     #endregion
 
@@ -262,7 +264,7 @@ public class BattleManager : MonoBehaviour
             if (_combo >= 5)
                 UpadateEnergy(_tmpEnergy / 100);
         }
-//        Debug.Log(_tmpEnergy);
+        //        Debug.Log(_tmpEnergy);
     }
 
 
@@ -335,25 +337,38 @@ public class BattleManager : MonoBehaviour
     }
 
 
-    void OnApplyRate(Mission mission, Int16 scoreRate)
+    private void OnApplyMission(Mission mission, short value)
     {
         if (Global.isGameStart)
         {
-            if (mission == Mission.HarvestRate)
+            switch (mission)
             {
-                Debug.Log("Rate:" + scoreRate);
-                if (_score > _otherScore)
-                {
-                    _scoreRate -= ((float)scoreRate / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
-                }
-                else
-                {
-                    _scoreRate += ((float)scoreRate / 100); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/100
-                }
+                case Mission.HarvestRate:
+                    {
+                        Debug.Log("Rate:" + value);
+                        if (_score > _otherScore)
+                        {
+                            _scoreRate -= ((float)value / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
+                        }
+                        else
+                        {
+                            _scoreRate += ((float)value / 100); //scoreRate 在伺服器以整數0~100 儲存 這裡是0~1 所以要/100
+                        }
 
-                battleHUD.MissionMsg(mission, _scoreRate);
-                _otherRate = 1 - _scoreRate;
-                _otherRate = (_otherRate == 0) ? 1 : _otherRate = 1 + _otherRate;                       // 如果 1(原始) - 1(我) = 0 代表倍率相同不調整倍率 ; 如果1 - 0.9(我) = 0.1 代表他多出0.1 ;  如果1 - 1.1(我) = -0.1 代表他少0.1 。最後 1+(+-0.1)就是答案
+                        battleHUD.MissionMsg(mission, _scoreRate);
+                        _otherRate = 1 - _scoreRate;
+                        _otherRate = (_otherRate == 0) ? 1 : _otherRate = 1 + _otherRate;                       // 如果 1(原始) - 1(我) = 0 代表倍率相同不調整倍率 ; 如果1 - 0.9(我) = 0.1 代表他多出0.1 ;  如果1 - 1.1(我) = -0.1 代表他少0.1 。最後 1+(+-0.1)就是答案
+                        break;
+                    }
+                //case Mission.WorldBoss:
+                //    {
+                //        Debug.Log("MiceID:" + value);
+                //        // value = mice id
+                //        SkillBase skill = skillFactory.GetSkill(Global.miceProperty, value);
+                //        SetPlayerState(skill.GetID());
+                //        break;
+                //    }
+
             }
         }
     }
@@ -392,7 +407,7 @@ public class BattleManager : MonoBehaviour
         // 取消委派
         Global.photonService.OtherScoreEvent -= OnOtherScore;
         Global.photonService.MissionCompleteEvent -= OnMissionComplete;
-        Global.photonService.ApplyMissionEvent -= OnApplyRate;
+        Global.photonService.ApplyMissionEvent -= OnApplyMission;
         Global.photonService.UpdateScoreEvent -= OnUpdateScore;
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
         Global.photonService.GameStartEvent -= OnGameStart;
@@ -420,7 +435,7 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("SetPlayerState:" + skillID);
         // BattleHUD show skill image
-        SkillItem skill = (SkillItem)skillFactory.GetSkill(Global.dictSkills, skillID);
+        SkillBase skill = skillFactory.GetSkill(Global.dictSkills, skillID);
         skill.SetAIController(playerAIState);
         playerAIState.SetPlayerAIState(skill.GetPlayerState(), skill);
         skill.Display();

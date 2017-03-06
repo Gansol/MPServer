@@ -49,7 +49,7 @@ namespace MPCOM
 
         private static float scoreRate = 1;
 
-        private struct ScoreRate
+        private struct Rate
         {
             public readonly static float mormal = 1;
             public readonly static float low = 0.8f;
@@ -89,6 +89,7 @@ namespace MPCOM
 
         private struct NinjaMice
         {
+            public readonly static int ID = 10005;    // ID
             public static int eatFull = 28;    // 2.86s = 9.79
             public static float perEat = 7;
             public static float eatingRate = 0.67f;
@@ -97,21 +98,21 @@ namespace MPCOM
 
 
         [AutoComplete]
-        public BattleData UpdateScoreRate(ENUM_ScoreRate rate)
+        public BattleData UpdateScoreRate(ENUM_Rate rate)
         {
             battleData.ReturnCode = "S508";
             battleData.ReturnMessage = "更新分數倍率成功！";
 
             switch ((int)rate)
             {
-                case (int)ENUM_ScoreRate.Normal:
-                    battleData.scoreRate = ScoreRate.mormal;
+                case (int)ENUM_Rate.Normal:
+                    battleData.scoreRate = Rate.mormal;
                     break;
-                case (int)ENUM_ScoreRate.Low:
-                    battleData.scoreRate = ScoreRate.low;
+                case (int)ENUM_Rate.Low:
+                    battleData.scoreRate = Rate.low;
                     break;
-                case (int)ENUM_ScoreRate.High:
-                    battleData.scoreRate = ScoreRate.high;
+                case (int)ENUM_Rate.High:
+                    battleData.scoreRate = Rate.high;
                     break;
                 default:
                     battleData.ReturnCode = "S509";
@@ -121,10 +122,35 @@ namespace MPCOM
             return battleData;
         }
 
+        [AutoComplete]
+        public BattleData UpdateEnergyRate(ENUM_Rate rate)
+        {
+            battleData.ReturnCode = "S512";
+            battleData.ReturnMessage = "更新分數倍率成功！";
+
+            switch ((int)rate)
+            {
+                case (int)ENUM_Rate.Normal:
+                    battleData.energyRate = Rate.mormal;
+                    break;
+                case (int)ENUM_Rate.Low:
+                    battleData.energyRate = Rate.low;
+                    break;
+                case (int)ENUM_Rate.High:
+                    battleData.energyRate = Rate.high;
+                    break;
+                default:
+                    battleData.ReturnCode = "S513";
+                    battleData.ReturnMessage = "更新分數倍率失敗！";
+                    break;
+            }
+            return battleData;
+        }
+
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-        public BattleData ClacScore(short miceID, float aliveTime,float scoreRate,float energyRate)
+        public BattleData ClacScore(short miceID, float aliveTime, float scoreRate, float energyRate)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -214,7 +240,7 @@ namespace MPCOM
                 throw e;
             }
 
-            battleData.energy = (Int16)((score > 0) ? 1 : 0);   // 打死老鼠增加能量
+            battleData.energy = (Int16)((score > 0) ? 1 : 0 * energyRate);   // 打死老鼠增加能量
             battleData.score = score;
             battleData.ReturnCode = "S501";
             battleData.ReturnMessage = "驗證分數成功！";
@@ -392,7 +418,7 @@ namespace MPCOM
                     case Mission.WorldBoss: // BOSS
                         {
                             // missionRate 是老鼠ID
-                            battleData.missionScore = (Int16)EggMice.ID;
+                            battleData.missionScore = (Int16)NinjaMice.ID;
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;

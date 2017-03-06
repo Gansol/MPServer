@@ -19,7 +19,7 @@ public class Taco : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > .5f && !_animFlag)
+        if (Time.time - m_StartTime > .5f && !_animFlag)
         {
             _skillTime = skillData.Attr + Random.Range(0, skillData.AttrDice);
             float speed = (float)1 / _skillTime;
@@ -29,13 +29,13 @@ public class Taco : SkillItem
             _animFlag = true;
         }
 
-        if (Time.time - startTime > _skillTime - 3)
+        if (Time.time - m_StartTime > _skillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if ((Time.time - startTime) > _skillTime)
+        if ((Time.time - m_StartTime) > _skillTime)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -58,6 +58,7 @@ public class Taco : SkillItem
 
     public override void Display()
     {
+        _skillTime = skillData.Attr + Random.Range(0, skillData.AttrDice);
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
         AssetLoader assetLoader = playerAIState.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
@@ -66,6 +67,6 @@ public class Taco : SkillItem
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Effect1");
 
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }

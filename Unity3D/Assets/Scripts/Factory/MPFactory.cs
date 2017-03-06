@@ -81,7 +81,7 @@ public class MPFactory : MonoBehaviour
         for (holePos = 0; count < spawnCount; holePos++)
         {
             holePos = SetStartPos(holeArray.Length, holePos, false);
-            objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[rndHoleArray[holePos]]);
+            objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[rndHoleArray[holePos]], false);
             count++;
             yield return new WaitForSeconds(spawnTime);
         }
@@ -90,6 +90,26 @@ public class MPFactory : MonoBehaviour
         Global.spawnFlag = true;
     }
     #endregion
+
+    /// <summary>
+    /// 1D陣列 順序產生
+    /// </summary>
+    /// <param name="miceID">老鼠ID</param>
+    /// <param name="holeArray">資料陣列</param>
+    /// <param name="spawnTime">每個間隔時間</param>
+    /// <param name="intervalTime">每組間隔時間</param>
+    /// <param name="lerpTime">加速度</param>
+    /// <param name="spawnCount">數量</param>
+    /// <param name="randomPos">隨機位置(-1=不隨機)</param>
+    /// <param name="isSkill">是否為技能</param>
+    /// <param name="reSpawn">正反產生</param>
+    /// <returns></returns>
+    public Coroutine SpawnBy1D(short miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill, bool reSpawn, bool impose)
+    {
+        coroutine = StartCoroutine(IESpawnBy1D(miceID, holeArray, spawnTime, intervalTime, lerpTime, spawnCount, randomPos, isSkill, reSpawn, impose));
+        return coroutine;
+    }
+
 
     #region -- SpawnBy1D --
     /// <summary>
@@ -107,7 +127,7 @@ public class MPFactory : MonoBehaviour
     /// <returns></returns>
     public Coroutine SpawnBy1D(short miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill, bool reSpawn)
     {
-        coroutine = StartCoroutine(IESpawnBy1D(miceID, holeArray, spawnTime, intervalTime, lerpTime, spawnCount, randomPos, isSkill, reSpawn));
+        coroutine = StartCoroutine(IESpawnBy1D(miceID, holeArray, spawnTime, intervalTime, lerpTime, spawnCount, randomPos, isSkill, reSpawn, false));
         return coroutine;
     }
 
@@ -149,18 +169,18 @@ public class MPFactory : MonoBehaviour
                 count++;
                 i += (reSpawn) ? -1 : 1;
             }
-            catch (Exception e)
+            catch
             {
                 Debug.Log("i: " + i + "holeArray: " + holeArray.Length + "count: " + count + "reSpawn: " + reSpawn);
-                throw ;
+                throw;
             }
         }
 
-        coroutine = StartCoroutine(IESpawnBy1D(miceID, buffer.ToArray(), spawnTime, intervalTime, lerpTime, spawnCount, -1, isSkill, reSpawn));
+        coroutine = StartCoroutine(IESpawnBy1D(miceID, buffer.ToArray(), spawnTime, intervalTime, lerpTime, spawnCount, -1, isSkill, reSpawn, false));
         return coroutine;
     }
 
-    private IEnumerator IESpawnBy1D(short miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill, bool reSpawn)
+    private IEnumerator IESpawnBy1D(short miceID, sbyte[] holeArray, float spawnTime, float intervalTime, float lerpTime, int spawnCount, int randomPos, bool isSkill, bool reSpawn, bool impose)
     {
         //   Debug.Log("1D spawnCount:" + spawnCount);
         int count = 0, holePos = 0;
@@ -171,7 +191,7 @@ public class MPFactory : MonoBehaviour
         {
             try
             {
-                objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[holePos]]);
+                objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[holePos]], impose);
             }
             catch (Exception e)
             {
@@ -288,7 +308,7 @@ public class MPFactory : MonoBehaviour
 
             while (j >= 0 && j < holeArray.GetLength(1) && count < spawnCount)    // 2D陣列
             {
-                objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[i, j]]);
+                objFactory.InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[i, j]], false);
                 count++;
                 //Debug.Log("count:" + count + "  i:" + i + "  j:" + j);
                 j += (reSpawn) ? -1 : 1;
@@ -335,21 +355,23 @@ public class MPFactory : MonoBehaviour
             // 初始化 MiceBoss數值
 
             MiceBossBase boss = clone.GetComponent(typeof(MiceBossBase)) as MiceBossBase;
-
-            boss.Initialize(0.1f, 6f, 60f, miceAttr.LifeTime);
-            boss.SetAnimState(new MiceAnimState(clone, true, lerpSpeed, upSpeed, upDistance, miceAttr.LifeTime));
+            SkillBase skill = skillFactory.GetSkill(Global.miceProperty, miceID);
+            MiceAnimState animState = new MiceAnimState(clone, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
+            
+            boss.SetAnimState(animState);
             boss.SetArribute(miceAttr);
-            boss.SetSkill(skillFactory.GetSkill(Global.miceProperty, miceID));
-
+            boss.SetSkill(skill);
+            boss.Initialize(0.1f, 6f, 60f, miceAttr.LifeTime);  // 錯誤 可能非必要
             clone.transform.gameObject.SetActive(true);
 
             Debug.Log(skillFactory.GetSkill(Global.miceProperty, miceID));
+
             // 加入老鼠陣列
             Global.dictBattleMice.Add(clone.transform.parent, clone);
         }
-        catch (Exception e)
+        catch
         {
-            throw ;
+            throw;
         }
     }
     #endregion
@@ -513,11 +535,11 @@ public class MPFactory : MonoBehaviour
 
 
 
-    void OnApplyMission(Mission mission, Int16 missionScore)
+    void OnApplyMission(Mission mission, Int16 value)
     {
         if (mission == Mission.WorldBoss)
         {
-            SpawnBoss(missionScore, 0.1f, 0.1f, 6, 60);    //missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
+            SpawnBoss(value, 0.1f, 0.1f, 6, 60);    //missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
         }
     }
 

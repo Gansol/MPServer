@@ -10,6 +10,7 @@ public class IceGlasses : SkillItem
     public IceGlasses(SkillAttr attr)
         : base(attr)
     {
+        playerState |= MPProtocol.ENUM_PlayerState.IceGlasses;
     }
 
     public override void Initialize()
@@ -21,13 +22,13 @@ public class IceGlasses : SkillItem
     {
         clickTimes = tap.GetTimes();
         animTime = tap.gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime;
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime || clickTimes == attr && animTime > .6f)
+        if (Time.time - m_StartTime > skillData.SkillTime || clickTimes >= attr && animTime > .6f)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -62,6 +63,6 @@ public class IceGlasses : SkillItem
         effects.Add(bundle);
         effects[0].GetComponent<Animator>().Play("Effect1");
         EventMaskSwitch.Switch(bundle, false);
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }

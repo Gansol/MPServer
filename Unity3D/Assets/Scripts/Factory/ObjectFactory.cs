@@ -81,11 +81,14 @@ public class ObjectFactory
     /// </summary>
     /// <param name="miceID"></param>
     /// <param name="hole"></param>
-    public GameObject InstantiateMice(PoolManager poolManager, short miceID, float miceSize, GameObject hole)
+    public GameObject InstantiateMice(PoolManager poolManager, short miceID, float miceSize, GameObject hole, bool impose)
     {
         Vector3 _miceSize;
-        if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open)
+        if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open || impose)
         {
+            if (impose && Global.dictBattleMice.ContainsKey(hole.transform))
+                Global.dictBattleMice[hole.transform].GetComponentInChildren<Mice>().SendMessage("OnDead", 0.0f);
+
             if (Global.dictBattleMice.ContainsKey(hole.transform))
                 Global.dictBattleMice.Remove(hole.transform);
 

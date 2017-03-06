@@ -6,34 +6,22 @@ using System;
 public class SkillFactory
 {
     static SkillBase skill = null;
-    static SkillAttr skillData =null;
+    static SkillAttr skillData = null;
+
     /// <summary>
     /// 取得技能
     /// </summary>
+    /// <param name="dictionary">技能所在字典</param>
     /// <param name="objectID">物件名稱</param>
     /// <returns></returns>
     public SkillBase GetSkill(Dictionary<string, object> dictionary, short objectID)
     {
-        skillData = new SkillAttr();
+
         short skillID = (short)System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(dictionary, "SkillID", objectID.ToString()));
         Debug.Log("skillID:" + skillID + "   objectID: " + objectID);
-        
 
-        Dictionary<string, object> dictSkillData = new Dictionary<string, object>();
+        GetSkillProperty(skillID);
 
-        Global.dictSkills.TryGet<Dictionary<string, object>>(skillID.ToString(), out dictSkillData);
-
-        skillData.SkillName = Convert.ToString(dictSkillData.Get<string>("SkillName")).Replace(" ","");
-        skillData.SkillLevel = Convert.ToByte(dictSkillData.Get<string>("SkillLevel"));
-        skillData.SkillType = Convert.ToByte(dictSkillData.Get<string>("SkillType"));
-        skillData.SkillTime = Convert.ToByte(dictSkillData.Get<string>("SkillTime"));
-        skillData.ColdDown = Convert.ToByte(dictSkillData.Get<string>("ColdDown"));
-        skillData.Delay = Convert.ToByte(dictSkillData.Get<string>("Delay"));
-        skillData.Energy = Convert.ToByte(dictSkillData.Get<string>("Energy"));
-        skillData.ProbValue = Convert.ToByte(dictSkillData.Get<string>("ProbValue"));
-        skillData.ProbDice = Convert.ToByte(dictSkillData.Get<string>("ProbDice"));
-        skillData.Attr = Convert.ToByte(dictSkillData.Get<string>("Attr"));
-        skillData.AttrDice = Convert.ToByte(dictSkillData.Get<string>("AttrDice"));
 
         switch ((ENUM_Skill)skillID)
         {
@@ -97,5 +85,43 @@ public class SkillFactory
         }
         Debug.Log(skill + "   " + skillData.Attr);
         return skill;
+    }
+
+    public List<SkillBase> GetSkillsByType(ENUM_SkillType skillType)
+    {
+        List<SkillBase> list = new List<SkillBase>();
+
+        foreach (KeyValuePair<string, object> skill in Global.dictSkills)
+        {
+            Dictionary<string, string> skillAttr = skill.Value as Dictionary<string, string>;
+            if ((short)skillType == Convert.ToInt16(skillAttr["SkillType"]))
+                list.Add(GetSkill(Global.dictSkills, Convert.ToInt16(skill.Key)));
+        }
+
+        return list;
+    }
+
+
+    private SkillAttr GetSkillProperty(short skillID)
+    {
+        skillData = new SkillAttr();
+        Dictionary<string, object> dictSkillData = new Dictionary<string, object>();
+
+        Global.dictSkills.TryGet<Dictionary<string, object>>(skillID.ToString(), out dictSkillData);
+
+        skillData.SkillID = Convert.ToInt16(dictSkillData.Get<string>("SkillID"));
+        skillData.SkillName = Convert.ToString(dictSkillData.Get<string>("SkillName")).Replace(" ", "");
+        skillData.SkillLevel = Convert.ToByte(dictSkillData.Get<string>("SkillLevel"));
+        skillData.SkillType = Convert.ToByte(dictSkillData.Get<string>("SkillType"));
+        skillData.SkillTime = Convert.ToByte(dictSkillData.Get<string>("SkillTime"));
+        skillData.ColdDown = Convert.ToByte(dictSkillData.Get<string>("ColdDown"));
+        skillData.Delay = Convert.ToByte(dictSkillData.Get<string>("Delay"));
+        skillData.Energy = Convert.ToByte(dictSkillData.Get<string>("Energy"));
+        skillData.ProbValue = Convert.ToByte(dictSkillData.Get<string>("ProbValue"));
+        skillData.ProbDice = Convert.ToByte(dictSkillData.Get<string>("ProbDice"));
+        skillData.Attr = Convert.ToByte(dictSkillData.Get<string>("Attr"));
+        skillData.AttrDice = Convert.ToByte(dictSkillData.Get<string>("AttrDice"));
+
+        return skillData;
     }
 }

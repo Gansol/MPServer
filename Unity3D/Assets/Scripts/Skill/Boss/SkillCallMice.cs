@@ -1,44 +1,85 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class SkillCallMice : SkillBoss
 {
+    PoolManager poolManager = GameObject.FindGameObjectWithTag("GM").GetComponent<PoolManager>();
     MPFactory spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
+    Dictionary<Transform, GameObject> dictMice, buffer;
+    ObjectFactory objFactory;
+
+    private int _spawnCount;
+    sbyte[] data;
 
     public SkillCallMice(SkillAttr skill)
         : base(skill)
     {
+        data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
+        dictMice = new Dictionary<Transform, GameObject>();
+        objFactory = new ObjectFactory();
     }
-    
 
     public override void Initialize()
     {
-        throw new System.NotImplementedException();
+        m_StartTime = m_LastTime = Time.time;
+        dictMice.Clear();
     }
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-//        spawner.Spawn(MPProtocol.SpawnStatus.LineL, "BlackMice", 0.1f, 0.1f, 0.1f, 3, false);
-//        Debug.Log("Spawn");
-        //state = new InvincibleState();
+        data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
+        Debug.Log("Call Mice Display");
+        int spawnCount = skillData.Attr + Random.Range(0, skillData.AttrDice + 1);
+        int[] rndHole = new int[spawnCount];
+        System.Random rnd = new System.Random();
+        
+        for (int i = 0; i < spawnCount;i++ )
+            rndHole[i] = rnd.Next(data.Min(), data.Max());
+
+        m_LastTime = Time.time;
+
+        dictMice.Clear();
+        this.obj = obj;
 
 
-        sbyte[] data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
-        spawner.SpawnBy1D(10002, data, 0.1f, 0.1f, 0.1f, 3, Random.Range(0, data.Length), false, false);  //錯誤
+        for (int i = 0; i < spawnCount; i++)
+        {
+            dictMice.Add(spawner.hole[data[i]].transform, objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawner.hole[rndHole[i]], true));
+        }
+
+        buffer = new Dictionary<Transform, GameObject>(dictMice);
     }
 
     public override void UpdateEffect()
     {
-        throw new System.NotImplementedException();
+        if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
+        {
+            foreach (KeyValuePair<Transform, GameObject> mice in buffer)
+            {
+                if (!Global.dictBattleMice.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
+            }
+
+            Display(obj, null, null);
+            m_LastTime = Time.time;
+        }
+
+        if ((Time.time - m_StartTime) > skillData.SkillTime)
+            Release();
+    }
+    public int GetMiceCount()
+    {
+        return dictMice.Count;
     }
 
     public override void Release()
     {
-        throw new System.NotImplementedException();
+        dictMice.Clear();
+       // playerAIState.Release(MPProtocol.ENUM_PlayerState.Boss);
     }
 
     public override void Display()
     {
-        throw new System.NotImplementedException();
     }
 }

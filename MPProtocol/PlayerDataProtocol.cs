@@ -10,6 +10,10 @@
         Protected = 1 << 4,
         Reflection = 1 << 5,
         Invincible = 1 << 6,
+        IceGlasses = 1 << 7,
+        Boss = 1 << 8,
+        WorldBoss = 1 << 9,
+
         All = -1,
     }
 

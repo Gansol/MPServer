@@ -4,6 +4,7 @@ using System.Collections;
 public abstract class AnimatorState
 {
     protected GameObject obj;
+    protected Animator anims;
     protected ENUM_AnimatorState animState = ENUM_AnimatorState.None;
     protected bool _upFlag, _bDead, _isDisappear, _bEating, _timeFlag, _bClick, _isBoss,_bMotion;
     protected float _survivalTime, _animTime, _lerpSpeed, _tmpSpeed, _upSpeed, _tmpDistance, _upDistance = -1, _lifeTime, _lastTime;
@@ -22,7 +23,6 @@ public abstract class AnimatorState
     {
         _isBoss = isBoss;
         _lerpSpeed = lerpSpeed;
-        _tmpSpeed = _upSpeed = upSpeed;
         _tmpDistance = _upDistance = upDistance;
         _lifeTime = lifeTime;
 

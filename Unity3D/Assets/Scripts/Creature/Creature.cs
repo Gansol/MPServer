@@ -14,7 +14,7 @@ public abstract class Creature : MonoBehaviour
     public abstract void SetAnimState(AnimatorState state);
     public abstract void SetArribute(CreatureAttr arribute);
 
-    protected abstract void OnInjured(short damage);
+    protected abstract void OnInjured(short damage, bool myAttack);
 
     public virtual void Play(AnimatorState.ENUM_AnimatorState state)
     {

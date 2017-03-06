@@ -39,7 +39,7 @@ public class TeamSwitcher : MonoBehaviour
     [Tooltip("失效時時顏色")]
     public float disableColor = 0.5f;
     [Tooltip("隊伍離開距離")]                                 // 可以增加老鼠離開時自動加到最後
-    public float leftDist = 100f;
+    public float leftDist = 50f;
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
     private GameObject _clone, _other;           // 複製物件、碰撞時對方物件、原老鼠位置

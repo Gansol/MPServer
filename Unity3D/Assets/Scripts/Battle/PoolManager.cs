@@ -66,16 +66,18 @@ public class PoolManager : MonoBehaviour
 
     private bool _mergeFlag = false;          // 合併老鼠完成
     private bool _poolingFlag = false;        // 初始化物件池
-
+    private bool _dataFlag = false;        // 初始化物件池
     public bool mergeFlag { get { return _mergeFlag; } }
     public bool poolingFlag { get { return _poolingFlag; } }
-
+    public bool dataFlag { get { return _dataFlag; } }
 
     private Vector3 bossScale = new Vector3(1.2f, 1.2f, 1.2f);
     private Vector3 skillScale = new Vector3(0.9f, 0.9f, 0.9f);
 
     void Awake()
     {
+        Global.photonService.LoadPlayerItem(Global.Account);
+        Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         assetLoader = gameObject.AddComponent<AssetLoader>();
         attrFactory = new AttrFactory();
         objFactory = new ObjectFactory();
@@ -91,6 +93,11 @@ public class PoolManager : MonoBehaviour
         _dictSkillMice = new Dictionary<string, object>();
         MergeMice();                                // 將雙方的老鼠合併 剔除相同的老鼠
         LoadItem();
+    }
+
+    private void OnLoadPlayerItem()
+    {
+        _dataFlag = true;
     }
 
     void Start()
@@ -155,7 +162,7 @@ public class PoolManager : MonoBehaviour
             InstantiateObject(_dictMiceObject);
             InstantiateSkillMice(_dictSkillMice);
             _poolingFlag = true;
-            //            Debug.Log("pooling Mice Completed ! ");
+            Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
         }
 
 
@@ -222,27 +229,24 @@ public class PoolManager : MonoBehaviour
 
                 // instantiate skill btn
                 clone = objFactory.Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, -1);
-                clone.AddComponent<SkillBtn>();
-                clone.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
-                clone.AddComponent<UIButton>();
+                Destroy(clone.GetComponent<BoxCollider2D>());
+                clone.transform.parent.gameObject.AddComponent<SkillBtn>();
+                clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
+                clone.transform.parent.gameObject.AddComponent<UIButton>();
+                clone.transform.parent.gameObject.AddComponent<BoxCollider2D>();
+                clone.transform.parent.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(300, 250);
                 //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<SkillBtn>().OnClick);
-                
+
 
                 // instantiate Item btn
                 int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
                 string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
-                short skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "SkillID", itemID.ToString()));
-                short skillType = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillType", skillID.ToString()));
+
 
                 if (assetLoader.GetAsset(itemName) != null)
                 {
                     bundle = assetLoader.GetAsset(itemName);
                     clone = objFactory.Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(300, 300), -1);
-                    clone.AddComponent<ItemBtn>();
-                    clone.GetComponent<ItemBtn>().init(itemID.ToString(), skillType, lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
-                    clone.AddComponent<BoxCollider2D>();
-                    clone.GetComponent<BoxCollider2D>().size = new Vector2(300, 250);
-                    clone.AddComponent<UIButton>();
                     clone.SetActive(false);
                     //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
                 }
@@ -288,9 +292,9 @@ public class PoolManager : MonoBehaviour
             {
                 miceAttr.SetHP(1);
                 mice.SetArribute(miceAttr);
-                mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime));
+                
                 clone.SetActive(true);
-
+                mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
                 return clone;
             }
         }
@@ -323,7 +327,7 @@ public class PoolManager : MonoBehaviour
         mice.SetArribute(miceAttr);
 
         // 設定動畫
-        mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime));
+        mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
         clone.gameObject.SetActive(false);    // 新版 子物件隱藏
     }
 
@@ -352,6 +356,7 @@ public class PoolManager : MonoBehaviour
             _dictMiceObject.Add(10001, "EggMice");
         //  Debug.Log(_dictObject);
         _mergeFlag = true;
+        Debug.Log("Merge Mice Completed ! " + _mergeFlag);
     }
 
 

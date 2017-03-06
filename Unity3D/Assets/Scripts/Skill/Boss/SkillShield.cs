@@ -15,7 +15,6 @@ public class SkillShield : SkillBoss
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-        Debug.Log(skillData.Attr);
         arribute.SetShield(skillData.Attr);
     }
 

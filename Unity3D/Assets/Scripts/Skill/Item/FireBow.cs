@@ -16,13 +16,13 @@ public class FireBow : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -53,6 +53,6 @@ public class FireBow : SkillItem
         effects.Add(objFactory.Instantiate(bundle, GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>().hole[0].transform.parent.transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Effect1");
 
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }

@@ -213,7 +213,7 @@ public class BattleHUD : MonoBehaviour
             if (!BossHPBar.activeSelf)
                 BossHPBar.SetActive(true);
 
-            BossHPBar.transform.GetChild(0).GetComponent<UISlider>().value = value;
+            BossHPBar.GetComponentInChildren<UISlider>().value = value;
         }
         else
         {

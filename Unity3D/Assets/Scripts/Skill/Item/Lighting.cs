@@ -17,7 +17,7 @@ public class Lighting : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName+" Release");
             Release();
@@ -67,6 +67,6 @@ public class Lighting : SkillItem
                 effects[i].GetComponent<Animator>().Play("Effect1");
             }
         }
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }

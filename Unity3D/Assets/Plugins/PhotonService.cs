@@ -39,8 +39,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     //委派事件 接收技能傷害
     public delegate void ApplySkillHandler(short ID);
     public event ApplySkillHandler ApplySkillMiceEvent;
-    public delegate void ApplySkillXHandler(short ID);
-    public event ApplySkillXHandler ApplySkillItemEvent;
+    public delegate void ApplySkillItemHandler(short ID);
+    public event ApplySkillItemHandler ApplySkillItemEvent;
 
     //委派事件 接收分數、對手分數
     public delegate void UpdateScoreHandler(Int16 score, Int16 energy);
@@ -263,10 +263,24 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Debug.Log("Recive Get Other MissionReward!" + otherMissionReward);
                 break;
 
+            //接收傷害
+            case (byte)BattleResponseCode.Damage:
+                Int16 score = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Damage];
+                UpdateScoreEvent(score, 0);
+                //Debug.Log("GET OTHER:" + damage);
+                break;
+
             //取得對方對BOSS傷害
             case (byte)BattleResponseCode.BossDamage:
                 Int16 damage = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Damage];
                 BossInjuredEvent(damage, false);
+                //Debug.Log("GET OTHER:" + damage);
+                break;
+
+            //取得對方對BOSS傷害
+            case (byte)BattleResponseCode.SkillBoss:
+                int skillID = (int)eventResponse.Parameters[(byte)SkillParameterCode.SkillID];
+                BossSkillEvent((ENUM_Skill)skillID);
                 //Debug.Log("GET OTHER:" + damage);
                 break;
         }
@@ -472,7 +486,6 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
                             Global.playerItem = Json.Deserialize(playerItem) as Dictionary<string, object>;
                             LoadPlayerItemEvent();
-
 
                             #region json.net to class bak
                             /* json.net to class 
@@ -823,6 +836,31 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
+            #region  Damage 接收受傷
+
+            case (byte)BattleResponseCode.Damage:// 接收受傷
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Int16 damage = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Damage];
+                            UpdateScoreEvent(damage, 0);
+                        }
+                        else
+                        {
+                            Debug.Log("RECIVE Damage ERROR !");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
             #region  BossDamage 接收BOSS受傷
 
             case (byte)BattleResponseCode.BossDamage:// 接收BOSS受傷
@@ -850,7 +888,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region  BossDamage 接收BOSS技能攻擊
+            #region  SkillBoss 接收BOSS技能攻擊
 
             case (byte)BattleResponseCode.SkillBoss:// 接收BOSS受傷
                 {
@@ -1534,6 +1572,29 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
+    #region Damage 對x造成傷害
+    /// <summary>
+    /// 對x造成傷害
+    /// </summary>
+    /// <param name="damage">傷害值</param>
+    /// <param name="self">是否攻擊自己</param>
+    public void Damage(Int16 damage, bool self)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },{ (byte)BattleParameterCode.Damage,damage },{ (byte)BattleParameterCode.CustomValue,self },
+            };
+
+            this.peer.OpCustom((byte)BattleOperationCode.Damage, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
     #region BossDamage 對BOSS造成傷害
     /// <summary>
     /// 對BOSS造成傷害
@@ -1616,7 +1677,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 更新分數倍率
     /// </summary>
     /// <param name="rate">倍率</param>
-    public void UpdateScoreRate(ENUM_ScoreRate rate)
+    public void UpdateScoreRate(ENUM_Rate rate)
     {
         try
         {
@@ -1636,12 +1697,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 更新分數倍率
     /// </summary>
     /// <param name="rate">倍率</param>
-    public void UpdateEnergyRate(ENUM_ScoreRate rate)
+    public void UpdateEnergyRate(ENUM_Rate rate)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-            { (byte)PlayerDataParameterCode.Account, Global.Account}, { (byte)BattleParameterCode.ScoreRate, rate}};
+            { (byte)PlayerDataParameterCode.Account, Global.Account}, { (byte)BattleParameterCode.EnergyRate, rate}};
             this.peer.OpCustom((byte)BattleOperationCode.UpdateEnergyRate, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
@@ -1656,13 +1717,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 傳送技能老鼠技能
     /// </summary>
     /// <param name="rate">倍率</param>
-    public void SendBossSkill(ENUM_Skill skill)
+    public void SendBossSkill(ENUM_Skill skill,bool self)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)SkillParameterCode.SkillID, skill}};
-            this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)SkillParameterCode.SkillID, skill}, { (byte)BattleParameterCode.CustomValue, self}};
+            this.peer.OpCustom((byte)BattleOperationCode.SkillBoss, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {

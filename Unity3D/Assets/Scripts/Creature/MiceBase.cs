@@ -26,7 +26,7 @@ public abstract class MiceBase : Creature
     /// 受傷
     /// </summary>
     /// <param name="damage"></param>
-    protected override void OnInjured(short damage)
+    protected override void OnInjured(short damage,bool myAttack)
     {
         m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
     }

@@ -3,53 +3,51 @@ using System.Collections;
 
 public class SugarAntsSkill : SkillBoss
 {
+    private bool skillFlag;
+
     public SugarAntsSkill(SkillAttr skill)
         : base(skill)
     {
+        skillFlag = true;
     }
 
     CreatureAttr arribute = null;
-    private int _tmpHp = 0;
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (arribute.GetHP() < arribute.GetHP() / 3)
-        {
-
-        }
-    }
 
     public override void Initialize()
     {
-        throw new System.NotImplementedException();
+        skillFlag = true;
     }
+
+    // Update is called once per frame
+    public override void UpdateEffect()
+    {
+        if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
+        {
+            if (arribute.GetHP() < arribute.GetHP() / 3 && skillFlag)
+            {
+                obj.GetComponent<Animator>().Play("Effect1");
+                arribute.SetHP(arribute.GetHP() + skillData.Attr + Random.Range(0, skillData.AttrDice + 1));
+                skillFlag = false;
+            }
+        }
+
+        if ((Time.time - m_StartTime) > skillData.SkillTime)
+            Release();
+    }
+
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-        _tmpHp = arribute.GetHP();
+        Debug.Log("SugerAnts Display!");
+        this.obj = obj;
         this.arribute = arribute;
-        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_ScoreRate.Low);
-    }
+        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Low);
 
-    //public override void Display()
-    //{
-    //    arribute.SetHP(arribute.GetHP() + System.Convert.ToInt32(_tmpHp / 3));
-    //}
-
-    public override void UpdateEffect()
-    {
-        throw new System.NotImplementedException();
     }
 
     public override void Release()
     {
-        throw new System.NotImplementedException();
+        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Normal);
     }
 
     public override void Display()

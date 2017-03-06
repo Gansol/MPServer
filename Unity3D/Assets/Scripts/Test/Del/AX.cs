@@ -6,19 +6,14 @@ using MPProtocol;
 
 public class AX : MonoBehaviour
 {
-    public delegate void A(string name);
+
     
-    void Start()
+    public virtual void Start()
     {
-        BX b = GetComponent<BX>();
-        b.StartCoroutineDelegate(XC);
+        Debug.Log("Base");
     }
 
-     IEnumerator XC()
-    {
-        Debug.Log("XC");
-        yield return new WaitForSeconds(1);
-    }
+
     //void Start()
     //{
     //    BX b = new BX();

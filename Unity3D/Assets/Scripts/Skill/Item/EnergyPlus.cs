@@ -11,13 +11,13 @@ public class EnergyPlus : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log("EnergyPlus Release");
             Release();
@@ -26,7 +26,7 @@ public class EnergyPlus : SkillItem
 
     public override void Release()
     {
-        Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_ScoreRate.Normal);
+        Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.Normal);
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
@@ -45,9 +45,9 @@ public class EnergyPlus : SkillItem
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Green");
 
-        Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_ScoreRate.High);
+        Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.High);
 
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 
     public override void Initialize()

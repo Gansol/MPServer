@@ -27,6 +27,14 @@ namespace MPProtocol
         Invincible,
         FeverTime,
     }
+    public enum ENUM_SkillType : int
+    {
+        Self = 0,
+        Buff,
+        Debuff,
+        Passive,
+        Damage,
+    }
 
     public enum SkillOperationCode
     {
@@ -41,7 +49,7 @@ namespace MPProtocol
         SkillName,
         SkillLevel,
         SkillType,
-        
+
         SkillTime,
         ColdDown,
         Delay,

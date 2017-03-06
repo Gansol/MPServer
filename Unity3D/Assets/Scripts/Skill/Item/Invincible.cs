@@ -15,13 +15,13 @@ public class Invincible : SkillItem {
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName+" Release");
             Release();
@@ -54,6 +54,6 @@ public class Invincible : SkillItem {
 
         BattleManager.SetInvincible(true);  // 錯誤
 
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }

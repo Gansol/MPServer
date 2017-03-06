@@ -99,5 +99,16 @@ namespace Gansol
         //    RenameKey(dict, "x", otherKey);
         //} 
         //#endregion
+
+        public object[] RndArray(object[] array)
+        {
+
+            return array;
+        }
+
     }
+
+
+
+
 }

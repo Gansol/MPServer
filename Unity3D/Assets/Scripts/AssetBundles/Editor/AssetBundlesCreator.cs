@@ -522,8 +522,6 @@ public class AssetBundlesCreator : EditorWindow
 
     private static string LoadTxt(string path)   // 載入JSON列表檔案
     {
-        Dictionary<string, object> files = new Dictionary<string, object>();
-
         // path = 資料夾物件下BundleInfo.json
         // 載入文字後並解析存入字典檔
         string text = File.ReadAllText(path);

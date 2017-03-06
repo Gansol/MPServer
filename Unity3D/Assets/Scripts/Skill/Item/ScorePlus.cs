@@ -16,13 +16,13 @@ public class ScorePlus : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 3)
+        if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
             // battleHUD shing
             // playerAIState.ShingICON();
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName+" Release");
             Release();
@@ -50,9 +50,9 @@ public class ScorePlus : SkillItem
 
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName+"Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Green");
-        
-        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_ScoreRate.High);
 
-        startTime = Time.time;
+        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.High);
+
+        m_StartTime = Time.time;
     }
 }

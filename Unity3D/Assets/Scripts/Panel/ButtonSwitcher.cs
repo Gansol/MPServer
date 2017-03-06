@@ -43,6 +43,7 @@ public class ButtonSwitcher : MPButton
         _originPos = transform.localPosition;
         _activeBtn = false;
         _other = gameObject;
+        leftDist = 25;
 //        teamCountMax = 5;
     }
 

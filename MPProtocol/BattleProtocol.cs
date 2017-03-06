@@ -70,7 +70,7 @@
         BillingX = 11,
     }
 
-    public enum ENUM_ScoreRate
+    public enum ENUM_Rate
     {
         Normal = 0,
         Low = 1,
@@ -114,6 +114,7 @@
         CheckStatus = 43,           // 檢查玩家遊戲狀態
         SendSkillMice = 44,         // 發動老鼠技能
         SendSkillItem = 45,         // 發動道具技能
+        Damage = 48,                 // 造成傷害
         UpdateScore = 52,           // 更新分數
         Mission = 53,               // 任務
         MissionCompleted = 54,      // 任務完成
@@ -122,6 +123,7 @@
         UpdateScoreRate = 59,       // 更新分數倍率
         UpdateEnergyRate = 60,      // 更新分數倍率
         SkillBoss = 61,             // 技能老鼠發動技能判斷
+
     }
 
     public enum BattleParameterCode
@@ -150,6 +152,7 @@
         ScoreRate = 21,                 // 分數倍率
         SkillType = 22,                 // 技能類型
         Energy = 23,                    // 能量
+        EnergyRate = 24,                // 能量倍率
     }
 
     public enum BattleResponseCode

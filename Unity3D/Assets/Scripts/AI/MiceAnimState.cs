@@ -7,11 +7,14 @@ public class MiceAnimState : AnimatorState
     public MiceAnimState(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
         : base(obj, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
     {
+        anims = obj.GetComponentInChildren<Animator>();
+        _tmpSpeed = _upSpeed = upSpeed / 10;
     }
     // private BattleManager battleManager = null;
 
     public override void UpdateAnimation()
     {
+        //anims = obj.GetComponentInChildren<Animator>();
         _survivalTime = Time.time - _lastTime;
         if (_bMotion && (_upFlag && obj.transform.localPosition.y < _upDistance))        // AnimationUp
             AnimationUp();
@@ -20,14 +23,13 @@ public class MiceAnimState : AnimatorState
             AnimationDown();
 
 
-
-        Animator anims = obj.GetComponentInChildren<Animator>();   // 播放 死亡動畫
         if (anims != null)
         {
             AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
             //Debug.Log("currentState : " + currentState.nameHash);
             if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))         // 如果 目前 動化狀態 是 up
             {
+                animState = ENUM_AnimatorState.Hello;
                 _animTime = currentState.normalizedTime;
 
                 // 目前播放的動畫 "總"時間
@@ -40,6 +42,7 @@ public class MiceAnimState : AnimatorState
             {
                 _animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
                 _upFlag = false;
+                animState = ENUM_AnimatorState.Die;
                 //Debug.Log("Die 1" + _bDead);
                 if (!_bDead)       // 限制執行一次
                 {
@@ -60,7 +63,7 @@ public class MiceAnimState : AnimatorState
 
                 if (!_bEating)        // 限制執行一次
                 {
-                    if (_animTime > _lifeTime && !_isBoss)                       // 動畫撥放完畢時
+                    if ((_animTime > _lifeTime || _survivalTime > _lifeTime) && !_isBoss)                       // 動畫撥放完畢時
                     {
                         _isDisappear = true;
                         _bEating = true;
@@ -75,7 +78,7 @@ public class MiceAnimState : AnimatorState
                 if (_animTime >= .5f && _isBoss)                       // 動畫撥放完畢時
                 {
                     animState = ENUM_AnimatorState.Idle;
-                    obj.GetComponentInChildren<Animator>().Play("Idle");
+                    Play(animState);
                 }
             }
         }
@@ -83,22 +86,22 @@ public class MiceAnimState : AnimatorState
 
     public override void Play(ENUM_AnimatorState animState)
     {
-        Animator animator = obj.GetComponentInChildren<Animator>();
         this.animState = animState;
+        anims = obj.GetComponentInChildren<Animator>();
 
         switch (animState)
         {
             case ENUM_AnimatorState.Hello:
-                animator.Play("Hello");
+                anims.Play("Hello");
                 break;
             case ENUM_AnimatorState.Idle:
-                animator.Play("Idle");
+                anims.Play("Idle");
                 break;
             case ENUM_AnimatorState.Die:
-                animator.Play("Die");
+                anims.Play("Die");
                 break;
             case ENUM_AnimatorState.OnHit:
-                animator.Play("OnHit");
+                anims.Play("OnHit");
                 break;
             default:
                 this.animState = ENUM_AnimatorState.None;
@@ -137,6 +140,7 @@ public class MiceAnimState : AnimatorState
             obj.transform.localPosition = _tmp;
             _upDistance = _tmpDistance;
             obj.SendMessage("OnDead", _survivalTime);
+            //anims.StopPlayback();
             _isDisappear = false;
         }
         else

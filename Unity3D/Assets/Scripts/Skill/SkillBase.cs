@@ -1,23 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MPProtocol;
 
 public abstract class SkillBase
 {
     protected GameObject skillEffect = null;
     protected GameObject skillItem = null;
     protected SkillAttr skillData = null;
-    //protected string skillID = "";
-    //protected string skillName = "";
-    //protected int skillType = -1;
-    //protected int skillLevel = -1;
-    //protected float skillTime = -1;
-    //protected float coldDown = -1;
-    //protected float delay = -1;
-    //protected float energy = -1;
-    //protected float probValue = -1;
-    //protected float probDice = -1;
-    //protected float attr = -1;
-    //protected float attrDice = -1;
+    protected ENUM_PlayerState playerState;
+    protected PlayerAIState playerAIState; // AIController
+    protected float m_LastTime, m_StartTime;
 
     public SkillBase(SkillAttr skillData)
     {
@@ -47,6 +39,15 @@ public abstract class SkillBase
     /// </summary>
     public virtual void Display() { }
 
+    public virtual ENUM_PlayerState GetPlayerState()
+    {
+        return playerState;
+    }
+
+    public virtual void SetAIController(PlayerAIState playerAIState)
+    {
+        this.playerAIState = playerAIState;
+    }
 
     public void SetSkillItem(GameObject skillItem)
     {
@@ -58,5 +59,15 @@ public abstract class SkillBase
     public short GetID()
     {
         return skillData.SkillID;
+    }
+
+    public short GetSkillTime()
+    {
+        return skillData.SkillTime;
+    }
+
+    public short GetColdDown()
+    {
+        return skillData.ColdDown;
     }
 }

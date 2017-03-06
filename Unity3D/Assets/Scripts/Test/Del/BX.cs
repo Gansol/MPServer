@@ -2,17 +2,6 @@
 using System.Collections;
 using System;
 
-public class BX : MonoBehaviour
+public class BX : AX
 {
-    public delegate IEnumerator CoroutineMethod();
-
-    IEnumerator RunCoroutine(CoroutineMethod coroutineMethod)
-    {
-        return coroutineMethod();
-    }
-
-    public void StartCoroutineDelegate(CoroutineMethod coroutineMethod)
-    {
-        StartCoroutine("RunCoroutine", coroutineMethod);
-    }
 }

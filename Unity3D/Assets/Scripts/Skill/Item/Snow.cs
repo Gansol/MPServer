@@ -20,13 +20,13 @@ public class Snow : SkillItem
 
     public override void UpdateEffect()
     {
-        if (Time.time - startTime > skillData.SkillTime - 1 && !animFlag)
+        if (Time.time - m_StartTime > skillData.SkillTime - 1 && !animFlag)
         {
             effects[0].GetComponent<Animator>().Play("Effect1");
             animFlag = true;
         }
 
-        if (Time.time - startTime > skillData.SkillTime)
+        if (Time.time - m_StartTime > skillData.SkillTime)
         {
             Debug.Log(skillData.SkillName + " Release");
             Release();
@@ -67,6 +67,6 @@ public class Snow : SkillItem
                 item.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, false);
         }
 
-        startTime = Time.time;
+        m_StartTime = Time.time;
     }
 }
