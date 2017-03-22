@@ -521,9 +521,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
-                    catch (Exception e)
+                    catch 
                     {
-                        Debug.Log(e);
+                        throw;
                     }
                 }
                 break;

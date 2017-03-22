@@ -9,6 +9,7 @@ public class Scorched : MonoBehaviour
         if (col.gameObject.GetComponent<Mice>())
         {
             col.gameObject.GetComponent<Mice>().OnEffect("Scorched", null);
+            if (GetComponent<ParticleSystem>()) GetComponent<ParticleSystem>().enableEmission = true;
         }
         else
         {

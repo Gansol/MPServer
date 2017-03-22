@@ -5,7 +5,9 @@ public class AudioManager : MonoBehaviour
 {
 
     public AudioClip BGSound;
-    float audio1Volume = 0f;
+    public AudioSource[] SE;
+    float audio1Volume = 0f, minVolume=.1f,maxVolume = .8f;
+
     bool flag;
 
     void Awake()
@@ -25,28 +27,27 @@ public class AudioManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (GUI.Button(new Rect(0, 300, 100, 50), "Audio UP"))
-        {
-            audio.volume += 0.5f;
-        }
-        if (GUI.Button(new Rect(100, 300, 100, 50), "Audio ON/OFF"))
-        {
-            if (flag)
-            {
-                audio.Stop();
-                audio.volume = 0.0f;
-            }
-            else
-            {
-                bFadeOut = false;
-                audio.Play();
-                audio.volume = 0.5f;
-            }
-        }
-        if (GUI.Button(new Rect(200, 300, 100, 50), "Audio Down"))
-        {
-            audio.volume -= 0.5f;
-        }
+        //if (GUI.Button(new Rect(0, 300, 100, 50), "Audio UP"))
+        //{
+        //    audio.volume += 0.5f;
+        //}
+        //if (GUI.Button(new Rect(100, 300, 100, 50), "Audio ON/OFF"))
+        //{
+        //    if (flag)
+        //    {
+        //        audio.volume = 0.0f;
+        //    }
+        //    else
+        //    {
+        //        bFadeOut = false;
+        //        audio.Play();
+        //        audio.volume = 0.5f;
+        //    }
+        //}
+        //if (GUI.Button(new Rect(200, 300, 100, 50), "Audio Down"))
+        //{
+        //    audio.volume -= 0.1f;
+        //}
     }
 
     void Update()
@@ -65,7 +66,7 @@ public class AudioManager : MonoBehaviour
     void FadeIn()
     {
 
-        if (audio.volume < 0.8f)
+        if (audio.volume < maxVolume)
         {
             audio.volume += 0.1f * Time.deltaTime;
         }
@@ -75,7 +76,7 @@ public class AudioManager : MonoBehaviour
     void FadeOut()
     {
 
-            if (audio.volume > 0.1f)
+        if (audio.volume > minVolume)
             {
                 audio.volume -= 0.1f * Time.deltaTime;
             }

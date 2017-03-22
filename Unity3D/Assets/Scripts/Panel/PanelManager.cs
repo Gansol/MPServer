@@ -28,8 +28,10 @@ public class PanelManager : MPPanel
     private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject _lastPanel;                           // 暫存Panel
     private string _panelName;                                      // panel名稱
-    private bool _loadedPanel;                                      // 載入的Panel
+    private bool _loadedPanel, _loginStatus, _checkFlag;             // 載入的Panel 登入狀態
     private int _panelNo;                                           // Panel編號
+    private float _ckeckTime;
+
 
     ObjectFactory insObj;
 
@@ -42,9 +44,10 @@ public class PanelManager : MPPanel
 
     void Awake()
     {
+        Global.photonService.LoginEvent += OnLogin;
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         insObj = new ObjectFactory();
-        dictPanelRefs = new Dictionary<string, PanelState>();
+        if (dictPanelRefs == null) dictPanelRefs = new Dictionary<string, PanelState>();
     }
 
     void Start()
@@ -64,6 +67,8 @@ public class PanelManager : MPPanel
             InstantiatePanel();
             PanelSwitch();
         }
+
+        MatchStatusChk();
     }
 
 
@@ -211,9 +216,10 @@ public class PanelManager : MPPanel
     /// <param name="panelNo">Panel編號</param>
     private void PanelSwitch()
     {
+
         PanelState panelState = dictPanelRefs[_panelName];      // 取得目前Panel狀態
 
-        if (panelState.obj != null)
+        if (panelState.obj != null && _loginStatus)
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
@@ -229,14 +235,13 @@ public class PanelManager : MPPanel
             else
             {
                 EventMaskSwitch.Resume();
-                panelState.obj.SetActive(false);
                 panelState.onOff = !panelState.onOff;
                 Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
             }
         }
         else
         {
-            Debug.LogError("PanelNo is unknow!");
+            Debug.LogError("PanelNo unknow or not login !");
         }
     }
     #endregion
@@ -309,6 +314,37 @@ public class PanelManager : MPPanel
         return newObject;
     }
     #endregion
+    private void MatchStatusChk()
+    {
+        if (Global.isMatching)
+        {
+            if ((_ckeckTime > 10) && _checkFlag)
+            {
+                Global.photonService.ExitWaitingRoom();
+                _ckeckTime = 0;
+                _checkFlag = false;
+            }
+            else
+            {
+                _checkFlag = true;
+                _ckeckTime += Time.deltaTime;
+            }
+        }
+    }
+
+    public void OnMatchGame()
+    {
+        if (!Global.isMatching && Global.LoginStatus)
+        {
+            Global.isMatching = true;
+            Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
+        }
+    }
+
+    private void OnLogin(bool loginStatus, string message, string returnCode)
+    {
+        _loginStatus = loginStatus;
+    }
 
     public override void OnLoading()
     {

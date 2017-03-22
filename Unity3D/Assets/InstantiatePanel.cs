@@ -6,10 +6,11 @@ public class InstantiatePanel : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        
+
 
         if (Application.loadedLevelName == "MainGame")
             Instantiate(assetLoader.GetAsset("MenuUI"));
+
 
         if (Application.loadedLevelName == "Battle")
             Instantiate(assetLoader.GetAsset("GameUI"));

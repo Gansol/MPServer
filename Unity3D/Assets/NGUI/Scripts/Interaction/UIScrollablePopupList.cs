@@ -235,7 +235,7 @@ public class UIScrollablePopupList : UIWidgetContainer
             mSelectedItem = value;
             if (mSelectedItem == null) return;
 #if UNITY_EDITOR
-			if (!Application.isPlaying) return;
+            if (!Application.isPlaying) return;
 #endif
             if (mSelectedItem != null)
                 TriggerCallbacks();
@@ -396,7 +396,7 @@ public class UIScrollablePopupList : UIWidgetContainer
             EventDelegate.Add(onChange, textLabel.SetCurrentSelection);
             textLabel = null;
 #if UNITY_EDITOR
-			NGUITools.SetDirty(this);
+            NGUITools.SetDirty(this);
 #endif
         }
 
@@ -776,18 +776,20 @@ public class UIScrollablePopupList : UIWidgetContainer
             x = Mathf.Max(x, bounds.size.x * dynScale - (bgPadding.x + padding.x) * 2f);
 
             float cx = x / dynScale;
-            Vector3 bcCenter = new Vector3(cx * 0.5f, -fontHeight * 0.5f, 0f);
-            Vector3 bcSize = new Vector3(cx, (labelHeight + padding.y) / dynScale, 1f);
+            // Vector3 bcCenter = new Vector3(cx * 0.5f, -fontHeight * 0.5f, 0f);
+            // Vector3 bcSize = new Vector3(cx, (labelHeight + padding.y) / dynScale, 1f);
 
             // Run through all labels and add colliders
             for (int i = 0, imax = labels.Count; i < imax; ++i)
             {
                 UILabel lbl = labels[i];
                 NGUITools.AddWidgetCollider(lbl.gameObject);
-                BoxCollider bc = GetComponent<BoxCollider>();
-                bcCenter.z = bc.center.z;
-                bc.center = bcCenter;
-                bc.size = bcSize;
+                BoxCollider bc = GetComponent<BoxCollider>();       // 修改
+                lbl.GetComponent<BoxCollider>().size = bc.size;     // 修改
+                lbl.GetComponent<BoxCollider>().center = bc.center; // 修改
+                // bcCenter.z = bc.center.z;
+                // bc.center = bcCenter;
+                // bc.size = bcSize;   
             }
 
             x += (bgPadding.x + padding.x) * 2f;
@@ -853,7 +855,7 @@ public class UIScrollablePopupList : UIWidgetContainer
             scrollbarSprite.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
             scrollbarSprite.color = scrollbarBgDefColour;
             scrollbarSprite.gameObject.name = "Scrollbar";
-            scrollbarSprite.transform.localPosition =new Vector2( scrollbarSprite.transform.localPosition.x + scrollbarSprite.width / 4,scrollbarSprite.transform.localPosition.y);
+            scrollbarSprite.transform.localPosition = new Vector2(scrollbarSprite.transform.localPosition.x + scrollbarSprite.width / 4, scrollbarSprite.transform.localPosition.y);
             UIButtonColor scColour = scrollbarSprite.gameObject.AddComponent<UIButtonColor>();
             scColour.defaultColor = scrollbarSprite.color;
             scColour.hover = scrollbarBgHovColour;

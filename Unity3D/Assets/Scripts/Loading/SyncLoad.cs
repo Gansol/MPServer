@@ -41,8 +41,9 @@ public class SyncLoad : MonoBehaviour
 
         if (Application.loadedLevel == (int)Global.Scene.MainGame)
         {
-            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
             assetLoader.LoadAsset("Panel/", "ComicFont");
+            assetLoader.LoadAsset("Panel/", "ComicFontB");
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadAsset("Panel/", "GameScene");
             assetLoader.LoadAsset("Panel/", "MainFront");
@@ -97,15 +98,19 @@ public class SyncLoad : MonoBehaviour
             if (Global.nextScene == (int)Global.Scene.MainGame)
                 Global.dictLoadedScene["MenuUI"].SetActive(true);
 
-        if (Application.loadedLevelName != "BundleCheck")
-        {
-            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = false;
-            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
-        }
+
+
+            if (Application.loadedLevelName != "BundleCheck")
+            {
+                _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = false;
+                _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
+            }
 
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
         Global.prevScene = Application.loadedLevel;
+
+
     }
 
 }

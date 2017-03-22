@@ -72,7 +72,7 @@ public class PoolManager : MonoBehaviour
     public bool dataFlag { get { return _dataFlag; } }
 
     private Vector3 bossScale = new Vector3(1.2f, 1.2f, 1.2f);
-    private Vector3 skillScale = new Vector3(0.9f, 0.9f, 0.9f);
+    private Vector3 skillScale = new Vector3(0.6f, 0.6f, 0.6f);
 
     void Awake()
     {
@@ -228,7 +228,7 @@ public class PoolManager : MonoBehaviour
                 scale = (i == 4) ? bossScale : skillScale;
 
                 // instantiate skill btn
-                clone = objFactory.Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, -1);
+                clone = objFactory.Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, 100);
                 Destroy(clone.GetComponent<BoxCollider2D>());
                 clone.transform.parent.gameObject.AddComponent<SkillBtn>();
                 clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, energyValue * (i + 1));
@@ -246,7 +246,7 @@ public class PoolManager : MonoBehaviour
                 if (assetLoader.GetAsset(itemName) != null)
                 {
                     bundle = assetLoader.GetAsset(itemName);
-                    clone = objFactory.Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(300, 300), -1);
+                    clone = objFactory.Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
                     clone.SetActive(false);
                     //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
                 }

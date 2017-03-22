@@ -51,6 +51,8 @@ public class Mice : MiceBase
             Global.dictBattleMice.Remove(transform.parent);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            battleManager.GetComponent<UIPlaySound>().Play();
+            battleManager.GetComponent<UIPlaySound>().volume =.87f;
         }
         else
         {

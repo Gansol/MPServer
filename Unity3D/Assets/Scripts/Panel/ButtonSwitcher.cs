@@ -31,14 +31,14 @@ public class ButtonSwitcher : MPButton
     private float _distance;                                  // 兩物件間距離
     private bool _isPress;   // 是否觸發、移動目標、是否按下、是否摧毀
     private Vector3 _originPos;                       // 原始座標、目標作標
-    //private PlayerManager pm;
+    //private NewPlayerManager pm;
 
     public Collider coll;
     #endregion
 
     void Awake()
     {
-        //pm = GetComponentInParent<PlayerManager>();
+        //pm = GetComponentInParent<NewPlayerManager>();
         coll = GetComponent<Collider>();
         _originPos = transform.localPosition;
         _activeBtn = false;
@@ -51,6 +51,10 @@ public class ButtonSwitcher : MPButton
     {
 
 
+    }
+    void Hover()
+    {
+        Debug.Log("FF");
     }
 
     #region -- 滑鼠事件片段程式碼 --
@@ -77,7 +81,7 @@ public class ButtonSwitcher : MPButton
                 {
                     PlayerManager.dictLoadedEquiped[_clone.name] = _clone;
                 }
-                if (transform.Find("Image").childCount != 0)
+              //  if (transform.Find("Image").childCount != 0)
                     _pressingIcon = gameObject.GetComponentInChildren<UISprite>().gameObject;
             }
             else
@@ -136,7 +140,7 @@ public class ButtonSwitcher : MPButton
     #region -- RetOrSwitch 交換或返回選擇 --
     void RetOrSwitch()
     {
-        //pm = GetComponentInParent<PlayerManager>();
+        //pm = GetComponentInParent<NewPlayerManager>();
         if (_activeBtn)
         {
             if (!_isTrigged && _other != gameObject && _other.tag != tag && transform.parent.name == _other.transform.parent.name)    // 按下時發生碰撞 且 放開時 交換物件   OnPress>RetOrSwitch 所以已經放開了
@@ -311,7 +315,7 @@ public class ButtonSwitcher : MPButton
         //}
         //else if (tag != "Inventory") // B>out
         //{
-        //    GameObject invButton = PlayerManager.dictLoadedItem[gameObject.name];
+        //    GameObject invButton = NewPlayerManager.dictLoadedItem[gameObject.name];
         //    if (invButton.transform.parent.name != pm._lastEmptyItemGroup.name)
         //    {
         //        invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
@@ -322,7 +326,7 @@ public class ButtonSwitcher : MPButton
         //    {
         //        invButton.SendMessage("EnableBtn");
         //    }
-        //    PlayerManager.dictLoadedEquiped.Remove(itemID);
+        //    NewPlayerManager.dictLoadedEquiped.Remove(itemID);
 
         //    //string itemID = pm.GetItemIDFromName(imageName, Global.itemProperty);
         //    Global.photonService.UpdatePlayerItem(short.Parse(itemID), false);
@@ -361,6 +365,7 @@ public class ButtonSwitcher : MPButton
             _clone.transform.localScale = transform.localScale;
             _clone.name = gameObject.name;
             _clone.tag = gameObject.tag;
+            UIEventListener.Get(_clone).onClick += GetComponentInParent<PlayerManager>().OnEquipClick;
             _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MeunObjetDepth); // 移動時深度提到最高防止遮擋
         }
     }

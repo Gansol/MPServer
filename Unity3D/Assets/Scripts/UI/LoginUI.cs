@@ -35,15 +35,13 @@ public class LoginUI : MonoBehaviour
 
     //private string JoinRoomResult = "";
     //private bool macthing = false;
-    private float ckeckTime;
-    private bool checkFlag = true;
     private static bool isLoginBtn = false;
 
     private int emailChk, passwordChk, confirmPasswordChk, equalPassword, nicknameChk;
 
     void OnEnable()
     {
-        if (Global.LoginStatus) ShowMatchGame();
+      //  if (Global.LoginStatus) ShowMatchGame();
         LoginMessageBox.gameObject.SetActive(false);
     }
     // 在Start裡建立好Login的回應事件
@@ -54,7 +52,7 @@ public class LoginUI : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnExitMainGame;
         Global.photonService.ReLoginEvent += OnReLogin;
         Global.photonService.GetProfileEvent += OnGetProfile;
-        Global.photonService.ExitWaitingEvent += ShowMatchGame;
+       // Global.photonService.ExitWaitingEvent += ShowMatchGame;
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
 
@@ -63,20 +61,7 @@ public class LoginUI : MonoBehaviour
 
     void Update()
     {
-        if (Global.isMatching)
-        {
-            if (ckeckTime > 10 && checkFlag)
-            {
-                Global.photonService.ExitWaitingRoom();
-                ckeckTime = 0;
-                checkFlag = false;
-            }
-            else
-            {
-                checkFlag = true;
-                ckeckTime += Time.deltaTime;
-            }
-        }
+
     }
 
     void OnGUI()
@@ -172,16 +157,6 @@ public class LoginUI : MonoBehaviour
     {
         myPanel.SetActive(false);
         loginPanel.SetActive(true);
-    }
-
-    public void OnMatchGame()
-    {
-        if (!Global.isMatching && Global.LoginStatus)
-        {
-            Global.isMatching = true;
-            ShowMatchGame();
-            Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
-        }
     }
 
     public void JoinMember(UILabel email, UIInput password, UIInput confrimPassword, UILabel nickname, UILabel age, UILabel sex)
@@ -283,7 +258,7 @@ public class LoginUI : MonoBehaviour
     {
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
-            ShowMatchGame();
+          //  ShowMatchGame();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
         }
@@ -296,10 +271,10 @@ public class LoginUI : MonoBehaviour
         }
     }
 
-    private void ShowMatchGame()
-    {
-        MatchGame.SetActive(!Global.isMatching);
-    }
+    //private void ShowMatchGame()
+    //{
+    //    MatchGame.SetActive(!Global.isMatching);
+    //}
 
     public void Logout(MemberType memberType)
     {

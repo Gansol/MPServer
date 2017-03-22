@@ -7,12 +7,11 @@ using MPProtocol;
 public class AX : MonoBehaviour
 {
 
-    
-    public virtual void Start()
+    void OnCollision2DEnter(Collision2D col)
     {
-        Debug.Log("Base");
+        col.gameObject.GetComponent<ParticleSystem>().enableEmission = true;
+        Debug.Log("Fuck");
     }
-
 
     //void Start()
     //{

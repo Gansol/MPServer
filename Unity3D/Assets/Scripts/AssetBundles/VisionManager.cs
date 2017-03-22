@@ -68,6 +68,7 @@ public class VisionManager : MonoBehaviour
 
             assetLoader.LoadAsset("Panel/", "LiHeiProFont");
             assetLoader.LoadAsset("Panel/", "ComicFont");
+            assetLoader.LoadAsset("Panel/", "ComicFontB");
 
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadAsset("Panel/", "GameScene");

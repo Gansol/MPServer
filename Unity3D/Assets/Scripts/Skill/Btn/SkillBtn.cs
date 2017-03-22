@@ -83,7 +83,7 @@ public class SkillBtn : MonoBehaviour
                 transform.GetChild(0).gameObject.SetActive(true);
                 // 如果道具不足 切換 顯示黑色
                 transform.GetChild(1).gameObject.SetActive(false);
-
+                _btnFlag = !_btnFlag;
                 if (_miceCount - _miceUsed != 0) { }
                     // to do 黑掉
             }
