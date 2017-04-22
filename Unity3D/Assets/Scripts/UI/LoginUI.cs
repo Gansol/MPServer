@@ -41,7 +41,7 @@ public class LoginUI : MonoBehaviour
 
     void OnEnable()
     {
-      //  if (Global.LoginStatus) ShowMatchGame();
+        //  if (Global.LoginStatus) ShowMatchGame();
         LoginMessageBox.gameObject.SetActive(false);
     }
     // 在Start裡建立好Login的回應事件
@@ -52,11 +52,14 @@ public class LoginUI : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnExitMainGame;
         Global.photonService.ReLoginEvent += OnReLogin;
         Global.photonService.GetProfileEvent += OnGetProfile;
-       // Global.photonService.ExitWaitingEvent += ShowMatchGame;
+        // Global.photonService.ExitWaitingEvent += ShowMatchGame;
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
 
         passwordChk = confirmPasswordChk = nicknameChk = emailChk = equalPassword = -1;
+
+        if (!Global.connStatus)
+            LoginPanel.SetActive(false);
     }
 
     void Update()
@@ -144,7 +147,8 @@ public class LoginUI : MonoBehaviour
     public void Login(UILabel email, UIInput password)
     {
         isLoginBtn = true;
-        Global.photonService.Login(email.text, password.value, MemberType.Gansol); // 登入
+       Global.Hash= Encrypt(password.value);
+       Global.photonService.Login(email.text, Global.Hash, MemberType.Gansol); // 登入
     }
 
     public void OpenJoinPanel(GameObject myPanel, GameObject joinPanel)
@@ -194,8 +198,8 @@ public class LoginUI : MonoBehaviour
             {
                 obj.SetActive(false);
             }
-
-            Global.photonService.JoinMember(email.text, password.value, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
+            Global.Hash = Encrypt(password.value.ToString());
+            Global.photonService.JoinMember(email.text, Global.Hash, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
             OpenLoginPanel(JoinPanel, LoginPanel);
         }
         else
@@ -258,7 +262,7 @@ public class LoginUI : MonoBehaviour
     {
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
-          //  ShowMatchGame();
+            //  ShowMatchGame();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
         }
@@ -309,7 +313,8 @@ public class LoginUI : MonoBehaviour
                     Global.Account = Social.localUser.id;
                     Global.Nickname = Social.localUser.userName;
                     Debug.Log(Global.Account);
-                    Global.photonService.Login(Global.Account, "12345678", MemberType.Google); // 登入
+                    Global.Hash = Encrypt("12345678");
+                    Global.photonService.Login(Global.Account,Global.Hash , MemberType.Google); // 登入
                 }
                 else
                 {
@@ -364,6 +369,7 @@ public class LoginUI : MonoBehaviour
         }
     }
 
+    // FB Login
     void GetFBProfiler(FBResult result)
     {
         if (result.Error != null)
@@ -378,7 +384,8 @@ public class LoginUI : MonoBehaviour
         FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
 
         Global.Account = FBProfiler["id"].ToString();
-        Global.photonService.Login(Global.Account, "12345678", MemberType.Facebook); // 登入
+        Global.Hash = Encrypt("12345678");
+        Global.photonService.Login(Global.Account, Global.Hash, MemberType.Facebook); // 登入
 
         foreach (var item in FBProfiler)
         {
@@ -427,12 +434,14 @@ public class LoginUI : MonoBehaviour
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
-                        Global.photonService.JoinMember(account, "12345678", name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
+                        string tmpPD = "12345678";
+                        Global.Hash = Encrypt(tmpPD);
+                        Global.photonService.JoinMember(account, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
                     catch (Exception e)
                     {
-                        throw ;
+                        throw;
                     }
                     break;
                 }
@@ -492,5 +501,17 @@ public class LoginUI : MonoBehaviour
         IPAddress ip = System.Net.Dns.GetHostEntry(strHostName).AddressList[0];
         getIP = ip.ToString();
         Debug.Log("ip:" + getIP);
+    }
+
+    /// <summary>
+    /// 破壞編碼 固定長度加密
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="length"></param>
+    /// <returns></returns>
+    private string Encrypt(string data)
+    {
+        string tmpString = TextUtility.SHA512Complier(Gansol.TextUtility.SerializeToStream(data));
+        return TextUtility.SHA1Complier(Gansol.TextUtility.SerializeToStream(tmpString));
     }
 }

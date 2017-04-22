@@ -3,12 +3,18 @@ using System.Collections;
 
 public class PhotonConnect : MonoBehaviour
 {
-
+    private InternetChecker internetCheck;
     public string ServerIP = "180.218.164.232";
     public int ServerPort = 5055;
     public string ServerName = "MPServer";
 
     private bool ConnectStatus = true;
+
+
+    void Awake()
+    {
+        internetCheck = new InternetChecker();
+    }
 
     // Use this for initialization
     void Start()

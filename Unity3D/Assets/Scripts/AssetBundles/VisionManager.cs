@@ -25,12 +25,13 @@ public class VisionManager : MonoBehaviour
 
     void Start() //開始檢查版本
     {
+        Global.nextScene = (int)Global.Scene.MainGame;
         assetLoader = gameObject.AddComponent<AssetLoader>();
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VisionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
-        StartCoroutine(visionChecker.CheckVision());
         Global.prevScene = Application.loadedLevel;
+        StartCoroutine(visionChecker.CheckVision());
     }
 
     void Update() //等待完成

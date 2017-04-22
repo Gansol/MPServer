@@ -59,6 +59,7 @@ public static class Global
     public static bool isArmorLoaded = false;        // 是否載入老鼠資料
     public static bool isLoaded = false;            // 是否載入場景
 
+    public static bool connStatus = false;          // 連線狀態
     public static bool LoginStatus = false;	        // true = 已登入,  false = 未登入
     public static bool BattleStatus = false;        // 是否開始對戰
     public static bool isMatching = false;          // 是否配對成功
@@ -69,8 +70,8 @@ public static class Global
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
 
-    public static int prevScene = (int)Scene.MainGame;  // 上一個場景
-    public static int nextScene = (int)Scene.MainGame;  // 要被載入的場景
+    public static int prevScene = (int)Scene.LogoScene;  // 上一個場景
+    public static int nextScene = (int)Scene.BundleCheck;  // 要被載入的場景
 
     public static int maxConnTimes = 5;                         // 重新連限次數
     public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
@@ -79,6 +80,7 @@ public static class Global
     public static string Ret = "";          // 回傳值
     public static int PrimaryID = 0;       // 主索引
     public static string Account = "";      // 帳號
+    public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
@@ -149,6 +151,7 @@ public static class Global
         MainGame = 1,
         Battle = 2,
         LoadScene = 3,
+        LogoScene = 4,
     }
 
     public enum UILayer

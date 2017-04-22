@@ -61,19 +61,19 @@ namespace MPCOM
                     return memberData;
                 }
 
-                // 檢查密碼
-                if (textUtility.SaveTextChk(password, new char[] { '#', '$', '%', '^', '&', '*', '(', ')' }) != 1)
-                {
-                    memberData.ReturnCode = "S103";
-                    memberData.ReturnMessage = "會員密碼內含不合法字元!!";
-                    return memberData;
-                }
-                else if (password.Length < 8 || password.Length > 16)
-                {
-                    memberData.ReturnCode = "S103";
-                    memberData.ReturnMessage = "會員密碼長度不正確(8~16字元)!!";
-                    return memberData;
-                }
+                //// 檢查密碼
+                //if (textUtility.SaveTextChk(password, new char[] { '#', '$', '%', '^', '&', '*', '(', ')' }) != 1)
+                //{
+                //    memberData.ReturnCode = "S103";
+                //    memberData.ReturnMessage = "會員密碼內含不合法字元!!";
+                //    return memberData;
+                //}
+                //else if (password.Length < 8 || password.Length > 16)
+                //{
+                //    memberData.ReturnCode = "S103";
+                //    memberData.ReturnMessage = "會員密碼長度不正確(8~16字元)!!";
+                //    return memberData;
+                //}
 
                 // 檢查暱稱
                 if (textUtility.SaveTextChk(nickname, new char[] { '#', '$', '%', '^', '&', '*', '(', ')' }) != 1)

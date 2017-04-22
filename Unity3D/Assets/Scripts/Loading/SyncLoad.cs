@@ -38,6 +38,10 @@ public class SyncLoad : MonoBehaviour
 
     private void LoadAssetCheck()
     {
+        if (Application.loadedLevel == (int)Global.Scene.BundleCheck)
+        {
+            bLoadAsset = true;
+        }
 
         if (Application.loadedLevel == (int)Global.Scene.MainGame)
         {
@@ -50,19 +54,15 @@ public class SyncLoad : MonoBehaviour
             assetLoader.LoadAsset("Panel/", "MainBack");
             assetLoader.LoadAsset("Panel/", "ShareObject");
             assetLoader.LoadPrefab("Panel/", "MenuUI");
-            bLoadAsset = !bLoadAsset;
+            bLoadAsset = true;
         }
 
         if (Application.loadedLevel == (int)Global.Scene.Battle)
         {
             assetLoader.LoadAsset("Panel/", "BattleHUD");
             assetLoader.LoadPrefab("Panel/", "GameUI");
-            bLoadAsset = !bLoadAsset;
+            bLoadAsset = true;
         }
-
-
-
-
     }
 
     private void InstantiateScene()
@@ -71,6 +71,9 @@ public class SyncLoad : MonoBehaviour
 
         switch (Application.loadedLevelName)
         {
+            case "BundleCheck":
+                sceneName = "MainGame";
+                break;
             case "MainGame":
                 sceneName = "MenuUI";
                 break;

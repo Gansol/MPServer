@@ -45,7 +45,7 @@ public class TeamManager : PanelManager
     //private int _page;                                                              // 翻頁值(翻一頁+10)
     private float _lastClickTime;                                                   // 點擊間距時間
     private static bool _bFirstLoad;                                                // 是否第一次載入
-    private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
+    private bool _bLoadedIcon, _bLoadedActor, _bLoadedEffect;                                       // 是否載入圖片、是否載入角色
 
     private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
@@ -74,9 +74,10 @@ public class TeamManager : PanelManager
             if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
                 Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (assetLoader.loadedObj && _bLoadedIcon)
+        if (assetLoader.loadedObj && _bLoadedIcon  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
             _bLoadedIcon = !_bLoadedIcon;
+            _bLoadedEffect = !_bLoadedEffect;
             assetLoader.init();
             InstantiateIcon(Global.dictMiceAll, infoGroupsArea[0].transform);
             LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
@@ -120,8 +121,8 @@ public class TeamManager : PanelManager
             LoadProperty loadProerty = new LoadProperty();
             loadProerty.LoadItemProperty(miceBtn.GetComponentInChildren<UISprite>().gameObject, infoGroupsArea[1], Global.miceProperty, (int)MPProtocol.StoreType.Mice);    // 載入老鼠屬性   
             LoadPlayerMiceProp(miceBtn.GetComponentInChildren<UISprite>().gameObject); // 載入玩家老鼠資料
-            InstantiateItem(infoGroupsArea[3].transform.GetChild(0), miceBtn.name);
-            InstantiateSkill(infoGroupsArea[3].transform.GetChild(0), miceBtn.name);
+            // InstantiateItem(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            // InstantiateSkill(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         }
     }
     #endregion
@@ -285,6 +286,7 @@ public class TeamManager : PanelManager
             {
                 assetLoader.init();
                 assetLoader.LoadAsset(iconPath + "/", "MiceICON");
+                // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedIcon = LoadIconObject(dictNotLoadedAsset, iconPath);
             }                                   // 已載入物件 實體化
             else
@@ -300,25 +302,34 @@ public class TeamManager : PanelManager
     }
     #endregion
 
-    private void LoadEffectAsset(Dictionary<string, object> dictNotLoadedAsset)
-    {
-        int itemID, skillID;
-        string itemName, skillName;
+    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+    //private bool LoadEffectAsset(Dictionary<string, object> dictNotLoadedAsset)
+    //{
+    //    int itemID, skillID;
+    //    string itemName, skillName;
 
-        assetLoader.LoadAsset("ItemICON" + "/", "ItemICON");
-        assetLoader.LoadAsset("Effects" + "/", "Effects");
+    //    assetLoader.LoadAsset("ItemICON" + "/", "ItemICON");
+    //    assetLoader.LoadAsset("Effects" + "/", "Effects");
+    //    if (dictNotLoadedAsset != null)
+    //    {
+    //        foreach (KeyValuePair<string, object> item in dictNotLoadedAsset)
+    //        {
+    //            itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+    //            itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
+    //            skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "SkillID", item.Key));
+    //            skillName = ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillName", skillID.ToString()).ToString();
 
-        foreach (KeyValuePair<string, object> item in dictNotLoadedAsset)
-        {
-            itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-            itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-            skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "SkillID", item.Key));
-            skillName = ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillName", item.Key).ToString();
+    //            assetLoader.LoadPrefab("ItemICON" + "/", itemName + "ICON");   // 載入 ICON
+    //            assetLoader.LoadPrefab("Effects" + "/", skillName + "Effect");  // 載入 Effect
+    //        }
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    } 
+    //}
 
-            assetLoader.LoadPrefab("ItemICON" + "/",itemName + "ICON");   // 載入 ICON
-            assetLoader.LoadPrefab("Effects" + "/", skillName + "Effect");  // 載入 Effect
-        }
-    }
     public void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
