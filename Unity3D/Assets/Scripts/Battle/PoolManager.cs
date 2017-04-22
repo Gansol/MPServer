@@ -28,6 +28,7 @@ public class PoolManager : MonoBehaviour
     private AttrFactory attrFactory;
     //private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictMiceObject;
+    private Dictionary<int, string> _dictSpecialObject;
     private Dictionary<int, string> _dictSkillObject;
     //private HashSet<int> _myMice;
     //private HashSet<int> _otherMice;
@@ -86,7 +87,14 @@ public class PoolManager : MonoBehaviour
         clearTime = 10;
         _poolingFlag = false;      // 初始化物件池
         _dictMiceObject = new Dictionary<int, string>();
+        _dictSpecialObject = new Dictionary<int, string>();
         _dictSkillObject = new Dictionary<int, string>();
+
+
+
+        _dictSpecialObject.Add(11001, "Bali");
+        _dictSpecialObject.Add(11002, "Much");
+        _dictSpecialObject.Add(11003, "HeroMice");
         //_myMice = new HashSet<int>();
         //_otherMice = new HashSet<int>();
         // _tmpDict = new Dictionary<string, object>();
@@ -104,6 +112,7 @@ public class PoolManager : MonoBehaviour
     {
         assetLoader.init();
         LoadMiceAsset();
+        LoadSpecialAsset();
         LoadItemAsset();
         LoadEffectAsset();
     }
@@ -112,14 +121,20 @@ public class PoolManager : MonoBehaviour
     {
         // 載入 老鼠資產
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
-        {
             assetLoader.LoadAsset(item.Value + "/", item.Value);
-        }
 
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
-        {
             assetLoader.LoadPrefab(item.Value + "/", item.Value);
-        }
+    }
+
+    private void LoadSpecialAsset()
+    {
+        // 載入 特殊老鼠
+        foreach (KeyValuePair<int, string> item in _dictSpecialObject)
+            assetLoader.LoadAsset(item.Value + "/", item.Value);
+
+        foreach (KeyValuePair<int, string> item in _dictSpecialObject)
+            assetLoader.LoadPrefab(item.Value + "/", item.Value);
     }
 
     private void LoadItemAsset()
@@ -142,9 +157,9 @@ public class PoolManager : MonoBehaviour
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
         {
             int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-            string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
+            string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
-            assetLoader.LoadPrefab("Effects" + "/", itemName.Remove(itemName.Length - 4) + "Effect");
+            assetLoader.LoadPrefab("Effects" + "/",itemName + "Effect");
         }
     }
 
@@ -153,18 +168,15 @@ public class PoolManager : MonoBehaviour
         //if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log(assetLoader.ReturnMessage);
 
-
-
-
         if (assetLoader.loadedObj && !_poolingFlag)
         {
             _dictSkillMice = Global.dictTeam;
             InstantiateObject(_dictMiceObject);
+            InstantiateObject(_dictSpecialObject);
             InstantiateSkillMice(_dictSkillMice);
             _poolingFlag = true;
             Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
         }
-
 
         _currentTime = Time.time;
 
@@ -184,19 +196,6 @@ public class PoolManager : MonoBehaviour
             _lastTime = _currentTime;
         }
     }
-    /*
-        List<float> GetMiceProperty(string miceName)
-        {
-            List<float> data = new List<float>();
-
-            foreach (KeyValuePair<string, object> item in Global.miceProperty)
-            {
-
-            }
-
-            return data;
-        }
-        */
 
 
     void InstantiateObject(Dictionary<int, string> objectData)
@@ -204,13 +203,13 @@ public class PoolManager : MonoBehaviour
         foreach (KeyValuePair<int, string> item in objectData)
         {
             GameObject bundle = assetLoader.GetAsset(item.Value);
-            if (bundle != null) Instantiate(item.Key.ToString(), bundle);
+            if (bundle != null) 
+                Instantiate(item.Key.ToString(), bundle);
         }
     }
 
     void InstantiateSkillMice(Dictionary<string, object> objectData)
     {
-
         int i = 0;
         float lerpSpeed = 0.1f;
         float upDistance = 30f;
@@ -272,29 +271,40 @@ public class PoolManager : MonoBehaviour
         //Debug.Log("_dictObject.Count:" + _dictObject.Count);
         //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
 
+        if (!ObjectPool.transform.FindChild(objectID))
+        {
+            Debug.Log("Pooling can't find :" + objectID);
+        }
+
         if (ObjectPool.transform.FindChild(objectID).childCount == 0)
         {
             string bundleName = (string)ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
             GameObject bundle = assetLoader.GetAsset(bundleName);
-            if (bundle != null) Instantiate(objectID, bundle);
+            if (bundle != null)
+                    Instantiate(objectID, bundle);
         }
+
 
         for (int i = 0; i < ObjectPool.transform.FindChild(objectID).childCount; i++)
         {
             GameObject clone = ObjectPool.transform.FindChild(objectID).GetChild(i).gameObject;
             MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
             MiceAttr miceAttr = attrFactory.GetMiceProperty(objectID);
-            mice.Initialize(lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
             if (mice.enabled == false) mice.enabled = true;
-
 
             if (clone.name == objectID && !clone.gameObject.activeSelf)
             {
+                clone.SetActive(true);
                 miceAttr.SetHP(1);
                 mice.SetArribute(miceAttr);
-                
+                mice.Initialize(false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime);
+                clone.transform.GetChild(0).localScale = Vector3.one;
+                clone.transform.GetChild(0).localRotation = Quaternion.identity;
+                clone.transform.GetChild(0).localPosition = Vector3.zero;
+                if (clone.GetComponent<BoxCollider2D>()) clone.GetComponent<BoxCollider2D>().enabled = true;
+                if (clone.GetComponentInChildren<BoxCollider2D>()) clone.GetComponentInChildren<BoxCollider2D>().enabled = true;
+                clone.SetActive(false);
                 clone.SetActive(true);
-                mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
                 return clone;
             }
         }
@@ -319,15 +329,37 @@ public class PoolManager : MonoBehaviour
         clone = objFactory.Instantiate(bundle, objGroup, objectID, Vector3.zero, Vector3.one, Vector2.zero, -1);
         MiceAttr miceAttr = attrFactory.GetMiceProperty(objectID);
         miceAttr.SetMaxHP(1);
-        // 附加 Mice 並初始化
-        Mice mice = clone.AddMissingComponent<Mice>();
-        mice.Initialize(lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
 
-        // 設定數值
-        mice.SetArribute(miceAttr);
+       MiceBase mice;
 
         // 設定動畫
-        mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+       if (objectID == "11001")
+       {
+           // 附加 Mice 並初始化
+           mice = clone.GetComponent<MiceBase>();
+           mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+       }else 
+        if (objectID == "11002")
+        { 
+            // 附加 Mice 並初始化
+            mice = clone.GetComponent<MiceBase>();
+            mice.SetAnimState(new MuchAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+        }
+        else if (objectID == "11003")
+        {            // 附加 Mice 並初始化
+            mice = clone.GetComponent<MiceBase>();
+            mice.SetAnimState(new HeroMiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance * 2, miceAttr.LifeTime));
+        }
+        else
+        {            // 附加 Mice 並初始化
+            mice = clone.AddMissingComponent<Mice>();
+            mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+        }
+            // 設定數值
+        mice.SetArribute(miceAttr);
+        mice.Initialize(false,lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
+
+
         clone.gameObject.SetActive(false);    // 新版 子物件隱藏
     }
 

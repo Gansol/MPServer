@@ -9,6 +9,7 @@ public class EasyBattleAIState : BattleAIState
     public EasyBattleAIState()
     {
         Debug.Log("Now State: EasyBattleAIState");
+        battleAIState = ENUM_BattleAIState.EasyMode;
         normalSpawn = 25;    //25 50 50 75
         spawnCount = 6;
         lerpTime = 0.035f;
@@ -22,6 +23,9 @@ public class EasyBattleAIState : BattleAIState
         maxSpawnInterval = 1;
         lastTime = spawnIntervalTime = 1.5f;
         spawnSpeed = 1.2f;
+        totalSpawn = 0;
+        wave = 0;
+        nextBali = 4; nextMuch = 3; nextSuper = 50;
     }
 
 
@@ -39,13 +43,13 @@ public class EasyBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001);//錯誤
+                Spawn(10001, spawnCount);//錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 3;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed);//錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed,spawnCount);//錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
 

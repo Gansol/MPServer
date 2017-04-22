@@ -72,7 +72,7 @@ public class ShadowAvatarSkill : SkillBoss
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer2)
                     {
                         if (Global.dictBattleMice.ContainsKey(mice2.Key))
-                           dictMice[mice2.Key].GetComponent<Mice>().SendMessage("OnDead", 0.0f);
+                           dictMice[mice2.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0.0f);
                         dictMice.Remove(mice.Key);
                     }
                     dictMice.Clear();
@@ -87,7 +87,7 @@ public class ShadowAvatarSkill : SkillBoss
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer)
                     {
                         if (mice2.Value != null)
-                            mice2.Value.GetComponent<Mice>().OnEffect("Shadow", null);
+                            mice2.Value.GetComponent<MiceBase>().OnEffect("Shadow", null);
                     }
 
                     dictMice[mice.Key] = objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, mice.Key.gameObject, false);
@@ -115,7 +115,7 @@ public class ShadowAvatarSkill : SkillBoss
         foreach (KeyValuePair<Transform, GameObject> mice in buffer)
         {
             if (Global.dictBattleMice.ContainsKey(mice.Key))
-                dictMice[mice.Key].GetComponent<Mice>().SendMessage("OnDead", 99f);
+                dictMice[mice.Key].GetComponent<MiceBase>().SendMessage("OnDead", 99f);
             dictMice.Remove(mice.Key);
         }
         skillFlag = false;

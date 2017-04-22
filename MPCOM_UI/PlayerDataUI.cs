@@ -1,6 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
 using Gansol;
+using System.Collections.Generic;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -24,12 +25,12 @@ namespace MPCOM
         byte[] LoadPlayerData(string account);
         byte[] LoadPlayerItem(string account);
         byte[] LoadPlayerItem(string account, Int16 itemID);
-        byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team , string friend);
-        byte[] UpdateGameOver(string account, int score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item);
-        byte[] UpdatePlayerData(string account, string miceAll , string miceName, int amount);
-        byte[] UpdatePlayerData(string account, string miceAll, string team );
+        byte[] UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend);
+        byte[] UpdateGameOver(string account, int score, short exp, Int16 maxCombo, int maxScore, int lostMice, int killMice, int battleResult, string item);
+        byte[] UpdatePlayerData(string account, string miceAll, string miceName, int amount);
+        byte[] UpdatePlayerData(string account, string miceAll, string team);
         byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount);
-        byte[] UpdatePlayerItem(string account, string jItemUsage);
+        byte[] UpdatePlayerItem(string account, string jItemUsage, string[] columns);
         byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
         byte[] SortPlayerItem(string account, string jString);
     }
@@ -117,7 +118,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家全部資料
         /// </summary>
-        public byte[] UpdatePlayerData(string account, byte rank, byte exp, Int16 maxCombo, int maxScore, int sumScore, Int16 sumLost, int sumKill, string item, string miceAll, string team, string friend)
+        public byte[] UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -142,7 +143,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家(GameOver時)資料
         /// </summary>
-        public byte[] UpdateGameOver(string account, int score, byte exp, Int16 maxCombo, int maxScore, Int16 lostMice, int killMice, int battleResult, string item )
+        public byte[] UpdateGameOver(string account, int score, short exp, Int16 maxCombo, int maxScore, int lostMice, int killMice, int battleResult, string item)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -172,7 +173,7 @@ namespace MPCOM
         /// <param name="miceName">老鼠名稱</param>
         /// <param name="amount">數量</param>
         /// <returns></returns>
-        public byte[] UpdatePlayerData(string account, string miceAll , string miceName, int amount)
+        public byte[] UpdatePlayerData(string account, string miceAll, string miceName, int amount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -197,7 +198,7 @@ namespace MPCOM
         /// <summary>
         /// 更新 玩家(TeamUpdate時)資料
         /// </summary>
-        public byte[] UpdatePlayerData(string account, string miceAll, string team )
+        public byte[] UpdatePlayerData(string account, string miceAll, string team)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -250,12 +251,13 @@ namespace MPCOM
 
         #region UpdatePlayerItem 更新玩家(多筆道具)資料
         /// <summary>
-        /// 更新玩家(多筆道具)資料
+        /// 更新玩家 多筆道具資料(使用量、經驗、等級)
         /// </summary>
         /// <param name="account"></param>
         /// <param name="jItemUsage"></param>
+        /// <param name="columns">UseCount、Exp、Rank</param>
         /// <returns></returns>
-        public byte[] UpdatePlayerItem(string account, string jItemUsage)
+        public byte[] UpdatePlayerItem(string account, string jItemUsage, string[] columns)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -264,7 +266,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.UpdatePlayerItem(account, jItemUsage);
+                playerData = playerDataLogic.UpdatePlayerItem(account, jItemUsage, columns);
             }
             catch (Exception e)
             {
@@ -332,6 +334,6 @@ namespace MPCOM
             }
             return TextUtility.SerializeToStream(playerData);
         }
-                #endregion
+        #endregion
     }
 }

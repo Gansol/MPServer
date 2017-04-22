@@ -434,6 +434,9 @@ namespace MPServer
             protected DateTime joinTime; // 多增加進入房間時間的屬性，並且設為唯讀
             public DateTime JoinTime { get { return joinTime; } }
             public int gameScore { get; set; }
+            public short totalScore { get; set; }
+            public byte missionCompletedCount { get; set; }
+            public byte maxMissionCount { get; set; }
             public float energy { get; set; }
             public float scoreRate { get; set; }
             public float energyRate { get; set; }
@@ -441,7 +444,7 @@ namespace MPServer
             public RoomActor(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP)
                 : base(guid, PrimaryID, Account, Nickname, Age, Sex, IP)
             {
-                energy = gameScore = 0;
+                energy = gameScore = totalScore = 0;
                 scoreRate = energyRate = 1f;
                 this.joinTime = System.DateTime.Now;    // 記錄加人此房間的時間
             }

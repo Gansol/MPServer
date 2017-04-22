@@ -1,5 +1,17 @@
 ﻿namespace MPProtocol
 {
+    public enum ENUM_BattleAIState : byte
+    {
+        Random = 0,
+        EasyMode = 1,
+        NormalMode = 2,
+        HardMode = 3,
+        CarzyMode = 4,
+        MissionMode = 5,
+        EndTimeMode = 6,
+        HelpMode = 7,
+    }
+
     public enum SpawnStatus : byte
     {
 
@@ -128,6 +140,7 @@
 
     public enum BattleParameterCode
     {
+        // 1~30
         Ret = 0,                        // 回傳值
         Damage = 1,                     // 技能傷害
         RoomID = 2,                     // 房間ID
@@ -148,11 +161,14 @@
         GoldReward = 17,                // 金幣獎勵
         SliverReward = 18,              // 銀幣獎勵(遊戲幣、糧食)
         EXPReward = 19,                 // 經驗獎勵(遊戲幣、糧食)
-        BattleResult = 20,              // 戰鬥結果
-        ScoreRate = 21,                 // 分數倍率
-        SkillType = 22,                 // 技能類型
-        Energy = 23,                    // 能量
-        EnergyRate = 24,                // 能量倍率
+        ItemReward = 20,                // 道具獎勵
+        BattleResult = 21,              // 戰鬥結果
+        ScoreRate = 22,                 // 分數倍率
+        SkillType = 23,                 // 技能類型
+        Energy = 24,                    // 能量
+        EnergyRate = 25,                // 能量倍率
+        SpawnCount = 26,                // 產生數量
+        Evaluate = 27,                  // 評價
     }
 
     public enum BattleResponseCode

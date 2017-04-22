@@ -24,11 +24,11 @@ namespace MPCOM
         public string ReturnMessage; //回傳說明文字<30全形字
 
         public byte Rank;			// 等級
-        public byte EXP;			// 經驗
+        public short Exp;			// 經驗
         public Int16 MaxCombo;		// 最大Combo數
         public int MaxScore;		// 最高分數
         public int SumScore;		// 總分數
-        public Int16 SumLost;		// 總跑掉老鼠
+        public int SumLost;		    // 總跑掉老鼠
         public int SumKill;		    // 總清除老鼠
         public int SumWin;		    // 總勝場
         public int SumBattle;		// 總場次

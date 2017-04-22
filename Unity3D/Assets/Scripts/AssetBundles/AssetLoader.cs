@@ -59,10 +59,15 @@ public class AssetLoader : MonoBehaviour
     public void LoadAsset(string folderPath, string assetName)
     {
         AssetBundleManager.init();
+        try
+        {
+            StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
+        }
+        catch
+        {
+            throw;
+        }
 
-        //StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Texture)));
-        //StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(Material)));
-        StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
     }
 
     public void LoadPrefab(string folderPath, string assetName)    // 載入遊戲物件

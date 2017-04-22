@@ -388,7 +388,7 @@ public class StoreManager : PanelManager
                 GameObject bundle = assetLoader.GetAsset(folder + (i + 1).ToString());
                 Transform parent = myParent.GetChild(1).GetChild(i).GetChild(0);
 
-                insObj.Instantiate(bundle, parent, folder + (i + 1).ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
+                insObj.Instantiate(bundle, parent, folder + (i + 1).ToString(), new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
             }
             else
             {
@@ -459,7 +459,7 @@ public class StoreManager : PanelManager
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
                 if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                 {
-                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(150, 150), 400);
+                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), new Vector3(0, -30), Vector3.one, new Vector2(140, 140), 400);
                 }
             }
             else

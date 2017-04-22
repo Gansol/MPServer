@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Mice : MiceBase
 {
@@ -7,14 +8,14 @@ public class Mice : MiceBase
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
     UICamera cam;
 
-    public override void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-
+        m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
     }
@@ -70,9 +71,9 @@ public class Mice : MiceBase
         if (Global.isGameStart)
         {
             if (m_Arribute.GetHP() == 0)
-                battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+                battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
             else
-                battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+                battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
             Global.dictBattleMice.Remove(transform.parent);
             Global.MiceCount--;
 
@@ -83,12 +84,22 @@ public class Mice : MiceBase
 
     public override void OnEffect(string name, object value)
     {
-        if (name == "Scorched")
+        if (name == "Scorched" || name == "HeroMice")
             OnHit();
         if (name == "Snow")
             m_AnimState.SetMotion((bool)value);
         if (name == "Shadow")
             Debug.Log("Play Shadow");
+        if (name == "Much")
+        {
+            Dictionary<int, Vector3> pos = value as Dictionary<int, Vector3>;
+            MiceAnimState state = m_AnimState as MiceAnimState;
+            m_AnimState.SetMotion(true);
+            state.SetToPos(pos[0]);
+            state.SetToScale(new Vector3(0.25f, 0.25f));
+            _survivalTime = 999;
+            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+        } 
         // play("Shadow"
     }
 }

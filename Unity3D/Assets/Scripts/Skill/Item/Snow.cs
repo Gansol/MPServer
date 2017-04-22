@@ -64,7 +64,10 @@ public class Snow : SkillItem
         foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMice)
         {
             if (item.Value != null)
+            {
+                //item.Value.GetComponent<MiceBase>().Play(AnimatorState.ENUM_AnimatorState.Frozen);
                 item.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, false);
+            }
         }
 
         m_StartTime = Time.time;

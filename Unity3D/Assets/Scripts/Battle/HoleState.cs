@@ -18,12 +18,7 @@ public class HoleState : MonoBehaviour
 
     void Update()
     {
-        if (name == "Hole5" && this.transform.childCount == 4)
-        {
-            GetComponent<BoxCollider>().enabled = false;
-            holeState = State.Closed;
-        }
-        else if (this.transform.childCount == 2)
+        if (transform.childCount >= 2)
         {
             GetComponent<BoxCollider>().enabled = false;
             holeState = State.Closed;

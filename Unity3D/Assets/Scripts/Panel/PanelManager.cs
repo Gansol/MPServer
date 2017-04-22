@@ -108,10 +108,10 @@ public class PanelManager : MPPanel
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadPrefab("Panel/", _panelName);
             _loadedPanel = true;
-        }                                                   // 已載入AB 顯示Panel
+        }
         else
         {
-            PanelSwitch();
+            PanelSwitch();// 已載入AB 顯示Panel
         }
     }
     #endregion
@@ -235,6 +235,7 @@ public class PanelManager : MPPanel
             else
             {
                 EventMaskSwitch.Resume();
+                panelState.obj.SetActive(false);
                 panelState.onOff = !panelState.onOff;
                 Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
             }
@@ -318,7 +319,7 @@ public class PanelManager : MPPanel
     {
         if (Global.isMatching)
         {
-            if ((_ckeckTime > 10) && _checkFlag)
+            if ((_ckeckTime > 30) && _checkFlag)
             {
                 Global.photonService.ExitWaitingRoom();
                 _ckeckTime = 0;
@@ -329,15 +330,6 @@ public class PanelManager : MPPanel
                 _checkFlag = true;
                 _ckeckTime += Time.deltaTime;
             }
-        }
-    }
-
-    public void OnMatchGame()
-    {
-        if (!Global.isMatching && Global.LoginStatus)
-        {
-            Global.isMatching = true;
-            Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
         }
     }
 

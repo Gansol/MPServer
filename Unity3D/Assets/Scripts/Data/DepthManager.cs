@@ -38,9 +38,7 @@ public class DepthManager : MonoBehaviour
                 }
             }
 
-
             go.gameObject.layer = parent.gameObject.layer;
-
 
             foreach (Transform child in go.transform)
             {

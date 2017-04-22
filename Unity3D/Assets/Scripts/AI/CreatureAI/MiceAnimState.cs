@@ -3,29 +3,50 @@ using System.Collections;
 
 public class MiceAnimState : AnimatorState
 {
+    private bool _toFlag, _toScale;
+    private Vector3 _toWorldPos, _scale;
 
     public MiceAnimState(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
         : base(obj, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
     {
         anims = obj.GetComponentInChildren<Animator>();
+        if (anims!=null)
+            currentState = anims.GetCurrentAnimatorStateInfo(0);
         _tmpSpeed = _upSpeed = upSpeed / 10;
     }
     // private BattleManager battleManager = null;
+
+    public void SetToPos(Vector3 toWorldPos)
+    {
+        _toWorldPos = toWorldPos;
+        _toFlag = true;
+    }
+
+    public void SetToScale(Vector3 scale)
+    {
+        _scale = scale;
+        _toScale = true;
+    }
 
     public override void UpdateAnimation()
     {
         //anims = obj.GetComponentInChildren<Animator>();
         _survivalTime = Time.time - _lastTime;
-        if (_bMotion && (_upFlag && obj.transform.localPosition.y < _upDistance))        // AnimationUp
+        if (_bMotion && !_toFlag && (_upFlag && obj.transform.localPosition.y < _upDistance))        // AnimationUp
             AnimationUp();
 
-        if (_bMotion && (_isDisappear && obj.transform.localPosition.y > -_upDistance)) // AnimationDown
+        if (_bMotion && !_toFlag && (_isDisappear && obj.transform.localPosition.y > -_upDistance)) // AnimationDown
             AnimationDown();
 
+        if (_bMotion && _toFlag && (Vector3.Distance(obj.transform.position, _toWorldPos) > 0)) // AnimationTo
+            AnimationTo();
+
+        if (_bMotion && _toScale && (Vector3.Distance(obj.transform.position, _toWorldPos) > 0)) // AnimationScale
+            AnimationScale();
 
         if (anims != null)
         {
-            AnimatorStateInfo currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
+            currentState = anims.GetCurrentAnimatorStateInfo(0);      // 取得目前動畫狀態 (0) = Layer
             //Debug.Log("currentState : " + currentState.nameHash);
             if (currentState.nameHash == Animator.StringToHash("Layer1.Hello"))         // 如果 目前 動化狀態 是 up
             {
@@ -150,4 +171,44 @@ public class MiceAnimState : AnimatorState
         }
     }
 
+    private void AnimationTo()
+    {
+        // _tmpSpeed = Mathf.Lerp(_tmpSpeed, 1, _lerpSpeed);
+        float distance = Vector3.Distance(obj.transform.GetChild(0).transform.position, _toWorldPos);
+        if (distance >= 0 && distance <= 0.05f)
+        {
+            obj.transform.GetChild(0).transform.position = _toWorldPos;
+            _toFlag = false;
+        }
+        else
+        {
+            obj.transform.GetChild(0).transform.position = Vector3.Lerp(obj.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed);
+        }
+    }
+
+    private void AnimationScale()
+    {
+        if (obj.transform.localScale == _scale)
+            _toScale = false;
+        obj.transform.localScale = Vector3.Lerp(obj.transform.localScale, _scale, 0.1f);
+
+    }
+    public override void init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    {
+        animState = ENUM_AnimatorState.None;
+        _isBoss = isBoss;
+        _lerpSpeed = lerpSpeed;
+        _tmpDistance = _upDistance = upDistance;
+        _lifeTime = lifeTime;
+
+        _lastTime = Time.time;
+        this.obj = obj;
+        _upFlag = true;
+        _bMotion = true;
+        _bDead = false;
+        _isDisappear = false;
+        _bEating = false;
+        _tmpSpeed = _upSpeed = upSpeed / 10;
+        _toFlag = _toScale = false;
+    }
 }

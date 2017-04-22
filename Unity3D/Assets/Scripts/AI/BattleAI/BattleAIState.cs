@@ -6,13 +6,15 @@ public abstract class BattleAIState
 {
     protected static float spawnOffset = 0f;    // SpawnTime修正值
     protected static double lastTime = 0d;
+    protected static int totalSpawn = 0, wave = 0, nextBali = 27, nextMuch = 4, nextSuper = 50;
     protected BattleManager battleManager = null;
     protected MPFactory spawner = null;
     protected SpawnState spawnState = null;
+    protected ENUM_BattleAIState battleAIState = ENUM_BattleAIState.EasyMode;
     protected SpawnStatus spawnStatus = SpawnStatus.LineL;
     protected int spawnCount, minStatus, maxStatus, minMethod, maxMethod, normalSpawn, nowCombo;          // 產生數量、老鼠產生資料最小值、老鼠產生資料最大值、正常產生狀態值、更換AI狀態後目前combo
-    protected float lerpTime, spawnTime, intervalTime, spawnIntervalTime, intervalOffset = .05f, minSpawnInterval, maxSpawnInterval,spawnSpeed; // 加速度、老鼠產生間隔、每組老鼠產生間隔、Spawn難度修正值、每次Spawn間隔、最大、最小間隔
-    
+    protected float lerpTime, spawnTime, intervalTime, spawnIntervalTime, intervalOffset = .05f, minSpawnInterval, maxSpawnInterval, spawnSpeed; // 加速度、老鼠產生間隔、每組老鼠產生間隔、Spawn難度修正值、每次Spawn間隔、最大、最小間隔
+
     protected Coroutine coroutine;
 
     public abstract void UpdateState();
@@ -32,17 +34,45 @@ public abstract class BattleAIState
     /// </summary>
     /// <param name="miceID">老鼠ID</param>
     /// <returns>routine</returns>
-    protected virtual Coroutine Spawn(short miceID)
+    protected virtual Coroutine Spawn(short miceID, int spawnCount)
     {
         //        Debug.Log(Time.time);
         Random.seed = unchecked((int)System.DateTime.Now.Ticks);
         bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
         spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
         if (spawner != null)
+        {
             coroutine = spawner.Spawn(new Vector2(minStatus, maxStatus), miceID, spawnTime, intervalTime, lerpTime, spawnCount, true, false, reSpawn);
+            totalSpawn += spawnCount;
+            SpawnNaturalMice(totalSpawn);
+        }
         else
+        {
             Debug.Log("Spawn Spawner is null!!!!!!!!!!!!!!!!!!!");
+        }
+
         return coroutine;
+    }
+
+    //生成 自然單位老鼠
+    private void SpawnNaturalMice(int totalSpawn)
+    {
+        if (totalSpawn > nextBali)
+        {
+            nextBali = totalSpawn + nextBali;
+            Spawn(11001, Random.Range(0, 3 + 1));//錯誤
+        }
+
+        if (totalSpawn > nextMuch)
+        {
+            nextMuch = totalSpawn + nextMuch;
+            Spawn(11002, 1);//錯誤
+        }
+        if (totalSpawn > nextSuper)
+        {
+            nextSuper = totalSpawn + nextSuper;
+            Spawn(11003, 1);//錯誤
+        }
     }
 
     /// <summary>
@@ -51,7 +81,7 @@ public abstract class BattleAIState
     /// <param name="miceID">老鼠ID</param>
     /// <param name="intervalTimes">間格倍率</param>
     /// <returns></returns>
-    protected virtual Coroutine SpawnSpecial(int spawnValue, short miceID, float intervalTimes)
+    protected virtual Coroutine SpawnSpecial(int spawnValue, short miceID, float intervalTimes, int spawnCount)
     {
         spawnState = SelectSpawnState(spawnValue, intervalTimes);
         Random.seed = unchecked((int)System.DateTime.Now.Ticks);
@@ -59,9 +89,16 @@ public abstract class BattleAIState
         spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
 
         if (spawner != null)
+        {
             coroutine = spawner.SpawnSpecial(spawnState, miceID, spawnTime, intervalTime, lerpTime, spawnCount, reSpawn);
+            totalSpawn += spawnCount;
+            SpawnNaturalMice(totalSpawn);
+        }
         else
+        {
             Debug.Log("SpawnSpecial Spawner is null!!!!!!!!!!!!!!!!!!!  " + this);
+        }
+
         return coroutine;
     }
 
@@ -188,5 +225,10 @@ public abstract class BattleAIState
     public void SetSpeed(float speed)
     {
         spawnSpeed = speed;
+    }
+
+    public ENUM_BattleAIState GetState()
+    {
+        return battleAIState;
     }
 }

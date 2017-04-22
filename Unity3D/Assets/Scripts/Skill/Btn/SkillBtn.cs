@@ -8,7 +8,7 @@ public class SkillBtn : MonoBehaviour
     MiceAttr attr;
 
     private bool _upFlag, _downFlag, _btnFlag;                                                          // 是否向上、是否向下、按鈕切換
-    private byte _useTimes, _skillTimes;                                                                // 使用次數、技能次數上限
+    private byte _useTimes, _skillTimes,_miceUseCount;                                                                // 使用次數、技能次數上限、使用量
     private short _miceID, _itemID, _skillID, _skillType, _miceCount, _itemCount, _miceUsed, _itemUsed; // 老鼠ID、道具ID、技能ID、技能類別、老鼠數量、道具數量、老鼠使用量、道具使用量
     private float _upDistance = 30, _energyValue = 0.2f, _lerpSpeedParm1 = 0.1f, lerpSpeedParm2 = 8f;   // 上升速度、能量值、加速參數1、加速參數2
 
@@ -60,8 +60,12 @@ public class SkillBtn : MonoBehaviour
                 {
                     Global.photonService.SendSkillMice(_miceID);
                     GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().UpadateEnergy(-_energyValue);
+                    
                     _useTimes++;
                     _miceUsed++;
+                    _miceUseCount++;
+
+                    GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().UpdateUseCount(_miceID, _miceUseCount);
                     _btnFlag = !_btnFlag;
                 }
 

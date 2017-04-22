@@ -39,6 +39,14 @@ namespace MPServer
         private int primaryID;
         MPServerPeer peerOther;
 
+        private BattleUI battleUI;
+        private CurrencyUI currencyUI;
+        private MemberUI memberUI;
+        private MiceDataUI miceDataUI;
+        private PlayerDataUI playerDataUI;
+        private SkillUI skillUI;
+        private StoreDataUI skillDataUI;
+
         //初始化
         public MPServerPeer(IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication)
             : base(rpcProtocol, nativePeer)
@@ -48,6 +56,13 @@ namespace MPServer
             _server = ServerApplication;
 
             _server.Actors.AddConnectedPeer(peerGuid, this);    // 加入連線中的peer列表
+
+            battleUI = new BattleUI();
+            memberUI = new MemberUI();
+            miceDataUI = new MiceDataUI();
+            playerDataUI = new PlayerDataUI();
+            skillUI = new SkillUI();
+            skillDataUI = new StoreDataUI();
         }
 
         //當斷線時
@@ -700,12 +715,12 @@ namespace MPServer
                                 Log.Debug("Data OK");
 
                                 byte rank = playerData.Rank;
-                                byte exp = playerData.EXP;
+                                short exp = playerData.Exp;
                                 Int16 maxCombo = playerData.MaxCombo;
-                                Int32 maxScore = playerData.MaxScore;
-                                Int32 sumScore = playerData.SumScore;
-                                Int16 sumLost = playerData.SumLost;
-                                Int32 sumKill = playerData.SumKill;
+                                int maxScore = playerData.MaxScore;
+                                int sumScore = playerData.SumScore;
+                                int sumLost = playerData.SumLost;
+                                int sumKill = playerData.SumKill;
                                 int sumWin = playerData.SumWin;
                                 int sumBattle = playerData.SumBattle;
 
@@ -718,7 +733,7 @@ namespace MPServer
                                 {
                                     Log.Debug("playerData.ReturnCode == S401");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.EXP, exp }, 
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp }, 
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
                                         { (byte)PlayerDataParameterCode.SumLost, sumLost } ,{ (byte)PlayerDataParameterCode.SumKill, sumKill },{ (byte)PlayerDataParameterCode.SumWin, sumWin },
                                         { (byte)PlayerDataParameterCode.SumBattle, sumBattle },{ (byte)PlayerDataParameterCode.SortedItem, item } ,{ (byte)PlayerDataParameterCode.MiceAll, miceAll } ,
@@ -745,11 +760,11 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                 byte rank = (byte)operationRequest.Parameters[(byte)PlayerDataParameterCode.Rank];
-                                byte exp = (byte)operationRequest.Parameters[(byte)PlayerDataParameterCode.EXP];
+                                short exp = (byte)operationRequest.Parameters[(byte)PlayerDataParameterCode.Exp];
                                 Int16 maxCombo = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.MaxCombo];
                                 int maxScore = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.MaxScore];
                                 int sumScore = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumScore];
-                                Int16 sumLost = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumLost];
+                                int sumLost = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumLost];
                                 int sumKill = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumKill];
 
                                 string item = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.SortedItem];              // Json資料
@@ -766,7 +781,7 @@ namespace MPServer
                                 {
                                     Log.Debug("playerData.ReturnCode == S403");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.EXP, exp }, 
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp }, 
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
                                         { (byte)PlayerDataParameterCode.MiceAll, miceAll } , { (byte)PlayerDataParameterCode.Team, team } , 
                                         { (byte)PlayerDataParameterCode.Friend, friend } 
@@ -835,14 +850,15 @@ namespace MPServer
                                 if (operationRequest.Parameters.Count == 3)
                                 { // 3個參數=更新裝備狀態
                                     bool isEquip = (bool)operationRequest.Parameters[(byte)PlayerDataParameterCode.Equip];
-                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.SortedItem];
+                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
                                     playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, itemID, isEquip)); // 更新裝備狀態
                                 }
                                 else// 更新數量
                                 {
                                     string jItemUsage = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.UseCount];
+                                    string[] columns = (string[])operationRequest.Parameters[(byte)PlayerDataParameterCode.Columns];
                                     Log.Debug("jItemUsage:  " + jItemUsage);
-                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, jItemUsage)); // 更新道具數量
+                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, jItemUsage, columns)); // 更新道具數量
                                 }
 
                                 if (playerData.ReturnCode == "S422")//取得玩家資料成功 回傳玩家資料
@@ -979,6 +995,7 @@ namespace MPServer
                             }
                             break;
                         #endregion
+
 
                         #region LoadCurrency 載入貨幣資料
                         case (byte)CurrencyOperationCode.Load:
@@ -1345,6 +1362,7 @@ namespace MPServer
                             break;
                         #endregion
 
+
                         #region Mission 發送任務
                         case (byte)BattleOperationCode.Mission:
                             {
@@ -1623,46 +1641,63 @@ namespace MPServer
                                     Int16 otherScore = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.OtherScore];
                                     Int16 gameTime = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Time];
                                     Int16 maxCombo = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.MaxCombo];
-                                    Int16 lostMice = (Int16)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumLost];
+                                    int lostMice = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumLost];
+                                    Int16 spawnCount = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.SpawnCount];
                                     int killMice = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumKill];
                                     string item = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.SortedItem];
-
+                                    string dictClientMiceData = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomValue];
+                                    string[] columns = ((string[])operationRequest.Parameters[(byte)PlayerDataParameterCode.Columns]);
                                     Room.RoomActor otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                     peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
+                                    Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
 
-                                    BattleUI battleUI = new BattleUI(); //實體化 IO (連結資料庫拿資料)
-                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.GameOver(score, otherScore, gameTime, lostMice)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("GameOver Data OK");
+                                    char[] trim = new char[] { '"' };
+                                    dictClientMiceData = dictClientMiceData.TrimStart(trim);
+                                    dictClientMiceData = dictClientMiceData.TrimEnd(trim);
 
-                                    if (battleData.ReturnCode == "S501")
+                                    Log.Debug("GameOver Data  : " + account + " " + score + " " + otherScore + " " + gameTime + " " + maxCombo + " " + lostMice + " " + spawnCount + " " + killMice + " " + item + " " + dictClientMiceData + " " + columns.Length + " ");
+
+                                    BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.GameOver(account, score, otherScore, gameTime, lostMice, roomActor.totalScore, spawnCount, roomActor.missionCompletedCount, roomActor.maxMissionCount, maxCombo, dictClientMiceData, columns)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                    Log.Debug("GameOver Data OK : " + battleData.ReturnCode);
+
+                                    if (battleData.ReturnCode == "S514")
                                     {
-                                        Room.RoomActor roomActor;
-                                        roomActor = _server.room.GetActorFromGuid(peerGuid);
-
                                         Log.Debug(roomActor.Nickname + "Player Score : " + roomActor.gameScore + "  " + otherActor.Nickname + "   Other Score : " + otherActor.gameScore);
 
                                         battleData.battleResult = (roomActor.gameScore > otherActor.gameScore) ? (byte)1 : (byte)0;
 
-
+                                        Log.Debug("GameOver Peer: " + roomActor.gameScore + " " + battleData.expReward + " " + maxCombo + " " + score + " " + lostMice + " " + killMice + " " + battleData.battleResult + " " + item);
                                         PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
                                         PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdateGameOver(account, roomActor.gameScore, battleData.expReward, maxCombo, score, lostMice, killMice, battleData.battleResult, item));// 更新會員資料
-
+                                        playerDataUI.UpdatePlayerItem(account, battleData.jMiceResult, columns);   // 更新玩家道具資料 battleData.jMiceResult= 已更新的老鼠(用量、經驗)字串
                                         if (playerData.ReturnCode == "S403")
                                         {
                                             playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account)); // 載入玩家資料 playerData的資料 = 資料庫拿的資料 用account去找
+                                            Log.Debug("battleData.expReward: =" + battleData.expReward + " battleData.sliverReward=  " + battleData.goldReward);
                                         }
                                         else
                                         {
                                             Log.Debug("Update PlayerData Error!" + "  Code:" + playerData.ReturnCode + "  Message:" + playerData.ReturnMessage);
                                         }
 
+                                        CurrencyUI currencyUI = new CurrencyUI();
+
+                                        if (battleData.sliverReward != 0)
+                                            currencyUI.UpdateCurrency(account, (byte)CurrencyType.Sliver, battleData.sliverReward);
+
+                                        if (battleData.goldReward != 0)
+                                            currencyUI.UpdateCurrency(account, (byte)CurrencyType.Gold, battleData.goldReward);
+
+                                        if (!string.IsNullOrEmpty(battleData.jItemReward) || battleData.jItemReward != "{}")
+                                            playerDataUI.UpdatePlayerItem(account, battleData.jItemReward, new string[] { PlayerItem.ItemCount.ToString()});
+
                                         if (playerData.ReturnCode == "S401")
                                         {
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                                     { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, roomActor.gameScore },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },
-                                                     { (byte)BattleParameterCode.EXPReward, battleData.expReward },{ (byte)BattleParameterCode.BattleResult, battleData.battleResult },{ (byte)PlayerDataParameterCode.MaxScore, playerData.MaxScore } ,
-                                                     { (byte)PlayerDataParameterCode.SumLost, playerData.SumLost },{ (byte)PlayerDataParameterCode.SumKill, playerData.SumKill },{ (byte)PlayerDataParameterCode.SortedItem, playerData.SortedItem },
-                                                     { (byte)PlayerDataParameterCode.MaxCombo, playerData.MaxCombo },{ (byte)PlayerDataParameterCode.Rank, playerData.Rank },                                            };
+                                                     { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, roomActor.gameScore },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },{ (byte)BattleParameterCode.GoldReward, battleData.goldReward },
+                                                     { (byte)BattleParameterCode.ItemReward, battleData.jItemReward },{ (byte)BattleParameterCode.EXPReward, battleData.expReward },{ (byte)BattleParameterCode.Evaluate, battleData.evaluate },{ (byte)BattleParameterCode.BattleResult, battleData.battleResult },
+                                                     { (byte)PlayerDataParameterCode.MaxScore, playerData.MaxScore } ,{ (byte)PlayerDataParameterCode.SumLost, playerData.SumLost },{ (byte)PlayerDataParameterCode.SumKill, playerData.SumKill },{ (byte)PlayerDataParameterCode.SortedItem, playerData.SortedItem },
+                                                     { (byte)PlayerDataParameterCode.MaxCombo, playerData.MaxCombo },{ (byte)PlayerDataParameterCode.Rank, playerData.Rank }};
 
                                             OperationResponse response = new OperationResponse((byte)BattleResponseCode.GameOver, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage };
                                             SendOperationResponse(response, new SendParameters());
@@ -1682,8 +1717,6 @@ namespace MPServer
                                         OperationResponse response = new OperationResponse((byte)BattleResponseCode.GameOver, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = battleData.ReturnMessage.ToString() };
                                         SendOperationResponse(response, new SendParameters());
                                     }
-
-
                                 }
                                 catch (Exception e)
                                 {
@@ -1717,7 +1750,7 @@ namespace MPServer
                                     if (storeData.ReturnCode == "S901") // 更新玩家貨幣
                                     {
                                         CurrencyUI currencyUI = new CurrencyUI();
-                                        CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, currencyType, storeData.Price * buyCount));
+                                        CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, currencyType, -storeData.Price * buyCount));
 
 
                                         Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode);

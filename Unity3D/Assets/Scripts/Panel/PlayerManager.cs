@@ -48,8 +48,11 @@ public class PlayerManager : PanelManager
         _itemType = (int)StoreType.Armor;
         _bInvActive = false;
         _bPanelFirstLoad =_bFirstLoad = true;
+    }
+
+    void OnEnable()
+    {
         Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
-        
     }
 
     void Update()
@@ -82,7 +85,7 @@ public class PlayerManager : PanelManager
         parent.FindChild("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
         parent.FindChild("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
         // parent.FindChild("Note").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.FindChild("Exp").GetComponent<UILabel>().text = Global.EXP.ToString() + " / " + clacExp.exp.ToString();
+        parent.FindChild("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + clacExp.Exp.ToString();
         parent.FindChild("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
     }
 
@@ -115,12 +118,13 @@ public class PlayerManager : PanelManager
     private void InstantiateEquipIcon(Dictionary<string, object> itemData, Transform myParent, int itemType)
     {
         int i = 0;
+        object itemID;
+        string itemName = "";
+        Transform imageParent = myParent.GetChild(i).GetChild(0);
 
         foreach (KeyValuePair<string, object> item in itemData)
         {
             var nestedData = item.Value as Dictionary<string, object>;
-            object itemID;
-            string itemName = "";
 
             nestedData.TryGetValue("ItemID", out itemID);
             itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
@@ -136,7 +140,7 @@ public class PlayerManager : PanelManager
                     string bundleName = itemName + "ICON";
                     if (assetLoader.GetAsset(bundleName) != null)                   // 已載入資產時
                     {
-                        Transform imageParent = myParent.GetChild(i).GetChild(0);
+                        
                         if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                         {
                             imageParent.parent.name = itemID.ToString();
@@ -152,6 +156,11 @@ public class PlayerManager : PanelManager
                     }
                 }
             }
+        }
+
+        if (imageParent.childCount == 0)
+        {
+            UIEventListener.Get(imageParent.parent.gameObject).onClick += OnEquipClick;
         }
     }
     #endregion
@@ -218,8 +227,14 @@ public class PlayerManager : PanelManager
     {
         _bInvActive = !_bInvActive;
        // inventoryArea.transform.parent.gameObject.SetActive(_bInvActive);
+        
         inventoryArea.transform.parent.parent.parent.gameObject.SetActive(_bInvActive);
-        _itemType = System.Convert.ToInt32(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
+
+        if (obj.GetComponentInChildren<UISprite>())
+            _itemType = System.Convert.ToInt32(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
+        else
+            _itemType = int.Parse(obj.transform.parent.name);
+
         InstantiateItem(_dictItemData, "InvItem", _itemType, inventoryArea.transform, itemOffset, itemCount, row);
         InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
 
@@ -232,7 +247,6 @@ public class PlayerManager : PanelManager
         Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
         if (_bFirstLoad)                        // 取得未載入物件
         {
-
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -282,5 +296,10 @@ public class PlayerManager : PanelManager
     private void OnLoadPanel()
     {
         GetMustLoadAsset();
+    }
+
+    private void OnDisable()
+    {
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPanel;
     }
 }

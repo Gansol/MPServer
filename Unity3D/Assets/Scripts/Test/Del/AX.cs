@@ -7,6 +7,25 @@ using MPProtocol;
 public class AX : MonoBehaviour
 {
 
+    enum fuc : short
+    {
+        a,
+        b,
+        c,
+    }
+
+    void HAHA(int ff)
+    {
+        Debug.Log((int)ff);
+    }
+    void Start()
+    {
+        transform.GetChild(0).localScale = Vector3.Lerp(transform.GetChild(0).localScale, new Vector3(.5f, .5f),0.1f);
+        transform.GetChild(0).localScale = Vector3.Lerp(transform.GetChild(0).localScale, new Vector3(.5f, .5f), 0.1f);
+        transform.GetChild(0).localScale = Vector3.Lerp(transform.GetChild(0).localScale, new Vector3(.5f, .5f), 0.1f);
+        transform.GetChild(0).localScale = Vector3.Lerp(transform.GetChild(0).localScale, new Vector3(.5f, .5f), 0.1f);
+    }
+
     void OnCollision2DEnter(Collision2D col)
     {
         col.gameObject.GetComponent<ParticleSystem>().enableEmission = true;

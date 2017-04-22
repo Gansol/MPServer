@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class MiceBase : Creature
 {
-    public abstract void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
+    public abstract void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
 
     /// <summary>
     /// On Touch / On Click

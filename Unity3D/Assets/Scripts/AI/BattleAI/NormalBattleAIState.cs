@@ -9,6 +9,7 @@ public class NormalBattleAIState : BattleAIState
     public NormalBattleAIState()
     {
         Debug.Log("Now State: NormalBattleAIState");
+        battleAIState = ENUM_BattleAIState.NormalMode;
         normalSpawn = 50;
         spawnCount = 12;
         lerpTime = 0.065f;
@@ -22,6 +23,9 @@ public class NormalBattleAIState : BattleAIState
         maxSpawnInterval = 2;
         spawnIntervalTime = 1.5f;
         spawnSpeed = 1.1f;
+        totalSpawn = 0;
+        wave = 0;
+        nextBali = 4; nextMuch = 27; nextSuper = 50;
     }
 
     public override void UpdateState()
@@ -42,13 +46,13 @@ public class NormalBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001);   // 錯誤
+                Spawn(10001, spawnCount);   // 錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 3;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed);    //錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed, spawnCount);    //錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
             SetSpawnIntervalTime();                             // 自動調整間隔時間(依照玩家能力)

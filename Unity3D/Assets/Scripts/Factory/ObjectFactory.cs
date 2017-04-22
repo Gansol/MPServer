@@ -27,7 +27,7 @@ public class ObjectFactory
     /// <param name="name">名稱</param>
     /// <param name="position">位置</param>
     /// <param name="scale">縮放</param>
-    /// <param name="spriteScale">2D圖形縮放 Vetor2.zero = not scale</param>
+    /// <param name="spriteScale">2D圖形縮放(Witdh Height) Vetor2.zero = not scale</param>
     /// <param name="depth">深度值 -1=不改變</param>
     /// <returns></returns>
     public GameObject Instantiate(GameObject bundle, Transform parent, string name, Vector3 position, Vector3 scale, Vector2 spriteScale, int depth)
@@ -93,17 +93,19 @@ public class ObjectFactory
                 Global.dictBattleMice.Remove(hole.transform);
 
             GameObject clone = poolManager.ActiveObject(miceID.ToString());
-            clone.transform.gameObject.SetActive(false);
+
             hole.GetComponent<HoleState>().holeState = HoleState.State.Closed;
             _miceSize = hole.transform.GetChild(0).localScale / 10 * miceSize;   // Scale 版本
             clone.transform.parent = hole.transform;              // hole[-1]是因為起始值是0 
             clone.layer = hole.layer;
             clone.transform.localPosition = Vector2.zero;
             clone.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
-            clone.GetComponent<BoxCollider2D>().enabled = true;
-            clone.transform.gameObject.SetActive(true);
+            //clone.GetComponent<BoxCollider2D>().enabled = true;
+
             clone.GetComponent<Creature>().Play(AnimatorState.ENUM_AnimatorState.Hello);
             Global.dictBattleMice.Add(clone.transform.parent, clone);
+            clone.transform.gameObject.SetActive(false);
+            clone.transform.gameObject.SetActive(true);
             return clone;
         }
         return null;

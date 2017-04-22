@@ -6,9 +6,10 @@ public class Scorched : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.GetComponent<Mice>())
+        if (col.gameObject.GetComponent<MiceBase>())
         {
-            col.gameObject.GetComponent<Mice>().OnEffect("Scorched", null);
+            GetComponent<BoxCollider2D>().enabled = false;
+            col.gameObject.GetComponent<MiceBase>().OnEffect("Scorched", null);
             if (GetComponent<ParticleSystem>()) GetComponent<ParticleSystem>().enableEmission = true;
         }
         else

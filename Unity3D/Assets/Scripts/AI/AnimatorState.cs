@@ -5,8 +5,9 @@ public abstract class AnimatorState
 {
     protected GameObject obj;
     protected Animator anims;
+    protected AnimatorStateInfo currentState;
     protected ENUM_AnimatorState animState = ENUM_AnimatorState.None;
-    protected bool _upFlag, _bDead, _isDisappear, _bEating, _timeFlag, _bClick, _isBoss,_bMotion;
+    protected bool _upFlag, _bDead, _isDisappear, _bEating, _timeFlag, _bClick, _isBoss, _bMotion;
     protected float _survivalTime, _animTime, _lerpSpeed, _tmpSpeed, _upSpeed, _tmpDistance, _upDistance = -1, _lifeTime, _lastTime;
     protected float _deadTime = 0.5f, _helloTime = 1.2f;
 
@@ -14,13 +15,19 @@ public abstract class AnimatorState
     {
         None = -1,
         Hello = 0,
-        Idle = 1,
-        Die = 2,
-        OnHit = 3,
+        Idle,
+        Eat,
+        Die,
+        OnHit,
+        Frozen,
+        Fire,
     }
+
+    public abstract void init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
 
     public AnimatorState(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
+        animState = ENUM_AnimatorState.None;
         _isBoss = isBoss;
         _lerpSpeed = lerpSpeed;
         _tmpDistance = _upDistance = upDistance;
@@ -57,5 +64,15 @@ public abstract class AnimatorState
     public virtual void SetMotion(bool value)
     {
         _bMotion = value;
+    }
+
+    public ENUM_AnimatorState GetAnimState()
+    {
+        return animState;
+    }
+
+    public AnimatorStateInfo GetAnimStateInfo()
+    {
+        return currentState;
     }
 }

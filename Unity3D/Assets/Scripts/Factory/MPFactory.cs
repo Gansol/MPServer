@@ -332,7 +332,8 @@ public class MPFactory : MonoBehaviour
             if (hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
             {
                 Global.dictBattleMice.Remove(hole[4].transform);
-                hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
+                if (hole[4].transform.GetComponentInChildren<Mice>())
+                    hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
             }
 
             // 播放洞口動畫

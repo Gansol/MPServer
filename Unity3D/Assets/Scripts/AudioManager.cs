@@ -58,7 +58,7 @@ public class AudioManager : MonoBehaviour
         {
             audio.volume = 0;
             audio.Play();
-            Debug.Log("REPLAY");
+            Debug.Log("PLAY Sound");
         }
 
     }

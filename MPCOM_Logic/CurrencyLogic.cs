@@ -1,5 +1,6 @@
 ﻿using System;
 using System.EnterpriseServices;
+using MPProtocol;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -62,7 +63,6 @@ namespace MPCOM
         #endregion
 
         #region UpdateCurrency
-
         [AutoComplete]
         public CurrencyData UpdateCurrency(string account, byte currencyType, int currency)
         {
@@ -84,11 +84,12 @@ namespace MPCOM
 
                 switch (currencyType)
                 {
-                    case 0:
+                    case (byte)CurrencyType.Sliver:
                         {
-                            if (currencyData.Rice > currency)
+                            rice = (currency > 0) ? currencyData.Rice + currency : currencyData.Rice - currency;
+
+                            if (rice >= 0)
                             {
-                                rice = currencyData.Rice - currency;
                                 currencyData = currencyIO.UpdateCurrency(account, rice);
                             }
                             else
@@ -98,11 +99,13 @@ namespace MPCOM
                             }
                             break;
                         }
-                    case 1:
+                    case (byte)CurrencyType.Gold:
                         {
-                            if (currencyData.Gold > currency)
+
+                            gold = currency > 0 ? (Int16)(currencyData.Gold + (Int16)currency) : (Int16)(currencyData.Gold - (Int16)currency);
+
+                            if (gold >= 0)
                             {
-                                gold = (Int16)(currencyData.Gold - (Int16)currency);
                                 currencyData = currencyIO.UpdateCurrency(account, gold);
                             }
                             else
@@ -118,15 +121,14 @@ namespace MPCOM
                         break;
                 }
             }
-            catch (Exception e)
+            catch
             {
-                throw e;
+                throw;
             }
 
             return currencyData;
 
         }
-
         #endregion
     }
 }

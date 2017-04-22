@@ -9,6 +9,7 @@ public class CrazyBattleAIState : BattleAIState
     public CrazyBattleAIState()
     {
         Debug.Log("Now State: CrazyBattleAIState");
+        battleAIState = ENUM_BattleAIState.CarzyMode;
         normalSpawn = 75;
         spawnCount = 12;
         lerpTime = 0.15f;
@@ -22,6 +23,9 @@ public class CrazyBattleAIState : BattleAIState
         maxSpawnInterval = 3;
         spawnIntervalTime = 2f;
         spawnSpeed = .9f;
+        totalSpawn = 0;
+        wave = 0;
+        nextBali = 4; nextMuch = 27; nextSuper = 50;
     }
 
 
@@ -38,13 +42,13 @@ public class CrazyBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001);// 錯誤
+                Spawn(10001,spawnCount);// 錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 2;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed);    // 錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed, spawnCount);    // 錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
             SetSpawnIntervalTime();

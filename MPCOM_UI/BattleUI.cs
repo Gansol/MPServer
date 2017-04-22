@@ -2,6 +2,8 @@
 using System.EnterpriseServices;
 using Gansol;
 using MPProtocol;
+using System.Collections.Generic;
+
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -24,7 +26,7 @@ namespace MPCOM
         byte[] ClacScore(short miceID, float aliveTime, float scoreRate, float energyRate);
         byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
-        byte[] GameOver(Int16 score,Int16 otherScore, Int16 gameTime, Int16 lostMice);
+        byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo , string dictClientMiceData, string[] columns);
         byte[] UpdateScoreRate(ENUM_Rate rate);
     }
 
@@ -170,8 +172,23 @@ namespace MPCOM
 
 
 
-
-        public byte[] GameOver(short score,short otherScore, short gameTime, short lostMice)
+        /// <summary>
+        /// 處理GameOver時事件
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="score">分數</param>
+        /// <param name="otherScore">對手分數</param>
+        /// <param name="gameTime">遊戲時間</param>
+        /// <param name="lostMice">遺漏的老鼠</param>
+        /// <param name="totalScore">遊戲可獲得的最大分數</param>
+        /// <param name="spawnCount">產生數量</param>
+        /// <param name="missionCompletedCount">任務完成數</param>
+        /// <param name="maxMissionCount">任務數量</param>
+        /// <param name="combo">遊戲時最大Combo</param>
+        /// <param name="dictClientMiceData">老鼠資料(Rank、Exp、UseCount)</param>
+        /// <param name="columns">更新欄位</param>
+        /// <returns></returns>
+        public byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo, string dictClientMiceData, string[] columns)
         {
             BattleData battleData = new BattleData();
             battleData.ReturnCode = "S500";
@@ -180,7 +197,7 @@ namespace MPCOM
             try
             {
                 BattleLogic battleLogic = new BattleLogic();
-                battleData = battleLogic.GameOver(score,otherScore, gameTime,lostMice);
+                battleData = battleLogic.GameOver( account,  score,  otherScore,  gameTime,  lostMice,  totalScore,  spawnCount,  missionCompletedCount,  maxMissionCount,  combo,  dictClientMiceData,  columns);
             }
             catch (Exception e)
             {

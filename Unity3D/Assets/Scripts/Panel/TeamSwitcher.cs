@@ -191,8 +191,9 @@ public class TeamSwitcher : MonoBehaviour
             _other = gameObject;
             _goTarget = _destroy = true;
             TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-            transform.GetChild(0).GetComponent<UISprite>().depth -= _depth;
-            //Debug.Log("return.");
+            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+            DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
+            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
         }
         else if (tag == "TeamIcon")
         {
@@ -201,7 +202,7 @@ public class TeamSwitcher : MonoBehaviour
                 _other = gameObject;
                 _goTarget = _destroy = true;
                 TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-                transform.GetChild(0).GetComponent<UISprite>().depth -= _depth; //有問題 UnityException: Transform child out of bounds
+                DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
                 //Debug.Log("return.");
             }
             else if (_distance > leftDist)  // B1>out

@@ -20,10 +20,12 @@
     public enum PlayerItem : short
     {
         ItemID = 0,
-        ItemCount = 1,
-        ItemType = 2,
-        IsEquip = 3,
-        UseCount = 4,
+        ItemCount,
+        ItemType ,
+        IsEquip,
+        UseCount ,
+        Rank,
+        Exp,
     }
 
     public enum PlayerDataOperationCode
@@ -38,26 +40,28 @@
 
     public enum PlayerDataParameterCode
     {
+        // 30~50
         Ret = 0,
-        Account = 20,
-        Rank = 21,
-        EXP = 22,
-        MaxCombo = 23,
-        MaxScore = 24,
-        SumScore = 25,
-        SumLost = 26,
-        SumKill = 27,
-        SumWin = 28,
-        SumBattle = 29,
-        SortedItem = 30,
-        MiceAll = 31,
-        Team = 32,
-        MiceAmount = 33,
-        Friend = 34,
-        PlayerItem = 35,
-        Equip = 36,
-        Count = 37,
-        UseCount = 38,
+        Account = 30,
+        Rank = 31,
+        Exp = 32,
+        MaxCombo = 33,
+        MaxScore = 34,
+        SumScore = 35,
+        SumLost = 36,
+        SumKill = 37,
+        SumWin = 38,
+        SumBattle = 39,
+        SortedItem = 40,
+        MiceAll = 41,
+        Team = 42,
+        MiceAmount = 43,
+        Friend = 44,
+        PlayerItem = 45,
+        Equip = 46,
+        Count = 47,
+        UseCount = 48,
+        Columns = 49,
     }
 
     public enum PlayerDataResponseCode

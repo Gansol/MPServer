@@ -2,7 +2,8 @@
 using System.EnterpriseServices;
 using MPProtocol;
 using ExitGames.Logging;
-
+using System.Collections.Generic;
+using System.Linq;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -155,7 +156,7 @@ namespace MPCOM
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
             Int16 score = 0;
-
+            Int16 totalScore = 0;
             try
             {
                 switch (miceID) //用老鼠ID來判斷 取得的分數是否異常
@@ -169,12 +170,16 @@ namespace MPCOM
                             Log.Debug("aliveTime:" + aliveTime + "EggMice.eatingRate: " + EggMice.eatingRate + "EggMice.eatFull: " + EggMice.eatFull + "All Eat: " + ateTimes * EggMice.perEat);
                             if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
-                                score -= Convert.ToInt16(EggMice.eatFull * scoreRate);
+                                score = Convert.ToInt16(EggMice.eatFull * scoreRate * -1);
+                                Log.Debug("1Score:" + score);
                             }
                             else
                             {
                                 score = Convert.ToInt16(EggMice.eatFull - (EggMice.perEat * ateTimes * scoreRate));
+                                Log.Debug("2Score:" + score);
                             }
+
+                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
                             break;
                         }
                     case 10002: //Black 錯誤
@@ -189,6 +194,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(BlackMice.eatFull - (BlackMice.perEat * ateTimes * scoreRate));
                             }
+                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
                             break;
                         }
                     case 10003: //Candy 錯誤
@@ -203,6 +209,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(CandyMice.eatFull - (CandyMice.perEat * ateTimes * scoreRate));
                             }
+                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
                             break;
                         }
                     case 10004: //Rabbit 錯誤
@@ -217,6 +224,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(RabbitMice.eatFull - (RabbitMice.perEat * ateTimes * scoreRate));
                             }
+                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
                             break;
                         }
                     case 10005: //Njnja 錯誤
@@ -231,6 +239,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(NinjaMice.eatFull - (NinjaMice.perEat * ateTimes * scoreRate));
                             }
+                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
                             break;
                         }
                 }
@@ -242,6 +251,7 @@ namespace MPCOM
 
             battleData.energy = (Int16)((score > 0) ? 1 : 0 * energyRate);   // 打死老鼠增加能量
             battleData.score = score;
+            battleData.totalScore = totalScore;
             battleData.ReturnCode = "S501";
             battleData.ReturnMessage = "驗證分數成功！";
             return battleData;
@@ -438,59 +448,378 @@ namespace MPCOM
 
         #region GameOver 遊戲結束
         [AutoComplete]
-        public BattleData GameOver(short score, short otherScore, short gameTime, short lostMice)
+        public BattleData GameOver(string account, short score, short otherScore, short gameTime, int lostMice,
+             short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount
+            , short combo, string jStringMiceData, string[] col)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
 
+            string itemReward = "{}", evaluateText;
+            short expReward = 0, sumEvaluateScore;
+            short sliverReward = 0, goldReward = 0, miceExp;
+            short[] lostRate, comboRate, scoreRate, timeRate, missionRate;
+            float[] evaluate;
+
+            List<string> columns = new List<string>(col);
             try
             {
-                if (score >= 0)
-                {
-                    battleData.score = score;
 
-                    float reward = 0;
-                    float exp = 0;
+                jStringMiceData = jStringMiceData.Replace(@"\", "");
+                Log.Debug("jStringMiceData:" + jStringMiceData);
+                Dictionary<string, object> dictClientMiceData = new Dictionary<string, object>();
+                dictClientMiceData = MiniJSON.Json.Deserialize(jStringMiceData) as Dictionary<string, object>;
+                Log.Debug("jStringMiceData:" + dictClientMiceData.Count);
+                Dictionary<string, Dictionary<string, object>> result = new Dictionary<string, Dictionary<string, object>>();
+                lostRate = GetLostRate(lostMice, spawnCount);
+                scoreRate = GetScoreRate(score, totalScore);
+                timeRate = GetTimeRate(gameTime);
+                comboRate = GetComboRate(combo, spawnCount);
+                missionRate = GetMissionRate(missionCompletedCount, maxMissionCount);
+                sumEvaluateScore = Convert.ToInt16(lostRate[1] + scoreRate[1] + timeRate[1] + comboRate[1] + missionRate[1]);
+                evaluate = GetEvaluate(sumEvaluateScore);
+                evaluateText = GetEvaluateText(sumEvaluateScore);
 
-                    if (gameTime >= 30)
-                    {
-                        reward = (score / 10 * 1.0f) + 5;
-                        exp = 1;
-                    }
-                    else if (gameTime >= 120)
-                    {
-                        reward = (score / 10 * 1.05f) + 25;
-                        exp = 2;
-                    }
-                    else if (gameTime >= 300)
-                    {
-                        reward = (score / 10 * 1.1f) + 50;
-                        exp = 5;
-                    }
+                //score / ( 100 + lost rate + combo rate+ mission rate+ score rate + time rate ) * evaluate + default
 
-                    if (lostMice == 0) reward *= 1.5f;
-                    if (score > otherScore) exp *= 2f;
+                sliverReward = (short)Math.Max(0, score / (100 + lostRate[0] + comboRate[0] + missionRate[0] + scoreRate[0] + timeRate[0]) * evaluate[0] + evaluate[1]);
 
-                    battleData.sliverReward = (Int16)reward;
-                    battleData.expReward = (byte)exp;
-                    battleData.ReturnCode = "S501";
-                    battleData.ReturnMessage = "計算獎勵成功！";
-                    return battleData;
-                }
-                else
-                {
-                    battleData.ReturnCode = "S507";
-                    battleData.ReturnMessage = "計算獎勵失敗！";
-                    return battleData;
-                }
+
+                PlayerData playerData = new PlayerData();
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+
+                playerData = playerDataIO.LoadPlayerItem(account);
+                result = UpdateResult(account, playerData, dictClientMiceData);
+
+                playerData = playerDataIO.LoadPlayerData(account);
+                expReward = GetExp(sliverReward, playerData.Rank);
+
+                itemReward = GetItemReward(new List<string>(dictClientMiceData.Keys), sumEvaluateScore);
+
+                goldReward = GetGoldReward(sumEvaluateScore);
+
+                // clac mice exp
+                // playerData = playerDataIO.UpdatePlayerItem(account, result, columns);
+
+                battleData.totalScore = score;
+                battleData.sliverReward = sliverReward;
+                battleData.goldReward = goldReward;
+                battleData.expReward = expReward;
+                battleData.jItemReward = itemReward;
+                battleData.evaluate = evaluateText;
+                battleData.jMiceResult = MiniJSON.Json.Serialize(result);
+                battleData.battleResult = 0;
+
+                battleData.ReturnCode = "S514";
+                battleData.ReturnMessage = "遊戲結束計算完成！";
+                Log.Debug("battleData.sliverReward:" + battleData.sliverReward + "battleData.expReward:" + battleData.expReward + " battleData.jItemReward:" + battleData.jItemReward + " battleData.goldReward:" + battleData.goldReward);
+                return battleData;
             }
-            catch (Exception e)
+            catch
             {
-
-                throw e;
+                throw;
             }
         }
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="micesID">玩家擁有老鼠ID</param>
+        /// <param name="sumEvaluateScore">評價分數加總</param>
+        /// <returns></returns>
+        private string GetItemReward(List<string> micesID, int sumEvaluateScore)
+        {
+            string result = "";
+            int itemKind = 0, itemCount = 0;
+            Random rnd = new Random();
+            Dictionary<string, object> rewardItem = new Dictionary<string, object>();
+            if (sumEvaluateScore >= 18f)
+            {
+                itemKind = rnd.Next(2, 4 + 1);
+                itemCount = rnd.Next(1, 5 + 1);
+            }
+
+            else if (sumEvaluateScore >= 15f)
+            {
+                itemKind = rnd.Next(2, 3 + 1);
+                itemCount = rnd.Next(2, 3 + 1);
+            }
+            else if (sumEvaluateScore >= 12f)
+            {
+                itemKind = rnd.Next(1, 3 + 1);
+                itemCount = rnd.Next(1, 3 + 1);
+            }
+            else if (sumEvaluateScore >= 9f)
+            {
+                itemKind = rnd.Next(1, 2 + 1);
+                itemCount = rnd.Next(1, 2 + 1);
+            }
+            else if (sumEvaluateScore < 9f)
+            {
+                itemKind = 1;
+                itemCount = rnd.Next(1, 3 + 1);
+            }
+
+            for (int i = 0; i < itemKind; i++)
+            {
+                string key = micesID[rnd.Next(0, micesID.Count)];
+                if (!rewardItem.ContainsKey(key))
+                {
+                    Dictionary<string, object> count = new Dictionary<string, object>();
+                    count.Add("ItemCount", itemCount);
+                    rewardItem.Add(key, count);
+                }
+            }
+            result = MiniJSON.Json.Serialize(rewardItem);
+            return result;
+        }
+
+        /// <summary>
+        /// 取得金幣獎勵
+        /// </summary>
+        /// <param name="sumEvaluateScore">評價分數加總</param>
+        /// <returns>金幣獎勵</returns>
+        private short GetGoldReward(int sumEvaluateScore)
+        {
+            short result = 0;
+            Random rnd = new Random();
+            if (sumEvaluateScore >= 18f)
+            {
+                result = Convert.ToInt16(rnd.Next(1, 5 + 1));
+            }
+            return result;
+        }
+
+        #region GameOver Clac Functions
+        private short[] GetLostRate(float lost, float spawnCount)
+        {
+            float rate = lost / spawnCount;
+            short[] result = new short[2];
+
+            if (rate == 1) { result[0] = -10; result[1] = 5; }
+            else if (rate <= .05f) { result[0] = -5; result[1] = 4; }
+            else if (rate <= .08f) { result[0] = 0; result[1] = 3; }
+            else if (rate <= .15f) { result[0] = 10; result[1] = 2; }
+            else if (rate > .15f) { result[0] = 20; result[1] = 1; }
+
+            return result;
+        }
+
+        private short[] GetComboRate(float combo, float spawnCount)
+        {
+            float rate = combo / spawnCount;
+            short[] result = new short[2];
+
+            if (rate == 1) { result[0] = -20; result[1] = 5; }
+            else if (rate >= .6f) { result[0] = -15; result[1] = 4; }
+            else if (rate >= .3f) { result[0] = -10; result[1] = 3; }
+            else if (rate >= .2f) { result[0] = -5; result[1] = 2; }
+            else if (rate < .2f) { result[0] = 0; result[1] = 1; }
+
+            return result;
+        }
+
+        private short[] GetMissionRate(float mission, float maxMission)
+        {
+            float rate = mission / maxMission;
+            short[] result = new short[2];
+
+            if (rate == 1) { result[0] = -15; result[1] = 3; }
+            else if (rate >= .6f) { result[0] = -10; result[1] = 2; }
+            else if (rate >= .3f) { result[0] = -5; result[1] = 1; }
+            else { result[0] = 10; result[1] = 0; }
+
+            return result;
+        }
+
+        private short[] GetScoreRate(float score, float totalScore)
+        {
+            float rate = score / totalScore;
+            short[] result = new short[2];
+
+            if (rate >= .8f) { result[0] = -10; result[1] = 5; }
+            else if (rate >= .6f) { result[0] = -5; result[1] = 4; }
+            else if (rate >= .5f) { result[0] = 0; result[1] = 3; }
+            else if (rate >= .4f) { result[0] = 5; result[1] = 2; }
+            else if (rate < .4f) { result[0] = 10; result[1] = 1; }
+
+            return result;
+        }
+
+        private short[] GetTimeRate(float time)
+        {
+            int gameTime = 300;
+            float rate = time / gameTime;
+            short[] result = new short[2];
+
+            if (rate >= .8f) { result[0] = -10; result[1] = 3; }
+            else if (rate >= .6f) { result[0] = -5; result[1] = 2; }
+            else if (rate >= .5f) { result[0] = 0; result[1] = 1; }
+            else if (rate >= .4f) { result[0] = 5; result[1] = 0; }
+            else if (rate < .4f) { result[0] = 10; result[1] = -5; }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 取得評價
+        /// </summary>
+        /// <param name="sumEvaluateScore">評價分數加總</param>
+        /// <returns>result[0]=獎勵倍率 result[1]=基礎獎勵</returns>
+        private float[] GetEvaluate(float sumEvaluateScore)
+        {
+            float[] result = new float[2];
+
+            if (sumEvaluateScore >= 18f) { result[0] = 1.5f; result[1] = 200; }
+            else if (sumEvaluateScore >= 15f) { result[0] = 1.1f; result[1] = 100; }
+            else if (sumEvaluateScore >= 12f) { result[0] = 1.05f; result[1] = 50; }
+            else if (sumEvaluateScore >= 9f) { result[0] = 1; result[1] = 50; }
+            else if (sumEvaluateScore < 9f) { result[0] = .5f; result[1] = 0; }
+            return result;
+        }
+
+        private string GetEvaluateText(float sumEvaluateScore)
+        {
+            if (sumEvaluateScore >= 18f) { return "S"; }
+            else if (sumEvaluateScore >= 15f) { return "A"; }
+            else if (sumEvaluateScore >= 12f) { return "B"; }
+            else if (sumEvaluateScore >= 9f) { return "C"; }
+            else if (sumEvaluateScore < 9f) { return "F"; }
+
+            return "F";
+        }
+
+        /// <summary>
+        /// 取得經驗值
+        /// </summary>
+        /// <param name="reward">銀幣獎勵</param>
+        /// <param name="level">等級</param>
+        /// <returns>經驗值</returns>
+        private short GetExp(float reward, float level)
+        {
+            reward = (reward / 10f * (100f + level)) + level;
+            Log.Debug("Battle Logic Get Exp:" + reward);
+            return Convert.ToInt16(Math.Round(Math.Min(short.MaxValue, reward), 0, MidpointRounding.AwayFromZero));
+        }
+
+        /// <summary>
+        /// 更新老鼠資料
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="playerData">伺服器玩家資料</param>
+        /// <param name="dictClientMiceData">客戶端老鼠資料(UseCount)</param>
+        /// <returns></returns>
+        private Dictionary<string, Dictionary<string, object>> UpdateResult(string account, PlayerData playerData, Dictionary<string, object> dictClientMiceData)
+        {
+            try
+            {
+                object level, exp, sUseCount, cUseCount, itemCount, data, outClientMiceData;
+
+                Dictionary<string, Dictionary<string, object>> result = new Dictionary<string, Dictionary<string, object>>();
+                Dictionary<string, object> dictServerData = new Dictionary<string, object>();
+                dictServerData = MiniJSON.Json.Deserialize(playerData.PlayerItem) as Dictionary<string, object>;
+
+                List<string> clientKeys = new List<string>(dictClientMiceData.Keys);
+                Dictionary<string, object> miceProp = new Dictionary<string, object>();
+
+                foreach (string key in clientKeys)
+                {
+                    Log.Debug("clientKey:" + key);
+                    if (dictServerData.ContainsKey(key))    // itemID = itemID
+                    {
+                        Log.Debug("Key Equal !!");
+                        dictServerData.TryGetValue(key, out data);  // 取出道具資料
+                        Dictionary<string, object> outServerMiceData = data as Dictionary<string, object>;
+
+                        if (outServerMiceData.TryGetValue(PlayerItem.Rank.ToString(), out level))
+                        {
+                            Log.Debug("Get Rank !!");
+                            if (outServerMiceData.TryGetValue(PlayerItem.Exp.ToString(), out exp))
+                            {
+                                Log.Debug("Get Exp !!");
+                                dictClientMiceData.TryGetValue(key, out outClientMiceData);
+
+                                miceProp = outClientMiceData as Dictionary<string, object>;
+                                miceProp.TryGetValue(PlayerItem.UseCount.ToString(), out cUseCount); // 從玩家老鼠資料中取出 使用次數
+
+                                Log.Debug("useCount:" + cUseCount);
+                                short[] clacResult = ClacMiceRank(Convert.ToInt32(level), Convert.ToInt32(exp), Convert.ToInt32(cUseCount));
+
+                                Log.Debug("  Key:" + key.ToString() + "Rank:" + clacResult[0] + "Exp:" + clacResult[1]);
+
+                                miceProp.Add(PlayerItem.Rank.ToString(), clacResult[0].ToString());                    // 使用clientMiceData參考修改資料
+                                miceProp.Add(PlayerItem.Exp.ToString(), clacResult[1].ToString());                     // 使用clientMiceData參考修改資料
+
+                                //// itemcount
+                                //outServerMiceData.TryGetValue(PlayerItem.ItemCount.ToString(), out itemCount);
+                                //if (ItemCountChk(Convert.ToInt16(itemCount), Convert.ToInt16(cUseCount)))
+                                //    miceProp.Add(PlayerItem.ItemCount.ToString(), (Convert.ToInt16(itemCount) - Convert.ToInt16(cUseCount)).ToString());
+
+                                // Log.Debug(" itemCount: " + itemCount + " cUseCount: " + Convert.ToInt16(cUseCount));
+                                // usecount
+                                //outServerMiceData.TryGetValue(PlayerItem.UseCount.ToString(),out sUseCount);
+                                //Log.Debug(" cUseCount: "+ Convert.ToInt16(miceProp[PlayerItem.UseCount.ToString()]) +" sUseCount: "+ Convert.ToInt16(sUseCount));
+                                //miceProp[PlayerItem.UseCount.ToString()] = Convert.ToInt16(cUseCount) + Convert.ToInt16(sUseCount);
+
+                            }
+                        }
+                        result.Add(key, miceProp);
+                    }
+
+                }
+
+                Log.Debug("result.Count: " + result.Count);
+
+                foreach (KeyValuePair<string, Dictionary<string, object>> x in result)
+                {
+                    foreach (KeyValuePair<string, object> y in x.Value)
+                    {
+                        Log.Debug("result inner.Key: " + y.Key + "  result inner.Key: " + y.Value);
+                    }
+                }
+
+                return result;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+        private bool ItemCountChk(int serverCount, int clientUseCount)
+        {
+            return (serverCount > clientUseCount) ? true : false;
+        }
+
+        /// <summary>
+        /// 計算老鼠等級、經驗
+        /// </summary>
+        /// <param name="level">伺服器老鼠等級</param>
+        /// <param name="exp">伺服器老鼠經驗</param>
+        /// <param name="useCount">客戶端老鼠使用量</param>
+        /// <returns>result[0] = exp result[1] = level</returns>
+        private short[] ClacMiceRank(float level, int exp, int useCount)
+        {
+            short[] result = new short[2];
+
+            useCount = Math.Max(0, useCount);
+            level = Math.Max(0, level);
+
+            int levelMaxExp = (int)(Math.Round(level * level / 5f, MidpointRounding.AwayFromZero) + 2 + level - 1);
+
+            if (exp + useCount < levelMaxExp)
+                exp += useCount;
+            else
+            {
+                exp = useCount + exp - levelMaxExp;
+                level++;
+            }
+
+            result[0] = (short)exp;
+            result[1] = (short)level;
+
+            return result;
+        }
     }
 }
