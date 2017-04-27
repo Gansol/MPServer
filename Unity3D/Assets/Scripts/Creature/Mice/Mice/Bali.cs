@@ -10,6 +10,7 @@ public class Bali : MiceBase
 
     public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
+        if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
@@ -47,12 +48,11 @@ public class Bali : MiceBase
     {
         if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
         {
+            hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
-            battleManager.GetComponent<UIPlaySound>().Play();
-            battleManager.GetComponent<UIPlaySound>().volume = .87f;
         }
         else
         {

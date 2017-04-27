@@ -191,9 +191,9 @@ public class TeamSwitcher : MonoBehaviour
             _other = gameObject;
             _goTarget = _destroy = true;
             TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+//            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
             DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
-            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+         //   Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
         }
         else if (tag == "TeamIcon")
         {
@@ -283,6 +283,7 @@ public class TeamSwitcher : MonoBehaviour
         }
         else
         {
+            RetOrigin();
             Debug.LogError("SwitchBtn Error!");//RetOrigin();
         }
     }

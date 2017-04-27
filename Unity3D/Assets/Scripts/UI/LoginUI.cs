@@ -10,14 +10,19 @@ using GooglePlayGames;
 using MiniJSON;
 using Gansol;
 using System.Data;
+using System.Text;
+using GooglePlayGames.BasicApi;
 
 public class LoginUI : MonoBehaviour
 {
     public GameObject LoginPanel;
     public GameObject JoinPanel;
     public GameObject MatchGame;
+    public GameObject LicensePanel;
+    public UIInput accountField, passwordField;
     public UILabel LoginMessageBox;
-
+    public UIToggle accountToggle, passwordToggle;
+    AssetLoader assetLoader;
     public GameObject[] ErrorText;
 
     TextUtility textUtility = new TextUtility();
@@ -32,21 +37,58 @@ public class LoginUI : MonoBehaviour
     //private string getAge = "0";
     //private string getSex = "0";
     private string getIP = "";
-
+    private string jFileName = "data.json";
+    private string jString;
     //private string JoinRoomResult = "";
     //private bool macthing = false;
     private static bool isLoginBtn = false;
 
     private int emailChk, passwordChk, confirmPasswordChk, equalPassword, nicknameChk;
+    Dictionary<string, object> data;
+
+    GameObject tmpPanel;
+
+    public void OnLicenseClickOn(GameObject panel)
+    {
+        panel.SetActive(false);
+        LicensePanel.SetActive(true);
+        tmpPanel = panel;
+    }
+
+    public void OnLicenseClickOff()
+    {
+        tmpPanel.SetActive(true);
+        LicensePanel.SetActive(false);
+        tmpPanel = null;
+    }
 
     void OnEnable()
     {
-        //  if (Global.LoginStatus) ShowMatchGame();
+        // if (Global.LoginStatus) ShowMatchGame();
         LoginMessageBox.gameObject.SetActive(false);
+
+        //// 讀取帳密儲存資訊
+        //if ((string.IsNullOrEmpty(jString) || jString == "{}") && File.Exists(Global.dataPath + jFileName))
+        //{
+        //    StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+
+        //    data = Json.Deserialize(jString) as Dictionary<string, object>;
+
+        //    accountField.value = data["Account"].ToString();
+        //    passwordField.value = data["Hash"].ToString();
+        //}
+        //else if (!string.IsNullOrEmpty(jString) && jString != "{}")
+        //{
+        //    data = Json.Deserialize(jString) as Dictionary<string, object>;
+        //    accountField.value = data["Account"].ToString();
+        //    passwordField.value = data["Hash"].ToString();
+        //}
+
     }
     // 在Start裡建立好Login的回應事件
     void Start()
     {
+        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;
@@ -64,15 +106,14 @@ public class LoginUI : MonoBehaviour
 
     void Update()
     {
-
     }
 
     void OnGUI()
     {
-        if (Global.photonService.ServerConnected)  // 若已連線成功才顯示登入對話盒
-        {
-            GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
-        }
+        //if (Global.photonService.ServerConnected)  // 若已連線成功才顯示登入對話盒
+        //{
+        //    GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
+        //}
 
         ShowChkMsg();
     }
@@ -146,13 +187,20 @@ public class LoginUI : MonoBehaviour
 
     public void Login(UILabel email, UIInput password)
     {
+        Global.ShowMessage("登入中...");
+        LoginPanel.SetActive(false);
         isLoginBtn = true;
-       Global.Hash= Encrypt(password.value);
-       Global.photonService.Login(email.text, Global.Hash, MemberType.Gansol); // 登入
+        Global.Hash = Encrypt(password.value);
+        char[] splitChar = new char[] { '@' };
+        string[] account = email.text.Split(splitChar);
+        Global.Account = account[0];
+        Global.MemberType = MemberType.Gansol;
+        Global.photonService.Login(Global.Account, Global.Hash, MemberType.Gansol); // 登入
     }
 
     public void OpenJoinPanel(GameObject myPanel, GameObject joinPanel)
     {
+        EventMaskSwitch.Switch(myPanel, true);
         myPanel.SetActive(false);
         joinPanel.SetActive(true);
     }
@@ -198,7 +246,17 @@ public class LoginUI : MonoBehaviour
             {
                 obj.SetActive(false);
             }
-            Global.Hash = Encrypt(password.value.ToString());
+
+
+            char[] splitChar = new char[] { '@' };
+            string[] account = email.text.Split(splitChar);
+            Global.Account = account[0];
+            Global.Hash = Encrypt(password.value);
+            Global.MemberType = MemberType.Gansol;
+
+            //SaveLoginInfo(accountToggle.value, passwordToggle.value);
+
+
             Global.photonService.JoinMember(email.text, Global.Hash, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
             OpenLoginPanel(JoinPanel, LoginPanel);
         }
@@ -208,6 +266,59 @@ public class LoginUI : MonoBehaviour
             password.value = "";
             confrimPassword.value = "";
         }
+    }
+
+    private void SaveLoginInfo(bool memAccount, bool memPD)
+    {
+        bool bChange = false;
+        StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+
+        Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
+
+        if (memAccount)
+        {
+            if (!data.ContainsKey("Account"))
+            {
+                data.Add("Account", Global.Account);
+            }
+            else if (data["Account"] != Global.Account)
+            {
+                data["Account"] = Global.Account;
+                bChange = true;
+            }
+        }
+
+        if (memPD)
+        {
+            if (!data.ContainsKey("Hash"))
+            {
+                data.Add("Hash", Global.Hash);
+            }
+            else if (data["Hash"] != Global.Hash)
+            {
+                data["Hash"] = Global.Hash;
+                bChange = true;
+            }
+        }
+
+        if (bChange)
+        {
+            string contant = Json.Serialize(data);
+            if (File.Exists(Global.dataPath + jFileName))
+                File.Delete(Global.dataPath + jFileName);
+            using (FileStream fs = File.Create(Global.dataPath + jFileName)) //using 會自動關閉Stream 建立檔案
+            {
+                fs.Write(new UTF8Encoding(true).GetBytes(contant), 0, contant.Length); //寫入檔案
+                fs.Dispose(); //避免錯誤 在寫一次關閉
+            }
+        }
+    }
+
+    IEnumerator LoadFile(string filePath)
+    {
+        WWW www = new WWW(filePath);
+        yield return www;
+        jString = www.text;
     }
 
     private Dictionary<string, object> GetSkillData(DataTable dt)
@@ -253,6 +364,8 @@ public class LoginUI : MonoBehaviour
     {
         Global.isJoinMember = joinStatus;
         Global.Ret = returnCode;
+        EventMaskSwitch.PrevToFirst();
+        // Global.photonService.Login(Global.Account, Global.Hash, Global.MemberType);
         LoginMessageBox.gameObject.SetActive(true);
         LoginMessageBox.color = Color.green;
         LoginMessageBox.text = "O  " + message;
@@ -263,13 +376,18 @@ public class LoginUI : MonoBehaviour
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
             //  ShowMatchGame();
+            LoginPanel.SetActive(false);
+            Global.ShowMessage("登入成功！");
+            EventMaskSwitch.PrevToFirst();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
         }
         else // 若登入失敗，取得錯誤回傳字串
         {
             isLoginBtn = false;
+            LoginPanel.SetActive(true);
             LoginMessageBox.gameObject.SetActive(true);
+            Global.ShowMessage(message);
             LoginMessageBox.color = Color.red;
             LoginMessageBox.text = "X  " + message;
         }
@@ -300,21 +418,39 @@ public class LoginUI : MonoBehaviour
     #region GoogleLogin
     public void GoogleLogin()
     {
+
         if (!isLoginBtn)
         {
             Debug.Log("Google Logining...");
             isLoginBtn = true;
+            if (!Social.localUser.authenticated)
+                PlayGamesPlatform.Activate();
             Social.localUser.Authenticate((bool success) =>
             {
                 if (success)
                 {
                     Debug.Log("You've successfully logged in" + Social.localUser.id);
+                    if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
-                    Global.Account = Social.localUser.id;
-                    Global.Nickname = Social.localUser.userName;
+
+                    Global.MemberType = MemberType.Google;
                     Debug.Log(Global.Account);
-                    Global.Hash = Encrypt("12345678");
-                    Global.photonService.Login(Global.Account,Global.Hash , MemberType.Google); // 登入
+                   
+
+                    // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
+                    Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
+                    Global.Hash = Encrypt(Global.Account);
+                    Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
+
+                    //string email = ((PlayGamesLocalUser)Social.localUser).Email;
+                    bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
+                    int age = (underage) ? 88 : 6;
+
+                    //if (String.IsNullOrEmpty(email))
+                    //    email = "example@example.com";
+
+                    Global.ShowMessage("登入中...");
+                    Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
                 }
                 else
                 {
@@ -337,6 +473,7 @@ public class LoginUI : MonoBehaviour
         if (FB.IsLoggedIn)
         {
             Debug.Log("login");
+            FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
         }
         else
         {
@@ -369,28 +506,41 @@ public class LoginUI : MonoBehaviour
         }
     }
 
+    // 普通登入時使用
     // FB Login
     void GetFBProfiler(FBResult result)
     {
+
         if (result.Error != null)
         {
             Debug.Log("Get FB profiler error!");
             FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
             return;
         }
-        Global.MemberType = MemberType.Facebook;
-
+        //Global.MemberType = MemberType.Facebook;
+        //if (!Global.photonService.ServerConnected) 
+        //    gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
         FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
+        Debug.Log(FBProfiler["id"].ToString());
+        Debug.Log(FBProfiler["name"].ToString());
+        Debug.Log(FBProfiler["email"].ToString());
+        Debug.Log(FBProfiler["gender"].ToString());
+        Debug.Log(FBProfiler["birthday"].ToString());
 
-        Global.Account = FBProfiler["id"].ToString();
-        Global.Hash = Encrypt("12345678");
+        string[] tmp = FBProfiler["email"].ToString().Split('@');
+        Global.Account = tmp[0];
+        Global.Hash = Encrypt(Global.Account);
+        Global.MemberType = MemberType.Facebook;
         Global.photonService.Login(Global.Account, Global.Hash, MemberType.Facebook); // 登入
 
         foreach (var item in FBProfiler)
         {
             Debug.Log("KEY:" + item.Key.ToString() + "Value:" + item.Value.ToString());
         }
+
+        LoginPanel.SetActive(false);
+        Global.ShowMessage("登入中...");
     }
     #endregion
 
@@ -412,8 +562,11 @@ public class LoginUI : MonoBehaviour
         isLoginBtn = false;
     }
 
+    // 加入會員後 再度取得資料並登入
     void OnGetProfile()
     {
+        Global.ShowMessage("登入中...");
+        LoginPanel.SetActive(false);
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)
         {
@@ -435,8 +588,10 @@ public class LoginUI : MonoBehaviour
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
                         string tmpPD = "12345678";
-                        Global.Hash = Encrypt(tmpPD);
-                        Global.photonService.JoinMember(account, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
+                        Global.Account = account;
+                        Global.Hash = Encrypt(Global.Account);
+                        Global.MemberType = MemberType.Facebook;
+                        Global.photonService.JoinMember(email, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
                     catch (Exception e)
@@ -453,9 +608,9 @@ public class LoginUI : MonoBehaviour
     {
         if (!String.IsNullOrEmpty(gender))
         {
-            if (gender == "female" || gender == "Female")
+            if (gender == "female" || gender == "Female" || gender == "女")
                 return 0;
-            if (gender == "male" || gender == "Male")
+            if (gender == "male" || gender == "Male" || gender == "男")
                 return 1;
         }
         return 2;

@@ -87,26 +87,28 @@ public class ObjectFactory
         if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open || impose)
         {
             if (impose && Global.dictBattleMice.ContainsKey(hole.transform))
-                Global.dictBattleMice[hole.transform].GetComponentInChildren<Mice>().SendMessage("OnDead", 0.0f);
+                Global.dictBattleMice[hole.transform].GetComponentInChildren<MiceBase>().SendMessage("OnDead", 0.0f);
 
             if (Global.dictBattleMice.ContainsKey(hole.transform))
                 Global.dictBattleMice.Remove(hole.transform);
 
             GameObject clone = poolManager.ActiveObject(miceID.ToString());
+            if (clone != null)
+            {
+                hole.GetComponent<HoleState>().holeState = HoleState.State.Closed;
+                _miceSize = hole.transform.Find("ScaleValue").localScale / 10 * miceSize;   // Scale 版本
+                clone.transform.parent = hole.transform;              // hole[-1]是因為起始值是0 
+                clone.layer = hole.layer;
+                clone.transform.localPosition = Vector2.zero;
+                clone.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
+                //clone.GetComponent<BoxCollider2D>().enabled = true;
 
-            hole.GetComponent<HoleState>().holeState = HoleState.State.Closed;
-            _miceSize = hole.transform.GetChild(0).localScale / 10 * miceSize;   // Scale 版本
-            clone.transform.parent = hole.transform;              // hole[-1]是因為起始值是0 
-            clone.layer = hole.layer;
-            clone.transform.localPosition = Vector2.zero;
-            clone.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
-            //clone.GetComponent<BoxCollider2D>().enabled = true;
-
-            clone.GetComponent<Creature>().Play(AnimatorState.ENUM_AnimatorState.Hello);
-            Global.dictBattleMice.Add(clone.transform.parent, clone);
-            clone.transform.gameObject.SetActive(false);
-            clone.transform.gameObject.SetActive(true);
-            return clone;
+                clone.GetComponent<Creature>().Play(AnimatorState.ENUM_AnimatorState.Hello);
+                Global.dictBattleMice.Add(clone.transform.parent, clone);
+                clone.transform.gameObject.SetActive(false);
+                clone.transform.gameObject.SetActive(true);
+                return clone;
+            }
         }
         return null;
     }

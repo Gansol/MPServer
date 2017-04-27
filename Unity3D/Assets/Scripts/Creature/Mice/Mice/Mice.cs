@@ -6,11 +6,14 @@ public class Mice : MiceBase
 {
     private BattleManager battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
+
     UICamera cam;
 
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+
+        if (hitSound==null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
@@ -45,15 +48,16 @@ public class Mice : MiceBase
     /// </summary>
     protected override void OnHit()
     {
+      //  gameObject.layer = cam.eventReceiverMask;
         if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
         {
+            hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             Global.dictBattleMice.Remove(transform.parent);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
-            battleManager.GetComponent<UIPlaySound>().Play();
-            battleManager.GetComponent<UIPlaySound>().volume =.87f;
+
         }
         else
         {

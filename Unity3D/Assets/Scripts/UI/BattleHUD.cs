@@ -6,12 +6,9 @@ using System.Collections.Generic;
 
 public class BattleHUD : MonoBehaviour
 {
-    float ckeckTime;
-
     public UILabel myName;
     public UILabel otherName;
-    public UISprite myImage;
-    public UISprite otherImage;
+    public UISprite myImage,otherImage;
     public GameObject HPBar;
     public GameObject ComboLabel;
     public GameObject BlueScore;
@@ -27,6 +24,7 @@ public class BattleHUD : MonoBehaviour
     public GameObject OtherPlusObject;
     public GameObject GGObject;
     public GameObject BossHPBar;
+    public UILabel GameTime;
     public GameObject[] StateICON;
 
     [Range(0.1f, 1.0f)]
@@ -38,13 +36,13 @@ public class BattleHUD : MonoBehaviour
     private AssetLoader assetLoader;
     private bool bLoadPrefab;
     private Dictionary<string, object> _dictItemReward;
-    Transform rewardPanel ;
+    Transform rewardPanel;
     ObjectFactory objFactory;
     void Start()
     {
         battleManager = GetComponent<BattleManager>();
         assetLoader = GetComponent<AssetLoader>();
-        objFactory  = new ObjectFactory();
+        objFactory = new ObjectFactory();
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
@@ -55,6 +53,9 @@ public class BattleHUD : MonoBehaviour
         myName.text = Global.Nickname;
         otherName.text = Global.OtherData.Nickname;
         rewardPanel = GGObject.transform.Find("Result").Find("Reward").GetChild(0).GetChild(0).GetChild(0);
+
+        myImage.spriteName = Global.PlayerImage;
+        otherImage.spriteName = Global.OtherData.Image;
     }
 
     void Update()
@@ -79,14 +80,14 @@ public class BattleHUD : MonoBehaviour
                 if (waitState.normalizedTime > 0.1f) WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
 
-        if (StartObject.activeSelf)
-        {
-            Animator startAnims = StartObject.GetComponent("Animator") as Animator;
-            AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+        //if (StartObject.activeSelf)
+        //{
+        //    Animator startAnims = StartObject.GetComponent("Animator") as Animator;
+        //    AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (startState.nameHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
-                if (startState.normalizedTime > 3.0f) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-        }
+        //    if (startState.nameHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
+        //        if (startState.normalizedTime > 1) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+        //}
 
         if (MissionObject.activeSelf)
         {
@@ -117,16 +118,6 @@ public class BattleHUD : MonoBehaviour
                 if (otherState.normalizedTime > 1.0f) OtherPlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
         #endregion
-
-        if (ckeckTime > 15)
-        {
-            Global.photonService.CheckStatus();
-            ckeckTime = 0;
-        }
-        else
-        {
-            ckeckTime += Time.deltaTime;
-        }
     }
 
     private void ShowItemReward()
@@ -155,10 +146,11 @@ public class BattleHUD : MonoBehaviour
         }
         bLoadPrefab = true;
     }
-    
+
 
     void OnGUI()
     {
+        GameTime.text = (Math.Max(0,Math.Floor(Global.GameTime - BattleManager.gameTime))).ToString();
         BlueScore.GetComponent<UILabel>().text = battleManager.score.ToString();         // 畫出分數值
         RedScore.GetComponent<UILabel>().text = battleManager.otherScore.ToString();     // 畫出分數值
 
@@ -267,32 +259,27 @@ public class BattleHUD : MonoBehaviour
         switch (mission)
         {
             case Mission.Harvest:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫       糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = value.ToString();
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫 "+value.ToString()+" 糧食";
                 Debug.Log("Mission : Harvest! 收穫:" + value + " 糧食");
                 break;
             case Mission.HarvestRate:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫增加       ";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = value.ToString();
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫增加 "+value.ToString();
                 Debug.Log("Mission : HarvestRate UP+! 收穫倍率:" + value);
                 break;
             case Mission.Exchange:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "交換收穫的糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
                 Debug.Log("Mission : Exchange! 交換收穫的糧食");
                 break;
             case Mission.Reduce:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "豐收祭典     糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "    " + value.ToString();
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "老鼠們偷吃了 " + value.ToString() + " 糧食..";
                 Debug.Log("Mission : Reduce! 豐收祭典 花費: " + value + " 糧食");
                 break;
             case Mission.DrivingMice:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "驅趕老鼠       隻";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "    " + value.ToString();
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "達成 " + value.ToString() + " Combo!";
                 Debug.Log("Mission : DrivingMice! 驅趕老鼠 數量: " + value + " 隻");
                 break;
             case Mission.WorldBoss:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "世界王出現!!";
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "超 級 老 鼠 出 沒 !!";
                 MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
                 Debug.Log("Mission WARNING 世界王出現!!");
                 break;
@@ -439,9 +426,9 @@ public class BattleHUD : MonoBehaviour
     /// <param name="lost"></param>
     public void GoodGameMsg(int score, bool result, int exp, int sliverReward, int goldReward, string jItemReward, int combo, int killMice, int lostMice, string evaluate, bool isHighScore, bool isHighCombo)
     {
-        ClacExp clacExp = new ClacExp(Global.Rank+1);
-        _dictItemReward = new Dictionary<string,object>( MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
-        
+        ClacExp clacExp = new ClacExp(Global.Rank + 1);
+        _dictItemReward = new Dictionary<string, object>(MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
+
 
         int maxExp = clacExp.Exp;
         int _exp = Global.Exp + exp;
@@ -468,8 +455,8 @@ public class BattleHUD : MonoBehaviour
         GGObject.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
         GGObject.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
 
-        
-        
+
+
 
         // EXP動畫還沒寫
         if (_exp > maxExp)
@@ -477,12 +464,14 @@ public class BattleHUD : MonoBehaviour
             Debug.Log("LEVEL UP!");
             _exp -= maxExp;
         }
-
-        GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = (float)_exp / 100f;
+        float value = _exp;
+        value = value / 100f;
+        GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
         GGObject.SetActive(true);
     }
 
-    private bool LoadItemICON(){
+    private bool LoadItemICON()
+    {
         if (_dictItemReward.Count != 0)
         {
             assetLoader.LoadAsset("MiceICON/", "MiceICON");

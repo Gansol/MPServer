@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.IO;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -15,13 +16,22 @@
  * ****************************************************************/
 public class VisionManager : MonoBehaviour
 {
+    public GameObject message;
+    public UILabel vision, downloadName;
+
     private AssetBundleChecker bundleChecker;
     private SyncLoad syncLoad;
     private VisionChecker visionChecker;
     private AssetLoader assetLoader;
+    InternetChecker connCheck;
+    private bool bundleCheckComplete, flag, bFirstDownload, reConnChk, bTwiceChk, bThreeChk, bCompleted, bDownload;
+    //private bool bLoadAsset;
 
-    private bool bundleCheckComplete;
-    private bool bLoadAsset;
+
+    void Awake()
+    {
+        connCheck = gameObject.AddComponent<InternetChecker>();
+    }
 
     void Start() //開始檢查版本
     {
@@ -31,63 +41,123 @@ public class VisionManager : MonoBehaviour
         visionChecker = new VisionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
         Global.prevScene = Application.loadedLevel;
-        StartCoroutine(visionChecker.CheckVision());
+
+        if (connCheck.ConnStatus)
+            StartCoroutine(visionChecker.CheckVision());
+        else
+            reConnChk = !reConnChk;
+
+        if (!File.Exists(Application.persistentDataPath + "/List/" + Global.visionListFile))
+            bFirstDownload = true;
     }
 
     void Update() //等待完成
     {
         //Debug.Log(Global.ReturnMessage + "  visionChecker.visionChk: " + visionChecker.visionChk);
 
+        if (!string.IsNullOrEmpty(Global.ReturnMessage))
+            downloadName.text = Global.ReturnMessage;
 
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log(assetLoader.ReturnMessage);
+            downloadName.text = assetLoader.ReturnMessage;
+
+        if (!connCheck.ConnStatus)
+        {
+            message.SetActive(true);
+            message.GetComponentInChildren<UILabel>().text = "請檢查網路連線狀態!";
+        }
+        else if (!Global.isCompleted && connCheck.ConnStatus)
+        {
+            message.SetActive(false);
+        }
 
         #region BundleCheck 檢查檔案
-        if (visionChecker.visionChk)
+
+        // 遊戲版本檢查
+        if (reConnChk && connCheck.ConnStatus)
         {
-            if (!bundleCheckComplete)
+            StartCoroutine(visionChecker.CheckVision());
+            reConnChk = !reConnChk;
+        }
+
+        // 第一次檢查
+        if (visionChecker.visionChk && connCheck.ConnStatus)
+        {
+            if (!visionChecker.isNewlyVision)
             {
-                bundleCheckComplete = true;
-                bundleChecker.StartCheck();
+                Debug.Log("Go Google Play!");
+            }
+            else
+            {
+                if (!bundleCheckComplete)
+                {
+                    bundleCheckComplete = true;
+                    bundleChecker.StartCheck();
+                }
             }
         }
-        #endregion
-
-        if (assetLoader.loadedObj && bLoadAsset)
-        {
-            StartCoroutine(visionChecker.ReplaceVisionList());
-            syncLoad = gameObject.AddComponent<SyncLoad>();
-            syncLoad.OnLoadScene();
-
-            bLoadAsset = !bLoadAsset;
-        }
-
-
-        #region Load MainGame 載入遊戲
-        if (Global.isCompleted && !bLoadAsset)
-        {
-
-            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-            assetLoader.LoadAsset("Panel/", "ComicFont");
-            assetLoader.LoadAsset("Panel/", "ComicFontB");
-
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadAsset("Panel/", "GameScene");
-            assetLoader.LoadAsset("Panel/", "MainFront");
-            assetLoader.LoadAsset("Panel/", "MainBack");
-            assetLoader.LoadAsset("Panel/", "ShareObject");
-
-
-
-            assetLoader.LoadPrefab("Panel/", "MenuUI");
-
-
-            bLoadAsset = !bLoadAsset;
-        }
 
 
         #endregion
+        //if (bFirstDownload)
+        //{
+        if (Global.isCompleted && !bTwiceChk && bundleChecker.bundleChk)
+        {
+            bundleChecker.StartCheck();
+            Global.isCompleted = false;
+           bDownload= bTwiceChk = true;
+        }
+        else
+        {
+            bTwiceChk = true;
+        }
+        //}
+        //else
+        //{
+        //    bTwiceChk = true;
+        //    //bThreeChk = true;
+        //}
+
+
+        if (Global.isCompleted && bTwiceChk && !bThreeChk && bundleChecker.bundleChk)
+        {
+            bundleChecker.StartCheck();
+            Global.isCompleted = false;
+           bDownload= bThreeChk = true;
+        }
+        else
+        {
+            bThreeChk = true;
+        }
+
+
+        if (Global.isCompleted && bThreeChk && !bCompleted)
+        {
+            bCompleted = true;
+            if (!bundleChecker.bundleChk)   // 如果沒有新增檔案
+            {
+                if (Global.connStatus) StartCoroutine(visionChecker.ReplaceVisionList());
+                syncLoad = gameObject.AddComponent<SyncLoad>();
+                syncLoad.OnLoadScene();
+            }
+            else if (!flag)
+            {
+                flag = !flag;
+                message.SetActive(true);
+                message.GetComponentInChildren<UILabel>().text = "更新完畢 請重新啟動遊戲！";
+            }
+        }
     }
 
 
+    void OnGUI()
+    {
+        if (bundleCheckComplete)
+            vision.text = "Ver." + Global.gameVersion + " build " + Global.bundleVersion;
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }

@@ -10,7 +10,7 @@ public class SyncLoad : MonoBehaviour
 
 
     void Awake()
-    {
+    { 
         AssetBundleManager.UnloadUnusedAssets();
         System.GC.Collect();
     }
@@ -23,6 +23,9 @@ public class SyncLoad : MonoBehaviour
 
     void Update()
     {
+        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
+
         if (assetLoader.loadedObj && bLoadAsset)
         {
             InstantiateScene();
@@ -45,14 +48,16 @@ public class SyncLoad : MonoBehaviour
 
         if (Application.loadedLevel == (int)Global.Scene.MainGame)
         {
-            //assetLoader.LoadAsset("Panel/", "LiHeiProFont");
+            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
             assetLoader.LoadAsset("Panel/", "ComicFont");
             assetLoader.LoadAsset("Panel/", "ComicFontB");
+
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadAsset("Panel/", "GameScene");
             assetLoader.LoadAsset("Panel/", "MainFront");
             assetLoader.LoadAsset("Panel/", "MainBack");
             assetLoader.LoadAsset("Panel/", "ShareObject");
+
             assetLoader.LoadPrefab("Panel/", "MenuUI");
             bLoadAsset = true;
         }
@@ -96,18 +101,18 @@ public class SyncLoad : MonoBehaviour
                 Global.dictLoadedScene[sceneName] = _clone;
         }
 
-            if (Global.prevScene == (int)Global.Scene.MainGame)
-                Global.dictLoadedScene["MenuUI"].SetActive(false);
-            if (Global.nextScene == (int)Global.Scene.MainGame)
-                Global.dictLoadedScene["MenuUI"].SetActive(true);
+        if (Global.prevScene == (int)Global.Scene.MainGame)
+            Global.dictLoadedScene["MenuUI"].SetActive(false);
+        if (Global.nextScene == (int)Global.Scene.MainGame)
+            Global.dictLoadedScene["MenuUI"].SetActive(true);
 
 
 
-            if (Application.loadedLevelName != "BundleCheck")
-            {
-                _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = false;
-                _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
-            }
+        if (Application.loadedLevelName != "BundleCheck")
+        {
+            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = false;
+            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
+        }
 
         Global.photonService.LoadSceneEvent += OnLoadScene;
 

@@ -61,7 +61,8 @@ public static class AssetBundleManager
 
     static AssetBundleManager()
     {
-        dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
+        if (dictAssetBundleRefs==null)
+            dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
     }
 
     public static void init()
@@ -128,12 +129,12 @@ public static class AssetBundleManager
                     _Ret = "C002";
                     _ReturnMessage = "載入資源失敗！ : \n" + assetPath + "\n";
                     Debug.Log(_ReturnMessage);
-                    foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
-                    {
-                        Debug.LogError("AB DICT: " + item.Key.ToString());
-                    }
+                    //foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+                    //{
+                    //    Debug.LogError("AB DICT: " + item.Key.ToString());
+                    //}
 
-                    Debug.LogError("assetName:" + assetPath + "   Get AB: " + bLoadedAssetbundle(assetName));
+                    Debug.LogError("assetName:" + fileName + "   assetPath:" + assetPath + "   bGetAsset: " + bLoadedAssetbundle(assetName));
                     throw new Exception(www.error);
                 }
                 else if (www.isDone)
@@ -190,7 +191,7 @@ public static class AssetBundleManager
             if (www.error != null)
             {
                 _Ret = "C002";
-                _ReturnMessage = "載入遊戲物件失敗！ :" + assetPath + "\n" + www.error;
+                _ReturnMessage = "載入遊戲物件失敗！ :" + " assetName:" + assetName + "\n assetPath:" + assetPath + "\n" + www.error;
                 Debug.Log("( 3 ) :" + _ReturnMessage);
                 throw new Exception(www.error);
             }

@@ -13,6 +13,7 @@ public class Much : MiceBase
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
@@ -72,14 +73,14 @@ public class Much : MiceBase
     /// </summary>
     protected override void OnHit()
     {
+        
         if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
         {
+            hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
-            battleManager.GetComponent<UIPlaySound>().Play();
-            battleManager.GetComponent<UIPlaySound>().volume = .87f;
         }
         else
         {

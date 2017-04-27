@@ -62,6 +62,7 @@
         Count = 47,
         UseCount = 48,
         Columns = 49,
+        PlayerImage = 50,
     }
 
     public enum PlayerDataResponseCode

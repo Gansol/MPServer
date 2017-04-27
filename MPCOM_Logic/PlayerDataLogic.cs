@@ -264,6 +264,24 @@ namespace MPCOM
 
         #endregion
 
+        #region UpdatePlayerData 更新玩家(圖片)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, object imageName)
+        {
+
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            //如果驗證成功 寫入玩家資料
+            PlayerDataIO playerDataIO = new PlayerDataIO();
+            playerData = playerDataIO.UpdatePlayerData(account, imageName);
+
+            return playerData;
+        }
+
+        #endregion
+
         #region UpdatePlayerData 更新玩家(Team)資料
 
         [AutoComplete]

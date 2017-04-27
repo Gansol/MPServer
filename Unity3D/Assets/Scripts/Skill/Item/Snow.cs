@@ -37,10 +37,17 @@ public class Snow : SkillItem
     {
         // resume motion
         foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMice)
-            mice.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, true);
+        {
+            if (mice.Value != null) 
+                mice.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, true);
+        }
 
         foreach (GameObject go in effects)
-            GameObject.Destroy(go);
+        {
+            if (go.GetComponent<UIPlaySound>())
+                GameObject.Destroy(go.GetComponent<UIPlaySound>());
+            GameObject.Destroy(go);   
+        }
 
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }

@@ -41,7 +41,8 @@ public class MatchManager : PanelManager
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
-
+    public GameObject ok_btn;
+    public UILabel matchText,timeText;
     //private int _page;                                                              // 翻頁值(翻一頁+10)
     private float _lastClickTime;                                                   // 點擊間距時間
     private static bool _bFirstLoad;                                                // 是否第一次載入
@@ -49,39 +50,73 @@ public class MatchManager : PanelManager
 
     private GameObject _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
+    private static int _miceCost, _maxCost = 100;
+    float _time, _lastTime, interval,escapeTime;
     #endregion
 
     void Awake()
     {
+        interval = 2;
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         //_dictTeamData = new Dictionary<string, object>();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
-
+        
         //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
         Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
         Global.photonService.LoadPlayerItemEvent += None;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
+        Global.photonService.UpdateMiceEvent += OnCostCheck;
+
     }
 
     void Update()
     {
-        if (_bLoadedActor || _bLoadedIcon)                                          // 除錯訊息
-            if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-                Debug.Log("訊息：" + assetLoader.ReturnMessage);
-
-        if (assetLoader.loadedObj && _bLoadedIcon)
+        if (enabled)
         {
-            _bLoadedIcon = !_bLoadedIcon;
-            assetLoader.init();
-            InstantiateIcon(Global.dictMiceAll, infoGroupsArea[0].transform);
-            LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
-            InstantiateIcon(Global.dictTeam, infoGroupsArea[2].transform);
-            // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
-            ActiveMice(Global.dictTeam);
+            if (_bLoadedActor || _bLoadedIcon)                                          // 除錯訊息
+                if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+                    Debug.Log("訊息：" + assetLoader.ReturnMessage);
+
+
+            if (Global.isMatching && Time.time > _lastTime + 1)
+            {
+                escapeTime++;
+                MatchScrollText();
+                _lastTime = Time.time;
+            }
+
+
+            if (assetLoader.loadedObj && _bLoadedIcon)
+            {
+                _bLoadedIcon = !_bLoadedIcon;
+                assetLoader.init();
+                InstantiateIcon(Global.dictMiceAll, infoGroupsArea[0].transform);
+                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+                InstantiateIcon(Global.dictTeam, infoGroupsArea[2].transform);
+                // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
+                ActiveMice(Global.dictTeam);
+                OnCostCheck();
+            }
         }
+    }
+
+    private void MatchScrollText()
+    {
+        try
+        {
+            timeText.text = "(" +escapeTime.ToString() + ")";
+        }
+        catch
+        {
+            throw;
+        }
+        //if (_lastTime > _time)
+        //{
+        //    matchText.text = "尋找玩家...";
+        //}
     }
 
     #region -- OnMiceClick 當按下老鼠時 --
@@ -225,8 +260,33 @@ public class MatchManager : PanelManager
             //_dictTeamData = Global.Team;
             Global.isPlayerDataLoaded = false;
         }
+        OnCostCheck();
     }
     #endregion
+
+
+
+    public void OnCostCheck()
+    {
+        object value;
+        _miceCost = 0;
+        Dictionary<string, object> data;
+        foreach (KeyValuePair<string, object> mice in Global.dictTeam)
+        {
+            data = Global.miceProperty[mice.Key] as Dictionary<string, object>;
+            data.TryGetValue("MiceCost", out value);
+            _miceCost += Convert.ToInt32(value);
+        }
+
+        infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text ="[14B5DE]"+ _miceCost + "/" + _maxCost+"[-]";
+        ok_btn.SetActive(true);
+        if (_miceCost > _maxCost)
+        {
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + _maxCost + "[-]";
+            ok_btn.SetActive(false);
+
+        }
+    }
 
     public void OnClosed(GameObject obj)
     {
@@ -295,24 +355,36 @@ public class MatchManager : PanelManager
     {
 
     }
+
+    // Match按鈕使用 開始配對
     public void OnMatchGame()
     {
         if (!Global.isMatching && Global.LoginStatus)
         {
+            matchText.text = "尋找玩家...";
+            escapeTime = 0;
             Global.isMatching = true;
             Panel[1].SetActive(true);
             Panel[0].SetActive(false);
+            timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
             Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
         }
     }
 
-    public void ExitWaitingRoom()
-    {
-        Global.photonService.ExitWaitingRoom();
-    }
-
     private void OnExitWaiting()
     {
-        OnClosed(Panel[1].transform.parent.gameObject);
+        //matchText.text = "等待超時，請重新配對！";
+
+        Panel[0].SetActive(true);
+        Panel[1].SetActive(false);
+        Panel[1].transform.parent.parent.gameObject.SetActive(false);
+        EventMaskSwitch.lastPanel = null;
+        EventMaskSwitch.Resume();
     }
+
+    //private void OnLoadScene()
+    //{
+    //    Global.photonService.LoadSceneEvent -= OnLoadScene;
+    //    OnClosed(Panel[1].transform.parent.gameObject);
+    //}
 }

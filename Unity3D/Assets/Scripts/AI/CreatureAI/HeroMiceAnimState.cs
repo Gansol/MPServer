@@ -49,7 +49,8 @@ public class HeroMiceAnimState : AnimatorState
                 // 目前播放的動畫 "總"時間
                 if (_animTime >= _helloTime)   // 動畫撥放完畢時
                 {
-                    if (currentState.nameHash == Animator.StringToHash("Layer1.Hello") && animState != ENUM_AnimatorState.Die) anims.Play("Idle");   // 老鼠開始吃東西
+                    if (currentState.nameHash == Animator.StringToHash("Layer1.Hello") && animState != ENUM_AnimatorState.Die) 
+                        anims.Play("Idle");   // 老鼠開始吃東西
                 }
             }
             else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die

@@ -8,6 +8,7 @@ public abstract class MiceBossBase : Creature
     protected int _shield = 0;
     protected int myHits, otherHits;              // 打擊紀錄
     protected float m_LastTime, m_StartTime;
+    protected bool flag;
 
     protected virtual void Awake()
     {
@@ -44,7 +45,8 @@ public abstract class MiceBossBase : Creature
     /// </summary>
     protected virtual void OnHit()
     {
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() != 0)
+        Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
+        if (Global.isGameStart && enabled && m_Arribute.GetHP() != 0)
         {
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
 
@@ -55,6 +57,9 @@ public abstract class MiceBossBase : Creature
             else
                 m_Arribute.SetShield(m_Arribute.GetShield() - 1);
         }
+
+        if (m_Arribute.GetHP() <= 0)
+            Destroy(gameObject);
     }
 
 

@@ -26,14 +26,15 @@ namespace MPProtocol
         Reflection,
         Invincible,
         FeverTime,
+        FreezeEnergy,
     }
     public enum ENUM_SkillType : int
     {
         Self = 0,
-        Buff,
-        Debuff,
-        Passive,
-        Damage,
+        Buff = 1,
+        Debuff = 2,
+        Passive = 3,
+        Damage = 4,
     }
 
     public enum SkillOperationCode

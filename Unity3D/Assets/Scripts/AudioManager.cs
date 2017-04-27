@@ -6,7 +6,7 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip BGSound;
     public AudioSource[] SE;
-    float audio1Volume = 0f, minVolume=.1f,maxVolume = .8f;
+    float audio1Volume = 0f, minVolume=.1f,maxVolume = .5f;
 
     bool flag;
 

@@ -25,7 +25,7 @@ public class DontTouchMeSkill : SkillBoss
     {
         this.obj = obj;
         _spawnCount = skillData.Attr + Random.Range(0, skillData.AttrDice + 1);
-        spawner.SpawnBy1D(System.Convert.ToInt16(obj.name), data, 0.1f, 0.1f, 0.1f, 1, Random.Range(0, data.Length), false, false); // 可能錯誤
+        spawner.SpawnBy1D(System.Convert.ToInt16(obj.name), data, 0.1f, 0.1f, 0.1f, _spawnCount, Random.Range(0, data.Length), false, false); // 可能錯誤
         m_LastTime = Time.time;
     }
 

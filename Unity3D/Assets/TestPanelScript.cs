@@ -57,12 +57,6 @@ public class TestPanelScript : MonoBehaviour
         bTSPanel = !bTSPanel;
     }
 
-    public void OnExit()
-    {
-        Global.photonService.KickOther();
-        Global.photonService.ExitRoom();
-    }
-
     // 現在無法調整了 spawnStatus 已由Spawner控制
     public void OnStatus(GameObject obj)
     {

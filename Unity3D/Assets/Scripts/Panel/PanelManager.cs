@@ -24,7 +24,7 @@ public class PanelManager : MPPanel
     #region 欄位
     public static GameObject _lastEmptyItemGroup;
     public GameObject[] Panel;                                      // 存放Panel位置
-
+    public GameObject loginPanel;
     private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject _lastPanel;                           // 暫存Panel
     private string _panelName;                                      // panel名稱
@@ -45,6 +45,7 @@ public class PanelManager : MPPanel
     void Awake()
     {
         Global.photonService.LoginEvent += OnLogin;
+        //Global.photonService.ConnectEvent += OnConnect;
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         insObj = new ObjectFactory();
         if (dictPanelRefs == null) dictPanelRefs = new Dictionary<string, PanelState>();
@@ -93,6 +94,7 @@ public class PanelManager : MPPanel
     public void LoadPanel(GameObject panel)
     {
         _panelNo = 0;
+
         foreach (GameObject item in Panel)  // 取得Panel編號
         {
             if (item == panel)
@@ -100,21 +102,89 @@ public class PanelManager : MPPanel
             _panelNo++;
         }
 
-        _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
-
-        if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
+        if (panel.name != "Tutorial(Panel)")
         {
-            assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadPrefab("Panel/", _panelName);
-            _loadedPanel = true;
+
+            _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
+
+            if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
+            {
+                assetLoader.init();
+                assetLoader.LoadAsset("Panel/", "PanelUI");
+                assetLoader.LoadPrefab("Panel/", _panelName);
+                _loadedPanel = true;
+            }
+            else
+            {
+                PanelSwitch();// 已載入AB 顯示Panel
+            }
         }
         else
         {
-            PanelSwitch();// 已載入AB 顯示Panel
+            _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
+            if (!dictPanelRefs.ContainsKey(_panelName))
+            {
+                PanelState ps = new PanelState();
+                ps.obj = panel;
+                ps.onOff = false;
+                dictPanelRefs.Add(_panelName, ps);
+            }
+
+            PanelSwitch();
         }
     }
     #endregion
+
+    #region -- InstantiateICON 實體化背包物件背景--
+    /// <summary>
+    /// 實體化商店物件背景
+    /// </summary>
+    /// <param name="itemData">資料字典</param>
+    /// <param name="itemPanel">實體化父系位置</param>
+    /// <param name="itemType">道具類別</param>
+    public Dictionary<string, GameObject> InstantiateICON(Dictionary<string, object> itemData, string itemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    {
+        if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
+        {
+            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, 1);
+            Vector2 pos = new Vector2();
+            Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
+
+            int i = 0;
+            insObj = new ObjectFactory();
+            foreach (KeyValuePair<string, object> item in itemData)
+            {
+                if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
+                {
+
+                    GameObject bundle = assetLoader.GetAsset(itemName);
+                    pos = sortItemPos(12, 5, offset, pos, i);
+                    bundle = insObj.Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+
+                    string iconName = item.Value + "ICON";
+                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
+                    {
+                        GameObject icon = assetLoader.GetAsset(iconName);
+                        bundle = insObj.Instantiate(icon, bundle.transform.FindChild("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                        bundle.transform.parent.parent.gameObject.tag = "InventoryICON";
+                        Destroy(bundle.transform.parent.parent.GetComponent<ButtonSwitcher>());
+                        Destroy(bundle.transform.parent.parent.GetComponent<UIDragScrollView>());
+                        Destroy(bundle.transform.parent.parent.GetComponent<Rigidbody>());
+                        Destroy(bundle.transform.parent.parent.GetComponent<UIDragObject>());
+                        bundle.transform.parent.parent.gameObject.AddComponent<ChangeICON>();
+
+                    }
+                    pos.x += offset.x;
+                }
+
+                i++;
+            }
+        }
+        return null;
+    }
+
+    #endregion
+
 
     #region -- InstantiateItem 實體化背包物件背景--
     /// <summary>
@@ -125,7 +195,8 @@ public class PanelManager : MPPanel
     /// <param name="itemType">道具類別</param>
     public Dictionary<string, GameObject> InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
-        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+        if (itemType != -1)
+            itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
@@ -156,9 +227,7 @@ public class PanelManager : MPPanel
         Vector2 pos = new Vector2();
         Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
         int count = parent.childCount, i = 0;
-
-        ObjectFactory insObj = new ObjectFactory();
-
+        insObj = new ObjectFactory();
         foreach (KeyValuePair<string, object> item in itemData)
         {
             var nestedData = item.Value as Dictionary<string, object>;
@@ -219,7 +288,7 @@ public class PanelManager : MPPanel
 
         PanelState panelState = dictPanelRefs[_panelName];      // 取得目前Panel狀態
 
-        if (panelState.obj != null && _loginStatus)
+        if (panelState.obj != null && (_loginStatus || !Global.connStatus))
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
@@ -319,9 +388,11 @@ public class PanelManager : MPPanel
     {
         if (Global.isMatching)
         {
-            if ((_ckeckTime > 30) && _checkFlag)
+            if ((_ckeckTime > Global.WaitTime) && _checkFlag)
             {
-                Global.photonService.ExitWaitingRoom();
+                //  Global.photonService.ExitWaitingRoom();
+
+                Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam);
                 _ckeckTime = 0;
                 _checkFlag = false;
             }
@@ -332,6 +403,14 @@ public class PanelManager : MPPanel
             }
         }
     }
+
+    //private void OnConnect(bool status)
+    //{
+    //    if(status)
+    //    {
+    //        loginPanel.SetActive(true);
+    //    }
+    //}
 
     private void OnLogin(bool loginStatus, string message, string returnCode)
     {

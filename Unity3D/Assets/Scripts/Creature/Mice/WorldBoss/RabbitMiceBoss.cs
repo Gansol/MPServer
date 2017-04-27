@@ -7,9 +7,6 @@ public class RabbitMiceBoss  : MiceBossBase{
     public override void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         myHits = otherHits = 0;
-        m_AIState = null;
-        m_Arribute = null;
-        m_Skill = null;
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
 
@@ -23,6 +20,10 @@ public class RabbitMiceBoss  : MiceBossBase{
     /// <param name="isMe">是否為自己攻擊</param>
     protected override void OnInjured(short damage, bool myAttack)
     {
+        if (!myAttack)
+        {
+            base.OnInjured(damage, myAttack);
+        }
         if (m_Arribute.GetShield() > 0)
         {
             m_Arribute.SetShield(m_Arribute.GetShield() - damage);

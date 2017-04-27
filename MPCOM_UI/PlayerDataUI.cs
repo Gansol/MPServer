@@ -29,6 +29,8 @@ namespace MPCOM
         byte[] UpdateGameOver(string account, int score, short exp, Int16 maxCombo, int maxScore, int lostMice, int killMice, int battleResult, string item);
         byte[] UpdatePlayerData(string account, string miceAll, string miceName, int amount);
         byte[] UpdatePlayerData(string account, string miceAll, string team);
+
+        byte[] UpdatePlayerData(string account, object imageName);
         byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount);
         byte[] UpdatePlayerItem(string account, string jItemUsage, string[] columns);
         byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
@@ -193,6 +195,32 @@ namespace MPCOM
             return TextUtility.SerializeToStream(playerData);
         }
         #endregion
+
+        #region UpdatePlayerData 更新玩家(TeamUpdate時)資料
+        /// <summary>
+        /// 更新 玩家(TeamUpdate時)資料
+        /// </summary>
+        public byte[] UpdatePlayerData(string account, object imageName)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerData(account, imageName);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
+
 
         #region UpdatePlayerData 更新玩家(TeamUpdate時)資料
         /// <summary>

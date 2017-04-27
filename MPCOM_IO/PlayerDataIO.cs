@@ -92,6 +92,7 @@ namespace MPCOM
                         playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
                         playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
                         playerData.Friend = Convert.ToString(DS.Tables[0].Rows[0]["Friend"]);
+                        playerData.PlayerImage = Convert.ToString(DS.Tables[0].Rows[0]["Image"]);
 
                         playerData.ReturnCode = "S401"; //true
                         playerData.ReturnMessage = "取得玩家資料成功！";
@@ -388,6 +389,62 @@ namespace MPCOM
         }
 
         #endregion UpdatePlayerData
+
+        #region UpdatePlayerData 更新玩家(圖片)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, object imageName)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Account FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
+
+                    // 如果找到玩家資料
+                    if (DS.Tables[0].Rows.Count == 1)
+                    {
+                        string query = @"UPDATE Player_PlayerData SET Image=@imageName WHERE Account=@account";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@imageName", imageName);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S430";
+                        playerData.ReturnMessage = "更新圖片資料成功！";
+                    }
+                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+                    {
+                        playerData.ReturnCode = "S431";
+                        playerData.ReturnMessage = "更新圖片資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+
+        #endregion
+
 
         #region UpdatePlayerData 更新玩家(Team)資料
         [AutoComplete]

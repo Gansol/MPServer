@@ -13,6 +13,7 @@ public class HeroMice : MiceBase
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
@@ -23,11 +24,13 @@ public class HeroMice : MiceBase
     void OnEnable()
     {
         GetComponent<BoxCollider2D>().enabled = true;
+        bDead = false;
         _lastTime = Time.fixedTime; // 出生時間
     }
 
     void Update()
     {
+//        Debug.Log("Hero State: "+m_AnimState.GetAnimState().ToString());
         if (Global.isGameStart)
         {
             m_AnimState.UpdateAnimation();
@@ -61,8 +64,14 @@ public class HeroMice : MiceBase
 
     protected override void OnHit()
     {
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
+        Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + gameObject.layer + " enabled:" + enabled + " m_Arribute.GetHP():" + m_Arribute.GetHP());
+        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && GetComponent<BoxCollider2D>().enabled)
+        {
+            GetComponent<BoxCollider2D>().enabled = false;
+            hitSound.Play();
+            //OnInjured(1, true);
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Eat);
+        }
     }
 
     protected override void OnDead(float lifeTime)

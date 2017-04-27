@@ -169,6 +169,7 @@
         EnergyRate = 25,                // 能量倍率
         SpawnCount = 26,                // 產生數量
         Evaluate = 27,                  // 評價
+        Combo = 28,                     // COMBO
     }
 
     public enum BattleResponseCode

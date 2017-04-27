@@ -6,7 +6,8 @@
         JoinRoom = 32,              // 加入房間
         QuitRoom = 33,              // 離開房間
         ExitWaiting = 35,           // 離開等待房間
-        SyncGameStart = 36,            // 遊戲載入完成
+        SyncGameStart = 36,         // 遊戲載入完成
+        MatchGameBot = 37,          // Bot配對
     }
 
     public enum MatchGameResponseCode

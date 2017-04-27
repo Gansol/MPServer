@@ -10,22 +10,22 @@ public class MessageManager : MonoBehaviour
     void Start()
     {
         Global.photonService.ShowMessageEvent += OnMessage;
+        Global.ShowMessageEvent += OnMessage;
         messageBox = messagePanel.transform.GetChild(0).gameObject;
     }
 
-    void OnMessage()
+    void OnMessage(string message)
     {
-        Debug.Log("HERER");
-        Debug.Log(messageBox.name);
         messagePanel.SetActive(true);
-        messageBox.GetComponentInChildren<UILabel>().text = "Complete !";
+        messageBox.GetComponentInChildren<UILabel>().text = message;
 
         EventMaskSwitch.Switch(messagePanel,true);
     }
 
-    public void  OnClosed(){
+    public bool OnClosed(){
         EventMaskSwitch.openedPanel.SetActive(false);
         EventMaskSwitch.PrevToFirst();
+        return true;
         //EventMaskSwitch.Prev();
     }
 }

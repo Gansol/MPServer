@@ -6,27 +6,11 @@ public class CandyMiceBoss : MiceBossBase {
 
     public override void Initialize(float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        throw new System.NotImplementedException();
-    }
+        myHits = otherHits = 0;
+        transform.localPosition = new Vector3(0, 0);
+        GetComponent<BoxCollider2D>().enabled = true;
 
-    protected override void Update()
-    {
-        base.Update();
-    }
-
-    protected override void OnHit()
-    {
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() != 0)
-        {
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
-
-            if (m_Arribute.GetHP() - 1 == 0) GetComponent<BoxCollider2D>().enabled = false;
-
-            if (m_Arribute.GetShield() == 0)
-                Global.photonService.BossDamage(1);  // 傷害1是錯誤的 需要由Server判定、技能等級
-            else
-                m_Arribute.SetShield(m_Arribute.GetShield() - 1);
-        }
+        m_Skill.Display(gameObject, m_Arribute, m_AIState);
     }
 
     /// <summary>
@@ -36,6 +20,10 @@ public class CandyMiceBoss : MiceBossBase {
     /// <param name="isMe">是否為自己攻擊</param>
     protected override void OnInjured(short damage, bool myAttack)
     {
+        if (!myAttack)
+        {
+            base.OnInjured(damage, myAttack);
+        }
         if (m_Arribute.GetShield() > 0)
         {
             m_Arribute.SetShield(m_Arribute.GetShield() - damage);
@@ -67,6 +55,15 @@ public class CandyMiceBoss : MiceBossBase {
 
     protected override void OnDead(float lifeTime)
     {
-        throw new System.NotImplementedException();
+        if (Global.isGameStart)
+        {
+            // 關閉血調顯示
+            battleHUD.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
+
+            Global.MiceCount--;
+            Global.dictBattleMice.Remove(transform);
+            OnDestory();
+            Destroy(gameObject);
+        }
     }
 }

@@ -30,24 +30,30 @@ public class PlayerManager : PanelManager
 
     public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
     public static Dictionary<string, GameObject> dictLoadedItem { get; set; }
+
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
-    public GameObject playerInfoArea, equipArea, playerRecordArea, inventoryArea;
+    public GameObject playerInfoArea, equipArea, playerRecordArea, imageArea,inventoryArea;
     public Vector3 actorScale;
     public Vector2 itemOffset, iconSize;
     public int itemCount = 8, row = 2, _itemType, iconDepth = 310;
-    private bool _bFirstLoad, _LoadedIcon, _bInvActive, _bPanelFirstLoad;
+    private bool _bFirstLoad, _LoadedIcon,_bImgActive, _bInvActive, _bPanelFirstLoad;
 
+    public static UISprite playerImage;
     ObjectFactory objFactory;
+
+    public GameObject iconBtn, equipBtn;
+
     void Awake()
     {
         dictLoadedEquiped = new Dictionary<string, GameObject>();
         dictLoadedItem = new Dictionary<string, GameObject>();
+
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         objFactory = new ObjectFactory();
         _dictItemData = Global.dictSortedItem;
         _itemType = (int)StoreType.Armor;
-        _bInvActive = false;
-        _bPanelFirstLoad =_bFirstLoad = true;
+        _bImgActive= _bInvActive = false;
+        _bPanelFirstLoad = _bFirstLoad = true;
     }
 
     void OnEnable()
@@ -69,9 +75,18 @@ public class PlayerManager : PanelManager
         {
             _LoadedIcon = !_LoadedIcon;
             assetLoader.init();
-            
+
+            Transform imageParent =playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
+            imageParent.GetComponent<UISprite>().spriteName = Global.PlayerImage;
+            playerImage = imageParent.GetComponent<UISprite>();
+            imageParent.parent.tag = "EquipICON";
+           // imageParent.GetComponent<ButtonSwitcher>().SendMessage("EnableBtn");
+
+     //      string key =  Global.dictMiceAll.FirstOrDefault(x => x.Value == imageParent.GetComponent<UISprite>().spriteName).Key;
+           
+          //  if (!dictLoadedICON.ContainsKey(key)) dictLoadedICON.Add(key, imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
             InstantiateEquipIcon(Global.playerItem, equipArea.transform, (int)StoreType.Armor);
-            
+
         }
     }
 
@@ -81,13 +96,23 @@ public class PlayerManager : PanelManager
         ClacExp clacExp = new ClacExp(Global.Rank);
         Transform parent = playerInfoArea.transform;
 
+        
         parent.FindChild("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
         parent.FindChild("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
         parent.FindChild("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
         // parent.FindChild("Note").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
         parent.FindChild("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + clacExp.Exp.ToString();
+        parent.FindChild("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(clacExp.Exp);
         parent.FindChild("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
     }
+
+
+    public void OnClosed(GameObject obj)
+    {
+        EventMaskSwitch.lastPanel = null;
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+    }
+
 
     private void LoadPlayerEquip()
     {
@@ -140,7 +165,7 @@ public class PlayerManager : PanelManager
                     string bundleName = itemName + "ICON";
                     if (assetLoader.GetAsset(bundleName) != null)                   // 已載入資產時
                     {
-                        
+
                         if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                         {
                             imageParent.parent.name = itemID.ToString();
@@ -174,7 +199,8 @@ public class PlayerManager : PanelManager
     /// <param name="itemType">道具類別</param>
     private void InstantiateItemIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
-        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
+        if (itemType!=-1)
+         itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
 
         if (itemData.Count != 0)
         {
@@ -223,23 +249,46 @@ public class PlayerManager : PanelManager
     }
     #endregion
 
+
+    public void OnImageClick()
+    {
+        _bImgActive = !_bImgActive;
+        imageArea.transform.parent.parent.parent.gameObject.SetActive(_bImgActive);
+
+        if (inventoryArea.transform.parent.parent.parent.gameObject.activeSelf) inventoryArea.transform.parent.parent.parent.gameObject.SetActive(false);
+
+        if (imageArea.transform.childCount == 0)
+        {
+            InstantiateICON(Global.dictMiceAll, "InvItem", imageArea.transform, itemOffset, itemCount, row);
+        }
+
+
+        imageArea.SetActive(false);   // 開關防止Item按鈕失效
+        imageArea.SetActive(true);
+    }
+
+
     public void OnEquipClick(GameObject obj)
     {
         _bInvActive = !_bInvActive;
-       // inventoryArea.transform.parent.gameObject.SetActive(_bInvActive);
-        
+        if (imageArea.transform.parent.parent.parent.gameObject.activeSelf) imageArea.transform.parent.parent.parent.gameObject.SetActive(false);
+
         inventoryArea.transform.parent.parent.parent.gameObject.SetActive(_bInvActive);
+        if (imageArea.transform.childCount == 0)
+        {
+            if (imageArea.transform.parent.parent.parent.gameObject.activeSelf) OnImageClick();
 
-        if (obj.GetComponentInChildren<UISprite>())
-            _itemType = System.Convert.ToInt32(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
-        else
-            _itemType = int.Parse(obj.transform.parent.name);
+            if (obj.GetComponentInChildren<UISprite>())
+                _itemType = System.Convert.ToInt32(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
+            else
+                _itemType = int.Parse(obj.transform.parent.name);
 
-        InstantiateItem(_dictItemData, "InvItem", _itemType, inventoryArea.transform, itemOffset, itemCount, row);
-        InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
+            InstantiateItem(_dictItemData, "InvItem", _itemType, inventoryArea.transform, itemOffset, itemCount, row);
+            InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
+        }
 
-        inventoryArea.SetActive(false);   // 開關防止Item按鈕失效
-        inventoryArea.SetActive(true);
+            inventoryArea.SetActive(false);   // 開關防止Item按鈕失效
+            inventoryArea.SetActive(true);
     }
 
     private void GetMustLoadAsset()
@@ -273,6 +322,10 @@ public class PlayerManager : PanelManager
         {
             assetLoader.loadedObj = _LoadedIcon = true;
         }
+        assetLoader.LoadAsset("MiceICON" + "/", "MiceICON");
+
+        foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
+            assetLoader.LoadPrefab("MiceICON" + "/", item.Value + "ICON");
         _dictItemData = Global.playerItem;
     }
 
@@ -288,6 +341,10 @@ public class PlayerManager : PanelManager
 
     public override void OnLoading()
     {
+        _bImgActive= _bInvActive = false;
+
+        imageArea.transform.parent.parent.parent.gameObject.SetActive(_bImgActive);
+        inventoryArea.transform.parent.parent.parent.gameObject.SetActive(_bInvActive);
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
@@ -296,6 +353,8 @@ public class PlayerManager : PanelManager
     private void OnLoadPanel()
     {
         GetMustLoadAsset();
+
+
     }
 
     private void OnDisable()

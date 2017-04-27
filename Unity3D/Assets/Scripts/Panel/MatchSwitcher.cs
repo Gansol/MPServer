@@ -177,6 +177,7 @@ public class MatchSwitcher : MonoBehaviour
         {
             RetOrigin();
         }
+        
     }
     #endregion
 
@@ -191,9 +192,9 @@ public class MatchSwitcher : MonoBehaviour
             _other = gameObject;
             _goTarget = _destroy = true;
             TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+          //  Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
             DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
-            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+         //   Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
         }
         else if (tag == "TeamIcon")
         {
@@ -213,8 +214,8 @@ public class MatchSwitcher : MonoBehaviour
 
                 TeamSequence(gameObject, false);
                 RemoveTeam(teamName);
-                tm.dictLoadedMice[transform.GetChild(0).name].GetComponent<MatchSwitcher>().enabled = true; // 要先Active 才能SendMessage
-                tm.dictLoadedMice[transform.GetChild(0).name].SendMessage("EnableBtn");                    // 啟動按鈕
+                tm.dictLoadedMice[teamName].GetComponent<MatchSwitcher>().enabled = true; // 要先Active 才能SendMessage
+                tm.dictLoadedMice[teamName].SendMessage("EnableBtn");                    // 啟動按鈕
                 tm.dictLoadedTeam.Remove(teamName);                                                        // 移除隊伍參考
 
                 gameObject.transform.localPosition = _originPos;
@@ -237,7 +238,6 @@ public class MatchSwitcher : MonoBehaviour
             {
                 Mice2Team(miceID);
                 AddTeam(miceID, null);
-
             }
             else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(_other.transform.GetChild(0).name) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
             {

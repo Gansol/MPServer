@@ -41,7 +41,11 @@ public class EggMiceBoss : MiceBossBase
     /// <param name="isMe">是否為自己攻擊</param>
     protected override void  OnInjured(short damage, bool myAttack)
     {
-        if (m_Arribute.GetShield() > 0)
+        if (!myAttack)
+        {
+            base.OnInjured(damage, myAttack);
+        }
+        else if (m_Arribute.GetShield() > 0)
         {
             m_Arribute.SetShield(m_Arribute.GetShield() - damage);
             Debug.Log("Hit Shield:" + m_Arribute.GetShield());

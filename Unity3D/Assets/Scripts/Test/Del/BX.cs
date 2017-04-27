@@ -6,6 +6,11 @@ using System.Collections.Generic;
 
 public class BX : MonoBehaviour
 {
+    void Awake()
+    {
+
+        Debug.Log("F");
+    }
     void OnClick()
     {
          Dictionary<string, Dictionary<string, object>> dictItemUsage = new Dictionary<string, Dictionary<string, object>>();

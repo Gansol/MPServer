@@ -18,7 +18,7 @@ using System.Collections.Generic;
  * ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
-    private int  _objCount = 0, _loadedCount = 0;
+    public int  _objCount = 0, _loadedCount = 0;
     public bool loadedObj;
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;

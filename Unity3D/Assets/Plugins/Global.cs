@@ -34,7 +34,44 @@ public static class Global
  string.Empty;
 #endif
 
+    public static string perfabFolder =
+#if UNITY_ANDROID
+ "/AssetBundles/";
+#elif UNITY_IPHONE || UNITY_IOS
+    "/AssetBundles/";
+#elif UNITY_WEBPLAYER
+    "/AssetBundles/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/AssetBundles/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        "/AssetBundles/";
+#endif
+
+    public static string exportFolder =
+#if UNITY_ANDROID
+ "/_AssetBundles/Android/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    "/_AssetBundles/iOS/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    "/_AssetBundles/STANDALONE_WIN/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/_AssetBundles/STANDALONE_OSX/";
+#endif
+
+    public static string dataPath =
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    Application.dataPath + "/StreamingAssets";
+#elif UNITY_ANDROID
+    "jar:file://" + Application.dataPath + "!/assets/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    Application.dataPath + "/Raw";
+#endif
+                                                                                                       
+    public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務
+
+    public delegate void ShowMessageHandler(string message);
+    public static event ShowMessageHandler ShowMessageEvent;
 
     public static readonly string itemListFile = "ItemList.json";          // 道具列表
     public static readonly string visionListFile = "VisionList.json";      // 版本列表
@@ -75,11 +112,15 @@ public static class Global
 
     public static int maxConnTimes = 5;                         // 重新連限次數
     public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
-    public static int GameTime = 30;        // 遊戲時間
+    public static int GameTime = 150;        // 遊戲時間
+    public static int WaitTime = 10;        // 配對等待時間
+    public static int OnlineActor = 0;        // 配對等待時間
 
+    public static string PlayerImage = "";  // 玩家圖片
     public static string Ret = "";          // 回傳值
     public static int PrimaryID = 0;       // 主索引
     public static string Account = "";      // 帳號
+    public static string Email = "";
     public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
     public static int RoomID = -1;          // 房間ID
@@ -98,6 +139,7 @@ public static class Global
     public static int SumKill = 0;          // 總除掉的老鼠
     public static int SumWin = 0;          // 總勝場
     public static int SumBattle = 0;          // 總場次
+    public static string gameVersion = "";    // 資產版本
     public static int bundleVersion = 1;    // 資產版本
     public static int MeunObjetDepth = 10000; // 主選單物件深度
 
@@ -119,6 +161,11 @@ public static class Global
 
     public static string ext = ".unity3d";       // AB副檔名
 
+    public static void ShowMessage(string message)
+    {
+        ShowMessageEvent(message);
+    }
+
     public static class OtherData
     {
         public static int PrimaryID = 0;        // 主索引
@@ -126,6 +173,7 @@ public static class Global
         public static byte Sex = 0;              // 性別
         public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
         public static string RoomPlace = "";    // 另一位玩家的房間位置
+        public static string Image="";
     }
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
@@ -147,11 +195,12 @@ public static class Global
     */
     public enum Scene : int
     {
-        BundleCheck = 0,
-        MainGame = 1,
-        Battle = 2,
-        LoadScene = 3,
-        LogoScene = 4,
+        LogoScene = 0,
+        BundleCheck = 1,
+        MainGame = 2,
+        Battle = 3,
+        LoadScene = 4,
+
     }
 
     public enum UILayer

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MPButton : MonoBehaviour {
+public class MPButton : MonoBehaviour
+{
     [Range(0, 1)]
     [Tooltip("回彈速度")]
     public float lerpSpeed = 0.25f;
@@ -31,18 +32,23 @@ public class MPButton : MonoBehaviour {
     {
         if (enable)
         {
-            go.GetComponent<ButtonSwitcher>().enabled = enable;
-            go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
+
+                go.GetComponent<ButtonSwitcher>().enabled = enable;
+                go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
+
             TweenColor.Begin(go, tweenColorSpeed, Color.white);
         }
         else
         {
-            go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
-            go.GetComponent<ButtonSwitcher>().enabled = enable;
-            TweenColor.Begin(go, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
+
+                go.GetComponent<ButtonSwitcher>()._activeBtn = enable;
+                go.GetComponent<ButtonSwitcher>().enabled = enable;
         }
+
+            TweenColor.Begin(go, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
+        
         go.GetComponent<BoxCollider>().isTrigger = false;
-        go.GetComponent<UIDragObject>().enabled = enable;
+            go.GetComponent<UIDragObject>().enabled = enable;
     }
     #endregion
 
@@ -50,10 +56,14 @@ public class MPButton : MonoBehaviour {
     public void DisableBtn()
     {
         TweenColor.Begin(this.gameObject, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
-        GetComponent<ButtonSwitcher>()._activeBtn = false;
-        GetComponent<ButtonSwitcher>().enabled = false;
-        GetComponent<UIDragObject>().enabled = false;
-        GetComponent<BoxCollider>().isTrigger = false;
+
+
+            GetComponent<ButtonSwitcher>()._activeBtn = false;
+            GetComponent<ButtonSwitcher>().enabled = false;
+            GetComponent<UIDragObject>().enabled = false;
+            GetComponent<BoxCollider>().isTrigger = false;
+  
+
         _isTrigged = false;
     }
     #endregion
@@ -62,10 +72,13 @@ public class MPButton : MonoBehaviour {
     public void EnableBtn()
     {
         TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
+
+ 
         GetComponent<ButtonSwitcher>().enabled = true;
         GetComponent<ButtonSwitcher>()._activeBtn = true;
         GetComponent<UIDragObject>().enabled = true;
         GetComponent<BoxCollider>().isTrigger = false;
+     
         _isTrigged = false;
     }
     #endregion

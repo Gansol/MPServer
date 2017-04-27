@@ -164,6 +164,7 @@ public class MissionManager : MonoBehaviour
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
                 if (BattleManager.gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
+                    //Mission[] missionSelect = { Mission.Exchange, Mission.DrivingMice, Mission.Harvest, Mission.WorldBoss };
                     Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
@@ -178,6 +179,7 @@ public class MissionManager : MonoBehaviour
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
                 if ((_score > activeScore || _otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
+                   // Mission[] missionSelect = { Mission.Exchange, Mission.DrivingMice, Mission.Harvest, Mission.WorldBoss };
                     Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
@@ -237,7 +239,7 @@ public class MissionManager : MonoBehaviour
                 {
                     if (BattleManager.gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
                     {
-                        if (battleManager.combo < _missionScore)
+                        if (battleManager.missionCombo > _missionScore)
                         {
                             _missionMode = MissionMode.Completed;
                             battleHUD.MissionFailedMsg(mission,0);

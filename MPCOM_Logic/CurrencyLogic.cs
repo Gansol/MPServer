@@ -1,6 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
 using MPProtocol;
+using ExitGames.Logging;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -30,7 +31,7 @@ namespace MPCOM
     public class CurrencyLogic : ServicedComponent  // ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
         CurrencyData currencyData = new CurrencyData();
-
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         protected override bool CanBePooled()
         {
             return true;
@@ -86,7 +87,8 @@ namespace MPCOM
                 {
                     case (byte)CurrencyType.Sliver:
                         {
-                            rice = (currency > 0) ? currencyData.Rice + currency : currencyData.Rice - currency;
+                            rice = currencyData.Rice + currency;
+                            
 
                             if (rice >= 0)
                             {
@@ -102,7 +104,7 @@ namespace MPCOM
                     case (byte)CurrencyType.Gold:
                         {
 
-                            gold = currency > 0 ? (Int16)(currencyData.Gold + (Int16)currency) : (Int16)(currencyData.Gold - (Int16)currency);
+                            gold =  Convert.ToInt16((currencyData.Gold + Convert.ToInt16(currency.ToString())).ToString());
 
                             if (gold >= 0)
                             {

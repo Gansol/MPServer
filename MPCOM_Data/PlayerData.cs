@@ -44,7 +44,7 @@ namespace MPCOM
         public string Friend;		// 好友			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string playerProperty;   // 玩家資料
         public string PlayerItem;   // 玩家道具資料
-
+        public string PlayerImage;   // 玩家道具資料
 
 
         /*

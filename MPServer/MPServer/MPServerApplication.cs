@@ -35,7 +35,7 @@ namespace MPServer
         public ActorCollection Actors = new ActorCollection();
         public PeerBase peer = null;
         public Room room = new Room();
-        public Dictionary<int,object> MiceData = new Dictionary<int,object>();      // 待測試
+        //public Dictionary<int,object> MiceData = new Dictionary<int,object>();      // 待測試
 
         /*
         public Dictionary<string, object> dictMiceProperty = new Dictionary<string,object>();
@@ -46,6 +46,7 @@ namespace MPServer
         protected override PeerBase CreatePeer(InitRequest initRequest) 
         {
             return new MPServerPeer(initRequest.Protocol, initRequest.PhotonPeer,this);
+            
         }
 
         // 伺服器初始化時
@@ -63,19 +64,6 @@ namespace MPServer
             }
 
             Log.Info("MPServer is running...");
-
-            /*
-            try
-            {
-                MiceDataUI miceDataUI = new MiceDataUI();
-                miceData = (MiceData)DeserializeFromStream(miceDataUI.LoadMiceData());
-                this.dictMiceProperty = Json.Deserialize(miceData.miceProperty) as Dictionary<string, object>;
-            }
-            catch (Exception e)
-            {
-                Log.Debug("發生例外情況: " + e.Message + " 於: " + e.StackTrace);
-            }
-             * */
         }
 
         // 伺服器關閉時 實作釋放資源
@@ -83,25 +71,5 @@ namespace MPServer
         {
             Log.Debug("Shutdown MPServer Server ...");
         }
-        /*
-        // 序列化物件
-        public static byte[] SerializeToStream(object UnSerializeObj)
-        {
-            MemoryStream stream = new MemoryStream();
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, UnSerializeObj);
-            return stream.ToArray();
-        }
-
-        // 反序列化物件
-        public static object DeserializeFromStream(byte[] SerializeArray)
-        {
-            MemoryStream stream = new MemoryStream(SerializeArray);
-            IFormatter formatter = new BinaryFormatter();
-            stream.Seek(0, SeekOrigin.Begin);
-            object UnSerializeObj = formatter.Deserialize(stream);
-            return UnSerializeObj;
-        }
-         * */
     }
 }

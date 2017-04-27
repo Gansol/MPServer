@@ -45,8 +45,6 @@ public class MPFactory : MonoBehaviour
         attrFactory = new AttrFactory();
         skillFactory = new SkillFactory();
         animFactory = new AnimFactory();
-
-        Global.photonService.ApplyMissionEvent += OnApplyMission;
         Global.photonService.LoadSceneEvent += OnLoadScene;
     }
 
@@ -343,10 +341,12 @@ public class MPFactory : MonoBehaviour
             // 產生MicBoss 並移除Mice Component
 
             GameObject clone = poolManager.ActiveObject(miceID.ToString());
-            MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
+           // MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
             MiceAttr miceAttr = attrFactory.GetMiceProperty(miceID.ToString());
 
-            if (mice.enabled) mice.enabled = false;
+           // if (mice.enabled) mice.enabled = false;
+            Destroy(clone.GetComponent<MiceBase>());
+
             clone.transform.gameObject.SetActive(false);
             clone.transform.parent = hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
@@ -535,18 +535,8 @@ public class MPFactory : MonoBehaviour
     #endregion
 
 
-
-    void OnApplyMission(Mission mission, Int16 value)
-    {
-        if (mission == Mission.WorldBoss)
-        {
-            SpawnBoss(value, 0.1f, 0.1f, 6, 60);    //missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
-        }
-    }
-
     void OnLoadScene()
     {
-        Global.photonService.ApplyMissionEvent -= OnApplyMission;
         Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 }

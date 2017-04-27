@@ -65,6 +65,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event SceneHandler GameStartEvent;
     public event SceneHandler WaitingPlayerEvent;
     public event SceneHandler ExitWaitingEvent;
+    public event SceneHandler ActorOnlineEvent;
+
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -84,7 +86,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event UpdateCurrencyHandler UpdateCurrencyEvent;
 
     //委派事件 ShowMessage
-    public delegate void ShowMessageHandler();
+    public delegate void ShowMessageHandler(string message);
     public event ShowMessageHandler ShowMessageEvent;
 
     //委派事件 ShowMessage
@@ -92,7 +94,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event LoadDataHandler LoadPlayerDataEvent;
     public event LoadDataHandler LoadStoreDataEvent;
     public event LoadDataHandler LoadPlayerItemEvent;
-
+    public event LoadDataHandler UpdateMiceEvent;
     public class PlayerItemData
     {
         public string itemID { get; set; }
@@ -105,6 +107,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public bool ServerConnected
     {
         get { return this.isConnected; }
+
+    }
+    void OnPlayerDisconnected()
+    {
+        Disconnect();
     }
 
     public string ServerDebugMessage
@@ -167,6 +174,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
     void IPhotonPeerListener.DebugReturn(DebugLevel level, string message)
     {
+        Debug.Log("伺服器關閉重啟中！");
+        ShowMessageEvent("伺服器關閉重啟中！");
         throw new NotImplementedException();
     }
 
@@ -188,7 +197,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 Global.OtherData.PrimaryID = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                 Global.OtherData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.Team]) as Dictionary<string, object>;
                 Global.OtherData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
+                Global.OtherData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
                 Global.nextScene = (int)Global.Scene.Battle;
+                ExitWaitingRoom();
                 LoadSceneEvent();
                 break;
 
@@ -197,11 +208,15 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 string time = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.ServerTime];
                 //                Debug.Log(time);
                 Global.ServerTime = DateTime.ParseExact(time, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
-                Debug.Log(Global.ServerTime);
+                Debug.Log("SyncGameStart:" + Global.ServerTime);
                 Global.GameTime = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.GameTime];
                 GameStartEvent();
                 break;
 
+            case (byte)SystemResponseCode.GetOnlineActor:
+                Global.OnlineActor = (int)eventResponse.Parameters[(byte)SystemParameterCode.GetOnlineActor];
+                ActorOnlineEvent();
+                break;
             // 被踢出房間了
             case (byte)BattleResponseCode.KickOther:
                 if (Global.isGameStart)
@@ -222,7 +237,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     LoadSceneEvent();
                     Global.isGameStart = false;
                     Global.isMatching = false;
-                    Debug.Log("Recive Offline!" + (string)eventResponse.Parameters[(byte)BattleResponseCode.DebugMessage]);
+                    Debug.Log("Recive Offline!");
                 }
                 break;
             // 接收 技能傷害
@@ -244,8 +259,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             //取得對方分數
             case (byte)BattleResponseCode.GetScore:
                 Int16 otherScore = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.OtherScore];
-                Int16 otherEnergy = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Energy];
-                //Debug.Log("Recive otherScore!"+otherScore);
+                Int16 otherEnergy = Convert.ToInt16(eventResponse.Parameters[(byte)BattleParameterCode.Energy]);
+                Debug.Log("Recive otherScore!" + otherEnergy);
+
+
                 OtherScoreEvent(otherScore, otherEnergy);
                 break;
 
@@ -270,10 +287,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 //Debug.Log("GET OTHER:" + damage);
                 break;
 
-            //取得對方對BOSS傷害
+            //取得對方對BOSS傷害 別人打的
             case (byte)BattleResponseCode.BossDamage:
                 Int16 damage = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Damage];
-                BossInjuredEvent(damage, false);
+                int primaryID = (int)eventResponse.Parameters[(byte)BattleParameterCode.PrimaryID];
+                if (Global.PrimaryID != primaryID)
+                    BossInjuredEvent(damage, false);
                 //Debug.Log("GET OTHER:" + damage);
                 break;
 
@@ -295,18 +314,37 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #region JoinMember 加入會員
 
-            case (byte)JoinMemberResponseCode.JoinMember://登入
+            case (byte)MemberResponseCode.JoinMember://登入
                 {
                     if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                     {
-                        string returnCode = (string)operationResponse.Parameters[(byte)JoinMemberParameterCode.Ret];
-                        JoinMemberEvent(true, returnCode, operationResponse.DebugMessage.ToString()); // send member data to loginEvent
+                        //string returnCode = (string)operationResponse.Parameters[(byte)MemberParameterCode.Ret];
+                        if (Global.MemberType == MemberType.Gansol)
+                        {
+                            JoinMemberEvent(true, "", operationResponse.DebugMessage.ToString()); // send member data to loginEvent
+                        }
+
+                        else
+                        {
+                            LoginEvent(true, operationResponse.DebugMessage, operationResponse.ReturnCode.ToString()); // send member data to loginEvent
+                        }
 
                     }
                     else//假如登入失敗 
                     {
-                        string returnCode = (string)operationResponse.Parameters[(byte)JoinMemberParameterCode.Ret];
-                        JoinMemberEvent(false, returnCode, operationResponse.DebugMessage.ToString()); // send member data to loginEvent
+                        //string returnCode = (string)operationResponse.Parameters[(byte)MemberParameterCode.Ret];
+                        if (Global.MemberType == MemberType.Gansol)
+                        {
+                            JoinMemberEvent(false, "", operationResponse.DebugMessage.ToString()); // send member data to loginEvent
+                        }
+                        else
+                        {
+                            LoginEvent(false, operationResponse.DebugMessage, operationResponse.ReturnCode.ToString()); // send member data to loginEvent
+                            Debug.Log("login fail :" + operationResponse.OperationCode);
+                        }
+
+                        Debug.Log("加入會員失敗 :" + operationResponse.OperationCode);
+
                     }
                     break;
                 }
@@ -321,20 +359,24 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     //{
                     if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                     {
-                        Debug.Log("login");
+                        Debug.Log("login:" + operationResponse.ReturnCode + "   " + operationResponse.DebugMessage);
                         Global.Ret = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
                         Global.Account = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
                         Global.Nickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
                         Global.Sex = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Sex]);
                         Global.Age = Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.Age]);
                         Global.PrimaryID = Convert.ToInt32(operationResponse.Parameters[(byte)LoginParameterCode.PrimaryID]);
-                        Global.MemberType = (MemberType)operationResponse.Parameters[(byte)LoginParameterCode.MemberType];
+                        Global.MemberType = (MemberType)Convert.ToByte(operationResponse.Parameters[(byte)LoginParameterCode.MemberType]);
 
                         Global.LoginStatus = true;
 
                         Global.photonService.LoadPlayerData(Global.Account);
                         Global.photonService.LoadMiceData();
                         Global.photonService.LoadSkillData();
+
+                        //if (Global.MemberType == MemberType.Google && String.IsNullOrEmpty(Global.Email))
+                        //    UpdateMemberData(Global.Email, "Email");
+
                         LoginEvent(true, operationResponse.DebugMessage, operationResponse.ReturnCode.ToString()); // send member data to loginEvent
 
                     }
@@ -342,6 +384,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     {
                         Debug.Log("login fail :" + operationResponse.OperationCode);
                         DebugReturn(0, operationResponse.DebugMessage.ToString());
+
+                        //if (Global.MemberType == MemberType.Google)
+                        //    operationResponse.DebugMessage = operationResponse.ReturnCode+"加入成功，請再次登入！";
                         LoginEvent(false, operationResponse.DebugMessage.ToString(), operationResponse.ReturnCode.ToString()); // send error message to loginEvent
                     }
 
@@ -454,7 +499,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.dictTeam = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
                             Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
                             Global.dictFriends = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend]) as Dictionary<string, object>;
-
+                            Global.PlayerImage = Convert.ToString(operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage]);
                             Global.photonService.LoadCurrency(Global.Account);      // 載入玩家資料時一起載入貨幣資料
                             //Debug.Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!Team"+Global.dictTeam.Count);
                             //Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
@@ -521,7 +566,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
-                    catch 
+                    catch
                     {
                         throw;
                     }
@@ -752,6 +797,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>;
                             Global.dictTeam = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
                             Debug.Log("Updated Mice.");
+                            UpdateMiceEvent();
                         }
                     }
                     catch (Exception e)
@@ -763,7 +809,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region BuyItem 購買道具
+            #region SortedItem 購買道具
 
             case (byte)PlayerDataResponseCode.SortedItem: // 購買道具
                 {
@@ -863,7 +909,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #region  BossDamage 接收BOSS受傷
 
-            case (byte)BattleResponseCode.BossDamage:// 接收BOSS受傷
+            case (byte)BattleResponseCode.BossDamage:// 接收BOSS受傷 自己打的
                 {
                     //                    Debug.Log("GET!");
                     try
@@ -927,10 +973,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>; ;
                             UpdateCurrencyEvent();
-                            ShowMessageEvent();
+                            ShowMessageEvent("購買完成！");
                         }
                         else
                         {
+                            ShowMessageEvent(operationResponse.DebugMessage);
                             Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
@@ -960,10 +1007,10 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         Global.MaxScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxScore];
                         Global.SumLost = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumLost];
                         Global.SumKill = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumKill];
-                        Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>; 
+                        Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
                         Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
-                        
+
                         Debug.Log("GameOver Score:" + score);
                         Debug.Log("GameOver ExpReward:" + expReward);
                         Debug.Log("GameOver SliverReward:" + sliverReward);
@@ -1012,10 +1059,69 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// </summary>
     public void Login(string Account, string Password, MemberType memberType)
     {
+        Debug.Log("memberType:" + (byte)memberType);
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
                              { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.MemberType, memberType }
+                        };
+
+            this.peer.OpCustom((byte)LoginOperationCode.Login, parameter, true, 0, true);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
+    }
+    #endregion
+
+
+    #region UpdateMemberData 更新會員資料
+    /// <summary>
+    /// 更新會員資料
+    /// </summary>
+    /// <param name="data">資料</param>
+    /// <param name="Colums">欄位</param>
+    public void UpdateMemberData(string data, string Columns)
+    {
+
+        if (Columns.ToString() == "Email")
+        {
+
+            try
+            {
+                Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+                           { (byte)MemberParameterCode.Account,Global.Account },  { (byte)MemberParameterCode.Email,data }
+                        };
+
+                this.peer.OpCustom((byte)MemberOperationCode.UpdateMember, parameter, true, 0, true);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        else
+        {
+            Debug.LogError("還沒寫好 要改成Json+欄位多重更新");
+        }
+
+    }
+    #endregion
+
+    #region Login Google 亂寫的登入會員
+    /// <summary>
+    /// 登入會員 傳送資料到Server
+    /// </summary>
+    public void LoginGoogle(string Account, string Password, string name, int age, string email, MemberType memberType)
+    {
+        Debug.Log("memberType:" + (byte)memberType);
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+                             { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.Nickname, name }
+                             ,{ (byte)MemberParameterCode.Email, email },{ (byte)MemberParameterCode.Age, age },{ (byte)LoginParameterCode.MemberType, memberType }
                         };
 
             this.peer.OpCustom((byte)LoginOperationCode.Login, parameter, true, 0, true);
@@ -1042,11 +1148,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             string[] Account = Email.Split(splitText);
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
-                           { (byte)JoinMemberParameterCode.Email,Email },  { (byte)JoinMemberParameterCode.Account,Account[0] },   { (byte)JoinMemberParameterCode.Password, Password }  ,{ (byte)JoinMemberParameterCode.Nickname, Nickname }  ,
-                             { (byte)JoinMemberParameterCode.Age, age }  ,{ (byte)JoinMemberParameterCode.Sex, sex }  , { (byte)JoinMemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)JoinMemberParameterCode.IP, IP}, { (byte)JoinMemberParameterCode.MemberType, memberType }  
+                           { (byte)MemberParameterCode.Email,Email },  { (byte)MemberParameterCode.Account,Account[0] },   { (byte)MemberParameterCode.Password, Password }  ,{ (byte)MemberParameterCode.Nickname, Nickname }  ,
+                             { (byte)MemberParameterCode.Age, age }  ,{ (byte)MemberParameterCode.Sex, sex }  , { (byte)MemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)MemberParameterCode.IP, IP}, { (byte)MemberParameterCode.MemberType, memberType }  
                         };
 
-            this.peer.OpCustom((byte)JoinMemberOperationCode.JoinMember, parameter, true, 0, true); // operationCode is 21
+            this.peer.OpCustom((byte)MemberOperationCode.JoinMember, parameter, true, 0, true); // operationCode is 21
         }
         catch (Exception e)
         {
@@ -1131,10 +1237,32 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 { (byte)MatchGameParameterCode.PrimaryID,PrimaryID},{ (byte)MatchGameParameterCode.Team,dictTeam}
+                 { (byte)MatchGameParameterCode.PrimaryID,PrimaryID},{ (byte)MatchGameParameterCode.Team,dictTeam}, { (byte)  MemberParameterCode.MemberType,Global.MemberType}
             };
 
             this.peer.OpCustom((byte)MatchGameOperationCode.MatchGame, parameter, true, 0, true);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region MatchGameBot 開始配對Bot遊戲
+    /// <summary>
+    /// 開始配對遊戲
+    /// </summary>
+    public void MatchGameBot(int PrimaryID, Dictionary<string, object> team)
+    {
+        string dictTeam = Json.Serialize(team);
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                 { (byte)MatchGameParameterCode.PrimaryID,PrimaryID}, { (byte)  MemberParameterCode.MemberType,Global.MemberType},{ (byte)MatchGameParameterCode.Team,dictTeam}
+            };
+
+            this.peer.OpCustom((byte)MatchGameOperationCode.MatchGameBot, parameter, true, 0, true);
         }
         catch (Exception e)
         {
@@ -1147,13 +1275,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
     /// </summary>
-    public void SendSkillMice(short miceID) //攻擊測試
+    public void SendSkillMice(short miceID, int energy) //攻擊測試
     {
         Debug.Log("IN Services SendSkill:" + miceID);
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 { (byte)BattleParameterCode.MiceID,miceID } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
+                 { (byte)BattleParameterCode.MiceID,miceID }, { (byte)BattleParameterCode.Energy,energy } ,{ (byte)BattleParameterCode.RoomID,Global.RoomID },{ (byte)BattleParameterCode.PrimaryID,Global.PrimaryID }
             };
 
             this.peer.OpCustom((byte)BattleOperationCode.SendSkillMice, parameter, true, 0, true);
@@ -1231,8 +1359,38 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     {
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)PlayerDataParameterCode.Account, account } };
-            this.peer.OpCustom((byte)PlayerDataOperationCode.LoadItem, parameter, true, 0, true);
+            if (Global.connStatus)
+            {
+                Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)PlayerDataParameterCode.Account, account } };
+                this.peer.OpCustom((byte)PlayerDataOperationCode.LoadItem, parameter, true, 0, true);
+            }
+            else
+            {
+                Debug.Log("FUCK");
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+
+
+    #region UpdatePlayerData 更新玩家(圖片)資料
+    /// <summary>
+    /// 更新玩家(圖片)資料
+    /// </summary>                                              
+    public void UpdatePlayerData(string imageName)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)PlayerDataParameterCode.Account, Global.Account }, { (byte)PlayerDataParameterCode.PlayerImage, imageName },}
+            ;
+            this.peer.OpCustom((byte)PlayerDataOperationCode.UpdatePlayer, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {
@@ -1296,7 +1454,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 須使用多層字典，編號為ItemID
     /// </summary>             
     /// <param name="jsonString">JsonString 1:itemCount , 2:useCount</param>
-    public void UpdatePlayerItem(string jsonString,List<string> columns)
+    public void UpdatePlayerItem(string jsonString, List<string> columns)
     {
         try
         {
@@ -1494,13 +1652,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 更新分數 地鼠用
     /// </summary>
-    public void UpdateScore(short miceID, float time)
+    public void UpdateScore(short miceID, int combo, float time)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
-            { (byte)BattleParameterCode.MiceID, miceID }, { (byte)BattleParameterCode.Time, time }
+            { (byte)BattleParameterCode.MiceID, miceID },{ (byte)BattleParameterCode.Combo, combo }, { (byte)BattleParameterCode.Time, time }
             };
 
             this.peer.OpCustom((byte)BattleOperationCode.UpdateScore, parameter, true, 0, false); // operationCode is RoomSpeak
@@ -1635,14 +1793,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <param name="killMice">清除的老鼠</param>
     /// <param name="lostMice">沒打到的老鼠</param>
     /// <param name="itemAmount">使用的道具數量</param>
-    public void GameOver(Int16 gameScore, Int16 otherScore, Int16 gameTime, Int16 maxCombo, int killMice, int lostMice,Int16 spawnCount, string dictClientMiceData,string[] columns)
+    public void GameOver(Int16 gameScore, Int16 otherScore, Int16 gameTime, Int16 maxCombo, int killMice, int lostMice, Int16 spawnCount, string dictClientMiceData, string[] columns)
     {
         Debug.Log(gameScore + " " + otherScore + " " + gameTime + " " + maxCombo + " " + killMice + " " + lostMice + " " + spawnCount);
         try
         {
             Debug.Log("Send GameOver:" + Global.dictSortedItem);
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-            { (byte)PlayerDataParameterCode.Account, Global.Account },
+            { (byte)PlayerDataParameterCode.Account, Global.Account },{ (byte)LoginParameterCode.PrimaryID, Global.PrimaryID },
             { (byte)BattleParameterCode.Score, gameScore },{ (byte)BattleParameterCode.OtherScore, otherScore },
             { (byte)BattleParameterCode.Time, gameTime },{ (byte)PlayerDataParameterCode.MaxCombo, Global.MaxCombo },
             { (byte)PlayerDataParameterCode.SumKill, killMice },{ (byte)PlayerDataParameterCode.SumLost, lostMice },
@@ -1670,6 +1828,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         Debug.Log(goods[0] + " " + goods[1] + " " + goods[2] + " " + goods[3]);
         try
         {
+
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Json.Serialize(Global.dictMiceAll) },
             { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[0])},{ (byte)StoreParameterCode.ItemName,goods[1]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[2])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[3])},
@@ -1728,13 +1887,31 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 傳送技能老鼠技能
     /// </summary>
     /// <param name="rate">倍率</param>
-    public void SendBossSkill(ENUM_Skill skill,bool self)
+    public void SendBossSkill(ENUM_Skill skill, bool self)
     {
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)SkillParameterCode.SkillID, skill}, { (byte)BattleParameterCode.CustomValue, self}};
             this.peer.OpCustom((byte)BattleOperationCode.SkillBoss, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+
+    #region GetOnlineActor 取得線上玩家
+    /// <summary>
+    /// 取得線上玩家
+    /// </summary>
+    public void GetOnlineActor()
+    {
+        try
+        {
+            this.peer.OpCustom((byte)SystemOperationCode.GetOnlineActor, null, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {

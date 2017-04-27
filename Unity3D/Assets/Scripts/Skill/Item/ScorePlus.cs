@@ -31,6 +31,7 @@ public class ScorePlus : SkillItem
 
     public override void Release()
     {
+        Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Normal);
         foreach(GameObject go in effects)
             GameObject.Destroy(go);
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG

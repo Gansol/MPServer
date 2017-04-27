@@ -785,8 +785,8 @@ public class UIScrollablePopupList : UIWidgetContainer
                 UILabel lbl = labels[i];
                 NGUITools.AddWidgetCollider(lbl.gameObject);
                 BoxCollider bc = GetComponent<BoxCollider>();       // 修改
-                lbl.GetComponent<BoxCollider>().size = bc.size;     // 修改
-                lbl.GetComponent<BoxCollider>().center = bc.center; // 修改
+                lbl.GetComponent<BoxCollider>().size = new Vector3(175, 50);//bc.size;     // 修改
+                lbl.GetComponent<BoxCollider>().center = new Vector3(100, -25);// bc.center; // 修改
                 // bcCenter.z = bc.center.z;
                 // bc.center = bcCenter;
                 // bc.size = bcSize;   
@@ -883,6 +883,7 @@ public class UIScrollablePopupList : UIWidgetContainer
             scrForegroundSprite.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
             scrForegroundSprite.color = scrollbarFgDefColour;
             scrForegroundSprite.gameObject.name = "Foreground";
+            //scrForegroundSprite.GetComponent<BoxCollider>().size = new Vector3(scrollbarSprite.GetComponent<BoxCollider>().size.x * 2, scrollbarSprite.GetComponent<BoxCollider>().size.y*2);
             UIButtonColor scFColour = scrForegroundSprite.gameObject.AddComponent<UIButtonColor>();
             scFColour.defaultColor = scrForegroundSprite.color;
             scFColour.hover = scrollbarFgHovColour;
@@ -903,8 +904,8 @@ public class UIScrollablePopupList : UIWidgetContainer
             mScroller.verticalScrollBar = scrollBehaviour;
             mScroller.ResetPosition();
             scrollBehaviour.value = 0; // does this actually do anything?
-
-
+            // Scroll Bar 寬度
+            scrollbarSprite.GetComponent<BoxCollider>().size = new Vector3(scrollbarSprite.GetComponent<BoxCollider>().size.x*2,scrollbarSprite.GetComponent<BoxCollider>().size.y);
         }
         //else OnSelect(false);
     }

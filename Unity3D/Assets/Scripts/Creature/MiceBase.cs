@@ -3,6 +3,8 @@ using System.Collections;
 
 public abstract class MiceBase : Creature
 {
+    protected static UIPlaySound hitSound;
+
     public abstract void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
 
     /// <summary>
@@ -58,6 +60,4 @@ public abstract class MiceBase : Creature
             this.m_Arribute = null;
         this.m_Arribute = arribute;
     }
-
-
 }

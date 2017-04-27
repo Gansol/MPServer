@@ -36,8 +36,10 @@ namespace MPCOM
         public short goldReward;            // 遊戲獎勵(金幣(Gold))
         public short expReward;             // 經驗獎勵
         public short battleResult;          // 戰鬥結果
+        public short bossHP;                // 任務目標
 
         public float scoreRate;             // 分數倍率
         public float energyRate;            // 能量倍率
+        public static readonly int GameTime = 150;  // 遊戲時間
     }
 }

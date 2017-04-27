@@ -8,15 +8,12 @@ using System.Text;
 using Gansol;
 public class AX : MonoBehaviour
 {
-
-    void Start(){
-        Debug.Log(Encrypt("a"));
-        Debug.Log(Encrypt("b"));
-    }
-
-    private string Encrypt(string data)
+    void Start()
     {
-        string tmpString = TextUtility.SHA512Complier(Gansol.TextUtility.SerializeToStream(data));
-        return TextUtility.SHA1Complier(Gansol.TextUtility.SerializeToStream(tmpString));
+        string account = "dfsf";
+        string[] memeberAccount = account.Split('@');
+        account = memeberAccount[0];
+
+        Debug.Log(account);
     }
 }

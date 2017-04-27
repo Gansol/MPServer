@@ -81,8 +81,11 @@ public class StoreManager : PanelManager
         {
             _bLoadedGashapon = !_bLoadedGashapon;
             assetLoader.init();
-            _tmpTab = infoGroupsArea[2];
-            InstantiateGashapon(infoGroupsArea[2].transform, assetFolder[0]);
+            //_tmpTab = infoGroupsArea[2];
+            //  InstantiateGashapon(infoGroupsArea[2].transform, assetFolder[0]);
+            GameObject go = new GameObject();
+            go.name = "Tab2";
+            OnTabClick(go);
         }
 
         if (assetLoader.loadedObj && _bLoadedIcon)                      // 載入道具完成後 實體化 道具
@@ -109,7 +112,7 @@ public class StoreManager : PanelManager
         {
             _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
-            _bLoadedActor = InstantiateActor(_lastItem.GetComponentInChildren<UISprite>().name, infoGroupsArea[4].transform.GetChild(0).GetChild(0), actorScale);
+            _bLoadedActor = InstantiateActor(_lastItem.GetComponentInChildren<UISprite>().name, infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Image"), actorScale);
         }
     }
 
@@ -118,6 +121,8 @@ public class StoreManager : PanelManager
     {
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
+        Global.photonService.LoadCurrency(Global.Account);
+        Global.photonService.LoadPlayerItem(Global.Account);
     }
 
     protected override void OnLoadPanel()
@@ -151,39 +156,83 @@ public class StoreManager : PanelManager
 
     public void OnItemClick(GameObject obj)
     {
-        // object itemType;
 
-
-        // Dictionary<string, object> itemData = Global.storeItem[obj.name] as Dictionary<string, object>;
-
-        //itemData.TryGetValue("ItemType", out itemType);
         _lastItem = obj;
-
-
+        Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItem.name] as Dictionary<string, object>;
+        Dictionary<string, object> playerItemData = new Dictionary<string,object>();
+        if (Global.playerItem.ContainsKey(_lastItem.name))
+            playerItemData = Global.playerItem[_lastItem.name] as Dictionary<string, object>;
+        object value;
 
         SelectItemProperty(_itemType);
 
+        if ((StoreType)_itemType == StoreType.Mice)
+        {
+            LoadProperty loadProperty = new LoadProperty();
+            infoGroupsArea[4].SetActive(true);
+            infoGroupsArea[4].transform.Find("Item").gameObject.SetActive(false);
+            infoGroupsArea[4].transform.Find("Mice").gameObject.SetActive(true);
+
+            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemData, _itemType);
+            loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemType);
+
+            if (playerItemData.Count != 0)
+            {
+                playerItemData.TryGetValue("ItemCount", out value);
+                infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
+            }
+            else
+            {
+                infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
+            }
+
+            _bLoadedActor = LoadActor(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Image"), actorScale);
+
+            infoGroupsArea[4].transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+            infoGroupsArea[4].layer = LayerMask.NameToLayer("ItemInfo");
+
+            dictItemProperty.TryGetValue("Description", out value);
+            infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString(); 
+
+            EventMaskSwitch.Switch(infoGroupsArea[4], true);
+        }
+        else if ((StoreType)_itemType == StoreType.Item || (StoreType)_itemType == StoreType.Armor)
+        {
+            LoadProperty loadProperty = new LoadProperty();
+            infoGroupsArea[4].SetActive(true);
+            infoGroupsArea[4].transform.Find("Item").gameObject.SetActive(true);
+            infoGroupsArea[4].transform.Find("Mice").gameObject.SetActive(false);
+
+            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemData, _itemType);
+            loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemType);
 
 
+            
+
+            
+            dictItemProperty.TryGetValue("ItemName", out value);
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItem.GetComponentInChildren<UISprite>().atlas;
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + "ICON";
+
+            if (playerItemData.Count != 0)
+            {
+                playerItemData.TryGetValue("ItemCount", out value);
+                infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
+
+            }
+            else
+            {
+                infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
+            }
+
+            dictItemProperty.TryGetValue("Description", out value);
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString(); 
 
 
-
-
-
-        //buyingGoodsData[0] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemID];
-        //buyingGoodsData[1] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemName];
-        //buyingGoodsData[2] = obj.GetComponent<Item>().storeInfo[(int)StoreProperty.ItemType];
-
-        LoadProperty loadProperty = new LoadProperty();
-        loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, _itemData, _itemType);
-        loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.GetChild(0).gameObject, _itemType);
-
-        _bLoadedActor = LoadActor(obj, infoGroupsArea[4].transform.GetChild(0).GetChild(0), actorScale);   // 錯誤 暫時道具沒有動畫物件
-
-        infoGroupsArea[4].SetActive(true);
-        infoGroupsArea[4].transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
-        infoGroupsArea[4].layer = LayerMask.NameToLayer("ItemInfo");
-        EventMaskSwitch.Switch(infoGroupsArea[4], true);
+            infoGroupsArea[4].transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+            infoGroupsArea[4].layer = LayerMask.NameToLayer("ItemInfo");
+            EventMaskSwitch.Switch(infoGroupsArea[4], true);
+        }
     }
 
     public void OnBuyClick(GameObject myPanel)
@@ -201,6 +250,8 @@ public class StoreManager : PanelManager
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItem.name] as Dictionary<string, object>;
         object value;
         //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
+        dictItemProperty.TryGetValue("CurrencyType", out value);
+
 
         dictItemProperty.TryGetValue("ItemID", out value);
         buyingGoodsData[0] = value.ToString();
@@ -211,10 +262,19 @@ public class StoreManager : PanelManager
         dictItemProperty.TryGetValue("CurrencyType", out value);
         buyingGoodsData[3] = value.ToString();
         buyingGoodsData[4] = "1";
+
+
+        dictItemProperty.TryGetValue("ItemName", out value);
+        infoGroupsArea[5].transform.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItem.GetComponentInChildren<UISprite>().atlas;
+        infoGroupsArea[5].transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + "ICON";
+
+
         infoGroupsArea[5].transform.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
         dictItemProperty.TryGetValue("Price", out value);
         infoGroupsArea[5].transform.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = value.ToString(); // price
         infoGroupsArea[5].transform.GetChild(0).FindChild("Price").GetComponent<UILabel>().text = value.ToString(); // price
+
+
     }
 
     /// <summary>
@@ -240,17 +300,18 @@ public class StoreManager : PanelManager
     public void OnComfirm(GameObject myPanel)
     {
         myPanel.SetActive(false);
+
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
     public void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        GameObject root = obj.transform.parent.parent.gameObject;
+        GameObject root = obj.transform.parent.gameObject;
 
-        _tmpTab.SetActive(false);
-        infoGroupsArea[2].SetActive(true);
-        _tmpTab = infoGroupsArea[2];
+        //_tmpTab.SetActive(false);
+        //infoGroupsArea[2].SetActive(true);
+        //_tmpTab = infoGroupsArea[2];
 
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         EventMaskSwitch.Resume();
@@ -270,14 +331,14 @@ public class StoreManager : PanelManager
 
         switch (value)
         {
-            case 1:
-                {
-                    _itemType = (int)StoreType.Gashapon;
-                    if (_tmpTab != infoGroupsArea[2]) _tmpTab.SetActive(false);
-                    infoGroupsArea[2].SetActive(true);
-                    _tmpTab = infoGroupsArea[2];
-                    break;
-                }
+            //case 1:
+            //    {
+            //        _itemType = (int)StoreType.Gashapon;
+            //        if (_tmpTab != infoGroupsArea[2]) _tmpTab.SetActive(false);
+            //        infoGroupsArea[2].SetActive(true);
+            //        _tmpTab = infoGroupsArea[2];
+            //        break;
+            //    }
             case 2:
                 _itemType = (int)StoreType.Mice;
                 break;
@@ -290,7 +351,8 @@ public class StoreManager : PanelManager
             case 5:
                 break;
             default:
-                Debug.LogError("Unknow Tab!");
+                _itemType = (int)StoreType.Mice;
+                Debug.Log("Show Default Panel");
                 break;
         }
 
@@ -299,7 +361,7 @@ public class StoreManager : PanelManager
         {
             SelectStoreItemData(_itemType);
             _itemData = ObjectFactory.GetItemInfoFromType(_itemData, _itemType);
-            if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
+//            if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
             assetLoader.init();
             assetLoader.LoadAsset(_folderString + "/", _folderString);
             _bLoadedIcon = LoadIconObject(SelectIconData(_itemData), _folderString);

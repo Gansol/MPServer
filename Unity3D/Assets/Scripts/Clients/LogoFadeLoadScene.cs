@@ -31,27 +31,24 @@ public class LogoFadeLoadScene : MonoBehaviour
         float time = Time.time;
 
 
-        if (time > lastTime + 0.1f && time < seconds / 4 * 3)
+        if (time > lastTime + 0.1f && time < seconds *.33f)
         {
-            Logo.color = new Color(255, 255, 255, Mathf.Lerp(Logo.color.a, 1, 0.3f));
+            Logo.color = new Color(255, 255, 255, Mathf.Lerp(Logo.color.a, 1, 0.4f));
             lastTime = time;
         }
 
-        if (time > lastTime + 0.1f && time > seconds / 4 * 3 && time < seconds)
+        if (time > lastTime + 0.1f && time > seconds *.67f && time < seconds)
         {
-            Logo.color = new Color(255, 255, 255, Mathf.Lerp(Logo.color.a, 0, 0.4f));
+            Logo.color = new Color(255, 255, 255, Mathf.Lerp(Logo.color.a, 0, 0.6f));
             lastTime = time;
         }
 
         if (time > seconds && !flag)
         {
             flag = !flag;
-            
 
-            if (check.ConnStatus)
-                Application.LoadLevel("BundleCheck");
-            if (!check.ConnStatus)
-                Application.LoadLevel("MainGame");
+            Application.LoadLevel("BundleCheck");
+
         }
     }
 }

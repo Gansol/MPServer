@@ -26,7 +26,7 @@ public class SkillFactory
         switch ((ENUM_Skill)skillID)
         {
             case ENUM_Skill.LesserHeal:
-                //skill = new LesserHeal();
+                skill = new LesserHeal(skillData);
                 break;
             case ENUM_Skill.Shield:
                 skill = new SkillShield(skillData);
@@ -78,6 +78,10 @@ public class SkillFactory
                 break;
             case ENUM_Skill.FeverTime:
                 skill = new FeverTime(skillData);
+                break;
+
+            case ENUM_Skill.FreezeEnergy:
+                skill = new FreezeEnergy(skillData);
                 break;
             default:
                 Debug.LogError("Skill is Null !");

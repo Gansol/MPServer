@@ -39,8 +39,8 @@ namespace MPCOM
         }
         #region variable 變數區
         private Int16 harvest = 200;
-        private Int16 drivingMice = 50;
-        private Int16 harvestRate = 2;               // 分數倍率
+        private Int16 drivingMice = 35;
+        private Int16 harvestRate = 50;               // 分數倍率
         private Int16 reduce = -500;                  // 減少分數
 
         private Int16 harvestReward = 100;
@@ -52,9 +52,16 @@ namespace MPCOM
 
         private struct Rate
         {
-            public readonly static float mormal = 1;
-            public readonly static float low = 0.8f;
-            public readonly static float high = 1.2f;
+            public readonly static float Normal = 1;
+            public readonly static float Low = 0.8f;
+            public readonly static float High = 1.2f;
+        }
+
+        private struct EnergyRate
+        {
+            public readonly static float Normal = 1;
+            public readonly static float Low = 0.5f;
+            public readonly static float High = 2f;
         }
 
         private struct EggMice
@@ -63,38 +70,73 @@ namespace MPCOM
             public readonly static int eatFull = 10;    // 2.5s = 4
             public readonly static float perEat = 1;
             public readonly static float eatingRate = 0.25f;
-            public readonly static float hp = 25f;
+            public readonly static float hp = 30f;
             public readonly static int skill = 1;
         }
 
         private struct BlackMice
         {
+            public readonly static int ID = 10002;    // ID
             public static int eatFull = 20;    // 2s = 10
             public static float perEat = 5;
             public static float eatingRate = 0.5f;
+            public readonly static float hp = 30f;
         }
 
         private struct CandyMice
         {
+            public readonly static int ID = 10003;    // ID
             public static int eatFull = 32;    // 3s = 10.667
             public static float perEat = 8;
             public static float eatingRate = 0.75f;
+            public readonly static float hp = 30f;
         }
 
         private struct RabbitMice
         {
+            public readonly static int ID = 10004;    // ID
             public static int eatFull = 24;    // 2.64s = 9.091
             public static float perEat = 3;
             public static float eatingRate = 0.33f;
+            public readonly static float hp = 30f;
         }
 
         private struct NinjaMice
         {
             public readonly static int ID = 10005;    // ID
-            public static int eatFull = 28;    // 2.86s = 9.79
-            public static float perEat = 7;
-            public static float eatingRate = 0.67f;
+            public static int eatFull = 15;    // 2.86s = 9.79
+            public static float perEat = 2;
+            public static float eatingRate = 0.25f;
+            public readonly static float hp = 30f;
         }
+
+        private struct ThiefMice
+        {
+            public readonly static int ID = 10006;    // ID
+            public static int eatFull = 15;    // 2.86s = 9.79
+            public static float perEat = 2;
+            public static float eatingRate = 0.25f;
+            public readonly static float hp = 30f;
+        }
+
+        private struct MagicMice
+        {
+            public readonly static int ID = 10007;    // ID
+            public static int eatFull = 15;    // 2.86s = 9.79
+            public static float perEat = 2;
+            public static float eatingRate = 0.25f;
+            public readonly static float hp = 30f;
+        }
+
+        private struct EngineerMice
+        {
+            public readonly static int ID = 10008;    // ID
+            public static int eatFull = 15;    // 2.86s = 9.79
+            public static float perEat = 2;
+            public static float eatingRate = 0.25f;
+            public readonly static float hp = 30f;
+        }
+
         #endregion
 
 
@@ -107,13 +149,13 @@ namespace MPCOM
             switch ((int)rate)
             {
                 case (int)ENUM_Rate.Normal:
-                    battleData.scoreRate = Rate.mormal;
+                    battleData.scoreRate = Rate.Normal;
                     break;
                 case (int)ENUM_Rate.Low:
-                    battleData.scoreRate = Rate.low;
+                    battleData.scoreRate = Rate.Low;
                     break;
                 case (int)ENUM_Rate.High:
-                    battleData.scoreRate = Rate.high;
+                    battleData.scoreRate = Rate.High;
                     break;
                 default:
                     battleData.ReturnCode = "S509";
@@ -132,13 +174,13 @@ namespace MPCOM
             switch ((int)rate)
             {
                 case (int)ENUM_Rate.Normal:
-                    battleData.energyRate = Rate.mormal;
+                    battleData.energyRate = EnergyRate.Normal;
                     break;
                 case (int)ENUM_Rate.Low:
-                    battleData.energyRate = Rate.low;
+                    battleData.energyRate = EnergyRate.Low;
                     break;
                 case (int)ENUM_Rate.High:
-                    battleData.energyRate = Rate.high;
+                    battleData.energyRate = EnergyRate.High;
                     break;
                 default:
                     battleData.ReturnCode = "S513";
@@ -151,7 +193,7 @@ namespace MPCOM
         #region ClacScore 計算老鼠命中分數
 
         [AutoComplete]
-        public BattleData ClacScore(short miceID, float aliveTime, float scoreRate, float energyRate)
+        public BattleData ClacScore(short miceID, float aliveTime, float scoreRate, int combo, float energyRate)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
@@ -171,12 +213,10 @@ namespace MPCOM
                             if (EggMice.perEat * ateTimes >= EggMice.eatFull)
                             {
                                 score = Convert.ToInt16(EggMice.eatFull * scoreRate * -1);
-                                Log.Debug("1Score:" + score);
                             }
                             else
                             {
                                 score = Convert.ToInt16(EggMice.eatFull - (EggMice.perEat * ateTimes * scoreRate));
-                                Log.Debug("2Score:" + score);
                             }
 
                             totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
@@ -194,7 +234,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(BlackMice.eatFull - (BlackMice.perEat * ateTimes * scoreRate));
                             }
-                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
+                            totalScore = Convert.ToInt16(BlackMice.eatFull * scoreRate);
                             break;
                         }
                     case 10003: //Candy 錯誤
@@ -209,7 +249,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(CandyMice.eatFull - (CandyMice.perEat * ateTimes * scoreRate));
                             }
-                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
+                            totalScore = Convert.ToInt16(CandyMice.eatFull * scoreRate);
                             break;
                         }
                     case 10004: //Rabbit 錯誤
@@ -224,7 +264,7 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(RabbitMice.eatFull - (RabbitMice.perEat * ateTimes * scoreRate));
                             }
-                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
+                            totalScore = Convert.ToInt16(RabbitMice.eatFull * scoreRate);
                             break;
                         }
                     case 10005: //Njnja 錯誤
@@ -239,7 +279,52 @@ namespace MPCOM
                             {
                                 score = Convert.ToInt16(NinjaMice.eatFull - (NinjaMice.perEat * ateTimes * scoreRate));
                             }
-                            totalScore = Convert.ToInt16(EggMice.eatFull * scoreRate);
+                            totalScore = Convert.ToInt16(NinjaMice.eatFull * scoreRate);
+                            break;
+                        }
+                    case 10006: //Njnja 錯誤
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / ThiefMice.eatingRate));
+
+                            if (ThiefMice.perEat * ateTimes >= ThiefMice.eatFull)
+                            {
+                                score = Convert.ToInt16(ThiefMice.eatFull * scoreRate * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(ThiefMice.eatFull - (ThiefMice.perEat * ateTimes * scoreRate));
+                            }
+                            totalScore = Convert.ToInt16(ThiefMice.eatFull * scoreRate);
+                            break;
+                        }
+                    case 10007: //Njnja 錯誤
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / MagicMice.eatingRate));
+
+                            if (NinjaMice.perEat * ateTimes >= MagicMice.eatFull)
+                            {
+                                score = Convert.ToInt16(MagicMice.eatFull * scoreRate * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(MagicMice.eatFull - (MagicMice.perEat * ateTimes * scoreRate));
+                            }
+                            totalScore = Convert.ToInt16(MagicMice.eatFull * scoreRate);
+                            break;
+                        }
+                    case 10008: //Njnja 錯誤
+                        {
+                            int ateTimes = Convert.ToInt16(Math.Floor(aliveTime / EngineerMice.eatingRate));
+
+                            if (EngineerMice.perEat * ateTimes >= EngineerMice.eatFull)
+                            {
+                                score = Convert.ToInt16(EngineerMice.eatFull * scoreRate * -1);
+                            }
+                            else
+                            {
+                                score = Convert.ToInt16(EngineerMice.eatFull - (EngineerMice.perEat * ateTimes * scoreRate));
+                            }
+                            totalScore = Convert.ToInt16(EngineerMice.eatFull * scoreRate);
                             break;
                         }
                 }
@@ -249,7 +334,19 @@ namespace MPCOM
                 throw e;
             }
 
-            battleData.energy = (Int16)((score > 0) ? 1 : 0 * energyRate);   // 打死老鼠增加能量
+
+            battleData.energy = 0;
+            if (score > 0)
+            {
+                battleData.energy = Convert.ToInt16(Math.Round(2 * energyRate, 0, MidpointRounding.AwayFromZero));
+                if (combo > 25)
+                    battleData.energy = Convert.ToInt16(Math.Round(3 * energyRate, 0, MidpointRounding.AwayFromZero));
+                if (combo > 50)
+                    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
+                if (combo > 100)
+                    battleData.energy = Convert.ToInt16(Math.Round(5 * energyRate, 0, MidpointRounding.AwayFromZero));
+            }
+
             battleData.score = score;
             battleData.totalScore = totalScore;
             battleData.ReturnCode = "S501";
@@ -286,7 +383,7 @@ namespace MPCOM
                         {
                             if (missionRate > 0 && customValue >= drivingMice) // 這裡自訂參數 customValue 是Combo
                             {
-                                battleData.missionReward = (Int16)Math.Round(missionRate * drivingMiceReward);
+                                battleData.missionReward = (Int16)Math.Round(missionRate * drivingMiceReward * customValue / 10);
                                 battleData.ReturnCode = "S503";
                                 battleData.ReturnMessage = "驗證任務獎勵成功！";
                                 return battleData;
@@ -330,6 +427,7 @@ namespace MPCOM
                         {
                             if (missionRate > 0) // 時間倒扣分
                             {
+                                Log.Debug("Mission.WorldBoss: 時間到！");
                                 float percent = (float)customValue / 100;
 
                                 if (customValue == 50)  // 平手 獎勵/2
@@ -399,8 +497,10 @@ namespace MPCOM
                         }
                     case Mission.DrivingMice: // 趕老鼠
                         {
+                            Random rnd = new Random();
+                            short value = Convert.ToInt16(missionRate * drivingMice);
                             //to do verification
-                            battleData.missionScore = (Int16)Math.Round((missionRate * drivingMice), 0);
+                            battleData.missionScore = Convert.ToInt16(rnd.Next(value - 10, value + 1));
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
@@ -429,6 +529,7 @@ namespace MPCOM
                         {
                             // missionRate 是老鼠ID
                             battleData.missionScore = (Int16)NinjaMice.ID;
+                            battleData.bossHP = (Int16)NinjaMice.hp;
                             battleData.ReturnCode = "S505";
                             battleData.ReturnMessage = "選擇任務成功！";
                             return battleData;
@@ -649,7 +750,7 @@ namespace MPCOM
 
         private short[] GetTimeRate(float time)
         {
-            int gameTime = 300;
+            int gameTime = 150;
             float rate = time / gameTime;
             short[] result = new short[2];
 

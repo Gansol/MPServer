@@ -50,6 +50,10 @@ public class NinjaMiceBoss : MiceBossBase
     /// <param name="isMe">是否為自己攻擊</param>
     protected override void OnInjured(short damage, bool myAttack)
     {
+        if (!myAttack)
+        {
+            base.OnInjured(damage, myAttack);
+        }
         if (m_Arribute.GetShield() > 0)
         {
             m_Arribute.SetShield(m_Arribute.GetShield() - damage);

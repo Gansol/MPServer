@@ -4,7 +4,7 @@ using System.EnterpriseServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Gansol;
-
+using MPProtocol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -28,6 +28,8 @@ namespace MPCOM
         byte[] JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime,byte memberType);
         byte[] JoinMember(string account, string nickname, string IP, string email, string joinTime, byte memberType);
         byte[] MemberLogin(string account,string password);
+
+        byte[] UpdateMember(string account ,string data, string columns);
     }
 
     public class MemberUI : ServicedComponent, IMemberUI
@@ -38,6 +40,19 @@ namespace MPCOM
         }
 
         #region JoinMember(Gansol) 加入會員
+        /// <summary>
+        /// JoinMember(Gansol、Facebook) 加入會員
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <param name="nickname"></param>
+        /// <param name="age"></param>
+        /// <param name="sex"></param>
+        /// <param name="IP"></param>
+        /// <param name="email"></param>
+        /// <param name="joinTime"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
         public byte[] JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
@@ -47,7 +62,7 @@ namespace MPCOM
             try
             {
                 MemberLogic memberLogic = new MemberLogic();
-                memberData = memberLogic.JoinMember(account, password, nickname, age, sex, IP, email, joinTime);
+                memberData = memberLogic.JoinMember(account, password, nickname, age, sex, IP, email, joinTime, memberType);
             }
             catch (Exception e)
             {
@@ -59,6 +74,16 @@ namespace MPCOM
         #endregion
 
         #region JoinMember(SNS) 加入會員
+        /// <summary>
+        /// JoinMember(SNS) 加入會員
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="nickname"></param>
+        /// <param name="IP"></param>
+        /// <param name="email"></param>
+        /// <param name="joinTime"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
         public byte[] JoinMember(string account, string nickname, string IP,string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
@@ -68,7 +93,7 @@ namespace MPCOM
             try
             {
                 MemberLogic memberLogic = new MemberLogic();
-                memberData = memberLogic.JoinMember(account, nickname, IP,email, joinTime, memberType);
+                memberData = memberLogic.JoinMember(account, nickname, IP,email, joinTime,memberType);
             }
             catch (Exception e)
             {
@@ -99,5 +124,27 @@ namespace MPCOM
             return TextUtility.SerializeToStream(memberData);
         }
         #endregion
+
+
+
+                public byte[] UpdateMember(string account ,string data , string columns)
+        {
+            MemberData memberData = new MemberData();
+            memberData.ReturnCode = "S100";
+            memberData.ReturnMessage = "";
+
+            try
+            {
+                MemberLogic memberLogic = new MemberLogic();
+                memberData = memberLogic.UpdateMember( account ,data,columns);
+            }
+            catch (Exception e)
+            {
+                memberData.ReturnCode = "S100";
+                memberData.ReturnMessage = e.Message;
+            }
+            return TextUtility.SerializeToStream(memberData);
+        }
+      
     }
 }

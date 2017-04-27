@@ -23,7 +23,7 @@ namespace MPCOM
 {
     public interface IBattleUI  // 使用介面 可以提供給不同程式語言繼承使用        
     {
-        byte[] ClacScore(short miceID, float aliveTime, float scoreRate, float energyRate);
+        byte[] ClacScore(short miceID, float aliveTime, float scoreRate, int combo, float energyRate);
         byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
         byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo , string dictClientMiceData, string[] columns);
@@ -95,7 +95,7 @@ namespace MPCOM
         /// <param name="eatingRate"></param>
         /// <param name="score"></param>
         /// <returns></returns>
-        public byte[] ClacScore(short miceID, float aliveTime, float scoreRate, float energyRate)
+        public byte[] ClacScore(short miceID, float aliveTime, float scoreRate, int combo, float energyRate)
         {
             BattleData battleData = new BattleData();
             battleData.ReturnCode = "S500";
@@ -104,7 +104,7 @@ namespace MPCOM
             try
             {
                 BattleLogic battleLogic = new BattleLogic();
-                battleData = battleLogic.ClacScore(miceID, aliveTime, scoreRate, energyRate);
+                battleData = battleLogic.ClacScore(miceID, aliveTime, scoreRate,combo, energyRate);
             }
             catch (Exception e)
             {

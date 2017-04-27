@@ -25,7 +25,7 @@ public class EasyBattleAIState : BattleAIState
         spawnSpeed = 1.2f;
         totalSpawn = 0;
         wave = 0;
-        nextBali = 4; nextMuch = 3; nextSuper = 50;
+        nextBali = 4; nextMuch = 3; nextSuper = 5;
     }
 
 

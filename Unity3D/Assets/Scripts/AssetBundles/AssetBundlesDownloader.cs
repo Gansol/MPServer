@@ -22,7 +22,7 @@ public class AssetBundlesDownloader : MonoBehaviour
 {
     #region 欄位
     public int fileCount { get; set; }
-    public bool fileDownloaded { get { return _fileDownloaded;} }
+    public bool fileDownloaded { get { return _fileDownloaded; } }
 
     private int _reConnTimes;
     private bool _fileDownloaded = false;
@@ -41,7 +41,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     public IEnumerator _DownloadListFile(string pathFile) //pathFile 要下載的List檔案
     {
         // www -> storage dict list -> download file
-
+        Global.ReturnMessage = "下載遊戲資源列表...";
         using (WWW wwwDownloadList = new WWW(Global.serverListPath + pathFile))
         {//下載伺服器List檔案
             yield return wwwDownloadList;
@@ -59,15 +59,14 @@ public class AssetBundlesDownloader : MonoBehaviour
             else if (wwwDownloadList.isDone)
             {
                 Dictionary<string, object> dictDownloadFile = Json.Deserialize(wwwDownloadList.text) as Dictionary<string, object>;
-                
+
                 _reConnTimes = 0;
                 fileCount = dictDownloadFile.Count;
 
-                // 一次多線下載 如果檔案太大 需要改寫
-                foreach (KeyValuePair<string, object> assets in dictDownloadFile)
-                {//等待下載 下載列表中 全部資源
-                    StartCoroutine(_DownloadFile(Global.assetBundlesPath, assets.Key.ToString()));
-                }
+                //等待下載 下載列表中 全部資源
+                List<string> assets = new List<string>(dictDownloadFile.Keys);
+                StartCoroutine(_DownloadFile(Global.assetBundlesPath, assets));
+
             }
             else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
             {
@@ -86,7 +85,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// <returns></returns>
     public bool DeleteFile(HashSet<string> hashSet)
     {
-//        Debug.Log(hashSet.Count);
+        //        Debug.Log(hashSet.Count);
         if (hashSet.Count != 0)
         {
             string localBundlesPath = Application.persistentDataPath + "/AssetBundles/"; //本機資源路徑
@@ -96,7 +95,7 @@ public class AssetBundlesDownloader : MonoBehaviour
 
             return true;
         }
-         return false;
+        return false;
     }
     #endregion
 
@@ -106,14 +105,14 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// </summary>
     /// <param name="hashSet"></param>
     /// <returns></returns>
-    public IEnumerator DownloadLostFile(HashSet<string> hashSet) 
+    public IEnumerator DownloadLostFile(List<string> assets)
     {
-        fileCount = hashSet.Count;
+        fileCount = assets.Count;
         // lost files name -> download all files
-        foreach (string assets in hashSet) //下載全部遺失的檔案
+        foreach (string asset in assets) //下載全部遺失的檔案
             StartCoroutine(_DownloadFile(Global.assetBundlesPath, assets));
 
-        yield return hashSet;
+        yield return assets;
     }
     #endregion
 
@@ -123,60 +122,65 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// </summary>
     /// <param name="path">下載路徑</param>
     /// <param name="assets">資產名稱</param>
-    public void DownloadFile(string path, string assets)
+    public void DownloadFile(string path, List<string> assets)
     {
         StartCoroutine(_DownloadFile(path, assets));
     }
 
-    private IEnumerator _DownloadFile(string path, string assets)
+    private IEnumerator _DownloadFile(string path, List<string> assets)
     {
-        if (!(File.Exists(Application.persistentDataPath + "/AssetBundles/" + assets)))  //如果檔案不存在資料夾 開始下載
+        foreach (string filePath in assets)
         {
-            Global.ReturnMessage = "Start Downloading... " + assets;
-            //Debug.Log("Start Downloading... " + assets);
-            using (WWW wwwAssetBundles = new WWW(path + assets))
+            if (!(File.Exists(Application.persistentDataPath + "/AssetBundles/" + filePath)))  //如果檔案不存在資料夾 開始下載
             {
-                ; //下載物件
-                yield return wwwAssetBundles; //等待下載完成，並回傳值
-
-                if (wwwAssetBundles.error != null && _reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
+                string[] folder = filePath.Split('/');
+                Global.ReturnMessage = "開始下載資源... " + folder[1];
+                //Debug.Log("Start Downloading... " + assets);
+                using (WWW wwwAssetBundles = new WWW(path + filePath))
                 {
-                    _reConnTimes++;
-                    yield return new WaitForSeconds(1.0f);
-                    DownloadFile(path, assets); // ＊＊＊＊這可能會出錯＊＊＊＊＊
-                    Global.ReturnMessage = "Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")";
-                    //Debug.Log("Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")");
+                    ; //下載物件
+                    yield return wwwAssetBundles; //等待下載完成，並回傳值
+
+                    if (wwwAssetBundles.error != null && _reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
+                    {
+                        _reConnTimes++;
+                        yield return new WaitForSeconds(1.0f);
+                        DownloadFile(path, assets); // ＊＊＊＊這可能會出錯＊＊＊＊＊
+                        Global.ReturnMessage = "Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")";
+                        //Debug.Log("Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")");
+                    }
+                    else if (wwwAssetBundles.isDone) //伺服器檔案 下載完成
+                    {
+                        Global.ReturnMessage = "下載資源完成!";
+                        //Debug.Log("AssetBundle Downloaded!");
+
+                        _reConnTimes = 0;
+                        fileCount--;
+
+                        System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/AssetBundles/"); //建立 檔案目錄
+
+                        byte[] file = wwwAssetBundles.bytes; //轉換為二進位物件
+
+                        string folderPath = Application.persistentDataPath + "/AssetBundles/" + folder[0];
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+                        File.WriteAllBytes(Application.persistentDataPath + "/AssetBundles/" + filePath, file); //寫入 檔案 WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
+
+                        ChkDownloadedCount();
+                    }
+                    else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
+                    {
+                        Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
+                        //Debug.LogError("Can't connecting to Server! Please check your network status.");
+                    }
                 }
-                else if (wwwAssetBundles.isDone) //伺服器檔案 下載完成
-                {
-                    Global.ReturnMessage = "AssetBundle Downloaded!";
-                    //Debug.Log("AssetBundle Downloaded!");
 
-                    _reConnTimes = 0;
-                    fileCount--;
-
-                    System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/AssetBundles/"); //建立 檔案目錄
-
-                    byte[] file = wwwAssetBundles.bytes; //轉換為二進位物件
-                    string[] folder = assets.Split('/');
-                    string folderPath = Application.persistentDataPath + "/AssetBundles/" + folder[0];
-                    if (!Directory.Exists(folderPath))
-                        Directory.CreateDirectory(folderPath);
-                    File.WriteAllBytes(Application.persistentDataPath + "/AssetBundles/" + assets, file); //寫入 檔案 WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
-
-                    ChkDownloadedCount();
-                }
-                else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
-                {
-                    Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
-                    //Debug.LogError("Can't connecting to Server! Please check your network status.");
-                }
             }
-        }
-        else if (File.Exists(Application.persistentDataPath + "/AssetBundles/" + assets) && !Global.isCompleted) //全部下載完成 取代檔案列表
-        {
-            fileCount--;
-            ChkDownloadedCount();
+            else if (File.Exists(Application.persistentDataPath + "/AssetBundles/" + filePath) && !Global.isCompleted) //全部下載完成 取代檔案列表
+            {
+                fileCount--;
+                ChkDownloadedCount();
+            }
         }
     }
     #endregion

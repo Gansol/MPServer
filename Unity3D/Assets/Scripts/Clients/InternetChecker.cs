@@ -53,6 +53,11 @@ public class InternetChecker : MonoBehaviour
             if (stopCheck)
                 ping = null;
         }
+        else if (Time.time > pingStartTime + waitingTime && !Global.connStatus)
+        {
+            pingStartTime = Time.time;
+            ping = new Ping(pingAddress);
+        }
     }
 
 
@@ -64,7 +69,8 @@ public class InternetChecker : MonoBehaviour
 
     private void InternetAvailable()
     {
-        Global.connStatus = false;
+        Global.connStatus = true;
+        //Global.connStatus = false;
         Debug.Log("Connect.");
     }
 }
