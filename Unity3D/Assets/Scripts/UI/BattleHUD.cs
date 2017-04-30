@@ -280,11 +280,10 @@ public class BattleHUD : MonoBehaviour
                 break;
             case Mission.WorldBoss:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "超 級 老 鼠 出 沒 !!";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
                 Debug.Log("Mission WARNING 世界王出現!!");
                 break;
         }
-        MissionObject.transform.GetChild(2).GetComponent<UILabel>().text = "Mission";
+        MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission";
         MissionObject.GetComponent<Animator>().Play("FadeIn");
     }
 
@@ -310,37 +309,25 @@ public class BattleHUD : MonoBehaviour
         switch (mission)
         {
             case Mission.Harvest:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                //                Debug.Log("Mission : Completed! 取得: " + missionReward + " 糧食");
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
                 break;
             case Mission.HarvestRate:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫倍率復原";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                //                Debug.Log("Mission 收穫倍率復原 = 1");
                 break;
             case Mission.Exchange:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務結束:不再交換糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                //                Debug.Log("Mission 任務結束:不再交換糧食");
                 break;
             case Mission.Reduce:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "豐收祭典任務結束";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
-                //               Debug.Log("Mission : Reduce! 豐收祭典 花費: " + missionReward + " 糧食");
                 break;
             case Mission.DrivingMice:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                //                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
                 break;
             case Mission.WorldBoss:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得       糧食";
-                MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = missionReward.ToString();
-                //                Debug.Log("Mission : Completed!  取得: " + missionReward + " 糧食");
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
                 break;
         }
-        MissionObject.transform.GetChild(2).GetComponent<UILabel>().text = "Completed!";
+        MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Completed!";
         MissionObject.GetComponent<Animator>().Play("Completed");
     }
 
@@ -374,15 +361,13 @@ public class BattleHUD : MonoBehaviour
         MissionObject.SetActive(true);
         if (mission == Mission.WorldBoss)
         {
-            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗       糧食";
-            MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "    " + value.ToString();
+            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗 "+value.ToString()+" 糧食";
         }
         else
         {
             MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗";
-            MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "";
         }
-        MissionObject.transform.GetChild(2).GetComponent<UILabel>().text = "Mission Failed!";
+        MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission Failed!";
         MissionObject.GetComponent<Animator>().Play("Completed");
         Debug.Log("Mission Failed!");
     }
@@ -466,6 +451,7 @@ public class BattleHUD : MonoBehaviour
         }
         float value = _exp;
         value = value / 100f;
+        Debug.Log("Exp Percent:" + value);
         GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
         GGObject.SetActive(true);
     }

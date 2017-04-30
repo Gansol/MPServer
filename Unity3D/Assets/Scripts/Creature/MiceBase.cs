@@ -13,12 +13,6 @@ public abstract class MiceBase : Creature
     protected abstract void OnHit();
 
     /// <summary>
-    /// 死亡
-    /// </summary>
-    /// <param name="lifeTime">存活時間</param>
-    protected abstract void OnDead(float lifeTime);
-
-    /// <summary>
     /// 接收效果
     /// </summary>
     /// <param name="name">存活時間</param>

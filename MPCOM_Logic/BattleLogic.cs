@@ -338,13 +338,14 @@ namespace MPCOM
             battleData.energy = 0;
             if (score > 0)
             {
-                battleData.energy = Convert.ToInt16(Math.Round(2 * energyRate, 0, MidpointRounding.AwayFromZero));
-                if (combo > 25)
-                    battleData.energy = Convert.ToInt16(Math.Round(3 * energyRate, 0, MidpointRounding.AwayFromZero));
-                if (combo > 50)
-                    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
-                if (combo > 100)
-                    battleData.energy = Convert.ToInt16(Math.Round(5 * energyRate, 0, MidpointRounding.AwayFromZero));
+                //battleData.energy = Convert.ToInt16(Math.Round(2 * energyRate, 0, MidpointRounding.AwayFromZero));
+                //if (combo > 25)
+                //    battleData.energy = Convert.ToInt16(Math.Round(3 * energyRate, 0, MidpointRounding.AwayFromZero));
+                //if (combo > 50)
+                //    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
+                //if (combo > 100)
+                //    battleData.energy = Convert.ToInt16(Math.Round(5 * energyRate, 0, MidpointRounding.AwayFromZero));
+                battleData.energy = 1;
             }
 
             battleData.score = score;

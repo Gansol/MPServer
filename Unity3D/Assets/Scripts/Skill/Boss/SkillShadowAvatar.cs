@@ -27,15 +27,25 @@ public class ShadowAvatarSkill : SkillBoss
     {
         skillFlag = false;
         m_StartTime = m_LastTime = Time.time;
-        dictMice.Clear();
+
+        buffer = new Dictionary<Transform, GameObject>(dictMice);
+        foreach (KeyValuePair<Transform, GameObject> mice in buffer)
+        {
+            if (Global.dictBattleMice.ContainsKey(mice.Key))
+                dictMice[mice.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0);
+            dictMice.Remove(mice.Key);
+        }
+
+        dictMice = new Dictionary<Transform, GameObject>();
     }
 
     public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
     {
-        skillFlag = true;
-        m_LastTime = Time.time;
         Debug.Log("Ninja Mice Display");
-        dictMice.Clear();
+
+        Initialize();
+
+        skillFlag = true;
         this.obj = obj;
         int rnd = Random.Range(0, data.Length);
 
@@ -69,12 +79,14 @@ public class ShadowAvatarSkill : SkillBoss
                     Debug.Log("****Correct!");
                     dictMice.Remove(mice.Key);
                     buffer2 = new Dictionary<Transform, GameObject>(dictMice);
+
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer2)
                     {
                         if (Global.dictBattleMice.ContainsKey(mice2.Key))
                            dictMice[mice2.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0.0f);
                         dictMice.Remove(mice.Key);
                     }
+
                     dictMice.Clear();
                     m_LastTime = Time.time;
                     skillFlag = false;
@@ -82,7 +94,6 @@ public class ShadowAvatarSkill : SkillBoss
                 }
                 else if (!Global.dictBattleMice.ContainsValue(mice.Value) && skillFlag)
                 {
-
                     Debug.Log("****Error!");
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer)
                     {
@@ -103,7 +114,7 @@ public class ShadowAvatarSkill : SkillBoss
             Release();
     }
 
-    public int GetMiceCount()
+    public int GetShadowCount()
     {
         return dictMice.Count;
     }
@@ -111,15 +122,7 @@ public class ShadowAvatarSkill : SkillBoss
 
     public override void Release()
     {
-        buffer = new Dictionary<Transform, GameObject>(dictMice);
-        foreach (KeyValuePair<Transform, GameObject> mice in buffer)
-        {
-            if (Global.dictBattleMice.ContainsKey(mice.Key))
-                dictMice[mice.Key].GetComponent<MiceBase>().SendMessage("OnDead", 99f);
-            dictMice.Remove(mice.Key);
-        }
-        skillFlag = false;
-        dictMice.Clear();
+        Initialize();
 //        playerAIState.Release(MPProtocol.ENUM_PlayerState.Boss);
     }
 

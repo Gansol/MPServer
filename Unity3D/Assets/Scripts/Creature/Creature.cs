@@ -16,6 +16,12 @@ public abstract class Creature : MonoBehaviour
 
     protected abstract void OnInjured(short damage, bool myAttack);
 
+    /// <summary>
+    /// 死亡
+    /// </summary>
+    /// <param name="lifeTime">存活時間</param>
+    protected abstract void OnDead(float lifeTime);
+
     public virtual void Play(AnimatorState.ENUM_AnimatorState state)
     {
         if (m_AnimState!=null)

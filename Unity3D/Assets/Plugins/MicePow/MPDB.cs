@@ -12,7 +12,9 @@ public class MPDB
     static string dbName = "MPDB.db";
 
     static string dbConnString =
-#if UNITY_ANDROID
+        #if UNITY_EDITOR
+ Application.dataPath + "/"
+#elif UNITY_ANDROID
  "URI=file:" + Application.persistentDataPath + "/"
 
 #elif UNITY_IOS

@@ -174,9 +174,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
     void IPhotonPeerListener.DebugReturn(DebugLevel level, string message)
     {
-        Debug.Log("伺服器關閉重啟中！");
-        ShowMessageEvent("伺服器關閉重啟中！");
-        throw new NotImplementedException();
+        //Debug.Log("伺服器關閉重啟中！");
+        ShowMessageEvent("伺服器重啟中，等待自動連線！");
+      //  throw new NotImplementedException();
     }
 
     // 收到 伺服器傳來的事件時
@@ -219,14 +219,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 break;
             // 被踢出房間了
             case (byte)BattleResponseCode.KickOther:
-                if (Global.isGameStart)
-                {
                     Global.nextScene = (int)Global.Scene.MainGame;
                     LoadSceneEvent();
                     Global.isGameStart = false;
                     Global.isMatching = false;
                     Debug.Log("Recive Kick!" + (string)eventResponse.Parameters[(byte)BattleResponseCode.DebugMessage]);
-                }
                 break;
 
             // 他斷線 我也玩不了 離開房間
@@ -260,7 +257,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.GetScore:
                 Int16 otherScore = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.OtherScore];
                 Int16 otherEnergy = Convert.ToInt16(eventResponse.Parameters[(byte)BattleParameterCode.Energy]);
-                Debug.Log("Recive otherScore!" + otherEnergy);
+//                Debug.Log("Recive otherScore!" + otherEnergy);
 
 
                 OtherScoreEvent(otherScore, otherEnergy);
@@ -293,7 +290,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 int primaryID = (int)eventResponse.Parameters[(byte)BattleParameterCode.PrimaryID];
                 if (Global.PrimaryID != primaryID)
                     BossInjuredEvent(damage, false);
-                //Debug.Log("GET OTHER:" + damage);
+                Debug.Log("GET OTHER Damage:" + damage);
                 break;
 
             //取得對方對BOSS傷害
@@ -427,6 +424,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                     try
                     {
                         Global.isGameStart = false;
+                        Global.isMatching = false;
                         Global.nextScene = (int)Global.Scene.MainGame;
                         LoadSceneEvent();
                         Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
@@ -918,6 +916,8 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         {
                             Int16 damage = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Damage];
                             BossInjuredEvent(damage, true);
+
+                            Debug.Log("GET Damage:" + damage);
                             //                            Debug.Log("RECIVE BossDamage !");
                         }
                         else

@@ -47,7 +47,7 @@ namespace MPServer
         private SkillUI skillUI;
         private StoreDataUI skillDataUI;
 
-        private static readonly int GameTime = 300;
+        private static readonly int GameTime = 180;
         private static readonly int maxNumPlayer = 2;
         //初始化
         public MPServerPeer(IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication)
@@ -724,20 +724,15 @@ namespace MPServer
                         #endregion
 
                         #region ExitRoom 離開房間
-                        case (byte)BattleOperationCode.ExitRoom:
+                        case (byte)BattleOperationCode.ExitRoom:    // 目前是KickOther 之後評審完改回
                             {
                                 try
                                 {
-
                                     Log.Debug("IN ExitRoom");
 
                                     int roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
                                     int primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
                                     Log.Debug("RoomID: " + roomID);
-                                    //to do exit room
-                                    //Log.Debug("1 playingRoomList Count:" + _server.room.playingRoomList.Count);
-                                    //Log.Debug("in Dictionary 1 :" + _server.room.playingRoomList[roomID].ContainsKey("RoomActor1"));
-                                    //Log.Debug("in Dictionary 2 :" + _server.room.playingRoomList[roomID].ContainsKey("RoomActor2"));
 
                                     // 移除BOSS資訊 如果有的話
                                     _server.room.KillBoss(roomID);
@@ -755,6 +750,57 @@ namespace MPServer
 
                                     OperationResponse response = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
                                     SendOperationResponse(response, new SendParameters());
+
+
+                                    Log.Debug("IN KickOther RoomID: " + roomID);
+
+                                    // 取得對方玩家>用GUID找Peer
+                                    otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
+                                    if (otherActor != null)
+                                    {
+                                        Log.Debug("找到要踢的玩家房間 RoomID: " + roomID);
+                                        peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
+
+                                        // 把他給踢了
+                                        OperationResponse response2 = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
+                                        peerOther.SendOperationResponse(response2, new SendParameters());
+                                    }
+
+
+
+
+
+
+
+
+
+
+                                    //Log.Debug("IN ExitRoom");
+
+                                    //int roomID = (int)operationRequest.Parameters[(byte)BattleParameterCode.RoomID];
+                                    //int primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
+                                    //Log.Debug("RoomID: " + roomID);
+                                    ////to do exit room
+                                    ////Log.Debug("1 playingRoomList Count:" + _server.room.playingRoomList.Count);
+                                    ////Log.Debug("in Dictionary 1 :" + _server.room.playingRoomList[roomID].ContainsKey("RoomActor1"));
+                                    ////Log.Debug("in Dictionary 2 :" + _server.room.playingRoomList[roomID].ContainsKey("RoomActor2"));
+
+                                    //// 移除BOSS資訊 如果有的話
+                                    //_server.room.KillBoss(roomID);
+                                    //// 取得雙方角色
+                                    //Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
+                                    //Room.RoomActor otherActor = _server.room.GetOtherPlayer(roomID, actor.PrimaryID);
+
+                                    //// 移除遊戲中房間、玩家
+                                    //if (otherActor != null)
+                                    //    _server.room.RemovePlayingRoom(roomID, actor.guid, otherActor.guid);
+                                    //else
+                                    //    _server.room.RemovePlayingRoom(roomID, actor.guid, peerGuid);
+                                    //Log.Debug("playingRoomList Count:" + _server.room.dictPlayingRoomList.Count);
+                                    //Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+
+                                    //OperationResponse response = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
+                                    //SendOperationResponse(response, new SendParameters());
 
                                 }
                                 catch (Exception e)
@@ -1686,6 +1732,9 @@ namespace MPServer
                                     if (mission == (byte)Mission.WorldBoss)
                                     {
                                         missionMethod = 10004;
+                                        //Random rnd = new Random();
+
+                                        //missionMethod = Convert.ToInt16(rnd.Next(10001, 10008 + 1));
                                         _server.room.SpawnBoss(roomID, battleData.bossHP);  // 產生BOSS血量 missionScore是BOSS HP
                                     }
 
@@ -1736,61 +1785,67 @@ namespace MPServer
 
                                         if (mission == (byte)Mission.WorldBoss) // 如果是 世界王任務 回傳給雙方任務完成
                                         {
-                                            _server.room.KillBoss(roomID);  // 世界王任務完成 把Server BOSS殺了          
 
-                                            #region 自己
+                                            int damage;
+                                            Dictionary<byte, object> parameter;
+                                            EventData eventData;
+                                            Room.RoomActor roomActor, otherActor;
 
-                                            // 儲存分數
-                                            Room.RoomActor roomActor;
                                             roomActor = _server.room.GetActorFromGuid(peerGuid);
-                                            roomActor.gameScore += battleData.missionReward;
-
-
-
-                                            if (roomActor.gameScore < 0) roomActor.gameScore = 0;
-
-                                            // 回傳給原玩家
-                                            // ResponseParameter
-                                            Dictionary<byte, object> myResParameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.MissionReward, missionReward }  };
-                                            OperationResponse response = new OperationResponse((byte)BattleResponseCode.MissionCompleted, myResParameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
-
-                                            // EventData
-                                            Dictionary<byte, object> myEventParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, otherReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
-                                            EventData myScoreEventData = new EventData((byte)BattleResponseCode.GetMissionScore, myEventParameter);
-                                            #endregion
-
-                                            #region 對方
-
-                                            // 回傳給另外一位玩家
-                                            Room.RoomActor otherActor;
                                             otherActor = _server.room.GetOtherPlayer(roomID, primaryID);
                                             peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
 
+                                            //if (_server.room.GetBossHP(roomID) > 0)
+                                            //{
+                                            //    damage = _server.room.GetBossHP(roomID);
+
+                                            //    Log.Debug("任務時間超過 還有殘血 發送傷害  -BossHP:" + damage);
+                                            //    parameter = new Dictionary<byte, object>() {{ (byte)BattleParameterCode.PrimaryID, primaryID }, { (byte)BattleParameterCode.Damage, damage }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
+                                            //    eventData = new EventData((byte)BattleResponseCode.BossDamage, parameter);
+                                            //    SendEvent(eventData, new SendParameters());
+
+                                            //    // 傳送殘血傷害給雙方
+                                            //    parameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.PrimaryID, otherActor.PrimaryID }, { (byte)BattleParameterCode.Damage, damage }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
+                                            //    eventData = new EventData((byte)BattleResponseCode.BossDamage, parameter);
+                                            //    peerOther.SendEvent(eventData, new SendParameters());
+
+                                            //}
+
+                                            _server.room.KillBoss(roomID);  // 世界王任務完成 把Server BOSS殺了          
+
+
                                             // 儲存分數
-                                            otherActor.gameScore += otherReward;
-                                            if (otherActor.gameScore < 0) otherActor.gameScore = 0;
+                                            roomActor.gameScore = Math.Max(0, roomActor.gameScore + battleData.missionReward);
 
+                                            // 回傳給原玩家 任務獎勵 參數
+                                              parameter = new Dictionary<byte, object> {{ (byte)BattleParameterCode.Ret, battleData.ReturnCode },
+                                                         { (byte)BattleParameterCode.MissionReward, missionReward }  };
+                                            OperationResponse response = new OperationResponse((byte)BattleResponseCode.MissionCompleted, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
 
-
-                                            // ResponseParameter
-                                            Dictionary<byte, object> otherResParameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.MissionReward, otherReward }  };
-                                            OperationResponse response2 = new OperationResponse((byte)BattleResponseCode.MissionCompleted, otherResParameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
-
-                                            // EventData
-                                            Dictionary<byte, object> otherEventParameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, missionReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
-                                            EventData otherScoreEventData = new EventData((byte)BattleResponseCode.GetMissionScore, otherEventParameter);
-
+                                            // 回傳給原玩家 對方任務獎勵 事件參數
+                                            parameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, otherReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
+                                            eventData = new EventData((byte)BattleResponseCode.GetMissionScore, parameter);
 
                                             SendOperationResponse(response, new SendParameters());// 我方 取得的分數
-                                            SendEvent(myScoreEventData, new SendParameters());   //  我方 接收對方 取得的分數
+                                            SendEvent(eventData, new SendParameters());   //  我方 接收對方 取得的分數
 
-                                            peerOther.SendOperationResponse(response2, new SendParameters());  // 對方 接收分數
-                                            peerOther.SendEvent(otherScoreEventData, new SendParameters());    // 對方 接收我方 取得的分數
 
-                                            #endregion
-                                            Log.Debug("World Boss roomActor.gameScore:" + roomActor.gameScore + "roomOtherActor.gameScore:" + otherActor.gameScore);
+                                            // 回傳給另外一位玩家
+
+                                            otherActor.gameScore = Math.Max(0, otherActor.gameScore + otherReward);
+
+                                            // 回傳給對方玩家 任務獎勵 參數
+                                            parameter = new Dictionary<byte, object> {
+                                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.MissionReward, otherReward }  };
+                                            response = new OperationResponse((byte)BattleResponseCode.MissionCompleted, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
+
+                                            // 回傳給對方玩家 任務獎勵 事件參數
+                                            parameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.MissionReward, missionReward }, { (byte)BattleResponseCode.DebugMessage, battleData.ReturnMessage.ToString() } };
+                                            eventData = new EventData((byte)BattleResponseCode.GetMissionScore, parameter);
+
+                                            peerOther.SendOperationResponse(response, new SendParameters());  // 對方 接收分數
+                                            peerOther.SendEvent(eventData, new SendParameters());    // 對方 接收我方 取得的分數
+
 
                                             Log.Debug("\n\nMissionReward: " + missionReward + "  \n\nOtherReward: " + otherReward + "  \n\n");
                                         }

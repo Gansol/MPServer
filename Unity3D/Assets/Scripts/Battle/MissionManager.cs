@@ -85,7 +85,6 @@ public class MissionManager : MonoBehaviour
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
-
             //Debug.Log("lastGameTime"+lastGameTime);
             if (missionMode == MissionMode.Closed)                                  // 任務關閉時，持續判斷是否觸發任務
                 MissionTrigger();

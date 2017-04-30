@@ -116,7 +116,7 @@ public class PoolManager : MonoBehaviour
         LoadItemAsset();
         LoadEffectAsset();
         assetLoader.LoadAsset("ItemICON/", "ItemICON");
-       
+
     }
 
     private void LoadMiceAsset()
@@ -195,7 +195,7 @@ public class PoolManager : MonoBehaviour
     void Update()
     {
         if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log("Message:" + assetLoader.ReturnMessage + "_loadedCount:"+  assetLoader._loadedCount +"_objCount:"+ assetLoader._objCount);
+            Debug.Log("Message:" + assetLoader.ReturnMessage + "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount);
 
         if (assetLoader.loadedObj && !_poolingFlag)
         {
@@ -245,7 +245,7 @@ public class PoolManager : MonoBehaviour
         int i = 0;
         float lerpSpeed = 0.1f;
         float upDistance = 30f;
-       // int energyValue = 0;
+        // int energyValue = 0;
 
         foreach (KeyValuePair<string, object> item in objectData)
         {
@@ -262,7 +262,7 @@ public class PoolManager : MonoBehaviour
                 clone = objFactory.Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, 100);
                 Destroy(clone.GetComponent<BoxCollider2D>());
                 clone.transform.parent.gameObject.AddComponent<SkillBtn>();
-                clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance,  i);
+                clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, i);
                 clone.transform.parent.gameObject.AddComponent<UIButton>();
                 clone.transform.parent.gameObject.AddComponent<BoxCollider2D>();
                 clone.transform.parent.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(300, 250);
@@ -454,6 +454,17 @@ public class PoolManager : MonoBehaviour
             string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
             _dictSkillObject.Add(itemID, itemName);
         }
+    }
 
+
+    public List<int> GetPoolMiceIDs()
+    {
+        return _dictMiceObject.Keys.ToList();
+    }
+
+    public List<int> GetPoolSkillIDs()
+    {
+        // 先把key轉換成list 再把list轉換int型態
+        return _dictSkillMice.Keys.ToList().Select(s => int.Parse(s)).ToList();
     }
 }

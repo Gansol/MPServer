@@ -28,6 +28,9 @@ namespace MPServer
         private static Dictionary<int, Dictionary<Guid, RoomActor>> _dictPlayingRoomList;               // 遊戲中的會員列表
         private static Dictionary<int, Dictionary<Guid, RoomActor>> _dictWaitingRoomList;               // 等待房間中的會員列表
         private static Dictionary<int, Dictionary<int, Guid>> _loadedPlayer;                                         // 在房間中，已載入遊戲的玩家數量
+        /// <summary>
+        /// RoomID,HP 房間內BossHP
+        /// </summary>
         private static Dictionary<int, int> _worldBossHP;                                          // 自己房間中的BOSSHP
         private static Dictionary<Guid, int> _guidGetRoom;
         private static int _waitIndex;
@@ -441,11 +444,22 @@ namespace MPServer
 
         public void KillBoss(int roomID)
         {
-            int tmp;
-            bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
-            if (hasBoss)
-                _worldBossHP.Remove(roomID);
+            lock (this)
+            {
+                int tmp;
+                bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
+                if (hasBoss)
+                    _worldBossHP.Remove(roomID);
+            }
         }
+
+        public int GetBossHP(int roomID)
+        {
+            if (_worldBossHP.ContainsKey(roomID))
+                return _worldBossHP[roomID];
+            return 0;
+        }
+
 
         /// <summary>
         /// 移除BOSS 使用GUID

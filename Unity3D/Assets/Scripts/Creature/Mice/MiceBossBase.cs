@@ -46,7 +46,7 @@ public abstract class MiceBossBase : Creature
     protected virtual void OnHit()
     {
         Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
-        if (Global.isGameStart && enabled && m_Arribute.GetHP() != 0)
+        if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
 
@@ -62,22 +62,55 @@ public abstract class MiceBossBase : Creature
             Destroy(gameObject);
     }
 
-
-    /// <summary>
-    /// 死亡
-    /// </summary>
-    /// <param name="lifeTime">存活時間</param>
-    protected abstract void OnDead(float lifeTime);
-
     /// <summary>
     /// 受傷
     /// </summary>
     /// <param name="damage"></param>
     protected override void OnInjured(short damage, bool myAttack)
     {
-        m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
+        if (myAttack && m_Arribute.GetShield() > 0)
+        {
+            m_Arribute.SetShield(m_Arribute.GetShield() - damage);
+            Debug.Log("Hit Shield:" + m_Arribute.GetShield());
+        }
+        else
+        {
+            m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
+        }
+
+        if (m_Arribute.GetHP() != 0)
+        {
+            int haha = myAttack ? myHits++ : otherHits++;
+        }
+        else
+        {
+            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            if (Global.OtherData.RoomPlace != "Host")
+            {
+                short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
+                Global.photonService.MissionCompleted((byte)MPProtocol.Mission.WorldBoss, 1, percent, "");
+            }
+            transform.parent.GetComponentInChildren<Animator>().Play("HoleScale_R");
+        }
     }
 
+    /// <summary>
+    /// 死亡時
+    /// </summary>
+    /// <param name="lifeTime">存活時間</param>
+    protected override void OnDead(float lifeTime)
+    {
+        if (Global.isGameStart)
+        {
+            // 關閉血調顯示
+            battleHUD.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
+
+            Global.MiceCount--;
+            Global.dictBattleMice.Remove(transform);
+            OnDestory();
+            Destroy(gameObject);
+        }
+    }
     /// <summary>
     /// 銷毀時，移除事件
     /// </summary>

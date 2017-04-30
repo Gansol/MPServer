@@ -18,15 +18,32 @@ public class HoleState : MonoBehaviour
 
     void Update()
     {
-        if (transform.childCount >= 2)
+
+        if (gameObject.name != "Hole5")
         {
-            GetComponent<BoxCollider>().enabled = false;
-            holeState = State.Closed;
+            if (transform.childCount > 1)
+            {
+                GetComponent<BoxCollider>().enabled = false;
+                holeState = State.Closed;
+            }
+            else
+            {
+                GetComponent<BoxCollider>().enabled = true;
+                holeState = State.Open;
+            }
         }
         else
         {
-            GetComponent<BoxCollider>().enabled = true;
-            holeState = State.Open;
+            if (transform.childCount > 3)
+            {
+                GetComponent<BoxCollider>().enabled = false;
+                holeState = State.Closed;
+            }
+            else
+            {
+                GetComponent<BoxCollider>().enabled = true;
+                holeState = State.Open;
+            }
         }
     }
 }
