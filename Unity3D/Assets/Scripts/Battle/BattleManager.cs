@@ -45,7 +45,7 @@ public class BattleManager : MonoBehaviour
     private float checkPoint = 15;          // 檢查時間點
     private static float _elapsedGameTime = 0;     // 經過時間
     private static readonly int _defaultStartTime = 3;     // 經過時間
-    private bool _isCombo, flag;                  // 是否連擊
+    private bool _isCombo;                  // 是否連擊
     private bool _isHighScore = false;              // 是否破分數紀錄
     private bool _isHighCombo = false;              // 是否破Combo紀錄
     private bool isSyncStart;               // 同步開始
@@ -66,6 +66,11 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         Debug.Log("Battle Start");
+
+        if (Global.MemberType == MemberType.Bot)
+        {
+            BotAI = new BotAI(poolManager.GetPoolMiceIDs(), poolManager.GetPoolSkillIDs());
+        }
 
         poolManager = GetComponent<PoolManager>();
         mpFactory = GetComponent<MPFactory>();
@@ -89,7 +94,7 @@ public class BattleManager : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnLoadScene;
         Global.photonService.BossSkillEvent += OnBossSkill;
         Global.isExitingRoom = false;
-        _isCombo = flag = false;
+        _isCombo = false;
         isSyncStart = true;
 
         _combo = _maxCombo = _tmpCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
@@ -186,13 +191,6 @@ public class BattleManager : MonoBehaviour
             _elapsedGameTime = Time.time - _lastTime - _defaultStartTime;    // 遊戲經過時間
             battleState = battleAIState.GetState();
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
-
-            if (Global.MemberType == MemberType.Bot && !flag)
-            {
-                BotAI = new BotAI(poolManager.GetPoolMiceIDs(), poolManager.GetPoolSkillIDs());
-                flag = !flag;
-            }
-
 
             BotAI.UpdateAI();
 
