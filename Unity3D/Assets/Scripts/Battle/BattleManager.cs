@@ -68,9 +68,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle Start");
 
         if (Global.MemberType == MemberType.Bot)
-        {
             BotAI = new BotAI(poolManager.GetPoolMiceIDs(), poolManager.GetPoolSkillIDs());
-        }
 
         poolManager = GetComponent<PoolManager>();
         mpFactory = GetComponent<MPFactory>();
@@ -192,7 +190,8 @@ public class BattleManager : MonoBehaviour
             battleState = battleAIState.GetState();
             if (_combo > _maxCombo) _maxCombo = _combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
 
-            BotAI.UpdateAI();
+            if (Global.MemberType == MemberType.Bot)
+                BotAI.UpdateAI();
 
             // 更新最高分
             if (_score > _maxScore)

@@ -56,7 +56,6 @@ public class BotAI
     // Update is called once per frame
     public void UpdateAI()
     {
-
         if (Global.isGameStart && Global.dictBattleMice.Count > 0 && Time.time > lastAITime)
         {
             lastAITime += hitIntervalTime * botLevel;
@@ -64,7 +63,6 @@ public class BotAI
             HitAI();
             SkillAI();
         }
-
     }
 
 
