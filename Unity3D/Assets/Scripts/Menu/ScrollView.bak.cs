@@ -24,8 +24,6 @@ public class ScrollView2 : MonoBehaviour
 
     void Start()
     {
-        ///currentCameraX = 0;  等待刪除
-        //lastCameraX = 0;      等待刪除
         startFlag = false;
         endFlag = false;
     }

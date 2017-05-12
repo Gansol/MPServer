@@ -96,12 +96,12 @@ public class Mice : MiceBase
             Debug.Log("Play Shadow");
         if (name == "Much")
         {
+            GetComponent<BoxCollider2D>().enabled = false;
             Dictionary<int, Vector3> pos = value as Dictionary<int, Vector3>;
             MiceAnimState state = m_AnimState as MiceAnimState;
             m_AnimState.SetMotion(true);
             state.SetToPos(pos[0]);
             state.SetToScale(new Vector3(0.25f, 0.25f));
-            _survivalTime = 999;
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
         } 
         // play("Shadow"

@@ -10,7 +10,7 @@ public class MiceAnimState : AnimatorState
         : base(obj, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
     {
         anims = obj.GetComponentInChildren<Animator>();
-        if (anims!=null)
+        if (anims != null)
             currentState = anims.GetCurrentAnimatorStateInfo(0);
         _tmpSpeed = _upSpeed = upSpeed / 10;
     }
@@ -24,6 +24,7 @@ public class MiceAnimState : AnimatorState
 
     public void SetToScale(Vector3 scale)
     {
+       
         _scale = scale;
         _toScale = true;
     }
@@ -182,6 +183,8 @@ public class MiceAnimState : AnimatorState
         }
         else
         {
+            /* if (obj.name != "10001")*/
+            //Debug.Log(obj.transform.parent.name + "\nPos:" + obj.transform.GetChild(0).transform.position+"\nLerp:" + Vector3.Lerp(obj.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed));
             obj.transform.GetChild(0).transform.position = Vector3.Lerp(obj.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed);
         }
     }

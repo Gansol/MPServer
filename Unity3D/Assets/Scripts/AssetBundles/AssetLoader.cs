@@ -49,6 +49,10 @@ public class AssetLoader : MonoBehaviour
                 AssetBundleManager.loadedObjectCount = _objCount = 0;
                 loadedObj = true;
             }
+            else
+            {
+            //    Debug.LogError("_objCount:" + _objCount + " AssetBundleManager.loadedObjectCount:" + AssetBundleManager.loadedObjectCount + "  _loadedCount:" + _loadedCount);
+            }
         }
 
         if (AssetBundleManager.isLoadPrefab)

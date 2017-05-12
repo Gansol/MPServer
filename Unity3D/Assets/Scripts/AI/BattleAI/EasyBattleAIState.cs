@@ -23,16 +23,18 @@ public class EasyBattleAIState : BattleAIState
         maxSpawnInterval = 1;
         lastTime = spawnIntervalTime = 1.5f;
         spawnSpeed = 1.2f;
-        totalSpawn = 0;
         wave = 0;
-        nextBali = 4; nextMuch = 3; nextSuper = 5;
+        nextBali = 4; nextMuch = 27; nextHero = 50;
+
+        pervStateTime = 0;
+        nextStateTime = Global.GameTime / 4;
     }
 
 
 
     public override void UpdateState()
     {
-        if ((battleManager.score > normalScore && battleManager.combo > normalCombo) || battleManager.score > normalMaxScore || BattleManager.gameTime > Global.GameTime / 4)
+        if ((battleManager.score > normalScore && battleManager.combo > normalCombo) || battleManager.score > normalMaxScore || BattleManager.gameTime > nextStateTime)
         {
             battleManager.SetSpawnState(new NormalBattleAIState());
         }
@@ -43,13 +45,13 @@ public class EasyBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001, spawnCount);//錯誤
+                Spawn(defaultMice, spawnCount);//錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 3;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed,spawnCount);//錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), defaultMice, spawnSpeed, spawnCount);//錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
 

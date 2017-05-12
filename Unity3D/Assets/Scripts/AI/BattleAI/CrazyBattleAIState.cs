@@ -23,15 +23,16 @@ public class CrazyBattleAIState : BattleAIState
         maxSpawnInterval = 3;
         spawnIntervalTime = 2f;
         spawnSpeed = .9f;
-        totalSpawn = 0;
         wave = 0;
-        nextBali = 4; nextMuch = 27; nextSuper = 50;
+        nextBali = 3; nextMuch = 10; nextHero = 40;
+
+        pervStateTime = Global.GameTime - 30;
     }
 
 
     public override void UpdateState()
     {
-        if (battleManager.combo < carzyCombo && battleManager.score < carzyMaxScore && BattleManager.gameTime < Global.GameTime - 50)
+        if (battleManager.combo < carzyCombo && battleManager.score < carzyMaxScore && BattleManager.gameTime < pervStateTime)
         {
             battleManager.SetSpawnState(new HardBattleAIState());
         }
@@ -42,13 +43,13 @@ public class CrazyBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001,spawnCount);// 錯誤
+                Spawn(defaultMice, spawnCount);// 錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 2;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed, spawnCount);    // 錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), defaultMice, spawnSpeed, spawnCount);    // 錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
             SetSpawnIntervalTime();

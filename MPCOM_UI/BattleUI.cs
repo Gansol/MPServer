@@ -26,7 +26,7 @@ namespace MPCOM
         byte[] ClacScore(short miceID, float aliveTime, float scoreRate, int combo, float energyRate);
         byte[] ClacMissionReward(byte mission, float missionRate, Int16 customVaule);
         byte[] SelectMission(byte mission, float missionRate);
-        byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo , string dictClientMiceData, string[] columns);
+        byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo , string JMicesUseCount,string jItemsUseCount, string[] columns);
         byte[] UpdateScoreRate(ENUM_Rate rate);
     }
 
@@ -188,7 +188,7 @@ namespace MPCOM
         /// <param name="dictClientMiceData">老鼠資料(Rank、Exp、UseCount)</param>
         /// <param name="columns">更新欄位</param>
         /// <returns></returns>
-        public byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo, string dictClientMiceData, string[] columns)
+        public byte[] GameOver(string account, short score, short otherScore, short gameTime, int lostMice, short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount, short combo, string jMicesUseCount, string jItemsUseCount, string[] columns)
         {
             BattleData battleData = new BattleData();
             battleData.ReturnCode = "S500";
@@ -197,7 +197,7 @@ namespace MPCOM
             try
             {
                 BattleLogic battleLogic = new BattleLogic();
-                battleData = battleLogic.GameOver( account,  score,  otherScore,  gameTime,  lostMice,  totalScore,  spawnCount,  missionCompletedCount,  maxMissionCount,  combo,  dictClientMiceData,  columns);
+                battleData = battleLogic.GameOver(account, score, otherScore, gameTime, lostMice, totalScore, spawnCount, missionCompletedCount, maxMissionCount, combo, jMicesUseCount, jItemsUseCount, columns);
             }
             catch (Exception e)
             {

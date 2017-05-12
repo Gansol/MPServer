@@ -23,19 +23,21 @@ public class HardBattleAIState : BattleAIState
         maxSpawnInterval = 2;
         spawnIntervalTime = 1.5f;
         spawnSpeed = .95f;
-        totalSpawn = 0;
         wave = 0;
-        nextBali = 4; nextMuch = 27; nextSuper = 50;
+        nextBali = 3; nextMuch = 15; nextHero = 45;
+
+        pervStateTime = Global.GameTime / 2;
+        nextStateTime = Global.GameTime - 30;
     }
 
     public override void UpdateState()
     {
 
-        if ((battleManager.score > carzyScore && battleManager.combo > carzyCombo) || (battleManager.score > carzyMaxScore && battleManager.combo > carzyCombo) || BattleManager.gameTime > Global.GameTime - 50)
+        if ((battleManager.score > carzyScore && battleManager.combo > carzyCombo) || (battleManager.score > carzyMaxScore && battleManager.combo > carzyCombo) || BattleManager.gameTime > nextStateTime)
         {
             battleManager.SetSpawnState(new CrazyBattleAIState());
         }
-        else if (battleManager.combo < hardCombo && battleManager.score < hardMaxScore && BattleManager.gameTime < Global.GameTime / 2)
+        else if (battleManager.combo < hardCombo && battleManager.score < hardMaxScore && BattleManager.gameTime < pervStateTime)
         {
             battleManager.SetSpawnState(new NormalBattleAIState());
         }
@@ -46,13 +48,13 @@ public class HardBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001, spawnCount);   //錯誤
+                Spawn(defaultMice, spawnCount);   //錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 2;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed, spawnCount);    //錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), defaultMice, spawnSpeed, spawnCount);    //錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
 

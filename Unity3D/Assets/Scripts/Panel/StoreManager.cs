@@ -46,7 +46,7 @@ public class StoreManager : PanelManager
     private string[] buyingGoodsData;
     private string _folderString;                               // 資料夾名稱
     private int _itemType;                                      // 道具形態
-    private bool _bLoadedGashapon, _bLoadedIcon, _bLoadedActor; // 是否載入轉蛋、是否載入圖片、是否載入角色
+    private bool _bFirstLoad,_bLoadedGashapon, _bLoadedIcon, _bLoadedActor; // 是否載入轉蛋、是否載入圖片、是否載入角色
     private static GameObject _tmpTab, _lastItem;               // 暫存分頁、暫存按下
     private Dictionary<string, object> _itemData;               // 道具資料
 
@@ -57,6 +57,7 @@ public class StoreManager : PanelManager
 
     private void Awake()
     {
+        _bFirstLoad = true;
         insObj = new ObjectFactory();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         dictItemRefs = new Dictionary<string, GameObject>();
@@ -106,6 +107,10 @@ public class StoreManager : PanelManager
             SelectStoreItemData(_itemType);                                  // 選擇商店資料
             InstantiateItemIcon(_itemData, parent);
             LoadPrice(_itemData, _itemType);
+            EventMaskSwitch.Resume();
+            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+            EventMaskSwitch.Switch(gameObject, false);
+            EventMaskSwitch.lastPanel = gameObject;
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)                     // 載入角色完成後 實體化 角色
@@ -129,6 +134,18 @@ public class StoreManager : PanelManager
     {
         if (transform.parent.gameObject.activeSelf)
         {
+            if (_bFirstLoad)
+            {
+                _bFirstLoad = false;
+            }
+            else
+            {
+                EventMaskSwitch.Resume();
+                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+                EventMaskSwitch.Switch(gameObject, false);
+                EventMaskSwitch.lastPanel = gameObject;
+            }
+
             _itemData = Global.storeItem;
             assetLoader.LoadAsset(assetFolder[0] + "/", assetFolder[0]);
             LoadGashapon(assetFolder[0]);

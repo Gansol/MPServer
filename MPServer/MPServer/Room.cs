@@ -33,7 +33,7 @@ namespace MPServer
         /// </summary>
         private static Dictionary<int, int> _worldBossHP;                                          // 自己房間中的BOSSHP
         private static Dictionary<Guid, int> _guidGetRoom;
-        private static int _waitIndex;
+       // private static int _waitIndex;
         private static int _roomIndex;                              // ＊＊＊＊＊因為是房間起始值為1 
         private static int _limit;
         //private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
@@ -55,7 +55,7 @@ namespace MPServer
             _worldBossHP = new Dictionary<int, int>();
             _guidGetRoom = new Dictionary<Guid, int>();
 
-            _waitIndex = 1;
+           // _waitIndex = 1;
             // _myRoom = 1;
             _limit = 2;
             _roomIndex = 1;
@@ -409,11 +409,11 @@ namespace MPServer
         /// <param name="roomID"></param>
         /// <param name="myPrimaryID"></param>
         /// <returns></returns>
-        public RoomActor GetWaitingPlayer(/*int roomID,*/ int primaryID)
+        public RoomActor GetWaitingPlayer(int roomID, int primaryID)
         {
             if (_dictWaitingRoomList.Count > 0) // 是否有遊戲中房間
             {
-                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[1]) //用RoomID找特定遊戲中房間的玩家
+                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[roomID]) //用RoomID找特定遊戲中房間的玩家
                 {
                     if (item.Value.PrimaryID != primaryID) //假如不等於自己的主索引就是另一位玩家
                     {
@@ -498,6 +498,7 @@ namespace MPServer
         {
             protected DateTime joinTime; // 多增加進入房間時間的屬性，並且設為唯讀
             public DateTime JoinTime { get { return joinTime; } }
+            public List<string> roomMice { get; set; }
             public int gameScore { get; set; }
             public int roomID { get; set; }
             public short totalScore { get; set; }
@@ -513,6 +514,7 @@ namespace MPServer
                 roomID = -1;
                 energy = gameScore = totalScore = 0;
                 scoreRate = energyRate = 1f;
+                roomMice = new List<string>();
                 this.joinTime = System.DateTime.Now;    // 記錄加人此房間的時間
             }
         }

@@ -99,6 +99,11 @@ public class MatchManager : PanelManager
                 // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
                 ActiveMice(Global.dictTeam);
                 OnCostCheck();
+
+                EventMaskSwitch.Resume();
+                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+                EventMaskSwitch.Switch(gameObject, false);
+                EventMaskSwitch.lastPanel = gameObject;
             }
         }
     }
@@ -150,7 +155,6 @@ public class MatchManager : PanelManager
     #region LoadPlayerMiceProp
     private void LoadPlayerMiceProp(GameObject miceBtn)
     {
-        ClacExp clacExp;
         object rank, exp, data;
         float miceMaxExp;
 
@@ -159,8 +163,7 @@ public class MatchManager : PanelManager
         Dictionary<string, object> miceProp = data as Dictionary<string, object>;
         miceProp.TryGetValue(PlayerItem.Rank.ToString(), out rank);
         miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
-        clacExp = new ClacExp(Convert.ToInt32(rank));
-        miceMaxExp = clacExp.ClacMiceExp(Convert.ToInt32(rank) + 1);
+        miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
         infoGroupsArea[1].transform.FindChild("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
         infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
@@ -242,6 +245,11 @@ public class MatchManager : PanelManager
                 _dictMiceData = SelectNewData(Global.dictMiceAll, _dictMiceData);
 
                 dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
+
+                EventMaskSwitch.Resume();
+                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+                EventMaskSwitch.Switch(gameObject, false);
+                EventMaskSwitch.lastPanel = gameObject;
             }
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
@@ -269,6 +277,7 @@ public class MatchManager : PanelManager
     public void OnCostCheck()
     {
         object value;
+        int maxCost = Clac.ClacCost(Global.Rank);
         _miceCost = 0;
         Dictionary<string, object> data;
         foreach (KeyValuePair<string, object> mice in Global.dictTeam)
@@ -278,11 +287,11 @@ public class MatchManager : PanelManager
             _miceCost += Convert.ToInt32(value);
         }
 
-        infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text ="[14B5DE]"+ _miceCost + "/" + _maxCost+"[-]";
+        infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
         ok_btn.SetActive(true);
-        if (_miceCost > _maxCost)
+        if (_miceCost > maxCost)
         {
-            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + _maxCost + "[-]";
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
             ok_btn.SetActive(false);
 
         }

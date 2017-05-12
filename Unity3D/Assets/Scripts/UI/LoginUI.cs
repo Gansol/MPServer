@@ -104,9 +104,6 @@ public class LoginUI : MonoBehaviour
             LoginPanel.SetActive(false);
     }
 
-    void Update()
-    {
-    }
 
     void OnGUI()
     {
@@ -421,6 +418,8 @@ public class LoginUI : MonoBehaviour
 
         if (!isLoginBtn)
         {
+            Global.ShowMessage("登入中...");
+            LoginPanel.SetActive(false);
             Debug.Log("Google Logining...");
             isLoginBtn = true;
             if (!Social.localUser.authenticated)
@@ -560,6 +559,10 @@ public class LoginUI : MonoBehaviour
         Global.LoginStatus = false;
         Global.isMatching = false;
         isLoginBtn = false;
+        LoginPanel.SetActive(true);
+        LoginMessageBox.gameObject.SetActive(true);
+        LoginMessageBox.color = Color.red;
+        LoginMessageBox.text = "X  " + "重複登入！";
     }
 
     // 加入會員後 再度取得資料並登入
@@ -587,14 +590,14 @@ public class LoginUI : MonoBehaviour
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
-                        string tmpPD = "12345678";
+                       // string tmpPD = "12345678";
                         Global.Account = account;
                         Global.Hash = Encrypt(Global.Account);
                         Global.MemberType = MemberType.Facebook;
                         Global.photonService.JoinMember(email, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
-                    catch (Exception e)
+                    catch 
                     {
                         throw;
                     }

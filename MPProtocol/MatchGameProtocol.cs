@@ -8,6 +8,8 @@
         ExitWaiting = 35,           // 離開等待房間
         SyncGameStart = 36,         // 遊戲載入完成
         MatchGameBot = 37,          // Bot配對
+        MatchGameFriend = 38,       // 好友配對
+        InviteMatchGame = 39,       // 邀請對戰
     }
 
     public enum MatchGameResponseCode
@@ -16,16 +18,21 @@
         ExitWaiting = 35,           // 離開等待房間
         SyncGameStart = 36,         // 同步遊戲
         WaitingGameStart = 37,      // 等待同步遊戲
+        MatchGameFriend = 38,       // 好友配對
+        InviteMatchGame = 39,       // 邀請對戰
     }
 
     public enum MatchGameParameterCode
     {
         PrimaryID,                  // 主索引
+        Account,                    // 帳號
         RoomID,                     // 房間ID
         Nickname,                   // 暱稱
         Team,                       // 隊伍資料
         RoomPlace,                  // 在房間中的位置(主機or客人)
         ServerTime,                 // 遊戲開始時間
         GameTime,                   // 遊戲時間
+        OtherAccount,               // 對手帳號
+        OtherTeam,                  // 對手隊伍
     }
 }

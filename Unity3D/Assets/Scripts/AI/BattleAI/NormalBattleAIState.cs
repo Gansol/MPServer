@@ -23,18 +23,20 @@ public class NormalBattleAIState : BattleAIState
         maxSpawnInterval = 2;
         spawnIntervalTime = 1.5f;
         spawnSpeed = 1.1f;
-        totalSpawn = 0;
         wave = 0;
-        nextBali = 4; nextMuch = 27; nextSuper = 50;
+        nextBali = 4; nextMuch = 20; nextHero = 47;
+
+        pervStateTime = Global.GameTime / 4;
+        nextStateTime = Global.GameTime / 2;
     }
 
     public override void UpdateState()
     {
-        if ((battleManager.score > hardScore && battleManager.combo > hardCombo) || battleManager.score > hardMaxScore || BattleManager.gameTime > Global.GameTime / 2)
+        if ((battleManager.score > hardScore && battleManager.combo > hardCombo) || battleManager.score > hardMaxScore || BattleManager.gameTime > nextStateTime)
         {
             battleManager.SetSpawnState(new HardBattleAIState());
         }
-        else if (battleManager.combo < normalCombo && battleManager.score < normalMaxScore && BattleManager.gameTime < Global.GameTime / 4)
+        else if (battleManager.combo < normalCombo && battleManager.score < normalMaxScore && BattleManager.gameTime < pervStateTime)
         {
             battleManager.SetSpawnState(new EasyBattleAIState());
         }
@@ -46,13 +48,13 @@ public class NormalBattleAIState : BattleAIState
             if (nowCombo < normalSpawn)
             {
                 // normal spawn
-                Spawn(10001, spawnCount);   // 錯誤
+                Spawn(defaultMice, spawnCount);   // 錯誤
                 lastTime = BattleManager.gameTime + spawnIntervalTime * 3;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), 10001, spawnSpeed, spawnCount);    //錯誤
+                SpawnSpecial(Random.Range(minMethod, maxMethod), defaultMice, spawnSpeed, spawnCount);    //錯誤
                 lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
             }
             SetSpawnIntervalTime();                             // 自動調整間隔時間(依照玩家能力)

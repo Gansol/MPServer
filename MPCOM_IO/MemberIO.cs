@@ -1,8 +1,10 @@
 ﻿using ExitGames.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.EnterpriseServices;
+using MiniJSON;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -310,7 +312,7 @@ namespace MPCOM
         #region UpdateMember 更新會員資料
 
         [AutoComplete]
-        public MemberData UpdateMember(string account , string data, string columns)
+        public MemberData UpdateMember(string account, string jString)
         {
             MemberData memberData = default(MemberData);
             memberData.ReturnCode = "S200";
@@ -331,17 +333,33 @@ namespace MPCOM
                     //如果找到會員資料(帳號、密碼) 登入成功
                     if (DS.Tables[0].Rows.Count > 0)
                     {
-                        string query = @" UPDATE GansolMember WITH(ROWLOCK) SET Email=@data WHERE Account=@account";
+                        Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
+                        string query = @" UPDATE GansolMember WITH(ROWLOCK) SET ";
+                        foreach (KeyValuePair<string, object> item in data)
+                            query += item.Key + "=" + item.Value + " ";
+                        query += " WHERE Account=@account";
+
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@account", account);
-                        command.Parameters.AddWithValue("@data", data);
-
+                        Log.Debug("-----------DevTest----------" + query);
                         command.ExecuteNonQuery();
 
                         memberData.ReturnCode = "S205";
                         memberData.ReturnMessage = "修改會員資料成功！";
-                       
+
+
+
+                        //string query = @" UPDATE GansolMember WITH(ROWLOCK) SET Email=@data WHERE Account=@account";
+                        //SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        //command.Parameters.Clear();
+                        //command.Parameters.AddWithValue("@account", account);
+                        //command.Parameters.AddWithValue("@data", data);
+
+                        //command.ExecuteNonQuery();
+
+                        //memberData.ReturnCode = "S205";
+                        //memberData.ReturnMessage = "修改會員資料成功！";
                     }
                     else
                     {

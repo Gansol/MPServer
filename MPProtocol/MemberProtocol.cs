@@ -9,10 +9,21 @@
         Twitter=4,
     }
 
+    public enum ENUM_MemberState          // 會員型態
+    {
+        Online,
+        Offline,
+        Idle,
+        Matching,
+        Playing,
+    }
+
     public enum MemberOperationCode
     {
         JoinMember = 21,                // 加入會員
         UpdateMember = 22,
+        LoadFriendsData = 23,
+        LoadOnlineActor = 24,
     }
 
     public enum MemberParameterCode
@@ -27,10 +38,15 @@
         JoinDate,                       // 加入會員日期
         MemberType,                     // 會員類型
         Email,                          // Email
+        Friends,                        // 好友
+        Custom,                         // 自定資料
     }
 
     public enum MemberResponseCode
     {
         JoinMember = 21,                // 加入會員
+        UpdateMember = 22,
+        LoadFriendsData = 23,
+        LoadOnlineActor = 24,
     }
 }

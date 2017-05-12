@@ -207,7 +207,7 @@ namespace MPCOM
 
         #region MemberLogin 會員登入
         [AutoComplete]
-        public MemberData UpdateMember(string account, string data, string columns)
+        public MemberData UpdateMember(string account,string jString)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "S200";
@@ -216,7 +216,7 @@ namespace MPCOM
             {
                 //如果檢查成功 進行會員資料比對
                 MemberIO memberIO = new MemberIO();
-                memberData = memberIO.UpdateMember( account ,data, columns);
+                memberData = memberIO.UpdateMember(account, jString);
             }
             catch (Exception e)
             {

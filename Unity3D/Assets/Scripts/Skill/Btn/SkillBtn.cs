@@ -58,9 +58,9 @@ public class SkillBtn : MonoBehaviour
     void Update()
     {
 
-        if (BattleManager.energy * 100 >= _cost)
+        if (BattleManager.Energy  >= _cost)
             AnimationColor(true);
-        if (BattleManager.energy * 100 < _cost)
+        if (BattleManager.Energy < _cost)
             AnimationColor(false);
 
         //if (BattleManager.energy >= _energyValue && _upFlag)
@@ -82,19 +82,23 @@ public class SkillBtn : MonoBehaviour
             if (!_btnFlag)
             {
                 // 能量是否足夠使用技能
-                if (BattleManager.energy * 100 >= _cost && _miceCount > _miceUsed)
+                if (BattleManager.Energy >= _cost && _miceCount > _miceUsed)
                 {
                     Global.photonService.SendSkillMice(_miceID, _cost);
-                    battleManager.UpadateEnergy(-_cost / 100f);
+                    battleManager.UpadateEnergy(-_cost);
+                    
                     _useTimes++;
                     _miceUsed++;
+
+                    Dictionary<string, object> data = battleManager.dictMiceUseCount[_miceID.ToString()];
+                    data["UseCount"] = _miceUsed;
                 }
 
                 // to do change Item iamge
                 if (_useTimes == _skillTimes)
                 {
                     _useTimes = 0;
-                    if (_itemCount - _itemUsed != 0)
+                    if (_itemCount > _itemUsed)
                     {
                         transform.GetChild(1).gameObject.SetActive(false);
                        
@@ -105,13 +109,17 @@ public class SkillBtn : MonoBehaviour
                     }
                 }
             }
-            else
+            else if (_itemCount > _itemUsed)
             {
                 Global.photonService.SendSkillItem(System.Convert.ToInt16(_itemID), _skillType);
                 transform.GetChild(1).gameObject.SetActive(true);
                 // 如果道具不足 切換 顯示黑色
                 transform.GetChild(2).gameObject.SetActive(false);
                 _itemUsed++;
+
+                Dictionary<string, object> data = battleManager.dictItemUseCount[_itemID.ToString()];
+                data["UseCount"] = _miceUsed;
+
                 _btnFlag = !_btnFlag;
                 //if (_miceCount - _miceUsed != 0) { }
                 // to do 黑掉

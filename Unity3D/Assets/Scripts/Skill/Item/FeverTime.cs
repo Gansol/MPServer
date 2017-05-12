@@ -7,6 +7,7 @@ public class FeverTime : SkillItem {
         : base(attr)
     {
         playerState |= MPProtocol.ENUM_PlayerState.ScorePlus;
+        playerState |= MPProtocol.ENUM_PlayerState.EnergyPlus;
         playerState |= MPProtocol.ENUM_PlayerState.Protected;
     }
 
@@ -56,6 +57,7 @@ public class FeverTime : SkillItem {
         effects[0].GetComponent<Animator>().Play("Green");
 
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.High);
+        Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.High);
         BattleManager.SetPropected(true);
         m_StartTime = Time.time;
     }

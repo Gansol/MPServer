@@ -25,7 +25,7 @@ public class BX : MonoBehaviour
                 columns.Add("UseCount");
                 columns.Add("Rank");
                 columns.Add("Exp");
-                Global.photonService.GameOver(0, 0, 0, 0, 0, 0, 0, jstring, columns.ToArray());
+                Global.photonService.GameOver(0, 0, 0, 0, 0, 0, 0, jstring, jstring, columns.ToArray());
     }
 
 }

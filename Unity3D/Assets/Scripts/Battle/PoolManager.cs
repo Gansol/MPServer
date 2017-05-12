@@ -115,7 +115,8 @@ public class PoolManager : MonoBehaviour
         LoadSpecialAsset();
         LoadItemAsset();
         LoadEffectAsset();
-        assetLoader.LoadAsset("ItemICON/", "ItemICON");
+        if (assetLoader.GetAsset("ItemICONPrefab") != null)
+            assetLoader.LoadAsset("ItemICON/", "ItemICON");
 
     }
 
@@ -206,6 +207,7 @@ public class PoolManager : MonoBehaviour
             InstantiateObject(_dictMiceObject);
             InstantiateObject(_dictSpecialObject);
             InstantiateSkillMice(_dictSkillMice);
+          //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
             _poolingFlag = true;
             Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
         }

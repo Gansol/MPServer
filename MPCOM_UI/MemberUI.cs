@@ -29,7 +29,13 @@ namespace MPCOM
         byte[] JoinMember(string account, string nickname, string IP, string email, string joinTime, byte memberType);
         byte[] MemberLogin(string account,string password);
 
-        byte[] UpdateMember(string account ,string data, string columns);
+        /// <summary>
+        /// 更新會員資料
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="jString">資料字典(欄位、值)</param>
+        /// <returns></returns>
+        byte[] UpdateMember(string account , string jString);
     }
 
     public class MemberUI : ServicedComponent, IMemberUI
@@ -126,8 +132,13 @@ namespace MPCOM
         #endregion
 
 
-
-                public byte[] UpdateMember(string account ,string data , string columns)
+        /// <summary>
+        /// 更新會員資料
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="jString">資料字典(欄位、值)</param>
+        /// <returns></returns>
+                public byte[] UpdateMember(string account, string jString)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "S100";
@@ -136,7 +147,7 @@ namespace MPCOM
             try
             {
                 MemberLogic memberLogic = new MemberLogic();
-                memberData = memberLogic.UpdateMember( account ,data,columns);
+                memberData = memberLogic.UpdateMember(account, jString);
             }
             catch (Exception e)
             {
@@ -144,7 +155,6 @@ namespace MPCOM
                 memberData.ReturnMessage = e.Message;
             }
             return TextUtility.SerializeToStream(memberData);
-        }
-      
+        }         
     }
 }

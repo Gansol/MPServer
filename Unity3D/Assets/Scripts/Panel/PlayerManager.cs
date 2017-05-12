@@ -86,23 +86,25 @@ public class PlayerManager : PanelManager
            
           //  if (!dictLoadedICON.ContainsKey(key)) dictLoadedICON.Add(key, imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
             InstantiateEquipIcon(Global.playerItem, equipArea.transform, (int)StoreType.Armor);
-
+            EventMaskSwitch.Resume();
+            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+            EventMaskSwitch.Switch(gameObject, false);
+            EventMaskSwitch.lastPanel = gameObject;
         }
     }
 
     #region -- LoadPlayer(Info、Equip、Record) 載入玩家資訊 --
     private void LoadPlayerInfo()
     {
-        ClacExp clacExp = new ClacExp(Global.Rank);
         Transform parent = playerInfoArea.transform;
-
+        int exp = Clac.ClacExp(Global.Rank);
         
         parent.FindChild("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
         parent.FindChild("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
         parent.FindChild("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
         // parent.FindChild("Note").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.FindChild("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + clacExp.Exp.ToString();
-        parent.FindChild("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(clacExp.Exp);
+        parent.FindChild("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + exp.ToString();
+        parent.FindChild("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(exp);
         parent.FindChild("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
     }
 
@@ -296,6 +298,7 @@ public class PlayerManager : PanelManager
         Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
         if (_bFirstLoad)                        // 取得未載入物件
         {
+            assetLoader.LoadAsset("MiceICON" + "/", "MiceICON");
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -306,6 +309,11 @@ public class PlayerManager : PanelManager
             _dictItemData = SelectNewData(Global.playerItem, _dictItemData);
 
             dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
+
+            EventMaskSwitch.Resume();
+            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+            EventMaskSwitch.Switch(gameObject, false);
+            EventMaskSwitch.lastPanel = gameObject;
         }
 
         if (dictNotLoadedAsset.Count != 0) // 如果 有未載入物件 載入AB
@@ -322,7 +330,7 @@ public class PlayerManager : PanelManager
         {
             assetLoader.loadedObj = _LoadedIcon = true;
         }
-        assetLoader.LoadAsset("MiceICON" + "/", "MiceICON");
+
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
             assetLoader.LoadPrefab("MiceICON" + "/", item.Value + "ICON");
@@ -350,7 +358,7 @@ public class PlayerManager : PanelManager
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
-    private void OnLoadPanel()
+    protected override void  OnLoadPanel()
     {
         GetMustLoadAsset();
 

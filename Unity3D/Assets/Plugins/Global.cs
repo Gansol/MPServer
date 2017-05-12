@@ -13,7 +13,7 @@ public static class Global
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
- "/AndroidList/";
+  "/DevList/";//  "/AndroidList/";   
 #elif UNITY_IPHONE
     "/iOSList/";
 #elif UNITY_STANDALONE_WIN
@@ -25,7 +25,7 @@ public static class Global
     //Android or iOS or Win 伺服器中的 檔案路徑
     public static readonly string assetBundlesPath = serverPath +
 #if UNITY_ANDROID
- "/AndroidBundles/";
+ "/DevBundles/"; // "/AndroidBundles/";
 #elif UNITY_IPHONE
     "/iOSBundles/";
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -146,7 +146,8 @@ public static class Global
     public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
     public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料
     public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();                       // 隊伍老鼠 JSON資料
-    public static Dictionary<string, object> dictFriends = new Dictionary<string, object>();                    // 好友列表 JSON資料
+    public static List<string> dictFriends = new List<string>();                                            // 好友列表 List資料
+    public static Dictionary<string, object> dictFriendsDetail = new Dictionary<string, object>();                    // 好友詳細列表 JSON資料
     public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();                     // 技能列表 JSON資料
     public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();                   // 老鼠屬性資料 
     public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();                   // 道具屬性資料 
@@ -169,6 +170,7 @@ public static class Global
     public static class OtherData
     {
         public static int PrimaryID = 0;        // 主索引
+        public static string Account = "";        // 主索引
         public static string Nickname = "";     // 暱稱
         public static byte Sex = 0;              // 性別
         public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料

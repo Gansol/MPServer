@@ -8,14 +8,19 @@ public class BattleHUD : MonoBehaviour
 {
     public UILabel myName;
     public UILabel otherName;
-    public UISprite myImage,otherImage;
-    public GameObject HPBar;
-    public GameObject ComboLabel;
-    public GameObject BlueScore;
-    public GameObject RedScore;
-    public GameObject BlueEnergyBar;
-    public GameObject RedEnergyBar;
-    public GameObject EnergyBar;
+    public UISprite myImage, otherImage;
+    public UISlider HPBar;
+    public UILabel ComboLabel;
+    public UILabel BlueScoreLabel;
+    public UILabel RedScoreLabel;
+    public UISlider BlueEnergyBar;
+    public UISlider RedEnergyBar;
+    public UISlider EnergyBar;
+    public UISlider FeverBar;
+    public UILabel BlueLifeText;
+    public UILabel RedLifeText;
+    public UISlider BlueLifeBar;
+    public UISlider RedLifeBar;
     public GameObject Combo;
     public GameObject MissionObject;
     public GameObject WaitObject;
@@ -23,31 +28,35 @@ public class BattleHUD : MonoBehaviour
     public GameObject ScorePlusObject;
     public GameObject OtherPlusObject;
     public GameObject GGObject;
-    public GameObject BossHPBar;
+    public UISlider BossHPBar;
     public UILabel GameTime;
     public GameObject[] StateICON;
+    public GameObject messagePanel;
 
     [Range(0.1f, 1.0f)]
     public float _beautyHP;                // 美化血條用
 
-    private double _beautyEnergy;
+    private Color _blueLifeColor, _redLifeColor;
+    private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife;
     //private double _energy;
     private BattleManager battleManager;
     private AssetLoader assetLoader;
     private bool bLoadPrefab;
     private Dictionary<string, object> _dictItemReward;
+    private float _tmpLife, _tmpOhterLife;
     Transform rewardPanel;
     ObjectFactory objFactory;
     void Start()
     {
+        WaitObject.transform.gameObject.SetActive(true);
         battleManager = GetComponent<BattleManager>();
         assetLoader = GetComponent<AssetLoader>();
         objFactory = new ObjectFactory();
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
-        assetLoader.LoadPrefab("Panel/", "InvItem");
-        _beautyEnergy = 0d;
+        //   assetLoader.LoadPrefab("Panel/", "InvItem");
+        _beautyEnergy = _beautyFever = 0f;
         //_energy = 0d;
         bLoadPrefab = true;
         myName.text = Global.Nickname;
@@ -56,6 +65,13 @@ public class BattleHUD : MonoBehaviour
 
         myImage.spriteName = Global.PlayerImage;
         otherImage.spriteName = Global.OtherData.Image;
+
+
+        _tmpLife = battleManager.life;
+        _tmpOhterLife = battleManager.otherLife;
+
+        _blueLifeColor = BlueLifeBar.GetComponent<UISprite>().color;
+        _redLifeColor = RedLifeBar.GetComponent<UISprite>().color;
     }
 
     void Update()
@@ -150,83 +166,105 @@ public class BattleHUD : MonoBehaviour
 
     void OnGUI()
     {
-        GameTime.text = (Math.Max(0,Math.Floor(Global.GameTime - BattleManager.gameTime))).ToString();
-        BlueScore.GetComponent<UILabel>().text = battleManager.score.ToString();         // 畫出分數值
-        RedScore.GetComponent<UILabel>().text = battleManager.otherScore.ToString();     // 畫出分數值
-
-        #region -- HUD Energy --
-        BlueEnergyBar.GetComponent<UISlider>().value = battleManager.Energy;
-        RedEnergyBar.GetComponent<UISlider>().value = battleManager.otherEnergy;
-        #endregion
+        float energy = BattleManager.Energy / 100f;
+        float feverEnergy = battleManager.feverEnergy / 100f;
+        float blueLife = battleManager.life / _tmpLife;
+        float redLife = battleManager.otherLife / _tmpOhterLife;
+        float tmpBlueLifeBar = BlueLifeBar.value, tmpRedLifeBar = RedLifeBar.value;
+        GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - BattleManager.gameTime))).ToString();
+        BlueScoreLabel.text = battleManager.score.ToString();         // 畫出分數值
+        RedScoreLabel.text = battleManager.otherScore.ToString();     // 畫出分數值
+        BlueLifeText.text = battleManager.life.ToString();
+        RedLifeText.text = battleManager.otherLife.ToString();
 
         #region Score Bar動畫
+
         float value = battleManager.score / (battleManager.score + battleManager.otherScore);                      // 得分百分比 兩邊都是0會 NaN
+
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
-            HPBar.GetComponent<UISlider>().value = value;
+            HPBar.value = value;
         }
         else if (_beautyHP > value)                                         // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
         {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;               // 先等於目前值，然後慢慢減少
+            HPBar.value = _beautyHP;                                        // 先等於目前值，然後慢慢減少
 
             if (_beautyHP >= value)
                 _beautyHP -= 0.01f;                                         // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
         }
         else if (_beautyHP < value)                                         // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
         {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;               // 先等於目前值，然後慢慢增加
+            HPBar.value = _beautyHP;                                        // 先等於目前值，然後慢慢增加
 
             if (_beautyHP <= value)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
         else if (battleManager.score == 0 && battleManager.otherScore == 0)
         {
-            HPBar.GetComponent<UISlider>().value = _beautyHP;
-            if (_beautyHP <= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value > 0.5f)
+            HPBar.value = _beautyHP;
+            if (_beautyHP <= HPBar.value && HPBar.value > 0.5f)
             {
                 _beautyHP -= 0.01f;
             }
 
-            if (_beautyHP >= HPBar.GetComponent<UISlider>().value && HPBar.GetComponent<UISlider>().value < 0.5f)
+            if (_beautyHP >= HPBar.value && HPBar.value < 0.5f)
                 _beautyHP += 0.01f;
         }
         #endregion
 
-        #region Energy Bar動畫
+        BeautyBar(EnergyBar, energy, _beautyEnergy);
+        BeautyBar(BlueEnergyBar, energy, _beautyEnergy);
+        BeautyBar(RedEnergyBar, battleManager.otherEnergy / 100f, _beautyOtherEnergy);
+        BeautyBar(FeverBar, feverEnergy, _beautyFever);
+        BeautyBar(BlueLifeBar, blueLife, _beautyLife);
+        BeautyBar(RedLifeBar, redLife, _beautyOtherLife);
 
-        if (BattleManager.energy == Math.Round(_beautyEnergy, 6))
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)(_beautyEnergy = BattleManager.energy);
-        }
+        //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
+        //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
+        //else
+        //    BarTweenColor(BlueLifeBar, Color.red, _blueLifeColor);
 
-        if (BattleManager.energy > _beautyEnergy)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢減少
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)BattleManager.energy, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else if (BattleManager.energy < _beautyEnergy)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)_beautyEnergy;           // 先等於目前值，然後慢慢增加
-            _beautyEnergy = Mathf.Lerp((float)_beautyEnergy, (float)BattleManager.energy, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
-        }
-        else
-        {
-            EnergyBar.GetComponent<UISlider>().value = (float)BattleManager.energy;
-        }
-
-        #endregion
-
-        #region EXP動畫
-
-        #endregion
-
-        ComboLabel.GetComponent<UILabel>().text = battleManager.combo.ToString();        // 畫出Combo值
+        ComboLabel.text = battleManager.combo.ToString();        // 畫出Combo值
 
         //        Debug.Log("_beautyEnergy: " + _beautyEnergy);
         //        Debug.Log("battleManager.energy: " + battleManager.energy);
     }
 
+    private void BeautyBar(UISlider bar, float value, float tmpValue)
+    {
+
+        bar.value = Mathf.Lerp(bar.value, value, 0.1f);
+
+        if (value == Math.Round(bar.value, 6)) bar.value = tmpValue = value;
+
+        //if (value > tmpValue)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
+        //{
+        //    bar.value = tmpValue;           // 先等於目前值，然後慢慢減少
+        //    tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
+        //}
+        //else if (value < tmpValue)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
+        //{
+        //    bar.value = (float)tmpValue;           // 先等於目前值，然後慢慢增加
+        //    tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
+        //}
+        //else
+        //{
+        //    bar.value = value;
+        //}
+    }
+
+    private void BarTweenColor(UISlider bar, Color toColor, Color defaultColor)
+    {
+        Color color = bar.GetComponent<UISprite>().color;
+        // 0.137255   // green -35
+        // 0.6471     // blue -165
+        if (toColor == Color.red)
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Max(color.r + ((1 - defaultColor.r) * (1 - bar.value)), 1),Mathf.Min( color.g - (defaultColor.g * (1 - bar.value)),0), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)),0));
+        if (toColor == Color.green)
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)),0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)),1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)),0));
+        //  color = new Color(1 - bar.value, color.g - color.g * (1 - bar.value), Math.Max(color.b - color.b * (1 - bar.value), 0));
+    }
 
     public void HPBar_Shing()
     {
@@ -242,14 +280,14 @@ public class BattleHUD : MonoBehaviour
     {
         if (!isDead)
         {
-            if (!BossHPBar.activeSelf)
-                BossHPBar.SetActive(true);
+            if (!BossHPBar.gameObject.activeSelf)
+                BossHPBar.gameObject.SetActive(true);
 
-            BossHPBar.GetComponentInChildren<UISlider>().value = value;
+            BossHPBar.value = value;
         }
         else
         {
-            BossHPBar.SetActive(false);
+            BossHPBar.gameObject.SetActive(false);
         }
     }
 
@@ -259,11 +297,11 @@ public class BattleHUD : MonoBehaviour
         switch (mission)
         {
             case Mission.Harvest:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫 "+value.ToString()+" 糧食";
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫 " + value.ToString() + " 糧食";
                 Debug.Log("Mission : Harvest! 收穫:" + value + " 糧食");
                 break;
             case Mission.HarvestRate:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫增加 "+value.ToString();
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫增加 " + value.ToString();
                 Debug.Log("Mission : HarvestRate UP+! 收穫倍率:" + value);
                 break;
             case Mission.Exchange:
@@ -309,7 +347,7 @@ public class BattleHUD : MonoBehaviour
         switch (mission)
         {
             case Mission.Harvest:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 " + missionReward.ToString() + " 糧食";
                 break;
             case Mission.HarvestRate:
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "收穫倍率復原";
@@ -321,10 +359,10 @@ public class BattleHUD : MonoBehaviour
                 MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "豐收祭典任務結束";
                 break;
             case Mission.DrivingMice:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 " + missionReward.ToString() + " 糧食";
                 break;
             case Mission.WorldBoss:
-                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 "+missionReward.ToString()+" 糧食";
+                MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "取得 " + missionReward.ToString() + " 糧食";
                 break;
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Completed!";
@@ -361,7 +399,7 @@ public class BattleHUD : MonoBehaviour
         MissionObject.SetActive(true);
         if (mission == Mission.WorldBoss)
         {
-            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗 "+value.ToString()+" 糧食";
+            MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗 " + value.ToString() + " 糧食";
         }
         else
         {
@@ -396,11 +434,6 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    public void EnergySilder(float value)
-    {
-        EnergyBar.GetComponent<UISlider>().value = (float)BattleManager.energy;
-    }
-
     /// <summary>
     /// 遊戲結束
     /// </summary>
@@ -411,12 +444,12 @@ public class BattleHUD : MonoBehaviour
     /// <param name="lost"></param>
     public void GoodGameMsg(int score, bool result, int exp, int sliverReward, int goldReward, string jItemReward, int combo, int killMice, int lostMice, string evaluate, bool isHighScore, bool isHighCombo)
     {
-        ClacExp clacExp = new ClacExp(Global.Rank + 1);
+
         _dictItemReward = new Dictionary<string, object>(MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
 
 
-        int maxExp = clacExp.Exp;
-        int _exp = Global.Exp + exp;
+        float maxExp = Clac.ClacExp(Global.Rank + 1);
+        float _exp = Global.Exp + exp;
 
 
 
@@ -450,10 +483,11 @@ public class BattleHUD : MonoBehaviour
             _exp -= maxExp;
         }
         float value = _exp;
-        value = value / 100f;
-        Debug.Log("Exp Percent:" + value);
-        GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
+        value = value / maxExp;
+        Debug.Log("Exp Percent:" + value + " _exp:" + _exp);
+
         GGObject.SetActive(true);
+        GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
     }
 
     private bool LoadItemICON()

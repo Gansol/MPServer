@@ -13,7 +13,7 @@
         IceGlasses = 1 << 7,
         Boss = 1 << 8,
         WorldBoss = 1 << 9,
-
+        FeverTime = 1 << 10,
         All = -1,
     }
 

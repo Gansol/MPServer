@@ -25,7 +25,7 @@ public class FreezeEnergy : SkillBoss
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
             // "-" 分數是正的
-            Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.Low);
+            Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.None);
             m_LastTime = Time.time;
         }
 

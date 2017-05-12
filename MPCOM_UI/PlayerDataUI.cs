@@ -35,6 +35,8 @@ namespace MPCOM
         byte[] UpdatePlayerItem(string account, string jItemUsage, string[] columns);
         byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
         byte[] SortPlayerItem(string account, string jString);
+
+        byte[] LoadFriendsData(List<string> friends);
     }
 
     public class PlayerDataUI : ServicedComponent, IPlayerDataUI    // 使用介面 可以提供給不同程式語言繼承使用  
@@ -359,6 +361,32 @@ namespace MPCOM
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
                 throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
+
+        #region LoadFriendsData 取得好友資料
+        /// <summary>
+        /// 取得朋友資料
+        /// </summary>
+        /// <param name="sFriends">朋友們</param>
+        /// <returns></returns>
+        public byte[] LoadFriendsData(List<string> firends)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S100";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.LoadFriendsData(firends);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S300";
+                playerData.ReturnMessage = e.Message;
             }
             return TextUtility.SerializeToStream(playerData);
         }

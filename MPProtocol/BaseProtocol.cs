@@ -5,6 +5,7 @@
         //GetRoomInfo = 91,            // 取得單一房間資訊
         //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
         GetOnlineActor = 1,
+        GetOnlineActorState,
     }
 
     public enum SystemParameterCode
@@ -12,7 +13,8 @@
         //GetRoomInfo = 91,            // 取得單一房間資訊
         //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
         Ret = 0,
-        GetOnlineActor,
+        OnlineActors,
+        ActorsState,
     }
 
     public enum SystemResponseCode
@@ -20,6 +22,7 @@
         //GetRoomInfo = 91,            // 取得單一房間資訊
         //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
         GetOnlineActor = 1,
+        GetOnlineActorState,
     }
 
     public enum ErrorCode

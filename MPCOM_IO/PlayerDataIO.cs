@@ -6,6 +6,7 @@ using System.EnterpriseServices;
 using System.Collections.Generic;
 using MiniJSON;
 using MPProtocol;
+using System.Linq;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -91,7 +92,7 @@ namespace MPCOM
                         playerData.SortedItem = Convert.ToString(DS.Tables[0].Rows[0]["Item"]);
                         playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
                         playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
-                        playerData.Friend = Convert.ToString(DS.Tables[0].Rows[0]["Friend"]);
+                        playerData.Friends = Convert.ToString(DS.Tables[0].Rows[0]["Friend"]);
                         playerData.PlayerImage = Convert.ToString(DS.Tables[0].Rows[0]["Image"]);
 
                         playerData.ReturnCode = "S401"; //true
@@ -892,5 +893,82 @@ namespace MPCOM
         }
 
         #endregion
+
+        #region LoadFriendsData 取得朋友資料
+        [AutoComplete]
+        public PlayerData LoadFriendsData(List<string> friends)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S300";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+
+                    string selectString = @"SELECT Player_PlayerData.Rank, GansolMember.Nickname,Player_PlayerData.Image FROM Player_PlayerData LEFT JOIN  GansolMember ON GansolMember.Account = Player_PlayerData.Account WHERE "; // unique
+
+                    foreach(string friend in friends)
+                        selectString += "Player_PlayerData.Account = " + friend + " OR ";
+
+                    adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
+                    adapter.Fill(DS);
+
+                    //如果找到會員資料(帳號、密碼) 登入成功
+                    if (DS.Tables[0].Rows.Count > 0)
+                    {
+                        int i = 0, j = 0;
+
+                        foreach (DataTable table in DS.Tables)
+                        {
+                            string itemID = "";
+                            Dictionary<string, object> dictFirends = new Dictionary<string, object>();
+
+                            foreach (DataRow row in table.Rows)
+                            {
+                                j = 0;
+                                Dictionary<string, object> dictData2 = new Dictionary<string, object>();
+                                foreach (DataColumn col in table.Columns)
+                                {
+                                    if (j == 0) itemID = table.Rows[i][col].ToString();// 0 = itemID
+
+                                    dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
+                                    j++;
+                                }
+                                dictFirends.Add(itemID, dictData2);
+                                i++;
+                            }
+                            playerData.Friends = Json.Serialize(dictFirends);
+                        }
+
+
+                       playerData.ReturnCode = "S432";
+                        playerData.ReturnMessage = "取得朋友資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S433";
+                        playerData.ReturnMessage = "取得朋友資料失敗，沒有資料！";
+                    }
+                }
+            }
+            catch 
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得朋友資料失敗，未知例外情況！";
+                throw;
+            }
+
+            return playerData;
+        }
+        #endregion
+
+
+        
     }
 }

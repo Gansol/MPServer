@@ -216,7 +216,7 @@ namespace MPCOM
                     */
 
                     clinetData = MiniJSON.Json.Deserialize(friend) as Dictionary<string, object>;
-                    serverData = MiniJSON.Json.Deserialize(playerData.Friend) as Dictionary<string, object>;
+                    serverData = MiniJSON.Json.Deserialize(playerData.Friends) as Dictionary<string, object>;
 
                     //如果與伺服器資料 數量不相同
                     if (serverData.Count != clinetData.Count)
@@ -484,11 +484,12 @@ namespace MPCOM
                 {
                     playerData.SumScore += score;
                     if (maxScore > playerData.MaxScore) playerData.MaxScore = maxScore;
+                    if (maxCombo > playerData.MaxCombo) playerData.MaxCombo = maxCombo;
                     playerData.SumLost += lostMice;
                     playerData.SumKill += killMice;
                     playerData.SumBattle += 1;
                     playerData.SumWin += battleResult > 0 ? 1 : 0;
-                    Log.Debug("Clac Exp:" + ClacExp(playerData.Rank + 1));
+                   // Log.Debug("Clac Exp:" + ClacExp(Math.Min(playerData.Rank + 1,100)));
                     if (playerData.Rank < maxRank && playerData.Rank > 0)
                     {
                         if (playerData.Exp + exp >= ClacExp(playerData.Rank + 1)) // +1 是因為要找下一等所需經驗值
@@ -579,7 +580,7 @@ namespace MPCOM
             Log.Debug("FUCK");
             //Log.Debug("dictServerItem.Count:" + dictServerItem.Count + "dictClient.Count:" + dictClient.Count);
 
-            object itemProp;
+            //object itemProp;
             // UseCount Exp Rank
 
 
@@ -618,8 +619,8 @@ namespace MPCOM
 
                     var dictClient = clientItemObejct as Dictionary<string, object>;
 
-                    object serverCount = 0, serverUseage = 0, serverRank, serverExp, clientCount = 0, clientUseCount = 0, clientRank, clientExp;
-                    bool bGetCount, bGetUseage, bGetRank, bGetExp;
+                    object serverCount = 0, serverUseage = 0, /*serverRank, serverExp,*/ clientCount = 0, clientUseCount = 0/*, clientRank, clientExp*/;
+                    bool bGetCount, bGetUseage/*, bGetRank, bGetExp*/;
 
                     dictServerItem.TryGetValue(PlayerItem.ItemCount.ToString(), out serverCount);
                     dictServerItem.TryGetValue(PlayerItem.UseCount.ToString(), out serverUseage);
@@ -954,5 +955,26 @@ namespace MPCOM
 
             return System.Convert.ToInt16(Math.Round(exp, 0, MidpointRounding.AwayFromZero));
         }
+
+        #region LoadFriendsData 取得朋友資料
+        [AutoComplete]
+        public PlayerData LoadFriendsData(List<string> friends)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S300";
+            playerData.ReturnMessage = "";
+            try
+            {
+                //如果檢查成功 進行會員資料比對
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.LoadFriendsData(friends);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return playerData;
+        }
+        #endregion
     }
 }

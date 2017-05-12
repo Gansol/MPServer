@@ -19,7 +19,7 @@ using MiniJSON;
 
 public abstract class MPPanel : MonoBehaviour
 {
-    public AssetLoader assetLoader;
+    protected AssetLoader assetLoader;
 
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
     private GameObject _tmpActor, _clone;

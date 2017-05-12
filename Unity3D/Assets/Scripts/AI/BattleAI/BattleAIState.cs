@@ -6,17 +6,17 @@ public abstract class BattleAIState
 {
     protected static float spawnOffset = 0f;    // SpawnTime修正值
     protected static double lastTime = 0d;
-    protected static int totalSpawn = 0, wave = 0, nextBali = 27, nextMuch = 4, nextSuper = 50;
+    protected static int  wave = 0, nextBali = 27, nextMuch = 4, nextHero = 50;
     protected BattleManager battleManager = null;
     protected MPFactory spawner = null;
     protected SpawnState spawnState = null;
     protected ENUM_BattleAIState battleAIState = ENUM_BattleAIState.EasyMode;
     protected SpawnStatus spawnStatus = SpawnStatus.LineL;
-    protected int spawnCount, minStatus, maxStatus, minMethod, maxMethod, normalSpawn, nowCombo;          // 產生數量、老鼠產生資料最小值、老鼠產生資料最大值、正常產生狀態值、更換AI狀態後目前combo
-    protected float lerpTime, spawnTime, intervalTime, spawnIntervalTime, intervalOffset = .05f, minSpawnInterval, maxSpawnInterval, spawnSpeed; // 加速度、老鼠產生間隔、每組老鼠產生間隔、Spawn難度修正值、每次Spawn間隔、最大、最小間隔
-
+    protected int totalSpawn,spawnCount, minStatus, maxStatus, minMethod, maxMethod, normalSpawn, nowCombo;          //總量 產生數量、老鼠產生資料最小值、老鼠產生資料最大值、正常產生狀態值、更換AI狀態後目前combo
+    protected float pervStateTime,nextStateTime, lerpTime, spawnTime, intervalTime, spawnIntervalTime, intervalOffset = .05f, minSpawnInterval, maxSpawnInterval, spawnSpeed; // 加速度、老鼠產生間隔、每組老鼠產生間隔、Spawn難度修正值、每次Spawn間隔、最大、最小間隔
     protected Coroutine coroutine;
 
+    protected short defaultMice = 10001,bali = 11001,much =11002,hero=11003;
     public abstract void UpdateState();
 
     public SpawnStatus GetSpawnStatus()
@@ -60,18 +60,18 @@ public abstract class BattleAIState
         if (totalSpawn > nextBali)
         {
             nextBali = totalSpawn + nextBali;
-            Spawn(11001, Random.Range(0, 3 + 1));//錯誤
+            Spawn(bali, Random.Range(0, 3 + 1));//錯誤
         }
 
         if (totalSpawn > nextMuch)
         {
             nextMuch = totalSpawn + nextMuch;
-            Spawn(11002, 1);//錯誤
+            Spawn(much, 1);//錯誤
         }
-        if (totalSpawn > nextSuper)
+        if (totalSpawn > nextHero)
         {
-            nextSuper = totalSpawn + nextSuper;
-            Spawn(11003, 1);//錯誤
+            nextHero = totalSpawn + nextHero;
+            Spawn(hero, 1);//錯誤
         }
     }
 

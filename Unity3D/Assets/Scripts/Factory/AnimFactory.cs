@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AnimFactory : MonoBehaviour {
+public class AnimFactory {
 
 	// Use this for initialization
 	void Start () {

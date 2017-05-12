@@ -87,6 +87,7 @@
         Normal = 0,
         Low = 1,
         High = 2,
+        None = 3,
     }
 
     public enum ENUM_Difficulty
@@ -135,7 +136,7 @@
         UpdateScoreRate = 59,       // 更新分數倍率
         UpdateEnergyRate = 60,      // 更新分數倍率
         SkillBoss = 61,             // 技能老鼠發動技能判斷
-
+        RoomMice = 62,              // 房間老鼠
     }
 
     public enum BattleParameterCode

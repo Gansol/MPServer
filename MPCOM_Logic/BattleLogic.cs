@@ -52,6 +52,7 @@ namespace MPCOM
 
         private struct Rate
         {
+            public readonly static float None = 0;
             public readonly static float Normal = 1;
             public readonly static float Low = 0.8f;
             public readonly static float High = 1.2f;
@@ -59,6 +60,7 @@ namespace MPCOM
 
         private struct EnergyRate
         {
+            public readonly static float None = 0;
             public readonly static float Normal = 1;
             public readonly static float Low = 0.5f;
             public readonly static float High = 2f;
@@ -148,6 +150,9 @@ namespace MPCOM
 
             switch ((int)rate)
             {
+                case (int)ENUM_Rate.None:
+                    battleData.scoreRate = Rate.None;
+                    break;
                 case (int)ENUM_Rate.Normal:
                     battleData.scoreRate = Rate.Normal;
                     break;
@@ -173,6 +178,9 @@ namespace MPCOM
 
             switch ((int)rate)
             {
+                case (int)ENUM_Rate.None:
+                    battleData.energyRate = EnergyRate.None;
+                    break;
                 case (int)ENUM_Rate.Normal:
                     battleData.energyRate = EnergyRate.Normal;
                     break;
@@ -345,7 +353,7 @@ namespace MPCOM
                 //    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
                 //if (combo > 100)
                 //    battleData.energy = Convert.ToInt16(Math.Round(5 * energyRate, 0, MidpointRounding.AwayFromZero));
-                battleData.energy = 1;
+                battleData.energy = Convert.ToInt16(1 * energyRate);
             }
 
             battleData.score = score;
@@ -552,14 +560,14 @@ namespace MPCOM
         [AutoComplete]
         public BattleData GameOver(string account, short score, short otherScore, short gameTime, int lostMice,
              short totalScore, short spawnCount, short missionCompletedCount, short maxMissionCount
-            , short combo, string jStringMiceData, string[] col)
+            , short combo, string jMicesUseCount, string jItemsUseCount, string[] col)
         {
             battleData.ReturnCode = "(Logic)S500";
             battleData.ReturnMessage = "";
 
             string itemReward = "{}", evaluateText;
             short expReward = 0, sumEvaluateScore;
-            short sliverReward = 0, goldReward = 0, miceExp;
+            short sliverReward = 0, goldReward = 0/*, miceExp*/;
             short[] lostRate, comboRate, scoreRate, timeRate, missionRate;
             float[] evaluate;
 
@@ -567,11 +575,12 @@ namespace MPCOM
             try
             {
 
-                jStringMiceData = jStringMiceData.Replace(@"\", "");
-                Log.Debug("jStringMiceData:" + jStringMiceData);
-                Dictionary<string, object> dictClientMiceData = new Dictionary<string, object>();
-                dictClientMiceData = MiniJSON.Json.Deserialize(jStringMiceData) as Dictionary<string, object>;
-                Log.Debug("jStringMiceData:" + dictClientMiceData.Count);
+                jMicesUseCount = jMicesUseCount.Replace(@"\", "");
+                //  Log.Debug("jStringMiceData:" + jStringMiceData);
+                Dictionary<string, object> dictClientMiceData, dictClientItemData = new Dictionary<string, object>();
+                dictClientMiceData = MiniJSON.Json.Deserialize(jMicesUseCount) as Dictionary<string, object>;
+                dictClientItemData = MiniJSON.Json.Deserialize(jItemsUseCount) as Dictionary<string, object>;
+                // Log.Debug("jStringMiceData:" + dictClientMiceData.Count);
                 Dictionary<string, Dictionary<string, object>> result = new Dictionary<string, Dictionary<string, object>>();
                 lostRate = GetLostRate(lostMice, spawnCount);
                 scoreRate = GetScoreRate(score, totalScore);
@@ -583,7 +592,7 @@ namespace MPCOM
                 evaluateText = GetEvaluateText(sumEvaluateScore);
 
                 //score / ( 100 + lost rate + combo rate+ mission rate+ score rate + time rate ) * evaluate + default
-
+                // Log.Debug("lostRate[0] " + lostRate[0] + "   comboRate[0] " + comboRate[0] + "   missionRate[0] " + missionRate[0] + "   scoreRate[0] " + scoreRate[0] + "    timeRate[0] " + timeRate[0] + "   evaluate[0] " + evaluate[0] + "   evaluate[1] " + evaluate[1]);
                 sliverReward = (short)Math.Max(0, score / (100 + lostRate[0] + comboRate[0] + missionRate[0] + scoreRate[0] + timeRate[0]) * evaluate[0] + evaluate[1]);
 
 
@@ -591,7 +600,7 @@ namespace MPCOM
                 PlayerDataIO playerDataIO = new PlayerDataIO();
 
                 playerData = playerDataIO.LoadPlayerItem(account);
-                result = UpdateResult(account, playerData, dictClientMiceData);
+                result = UpdateResult(account, playerData, dictClientMiceData, dictClientItemData);
 
                 playerData = playerDataIO.LoadPlayerData(account);
                 expReward = GetExp(sliverReward, playerData.Rank);
@@ -614,7 +623,7 @@ namespace MPCOM
 
                 battleData.ReturnCode = "S514";
                 battleData.ReturnMessage = "遊戲結束計算完成！";
-                Log.Debug("battleData.sliverReward:" + battleData.sliverReward + "battleData.expReward:" + battleData.expReward + " battleData.jItemReward:" + battleData.jItemReward + " battleData.goldReward:" + battleData.goldReward);
+                // Log.Debug("battleData.sliverReward:" + battleData.sliverReward + "battleData.expReward:" + battleData.expReward + " battleData.jItemReward:" + battleData.jItemReward + " battleData.goldReward:" + battleData.goldReward);
                 return battleData;
             }
             catch
@@ -693,7 +702,6 @@ namespace MPCOM
             return result;
         }
 
-        #region GameOver Clac Functions
         private short[] GetLostRate(float lost, float spawnCount)
         {
             float rate = lost / spawnCount;
@@ -800,86 +808,112 @@ namespace MPCOM
         /// <returns>經驗值</returns>
         private short GetExp(float reward, float level)
         {
-            reward = (reward / 10f * (100f + level)) + level;
-            Log.Debug("Battle Logic Get Exp:" + reward);
+            //  Log.Debug("sliverReward:" + reward + " level:" + level);
+            reward = reward / (10f * (100f + level) / 100f) + level;
+            // Log.Debug("Battle Logic Get Exp:" + reward);
             return Convert.ToInt16(Math.Round(Math.Min(short.MaxValue, reward), 0, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>
-        /// 更新老鼠資料
+        /// 更新老鼠、道具資料
         /// </summary>
         /// <param name="account">帳號</param>
         /// <param name="playerData">伺服器玩家資料</param>
         /// <param name="dictClientMiceData">客戶端老鼠資料(UseCount)</param>
         /// <returns></returns>
-        private Dictionary<string, Dictionary<string, object>> UpdateResult(string account, PlayerData playerData, Dictionary<string, object> dictClientMiceData)
+        private Dictionary<string, Dictionary<string, object>> UpdateResult(string account, PlayerData playerData, Dictionary<string, object> dictClientMiceData, Dictionary<string, object> dictClientItemData)
         {
             try
             {
-                object level, exp, sUseCount, cUseCount, itemCount, data, outClientMiceData;
+                object level, exp, sMiceUseCount, sMiceCount, sItemCount, sItemUseCount, cMiceUseCount, cItemUseCount, data, outClientData;
 
                 Dictionary<string, Dictionary<string, object>> result = new Dictionary<string, Dictionary<string, object>>();
                 Dictionary<string, object> dictServerData = new Dictionary<string, object>();
                 dictServerData = MiniJSON.Json.Deserialize(playerData.PlayerItem) as Dictionary<string, object>;
 
-                List<string> clientKeys = new List<string>(dictClientMiceData.Keys);
-                Dictionary<string, object> miceProp = new Dictionary<string, object>();
+                List<string> clientMiceKeys = new List<string>(dictClientMiceData.Keys);
+                List<string> clientItemKeys = new List<string>(dictClientItemData.Keys);
+                Dictionary<string, object> prop = new Dictionary<string, object>();
 
-                foreach (string key in clientKeys)
+                #region 計算老鼠經驗等級用量
+                foreach (string key in clientMiceKeys)
                 {
-                    Log.Debug("clientKey:" + key);
+                    //   Log.Debug("clientKey:" + key);
                     if (dictServerData.ContainsKey(key))    // itemID = itemID
                     {
-                        Log.Debug("Key Equal !!");
+                        //    Log.Debug("Key Equal !!");
                         dictServerData.TryGetValue(key, out data);  // 取出道具資料
                         Dictionary<string, object> outServerMiceData = data as Dictionary<string, object>;
 
                         if (outServerMiceData.TryGetValue(PlayerItem.Rank.ToString(), out level))
                         {
-                            Log.Debug("Get Rank !!");
+                            //   Log.Debug("Get Rank !!");
                             if (outServerMiceData.TryGetValue(PlayerItem.Exp.ToString(), out exp))
                             {
-                                Log.Debug("Get Exp !!");
-                                dictClientMiceData.TryGetValue(key, out outClientMiceData);
+                                //   Log.Debug("Get Exp !!");
+                                dictClientMiceData.TryGetValue(key, out outClientData);
 
-                                miceProp = outClientMiceData as Dictionary<string, object>;
-                                miceProp.TryGetValue(PlayerItem.UseCount.ToString(), out cUseCount); // 從玩家老鼠資料中取出 使用次數
+                                prop = outClientData as Dictionary<string, object>;
+                                prop.TryGetValue(PlayerItem.UseCount.ToString(), out cMiceUseCount); // 從玩家老鼠資料中取出 使用次數
 
-                                Log.Debug("useCount:" + cUseCount);
-                                short[] clacResult = ClacMiceRank(Convert.ToInt32(level), Convert.ToInt32(exp), Convert.ToInt32(cUseCount));
+                                //   Log.Debug("useCount:" + cUseCount);
+                                short[] clacResult = ClacMiceRank(Convert.ToInt32(level), Convert.ToInt32(exp), Convert.ToInt32(cMiceUseCount));
 
-                                Log.Debug("  Key:" + key.ToString() + "Rank:" + clacResult[0] + "Exp:" + clacResult[1]);
+                                //   Log.Debug("  Key:" + key.ToString() + "Rank:" + clacResult[0] + "Exp:" + clacResult[1]);
 
-                                miceProp.Add(PlayerItem.Rank.ToString(), clacResult[0].ToString());                    // 使用clientMiceData參考修改資料
-                                miceProp.Add(PlayerItem.Exp.ToString(), clacResult[1].ToString());                     // 使用clientMiceData參考修改資料
+                                prop.Add(PlayerItem.Rank.ToString(), clacResult[0].ToString());                    // 使用clientMiceData參考修改資料
+                                prop.Add(PlayerItem.Exp.ToString(), clacResult[1].ToString());                     // 使用clientMiceData參考修改資料
 
-                                //// itemcount
-                                //outServerMiceData.TryGetValue(PlayerItem.ItemCount.ToString(), out itemCount);
-                                //if (ItemCountChk(Convert.ToInt16(itemCount), Convert.ToInt16(cUseCount)))
-                                //    miceProp.Add(PlayerItem.ItemCount.ToString(), (Convert.ToInt16(itemCount) - Convert.ToInt16(cUseCount)).ToString());
+                                // itemcount
+                                outServerMiceData.TryGetValue(PlayerItem.ItemCount.ToString(), out sMiceCount);
+                                if (ItemCountChk(Convert.ToInt16(sMiceCount), Convert.ToInt16(cMiceUseCount)))
+                                    prop.Add(PlayerItem.ItemCount.ToString(), (Convert.ToInt16(sMiceCount) - Convert.ToInt16(cMiceUseCount)).ToString());
 
-                                // Log.Debug(" itemCount: " + itemCount + " cUseCount: " + Convert.ToInt16(cUseCount));
+                                Log.Debug(" itemCount: " + sMiceCount + " cUseCount: " + Convert.ToInt16(cMiceUseCount));
                                 // usecount
-                                //outServerMiceData.TryGetValue(PlayerItem.UseCount.ToString(),out sUseCount);
-                                //Log.Debug(" cUseCount: "+ Convert.ToInt16(miceProp[PlayerItem.UseCount.ToString()]) +" sUseCount: "+ Convert.ToInt16(sUseCount));
-                                //miceProp[PlayerItem.UseCount.ToString()] = Convert.ToInt16(cUseCount) + Convert.ToInt16(sUseCount);
+                                outServerMiceData.TryGetValue(PlayerItem.UseCount.ToString(), out sMiceUseCount);
+                                Log.Debug(" cUseCount: " + Convert.ToInt16(prop[PlayerItem.UseCount.ToString()]) + " sUseCount: " + Convert.ToInt16(sMiceUseCount));
+                                prop[PlayerItem.UseCount.ToString()] = Convert.ToInt16(cMiceUseCount) + Convert.ToInt16(sMiceUseCount);
 
                             }
                         }
-                        result.Add(key, miceProp);
+                        result.Add(key, prop);
                     }
 
                 }
+                #endregion
 
-                Log.Debug("result.Count: " + result.Count);
-
-                foreach (KeyValuePair<string, Dictionary<string, object>> x in result)
+                foreach (string key in clientItemKeys)
                 {
-                    foreach (KeyValuePair<string, object> y in x.Value)
+                    if (dictServerData.ContainsKey(key))    // itemID = itemID
                     {
-                        Log.Debug("result inner.Key: " + y.Key + "  result inner.Key: " + y.Value);
+                        dictServerData.TryGetValue(key, out data);  // 取出道具資料
+                        Dictionary<string, object> outServerItemData = data as Dictionary<string, object>;
+
+                        if (outServerItemData.TryGetValue(PlayerItem.ItemCount.ToString(), out sItemCount))
+                        {
+                            if (outServerItemData.TryGetValue(PlayerItem.UseCount.ToString(), out sItemUseCount))
+                            {
+                                dictClientItemData.TryGetValue(key, out outClientData);
+
+                                prop = outClientData as Dictionary<string, object>;
+                                prop.TryGetValue(PlayerItem.UseCount.ToString(), out cItemUseCount); // 從玩家老鼠資料中取出 使用次數
+                                prop[PlayerItem.UseCount.ToString()] = Convert.ToInt32(sItemUseCount) + Convert.ToInt32(cItemUseCount);// 計算使用量
+                                prop.Add(PlayerItem.ItemCount.ToString(), Convert.ToInt16(sItemCount) - Convert.ToInt16(cItemUseCount));// 計算數量
+                                result.Add(key, prop);
+                            }
+                        }
                     }
                 }
+                //Log.Debug("result.Count: " + result.Count);
+
+                //foreach (KeyValuePair<string, Dictionary<string, object>> x in result)
+                //{
+                //    foreach (KeyValuePair<string, object> y in x.Value)
+                //    {
+                //        Log.Debug("result inner.Key: " + y.Key + "  result inner.Key: " + y.Value);
+                //    }
+                //}
 
                 return result;
             }
@@ -888,7 +922,8 @@ namespace MPCOM
                 throw;
             }
         }
-        #endregion
+
+
         private bool ItemCountChk(int serverCount, int clientUseCount)
         {
             return (serverCount > clientUseCount) ? true : false;

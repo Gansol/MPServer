@@ -22,6 +22,8 @@ using System.Collections;
 public class PanelManager : MPPanel
 {
     #region 欄位
+    public static GameObject[] PanelRefs;
+    private ScrollView scrollView;
     public static GameObject _lastEmptyItemGroup;
     public GameObject[] Panel;                                      // 存放Panel位置
     public GameObject loginPanel;
@@ -53,7 +55,8 @@ public class PanelManager : MPPanel
 
     void Start()
     {
-
+        PanelRefs = Panel;
+        scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
     }
 
     void Update()
@@ -124,10 +127,10 @@ public class PanelManager : MPPanel
             _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
             if (!dictPanelRefs.ContainsKey(_panelName))
             {
-                PanelState ps = new PanelState();
-                ps.obj = panel;
-                ps.onOff = false;
-                dictPanelRefs.Add(_panelName, ps);
+                PanelState panelState = new PanelState();
+                panelState.obj = panel;
+                panelState.onOff = false;
+                dictPanelRefs.Add(_panelName, panelState);
             }
 
             PanelSwitch();
@@ -292,17 +295,20 @@ public class PanelManager : MPPanel
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
+                scrollView.scroll = false;
                 if (_lastPanel != null) _lastPanel.SetActive(false);
+                Panel[5].SetActive(true);
                 panelState.obj.SetActive(true);
                 panelState.obj.transform.GetChild(0).SendMessage("OnLoading");
                 panelState.onOff = !panelState.onOff;
                 _lastPanel = panelState.obj;
 
-                EventMaskSwitch.Switch(panelState.obj, false);
-                EventMaskSwitch.lastPanel = panelState.obj;
+                EventMaskSwitch.Switch(Panel[5], false);
+                EventMaskSwitch.lastPanel = Panel[5];
             }                                                   // 如果Panel已開啟
             else
             {
+                scrollView.scroll = true;
                 EventMaskSwitch.Resume();
                 panelState.obj.SetActive(false);
                 panelState.onOff = !panelState.onOff;

@@ -43,6 +43,7 @@ public class TeamManager : PanelManager
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
 
     //private int _page;                                                              // 翻頁值(翻一頁+10)
+    private int _miceCost;
     private float _lastClickTime;                                                   // 點擊間距時間
     private static bool _bFirstLoad;                                                // 是否第一次載入
     private bool _bLoadedIcon, _bLoadedActor, _bLoadedEffect;                                       // 是否載入圖片、是否載入角色
@@ -64,8 +65,9 @@ public class TeamManager : PanelManager
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
 
-        Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
-        Global.photonService.LoadPlayerItemEvent += None;
+        Global.photonService.LoadPlayerDataEvent += OnCostCheck;
+        Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
+        Global.photonService.UpdateMiceEvent += OnCostCheck;
     }
 
     void Update()
@@ -85,6 +87,10 @@ public class TeamManager : PanelManager
             // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
             ActiveMice(Global.dictTeam);
             StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));
+            EventMaskSwitch.Resume();
+             GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+            EventMaskSwitch.Switch(gameObject, false);
+            EventMaskSwitch.lastPanel = gameObject;
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)
@@ -138,7 +144,7 @@ public class TeamManager : PanelManager
                 if (data.TryGetValue(parent.GetChild(i).GetComponentInChildren<UISprite>().name, out miceData))
                 {
                     Dictionary<string, object> miceProp = miceData as Dictionary<string, object>;
-                    parent.FindChild("Text").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
+                    parent.parent.FindChild("ItemCount").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
                 }
         }
     }
@@ -147,7 +153,6 @@ public class TeamManager : PanelManager
     #region LoadPlayerMiceProp
     private void LoadPlayerMiceProp(GameObject miceBtn)
     {
-        ClacExp clacExp;
         object rank, exp, data;
         float miceMaxExp;
 
@@ -156,8 +161,7 @@ public class TeamManager : PanelManager
         Dictionary<string, object> miceProp = data as Dictionary<string, object>;
         miceProp.TryGetValue(PlayerItem.Rank.ToString(), out rank);
         miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
-        clacExp = new ClacExp(Convert.ToInt32(rank));
-        miceMaxExp = clacExp.ClacMiceExp(Convert.ToInt32(rank) + 1);
+        miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
         infoGroupsArea[1].transform.FindChild("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
         infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
@@ -275,11 +279,17 @@ public class TeamManager : PanelManager
             }
             else
             {
+                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
                 ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, dictLoadedMice);
                 ExpectOutdataObject(Global.dictTeam, _dictMiceData, dictLoadedTeam);
                 _dictMiceData = SelectNewData(Global.dictMiceAll, _dictMiceData);
 
                 dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
+
+                EventMaskSwitch.Resume();
+                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+                EventMaskSwitch.Switch(gameObject, false);
+                EventMaskSwitch.lastPanel = gameObject;
             }
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
@@ -298,6 +308,8 @@ public class TeamManager : PanelManager
             _dictMiceData = Global.dictMiceAll;
             //_dictTeamData = Global.Team;
             Global.isPlayerDataLoaded = false;
+
+            OnCostCheck();
         }
     }
     #endregion
@@ -388,6 +400,48 @@ public class TeamManager : PanelManager
     }
     #endregion
 
+    private void OnCostCheck()
+    {
+        object value;
+        int maxCost = Clac.ClacCost(Global.Rank);
+        _miceCost = 0;
+        Dictionary<string, object> data;
+        foreach (KeyValuePair<string, object> mice in Global.dictTeam)
+        {
+            data = Global.miceProperty[mice.Key] as Dictionary<string, object>;
+            data.TryGetValue("MiceCost", out value);
+            _miceCost += Convert.ToInt32(value);
+        }
+
+        
+        if (_miceCost > maxCost)
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
+        else
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+    }
+
+
+    //private void CheckSolt(){
+    //    if (Global.Rank < 5)
+    //        infoGroupsArea[2].transform.GetChild(1).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(1).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 10)
+    //        infoGroupsArea[2].transform.GetChild(2).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(2).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 15)
+    //        infoGroupsArea[2].transform.GetChild(3).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(3).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 20)
+    //        infoGroupsArea[2].transform.GetChild(4).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(4).gameObject.SetActive(true);
+    //}
 
     private void None()
     {
