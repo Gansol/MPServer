@@ -2,6 +2,7 @@
 using System.EnterpriseServices;
 using Gansol;
 using System.Collections.Generic;
+using System.Linq;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -23,6 +24,8 @@ namespace MPCOM
     public interface IPlayerDataUI  // 使用介面 可以提供給不同程式語言繼承使用  
     {
         byte[] LoadPlayerData(string account);
+        byte[] LoadPlayerData(string account, string[] columns);
+
         byte[] LoadPlayerItem(string account);
         byte[] LoadPlayerItem(string account, Int16 itemID);
         byte[] UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend);
@@ -36,7 +39,8 @@ namespace MPCOM
         byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
         byte[] SortPlayerItem(string account, string jString);
 
-        byte[] LoadFriendsData(List<string> friends);
+        byte[] LoadFriendsData(string[] friends);
+        byte[] RemoveFriend(string account,string friend);
     }
 
     public class PlayerDataUI : ServicedComponent, IPlayerDataUI    // 使用介面 可以提供給不同程式語言繼承使用  
@@ -63,6 +67,33 @@ namespace MPCOM
                 playerData.ReturnCode = "S400";
                 playerData.ReturnMessage = e.Message;
                 throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
+
+        #region LoadPlayerData 載入特定欄位資料
+        /// <summary>
+        /// 載入特定欄位資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public byte[] LoadPlayerData(string account, string[] columns)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //to do check 
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.LoadPlayerData(account, columns.ToList());
+            }
+            catch
+            {
+                throw;
             }
             return TextUtility.SerializeToStream(playerData);
         }
@@ -138,6 +169,35 @@ namespace MPCOM
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
                 throw e;
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
+        #endregion
+
+        #region UpdatePlayerData 更新玩家(好友)資料
+        /// <summary>
+        /// 更新玩家(好友)資料 含載入朋友資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="friend"></param>
+        /// <returns></returns>
+        [AutoComplete]
+        public byte[] UpdatePlayerData(string account, string friend)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.UpdatePlayerData(account, friend);
+            }
+            catch
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　";
+                throw;
             }
             return TextUtility.SerializeToStream(playerData);
         }
@@ -372,7 +432,7 @@ namespace MPCOM
         /// </summary>
         /// <param name="sFriends">朋友們</param>
         /// <returns></returns>
-        public byte[] LoadFriendsData(List<string> firends)
+        public byte[] LoadFriendsData(string[] firends)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S100";
@@ -381,7 +441,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.LoadFriendsData(firends);
+                playerData = playerDataLogic.LoadFriendsData(firends.ToList());
             }
             catch (Exception e)
             {
@@ -391,5 +451,25 @@ namespace MPCOM
             return TextUtility.SerializeToStream(playerData);
         }
         #endregion
+
+
+        public byte[] RemoveFriend(string account,string friend)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.RemoveFriend(account,friend);
+            }
+            catch
+            {
+                playerData.ReturnCode = "(UI)S499";
+                playerData.ReturnMessage = "玩家資料未知例外情況！";
+            }
+            return TextUtility.SerializeToStream(playerData);
+        }
     }
 }

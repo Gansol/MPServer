@@ -21,21 +21,24 @@
     {
         ItemID = 0,
         ItemCount,
-        ItemType ,
+        ItemType,
         IsEquip,
-        UseCount ,
+        UseCount,
         Rank,
         Exp,
     }
 
     public enum PlayerDataOperationCode
     {
-        LoadPlayer = 121,          // 載入玩家資料
-        UpdatePlayer = 122,        // 更新玩家資料
-        UpdateMice = 123,        // 更新老鼠資料
-        LoadItem = 124,          // 載入道具資料
-        UpdateItem = 125,        // 更新道具資料
-        SortItem = 126,          // 排序道具資料
+        LoadPlayer = 121,       // 載入玩家資料
+        UpdatePlayer = 122,     // 更新玩家資料
+        UpdateMice = 123,       // 更新老鼠資料
+        LoadItem = 124,         // 載入道具資料
+        UpdateItem = 125,       // 更新道具資料
+        SortItem = 126,         // 排序道具資料
+        InviteFriend = 127,     // 邀請好友
+        ApplyInviteFriend = 128,// 同意好友邀請
+        RemoveFriend = 129,     // 移除好友
     }
 
     public enum PlayerDataParameterCode
@@ -73,5 +76,8 @@
         LoadedItem = 124,            // 載入道具資料完成
         UpdatedItem = 125,           // 更新道具資料完成
         SortedItem = 126,            // 排序道具資料完成
+        InviteFriend = 127,     // 邀請好友
+        ApplyInviteFriend = 128,// 同意好友邀請
+        RemoveFriend = 129,     // 移除好友
     }
 }

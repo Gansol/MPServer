@@ -8,14 +8,20 @@ using System.Text;
 using Gansol;
 public class AX : MonoBehaviour
 {
+    public GameObject f;
+    public UIInput x;
 
-    void Start()
+    public void SXtart(GameObject go ,UIInput input)
     {
-        List<string> b = new List<string> { "a", "b" };
-        string[] a = new string[] { "a", "b" };
-        String.Join(",", b.ToArray());
-        Debug.Log(String.Join(",", b.ToArray()));
+        f = go;
+        x = input;
+        Debug.Log(go.GetComponent<UIInput>().value);
+        Debug.Log(input.value);
     }
-
+    void Update()
+    {
+        Debug.Log(f.GetComponent<UIInput>().value);
+        Debug.Log(x.value);
+    }
 
 }

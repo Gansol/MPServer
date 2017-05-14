@@ -260,6 +260,93 @@ namespace MPCOM
         }
         #endregion
 
+        #region LoadPlayerData 載入玩家特定欄位資料
+        /// <summary>
+        /// 載入玩家特定欄位資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        [AutoComplete]
+        public PlayerData LoadPlayerData(string account, List<string> columns)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";             //預設值
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                // 把引號'變成''以防止隱碼攻擊
+                //Account = Account.Replace("'", "''");
+                //Password = Password.Replace("'", "''");
+
+                using (SqlConnection sqlConn = new SqlConnection(connectionString))
+                {
+
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
+
+                    // 讀取玩家資料 填入DS資料列
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    char[] charsToTrim = new char[] { ',' };
+                    string selectString = "SELECT ";
+
+                    foreach (string col in columns)
+                    {
+                        selectString += col + ",";
+                    }
+
+                    selectString = selectString.TrimEnd(charsToTrim) + String.Format("  FROM Player_PlayerData WITH(NOLOCK) WHERE Account='{0}'", account);
+
+                    Log.Debug("selectString:" + selectString);
+                    adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
+                    adapter.Fill(DS);
+
+                    // 若有讀到則取得所有資料
+                    if (DS.Tables[0].Rows.Count > 0)
+                    {
+                        Log.Debug("columns.Contains(Friend):" + columns.Contains("Friend"));
+                        if (columns.Contains("PrimaryID")) playerData.PrimaryID = Convert.ToInt32(DS.Tables[0].Rows[0]["PrimaryID"]);
+                        if (columns.Contains("Account")) playerData.Account = Convert.ToString(DS.Tables[0].Rows[0]["Account"]);
+                        if (columns.Contains("Rank")) playerData.Rank = Convert.ToByte(DS.Tables[0].Rows[0]["Rank"]);
+                        if (columns.Contains("EXP")) playerData.Exp = Convert.ToInt16(DS.Tables[0].Rows[0]["EXP"]);
+                        if (columns.Contains("MaxCombo")) playerData.MaxCombo = Convert.ToInt16(DS.Tables[0].Rows[0]["MaxCombo"]);
+                        if (columns.Contains("MaxScore")) playerData.MaxScore = Convert.ToInt32(DS.Tables[0].Rows[0]["MaxScore"]);
+                        if (columns.Contains("SumScore")) playerData.SumScore = Convert.ToInt32(DS.Tables[0].Rows[0]["SumScore"]);
+                        if (columns.Contains("SumLost")) playerData.SumLost = Convert.ToInt32(DS.Tables[0].Rows[0]["SumLost"]);
+                        if (columns.Contains("SumKill")) playerData.SumKill = Convert.ToInt32(DS.Tables[0].Rows[0]["SumKill"]);
+                        if (columns.Contains("SumWin")) playerData.SumWin = Convert.ToInt32(DS.Tables[0].Rows[0]["SumWin"]);
+                        if (columns.Contains("Item")) playerData.PlayerItem = Convert.ToString(DS.Tables[0].Rows[0]["Item"]);
+                        if (columns.Contains("MiceAll")) playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
+                        if (columns.Contains("Team")) playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
+                        if (columns.Contains("Friend")) playerData.Friends = Convert.ToString(DS.Tables[0].Rows[0]["Friend"]);
+                        if (columns.Contains("AccountLevel")) playerData.AccountLevel = Convert.ToByte(DS.Tables[0].Rows[0]["AccountLevel"]);
+
+                        playerData.ReturnCode = "S436"; //true
+                        playerData.ReturnMessage = "取得玩家特定資料成功！";
+                    }
+                    else
+                    {
+                        playerData.ReturnCode = "S437";
+                        playerData.ReturnMessage = "取得玩家道具資料失敗！";
+                    }
+                }
+                return playerData;
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("Load PlayerData Failed ! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+        }
+        #endregion
+
         #region UpdatePlayerData 更新玩家(全部)資料
         [AutoComplete]
         public PlayerData UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend)
@@ -317,6 +404,68 @@ namespace MPCOM
             {
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "取得玩家資料例外情況！";
+                Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
+                throw e;
+            }
+            return playerData;
+        }
+
+        #endregion UpdatePlayerData
+
+        #region UpdatePlayerData 更新玩家(單筆)好友資料
+        /// <summary>
+        /// 更新玩家(好友)資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="friends"></param>
+        /// <returns></returns>
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, List<string> friends)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    SqlCommand sqlCmd = new SqlCommand();
+                    sqlCmd.Connection = sqlConn;
+                    sqlConn.Open();
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Account FROM Player_PlayerData WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.Fill(DS);
+
+                    //Log.Debug("Tables Count: " + DS.Tables[0].Rows.Count);
+
+                    // 如果找到玩家資料
+                    if (DS.Tables[0].Rows.Count == 1)
+                    {
+                        string friend = String.Join(",", friends.ToArray());
+                        string query = @"UPDATE Player_PlayerData WITH(ROWLOCK) SET Friend=@friend WHERE Account=@account ";
+                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@account", account);
+                        command.Parameters.AddWithValue("@friend", friend);
+                        command.ExecuteNonQuery();
+
+                        playerData.ReturnCode = "S434";
+                        playerData.ReturnMessage = "更新好友資料成功！";
+                    }
+                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+                    {
+                        playerData.ReturnCode = "S435";
+                        playerData.ReturnMessage = "更新好友資料失敗！";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "更新好友資料例外情況！";
                 Log.Debug("(IO)UpdatePlayerData failed! " + e.Message + " 於: " + e.StackTrace);
                 throw e;
             }
@@ -683,7 +832,7 @@ namespace MPCOM
                     }
                     if (dictItemUsage.Count == counter) updateString += "end),";
                 }
-                
+
                 counter = 0;
 
                 i++;
@@ -896,7 +1045,7 @@ namespace MPCOM
 
         #region LoadFriendsData 取得朋友資料
         [AutoComplete]
-        public PlayerData LoadFriendsData(List<string> friends)
+        public PlayerData LoadFriendsData(List<string> accounts)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S300";
@@ -913,9 +1062,11 @@ namespace MPCOM
 
                     string selectString = @"SELECT Player_PlayerData.Rank, GansolMember.Nickname,Player_PlayerData.Image FROM Player_PlayerData LEFT JOIN  GansolMember ON GansolMember.Account = Player_PlayerData.Account WHERE "; // unique
 
-                    foreach(string friend in friends)
-                        selectString += "Player_PlayerData.Account = " + friend + " OR ";
+                    foreach (string account in accounts)
+                        selectString += "Player_PlayerData.Account = '" + account + "' OR ";
 
+                    selectString = selectString.Remove(selectString.Length - 3);
+                    Log.Debug("FUCK: " + selectString);
                     adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
                     adapter.Fill(DS);
 
@@ -926,7 +1077,7 @@ namespace MPCOM
 
                         foreach (DataTable table in DS.Tables)
                         {
-                            string itemID = "";
+                            string account = "";
                             Dictionary<string, object> dictFirends = new Dictionary<string, object>();
 
                             foreach (DataRow row in table.Rows)
@@ -935,19 +1086,18 @@ namespace MPCOM
                                 Dictionary<string, object> dictData2 = new Dictionary<string, object>();
                                 foreach (DataColumn col in table.Columns)
                                 {
-                                    if (j == 0) itemID = table.Rows[i][col].ToString();// 0 = itemID
-
+                                    //if(col.ColumnName=="Account")  account = table.Rows[i][col].ToString();// 0 = itemID
                                     dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
                                     j++;
                                 }
-                                dictFirends.Add(itemID, dictData2);
+                                dictFirends.Add(accounts[i], dictData2);
                                 i++;
                             }
                             playerData.Friends = Json.Serialize(dictFirends);
                         }
 
 
-                       playerData.ReturnCode = "S432";
+                        playerData.ReturnCode = "S432";
                         playerData.ReturnMessage = "取得朋友資料成功！";
                     }
                     else
@@ -957,7 +1107,7 @@ namespace MPCOM
                     }
                 }
             }
-            catch 
+            catch
             {
                 playerData.ReturnCode = "S499";
                 playerData.ReturnMessage = "取得朋友資料失敗，未知例外情況！";
@@ -969,6 +1119,6 @@ namespace MPCOM
         #endregion
 
 
-        
+
     }
 }

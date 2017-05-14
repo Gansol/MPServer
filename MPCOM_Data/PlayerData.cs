@@ -23,6 +23,8 @@ namespace MPCOM
         public string ReturnCode; //回傳值
         public string ReturnMessage; //回傳說明文字<30全形字
 
+        public int PrimaryID;
+        public string Account;
         public byte Rank;			// 等級
         public short Exp;			// 經驗
         public Int16 MaxCombo;		// 最大Combo數
@@ -32,19 +34,22 @@ namespace MPCOM
         public int SumKill;		    // 總清除老鼠
         public int SumWin;		    // 總勝場
         public int SumBattle;		// 總場次
+        public string PlayerItem;   // 玩家道具資料
+        public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
+        public string Team;			// 隊伍			＊＊＊類型ＪＳＯＮ＊＊＊＊
+        public string Friends;		// 好友			＊＊＊類型ＪＳＯＮ＊＊＊＊
+        public string PlayerImage;   // 玩家道具資料
+        public byte AccountLevel;
 
         public Int16 ItemID;
         public Int16 ItemCount;
         public byte ItemType;
-
-        public string SortedItem;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除
-        public string MiceAll;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊
-        public string Team;			// 隊伍			＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string MiceAmount;	// 老鼠數量		＊＊＊類型ＪＳＯＮ＊＊＊＊
-        public string Friends;		// 好友			＊＊＊類型ＪＳＯＮ＊＊＊＊
+        public string SortedItem;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除
+
         public string playerProperty;   // 玩家資料
-        public string PlayerItem;   // 玩家道具資料
-        public string PlayerImage;   // 玩家道具資料
+
+
 
 
         /*

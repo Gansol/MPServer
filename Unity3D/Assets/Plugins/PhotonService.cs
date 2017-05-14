@@ -86,7 +86,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event UpdateCurrencyHandler UpdateCurrencyEvent;
 
     //委派事件 ShowMessage
-    public delegate void ShowMessageHandler(string message);
+    public delegate void ShowMessageHandler(string message, Global.MessageBoxType messageBoxType);
     public event ShowMessageHandler ShowMessageEvent;
 
     //委派事件 ShowMessage
@@ -95,8 +95,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event LoadDataHandler LoadStoreDataEvent;
     public event LoadDataHandler LoadPlayerItemEvent;
     public event LoadDataHandler UpdateMiceEvent;
+    public event LoadDataHandler LoadFriendsDataEvent;
+    public event LoadDataHandler ApplyInviteFriendEvent;
+    public event LoadDataHandler RemoveFriendEvent;
 
-    public delegate void ActorStateHandler(string value);
+    public delegate void InviteFriendHandler(string value);
+    public event InviteFriendHandler InviteFriendEvent;
+
+    public delegate void ActorStateHandler();
     public event ActorStateHandler GetOnlineActorStateEvent;
 
     public class PlayerItemData
@@ -179,7 +185,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     void IPhotonPeerListener.DebugReturn(DebugLevel level, string message)
     {
         //Debug.Log("伺服器關閉重啟中！");
-        ShowMessageEvent("伺服器重啟中，等待自動連線！");
+        ShowMessageEvent("伺服器重啟中，等待自動連線！", 0);
         //  throw new NotImplementedException();
     }
 
@@ -192,7 +198,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             // 重複登入
             case (byte)LoginOperationCode.ReLogin:
                 ReLoginEvent();
-                ShowMessageEvent("重複登入，請重新登入！");
+                ShowMessageEvent("重複登入，請重新登入！", 0);
                 break;
 
             // 配對成功 傳入 房間ID、對手資料、老鼠資料
@@ -218,7 +224,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 GameStartEvent();
                 break;
 
-            case (byte)SystemResponseCode.GetOnlineActor:
+            case (byte)MemberResponseCode.GetOnlineActor:
                 Global.OnlineActor = (int)eventResponse.Parameters[(byte)SystemParameterCode.OnlineActors];
                 ActorOnlineEvent();
                 break;
@@ -506,11 +512,17 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>;
                             Global.dictTeam = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
                             Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
-                            Global.dictFriends = ((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend]).Split(',').ToList();
+
+                            string friends = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend];
+                            if (!string.IsNullOrEmpty(friends)) Global.dictFriends = friends.Split(',').ToList();
+
                             Global.PlayerImage = Convert.ToString(operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage]);
                             Global.photonService.LoadCurrency(Global.Account);      // 載入玩家資料時一起載入貨幣資料
                             //Debug.Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!Team"+Global.dictTeam.Count);
                             //Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
+
+
+
                             Global.isPlayerDataLoaded = true;
                             LoadPlayerDataEvent();
 
@@ -583,15 +595,26 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #endregion
 
-            #region LoadFriendsData 載入好友資料
+            #region LoadFriendsDetail 載入好友資料
 
-            case (byte)MemberOperationCode.LoadFriendsData:    // 離開房間
+            case (byte)MemberOperationCode.LoadFriendsDetail:    // 載入好友資料
                 {
                     try
                     {
-                        string firends = (string)operationResponse.Parameters[(byte)MemberParameterCode.Friends];
-                        Global.dictFriendsDetail = Json.Deserialize(firends) as Dictionary<string, object>;
-                        Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
+                        if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
+                        {
+                            if (operationResponse.Parameters.Count > 0)
+                            {
+                                string firends = (string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail];
+                                Global.dictOnlineFriendsDetail = Json.Deserialize(firends) as Dictionary<string, object>;
+                            }
+                            else
+                            {
+                                Global.dictOnlineFriendsDetail.Clear();
+                            }
+                            LoadFriendsDataEvent();
+                        }
+                        //    Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
                     {
@@ -604,13 +627,96 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
             #region GetOnlineActorState 載入玩家狀態
 
-            case (byte)SystemOperationCode.GetOnlineActorState:    // 離開房間
+            case (byte)MemberResponseCode.GetOnlineActorState:    // 離開房間
                 {
                     try
                     {
-                        string jPlayers = (string)operationResponse.Parameters[(byte)MemberParameterCode.Friends];
-                        GetOnlineActorStateEvent(jPlayers);
+                        if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
+                        {
+
+                            if (operationResponse.Parameters.ContainsKey((byte)MemberParameterCode.OnlineFriendsState))
+                                Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
+                            else
+                                Global.dictOnlineFriendsState.Clear();
+                            GetOnlineActorStateEvent();
+                        }
+
                         Debug.Log("GetOnlineActorState 資訊：" + operationResponse.DebugMessage.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region InviteFriend 顯示
+
+            case (byte)PlayerDataResponseCode.InviteFriend:    // 離開房間
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
+                        {
+                            string nickname = (string)operationResponse.Parameters[(byte)MemberParameterCode.Friends];
+                            Global.ShowMessage(nickname + " 想成為你的好友!", Global.MessageBoxType.YesNo);
+                            InviteFriendEvent(nickname);
+                        }
+                        else
+                        {
+                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Default);
+                        }
+                        Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region ApplyInviteFriend 同意好友邀請
+
+            case (byte)PlayerDataResponseCode.ApplyInviteFriend:    // 離開房間
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
+                        {
+                            Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
+                            Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
+                            Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
+                            ApplyInviteFriendEvent();
+                        }
+                        Debug.Log("資訊：" +operationResponse.ReturnCode+" "+ operationResponse.DebugMessage.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region RemoveFriend 移除好友
+
+            case (byte)PlayerDataResponseCode.RemoveFriend:    // 離開房間
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
+                        {
+                            Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
+                            Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
+                            Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
+                            RemoveFriendEvent();
+                        }
+                          Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
                     {
@@ -1021,11 +1127,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>; ;
                             UpdateCurrencyEvent();
-                            ShowMessageEvent("購買完成！");
+                            ShowMessageEvent("購買完成！", 0);
                         }
                         else
                         {
-                            ShowMessageEvent(operationResponse.DebugMessage);
+                            ShowMessageEvent(operationResponse.DebugMessage, 0);
                             Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
@@ -1110,11 +1216,14 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         Debug.Log("memberType:" + (byte)memberType);
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            if (Global.photonService.isConnected)
+            {
+                Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
                              { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.MemberType, memberType }
                         };
 
-            this.peer.OpCustom((byte)LoginOperationCode.Login, parameter, true, 0, true);
+                this.peer.OpCustom((byte)LoginOperationCode.Login, parameter, true, 0, true);
+            }
         }
         catch (Exception e)
         {
@@ -1990,18 +2099,18 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// 傳送房間所有老鼠資料
     /// </summary>
     /// <param name="rate">倍率</param>
-    public void SendRoomMice(int roomID, List<string> roomMice)
+    public void SendRoomMice(int roomID, string[] roomMice)
     {
-        try
-        {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
-            this.peer.OpCustom((byte)BattleOperationCode.SkillBoss, parameter, true, 0, true); // operationCode is RoomSpeak
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        //try
+        //{
+        //    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+        //    { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
+        //    this.peer.OpCustom((byte)BattleOperationCode., parameter, true, 0, true); // operationCode is RoomSpeak
+        //}
+        //catch (Exception e)
+        //{
+        //    throw e;
+        //}
     }
     #endregion
 
@@ -2013,7 +2122,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     {
         try
         {
-            this.peer.OpCustom((byte)SystemOperationCode.GetOnlineActor, null, true, 0, false); // operationCode is RoomSpeak
+            this.peer.OpCustom((byte)MemberOperationCode.GetOnlineActor, null, true, 0, false); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {
@@ -2026,13 +2135,12 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <summary>
     /// 取得好友資料
     /// </summary>
-    public void LoadFriendsData(List<string> firends)
+    public void LoadFriendsData(string[] firends)
     {
         try
         {
-            List<string> a = new List<string> { "b" };
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, a } };
-            this.peer.OpCustom((byte)MemberOperationCode.LoadFriendsData, parameter, true, 0, true); // operationCode is RoomSpeak
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, firends } };
+            this.peer.OpCustom((byte)MemberOperationCode.LoadFriendsDetail, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch
         {
@@ -2040,21 +2148,17 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         }
     }
     #endregion
-
 
     #region LoadActorsState 取得玩家狀態
     /// <summary>
     /// 取得玩家狀態
     /// </summary>
     /// <param name="players">玩家們(null=全部)</param>
-    public void GetOnlineActorState(List<string> players)
+    public void GetOnlineActorState(string[] players)
     {
         try
         {
-            if (players.Count != 0)
-                this.peer.OpCustom((byte)SystemOperationCode.GetOnlineActorState, new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, players } }, true, 0, false); // operationCode is RoomSpeak
-            else
-                Debug.LogError("沒有玩家資料!");
+                this.peer.OpCustom((byte)MemberOperationCode.GetOnlineActorState, new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, players } }, true, 0, false); // operationCode is RoomSpeak
         }
         catch
         {
@@ -2062,4 +2166,62 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         }
     }
     #endregion
+
+    #region InviteFriend 邀請好友
+    /// <summary>
+    /// 邀請好友
+    /// </summary>
+    /// <param name="friend">玩家暱稱或帳號</param>
+    public void InviteFriend(string friend)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(friend))
+                this.peer.OpCustom((byte)PlayerDataOperationCode.InviteFriend, new Dictionary<byte, object> { { (byte)PlayerDataParameterCode.Account, Global.Account }, { (byte)PlayerDataParameterCode.Friend, friend } }, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch
+        {
+            throw;
+        }
+    }
+    #endregion
+
+    #region RemoveFriend 移除好友
+    /// <summary>
+    /// 移除好友
+    /// </summary>
+    /// <param name="friend">玩家暱稱或帳號</param>
+    public void ApplyInviteFriend(string friend)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(friend))
+                this.peer.OpCustom((byte)PlayerDataOperationCode.ApplyInviteFriend, new Dictionary<byte, object> { { (byte)PlayerDataParameterCode.Account, Global.Account }, { (byte)PlayerDataParameterCode.Friend, friend } }, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch
+        {
+            throw;
+        }
+    }
+    #endregion
+
+    #region RemoveFriend 移除好友
+    /// <summary>
+    /// 移除好友
+    /// </summary>
+    /// <param name="friend">玩家暱稱或帳號</param>
+    public void RemoveFriend(string friend)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(friend))
+                this.peer.OpCustom((byte)PlayerDataOperationCode.RemoveFriend, new Dictionary<byte, object> { { (byte)PlayerDataParameterCode.Account, Global.Account }, { (byte)PlayerDataParameterCode.Friend, friend } }, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch
+        {
+            throw;
+        }
+    }
+    #endregion
+
 }

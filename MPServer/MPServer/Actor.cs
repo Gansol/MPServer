@@ -14,7 +14,7 @@ namespace MPServer
 
         public DateTime LoginTime { get; set; }         // 登入時間
         public string LoginStatus { get; set; }         // 登入狀態 0:登出  1:登入
-        public int GameStatus { get; set; }             // 目前狀態 0:閒置  1:遊戲中
+        public int GameStatus =(byte) MPProtocol.ENUM_MemberState.Offline;             // 目前狀態 0:閒置  1:遊戲中
 
         public Actor(Guid guid, int primaryID, string account, string nickname, byte age, byte sex, string IP)
         {

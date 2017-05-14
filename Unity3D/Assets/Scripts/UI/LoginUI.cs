@@ -184,7 +184,7 @@ public class LoginUI : MonoBehaviour
 
     public void Login(UILabel email, UIInput password)
     {
-        Global.ShowMessage("登入中...");
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChkBtn);
         LoginPanel.SetActive(false);
         isLoginBtn = true;
         Global.Hash = Encrypt(password.value);
@@ -374,7 +374,7 @@ public class LoginUI : MonoBehaviour
         {
             //  ShowMatchGame();
             LoginPanel.SetActive(false);
-            Global.ShowMessage("登入成功！");
+            Global.ShowMessage("登入成功！", Global.MessageBoxType.Default);
             EventMaskSwitch.PrevToFirst();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
@@ -384,7 +384,7 @@ public class LoginUI : MonoBehaviour
             isLoginBtn = false;
             LoginPanel.SetActive(true);
             LoginMessageBox.gameObject.SetActive(true);
-            Global.ShowMessage(message);
+            Global.ShowMessage(message, Global.MessageBoxType.Default);
             LoginMessageBox.color = Color.red;
             LoginMessageBox.text = "X  " + message;
         }
@@ -418,7 +418,7 @@ public class LoginUI : MonoBehaviour
 
         if (!isLoginBtn)
         {
-            Global.ShowMessage("登入中...");
+            Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
             LoginPanel.SetActive(false);
             Debug.Log("Google Logining...");
             isLoginBtn = true;
@@ -434,7 +434,7 @@ public class LoginUI : MonoBehaviour
 
                     Global.MemberType = MemberType.Google;
                     Debug.Log(Global.Account);
-                   
+
 
                     // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
                     Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
@@ -448,7 +448,7 @@ public class LoginUI : MonoBehaviour
                     //if (String.IsNullOrEmpty(email))
                     //    email = "example@example.com";
 
-                    Global.ShowMessage("登入中...");
+                    Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
                     Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
                 }
                 else
@@ -539,7 +539,7 @@ public class LoginUI : MonoBehaviour
         }
 
         LoginPanel.SetActive(false);
-        Global.ShowMessage("登入中...");
+        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
     }
     #endregion
 
@@ -568,7 +568,7 @@ public class LoginUI : MonoBehaviour
     // 加入會員後 再度取得資料並登入
     void OnGetProfile()
     {
-        Global.ShowMessage("登入中...");
+        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
         LoginPanel.SetActive(false);
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)
@@ -590,14 +590,14 @@ public class LoginUI : MonoBehaviour
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
-                       // string tmpPD = "12345678";
+                        // string tmpPD = "12345678";
                         Global.Account = account;
                         Global.Hash = Encrypt(Global.Account);
                         Global.MemberType = MemberType.Facebook;
                         Global.photonService.JoinMember(email, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
-                    catch 
+                    catch
                     {
                         throw;
                     }

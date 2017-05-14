@@ -13,7 +13,7 @@ public static class Global
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
-  "/DevList/";//  "/AndroidList/";   
+ "/DevList/";//  "/AndroidList/";   
 #elif UNITY_IPHONE
     "/iOSList/";
 #elif UNITY_STANDALONE_WIN
@@ -60,17 +60,17 @@ public static class Global
 
     public static string dataPath =
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-    Application.dataPath + "/StreamingAssets";
+ Application.dataPath + "/StreamingAssets";
 #elif UNITY_ANDROID
     "jar:file://" + Application.dataPath + "!/assets/";
 #elif UNITY_IPHONE  || UNITY_IOS
     Application.dataPath + "/Raw";
 #endif
-                                                                                                       
+
     public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務
 
-    public delegate void ShowMessageHandler(string message);
+    public delegate void ShowMessageHandler(string message, MessageBoxType messageBoxType);
     public static event ShowMessageHandler ShowMessageEvent;
 
     public static readonly string itemListFile = "ItemList.json";          // 道具列表
@@ -146,8 +146,9 @@ public static class Global
     public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
     public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料
     public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();                       // 隊伍老鼠 JSON資料
-    public static List<string> dictFriends = new List<string>();                                            // 好友列表 List資料
-    public static Dictionary<string, object> dictFriendsDetail = new Dictionary<string, object>();                    // 好友詳細列表 JSON資料
+    public static List<string> dictFriends = new List<string>();                                                                        // 好友列表 List資料
+    public static Dictionary<string, object> dictOnlineFriendsDetail = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
+    public static Dictionary<string, object> dictOnlineFriendsState = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
     public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();                     // 技能列表 JSON資料
     public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();                   // 老鼠屬性資料 
     public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();                   // 道具屬性資料 
@@ -162,10 +163,18 @@ public static class Global
 
     public static string ext = ".unity3d";       // AB副檔名
 
-    public static void ShowMessage(string message)
+    public enum MessageBoxType
     {
-        ShowMessageEvent(message);
+        NonChkBtn = -1,
+        Default,
+        YesNo,
     }
+
+    public static void ShowMessage(string message, MessageBoxType messageBoxType)
+    {
+        ShowMessageEvent(message, messageBoxType);
+    }
+
 
     public static class OtherData
     {
@@ -175,7 +184,7 @@ public static class Global
         public static byte Sex = 0;              // 性別
         public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
         public static string RoomPlace = "";    // 另一位玩家的房間位置
-        public static string Image="";
+        public static string Image = "";
     }
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
@@ -222,7 +231,7 @@ public static class Global
         MainCamera,
         HUDCamera,
     }
-    
+
     public static void RenameKey<TKey, TValue>(this IDictionary<TKey, TValue> dic,
                                   TKey fromKey, TKey toKey)
     {
@@ -277,5 +286,5 @@ public static class Global
         return stopwatch.Elapsed;
     }
 
-    
+
 }

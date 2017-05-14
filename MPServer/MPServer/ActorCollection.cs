@@ -155,7 +155,7 @@ namespace MPServer
                         if (!MemberTypeGetPrimary.ContainsKey(PrimaryID) && memberType == (byte)MemberType.Bot)  // 若會員帳號暱稱索引會員編號列表沒有資料，加入索引
                             MemberTypeGetPrimary.Add(PrimaryID, memberType);
 
-                        Log.Debug("MemberTypeGetPrimary:" + MemberTypeGetPrimary.Count + "PrimaryID: " + PrimaryID+ "  memberType: " + memberType);
+                        Log.Debug("MemberTypeGetPrimary:" + MemberTypeGetPrimary.Count + "PrimaryID: " + PrimaryID + "  memberType: " + memberType);
                         actorReturn.ReturnCode = "S301";                     // 加入線上會員資料成功
                         actorReturn.DebugMessage = "";
 
@@ -318,7 +318,8 @@ namespace MPServer
 
         public void RemoveConnectedPeer(Guid guid)                          // 移除連接的Peer
         {
-            ConnectedClients.Remove(guid);
+            if (guid != null)
+                ConnectedClients.Remove(guid);
         }
 
         /// <summary>
@@ -460,9 +461,9 @@ namespace MPServer
             {
                 foreach (KeyValuePair<int, byte> item in MemberTypeGetPrimary)
                 {
-                    Log.Debug("In Fuck: " + memberType +" KEY: "+item.Key+" Value: "+item.Value);
+                    Log.Debug("In Fuck: " + memberType + " KEY: " + item.Key + " Value: " + item.Value);
                 }
-                
+
                 return null; //找不到
             }
             else

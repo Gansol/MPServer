@@ -4,6 +4,7 @@ using System.EnterpriseServices;
 using MiniJSON;
 using ExitGames.Logging;
 using MPProtocol;
+using System.Linq;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -67,6 +68,32 @@ namespace MPCOM
             return playerData;
         }
 
+        #endregion
+
+        #region LoadPlayerData 載入特定欄位資料
+        /// <summary>
+        /// 載入特定欄位資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        public PlayerData LoadPlayerData(string account, List<string> columns)
+        {
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //to do check 
+                PlayerDataIO playerDataIO = new PlayerDataIO();
+                playerData = playerDataIO.LoadPlayerData(account, columns);
+            }
+            catch
+            {
+                throw;
+            }
+            return playerData;
+        } 
         #endregion
 
         #region LoadPlayerItem 載入玩家道具(單筆)資料
@@ -264,11 +291,46 @@ namespace MPCOM
 
         #endregion
 
+        #region UpdatePlayerData 更新玩家(好友)資料
+        [AutoComplete]
+        public PlayerData UpdatePlayerData(string account, string friend)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            //如果驗證成功 寫入玩家資料
+            PlayerDataIO playerDataIO = new PlayerDataIO();
+            playerData = playerDataIO.LoadPlayerData(account, new List<string> { "Friend" });
+
+            if (playerData.ReturnCode == "S436")
+            {
+                // 如果改為暱稱為玩家索引時啟動
+                //if (account == friend)
+                //{
+                //    playerData.ReturnCode = "S438";
+                //    playerData.ReturnMessage = "不能加自己為好友！";
+                //}
+                //else
+                    if (playerData.Friends.Contains(friend))
+                {
+                    playerData.ReturnCode = "S439";
+                    playerData.ReturnMessage = "已加入好友！";
+                }
+                else
+                {
+                    playerData.Friends = (playerData.Friends + "," + friend).TrimStart(',');
+                    playerData = playerDataIO.UpdatePlayerData(account, playerData.Friends.Split(',').ToList());
+                }
+            }
+            return playerData;
+        }
+        #endregion
+
         #region UpdatePlayerData 更新玩家(圖片)資料
         [AutoComplete]
         public PlayerData UpdatePlayerData(string account, object imageName)
         {
-
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
             playerData.ReturnMessage = "";
@@ -318,59 +380,15 @@ namespace MPCOM
                         playerData.ReturnMessage = "隊伍老鼠異常！";
                     }
 
-                    /*
-                    clinetData = MiniJSON.Json.Deserialize(miceAmount) as Dictionary<string, object>;
-                    serverData = MiniJSON.Json.Deserialize(playerData.MiceAmount) as Dictionary<string, object>;
-
-                    //如果與伺服器資料 數量不相同
-                    if (serverData.Count == clinetData.Count)
-                    {
-                        foreach (KeyValuePair<string, object> serverMice in serverData)
-                        {
-                            if (serverMice.Value != clinetData[serverMice.Key])
-                            {
-                                playerData.ReturnCode = "S414";
-                                playerData.ReturnMessage = "老鼠數量異常！";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        playerData.ReturnCode = "S414";
-                        playerData.ReturnMessage = "老鼠數量異常！";
-                    }
-                    */
-                    /*
-                    clinetData = MiniJSON.Json.Deserialize(item) as Dictionary<string, object>;
-                    serverData = MiniJSON.Json.Deserialize(playerData.Item) as Dictionary<string, object>;
-
-                    //如果與伺服器資料 數量不相同
-                    if (serverData.Count == clinetData.Count)
-                    {
-                        foreach (KeyValuePair<string, object> serverItem in serverData)
-                        {
-                            if (serverItem.Value != clinetData[serverItem.Key])
-                            {
-                                playerData.ReturnCode = "S419";
-                                playerData.ReturnMessage = "道具數量異常！";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        playerData.ReturnCode = "S419";
-                        playerData.ReturnMessage = "道具數量異常！";
-                    }
-                    */
                     //如果驗證成功 寫入玩家資料
                     PlayerDataIO playerDataIO = new PlayerDataIO();
                     playerData = playerDataIO.UpdatePlayerData(account, miceAll, team);
                 }
 
             }
-            catch (Exception e)
+            catch
             {
-                throw e;
+                throw ;
             }
 
             return playerData;
@@ -489,7 +507,7 @@ namespace MPCOM
                     playerData.SumKill += killMice;
                     playerData.SumBattle += 1;
                     playerData.SumWin += battleResult > 0 ? 1 : 0;
-                   // Log.Debug("Clac Exp:" + ClacExp(Math.Min(playerData.Rank + 1,100)));
+                    // Log.Debug("Clac Exp:" + ClacExp(Math.Min(playerData.Rank + 1,100)));
                     if (playerData.Rank < maxRank && playerData.Rank > 0)
                     {
                         if (playerData.Exp + exp >= ClacExp(playerData.Rank + 1)) // +1 是因為要找下一等所需經驗值
@@ -749,6 +767,58 @@ namespace MPCOM
 
 
 
+        #region UpdatePlayerData 更新玩家(Team)資料
+
+        [AutoComplete]
+        public PlayerData RemoveFriend(string account,string friend)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(Logic)S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                //載入伺服器玩家資料提供比對
+                playerData = LoadPlayerData(account);
+
+                if (playerData.ReturnCode == "S401")
+                {
+                    List<string> friends = playerData.Friends.Split(',').ToList();
+
+
+                    if (friends.Contains(friend) && account != friend)
+                    {
+                        friends.Remove(friend);
+
+                        PlayerDataIO playerIO = new PlayerDataIO();
+                        playerData = playerIO.UpdatePlayerData(account, friends);
+                        playerData.ReturnCode = "S440";
+                        playerData.ReturnMessage = "刪除好友成功！";
+                        return playerData;
+                    }
+                    else
+                    {
+                        Log.Debug(friend + "  " + account);
+                        playerData.ReturnCode = "S441";
+                        playerData.ReturnMessage = "刪除好友失敗，不在好友列表！";
+                        return playerData;
+                    }
+                }
+
+            }
+            catch
+            {
+                throw;
+            }
+
+            return playerData;
+
+        }
+        #endregion
+
+
+
+
 
 
 
@@ -945,11 +1015,11 @@ namespace MPCOM
 
             if (level % 5 == 0)
             {
-                exp += Math.Pow(level+1, 2) * 0.02f;
+                exp += Math.Pow(level + 1, 2) * 0.02f;
             }
             else if (level % 5 == 1)
             {
-                exp -= Math.Pow(level+1, 2) * 0.02f;
+                exp -= Math.Pow(level + 1, 2) * 0.02f;
             }
             exp += defaultValue;
 

@@ -4,7 +4,7 @@
     {
         MatchGame = 31,             // 配對遊戲
         JoinRoom = 32,              // 加入房間
-        QuitRoom = 33,              // 離開房間
+        QuitRoom = 33,              // 離開房間 可以砍了
         ExitWaiting = 35,           // 離開等待房間
         SyncGameStart = 36,         // 遊戲載入完成
         MatchGameBot = 37,          // Bot配對
@@ -25,7 +25,6 @@
     public enum MatchGameParameterCode
     {
         PrimaryID,                  // 主索引
-        Account,                    // 帳號
         RoomID,                     // 房間ID
         Nickname,                   // 暱稱
         Team,                       // 隊伍資料
@@ -34,5 +33,6 @@
         GameTime,                   // 遊戲時間
         OtherAccount,               // 對手帳號
         OtherTeam,                  // 對手隊伍
+        Account,                    // 帳號
     }
 }
