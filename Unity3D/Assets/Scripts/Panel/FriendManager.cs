@@ -17,6 +17,8 @@ public class FriendManager : MPPanel
     private string _selectPlayerNickname;
     private List<string> _tmpFriends;
     private Vector2 itemPos;
+    private GameObject _lastMsgPanel;
+
     void Awake()
     {
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
@@ -56,9 +58,9 @@ public class FriendManager : MPPanel
     public override void OnLoading()
     {
         Global.photonService.LoadPlayerData(Global.Account);
-            Global.photonService.LoadFriendsData(Global.dictFriends.ToArray());
-            Global.photonService.GetOnlineActorState(Global.dictFriends.ToArray());
-        if(_bFirstLoad)
+        Global.photonService.LoadFriendsData(Global.dictFriends.ToArray());
+        Global.photonService.GetOnlineActorState(Global.dictFriends.ToArray());
+        if (_bFirstLoad)
             Global.photonService.LoadMiceData();
     }
 
@@ -126,9 +128,9 @@ public class FriendManager : MPPanel
             int i = 0;
             _bRemoveFriend = true;
 
-            foreach (string friend in Global.dictFriends)
+            foreach (string friend in _tmpFriends)
             {
-                if (!_tmpFriends.Contains(friend)) buffer.Add(friend);
+                if (!Global.dictFriends.Contains(friend)) buffer.Add(friend);
             }
 
             foreach (string removeName in buffer)
@@ -149,7 +151,7 @@ public class FriendManager : MPPanel
                 detail.TryGetValue("Nickname", out nickname);
                 detail.TryGetValue("Image", out imageName);
                 if (itemPanel.childCount != 0)
-                    LoadFriendData(rank.ToString(), nickname.ToString(), itemPanel.GetChild(i));
+                    LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), itemPanel.GetChild(i));
                 i++;
             }
         }
@@ -158,10 +160,10 @@ public class FriendManager : MPPanel
     }
 
 
-    private GameObject InstantiateItem(string nickname, Vector2 offset)
+    private GameObject InstantiateItem(Vector2 offset)
     {
         GameObject bundle = assetLoader.GetAsset(slotItemName);
-        GameObject item = objFactory.Instantiate(bundle, itemPanel, nickname, offset, Vector2.one, Vector2.zero, -1);
+        GameObject item = objFactory.Instantiate(bundle, itemPanel, slotItemName, offset, Vector2.one, Vector2.zero, -1);
         UIEventListener.Get(item).onClick = SelectPlayer;
         return item;
     }
@@ -209,8 +211,9 @@ public class FriendManager : MPPanel
 
     }
 
-    private void LoadFriendData(string rank, string nickname, Transform friendItemSlot)
+    private void LoadFriendData(string account, string rank, string nickname, Transform friendItemSlot)
     {
+        friendItemSlot.name = account;
         friendItemSlot.Find("Rank").GetComponent<UILabel>().text = rank;
         friendItemSlot.Find("NickName").GetComponent<UILabel>().text = nickname;
     }
@@ -262,9 +265,9 @@ public class FriendManager : MPPanel
         detail.TryGetValue("Rank", out rank);
         detail.TryGetValue("Nickname", out nickname);
         detail.TryGetValue("Image", out imageName);
-        GameObject friendItemSlot = InstantiateItem(account, itemPos);
+        GameObject friendItemSlot = InstantiateItem(itemPos);
         InstantiateICON(imageName.ToString(), friendItemSlot.transform);
-        LoadFriendData(rank.ToString(), nickname.ToString(), friendItemSlot.transform);
+        LoadFriendData(account, rank.ToString(), nickname.ToString(), friendItemSlot.transform);
         itemPos.y += offset.y;
     }
 
@@ -279,6 +282,11 @@ public class FriendManager : MPPanel
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         // EventMaskSwitch.Prev();
     }
+    public void OnPrev(GameObject obj)
+    {
+        _lastMsgPanel.SetActive(false);
+        EventMaskSwitch.Prev(1);
+    }
 
     public void SelectPlayer(GameObject player)
     {
@@ -287,6 +295,7 @@ public class FriendManager : MPPanel
 
     public void ShowInviteFirend(GameObject message)
     {
+        _lastMsgPanel = message;
         message.SetActive(true);
         EventMaskSwitch.Switch(message, true);
     }
@@ -319,5 +328,11 @@ public class FriendManager : MPPanel
             Global.photonService.RemoveFriend(_selectPlayerNickname);
             _selectPlayerNickname = null;
         }
+    }
+
+    void OnDisable()
+    {
+        if (_lastMsgPanel != null)
+            _lastMsgPanel.SetActive(false);
     }
 }

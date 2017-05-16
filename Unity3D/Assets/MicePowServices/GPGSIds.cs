@@ -25,6 +25,7 @@ namespace MicePowServices
 {
 public static class GPGSIds
 {
+        public const string leaderboard_micepow = "CgkI--HZitcEEAIQBg"; // <GPGSID>
         public const string achievement_ = "CgkI--HZitcEEAIQBQ"; // <GPGSID>
         public const string achievement_micepow = "CgkI--HZitcEEAIQAQ"; // <GPGSID>
 

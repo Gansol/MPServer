@@ -692,7 +692,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             ApplyInviteFriendEvent();
                         }
-                        Debug.Log("資訊：" +operationResponse.ReturnCode+" "+ operationResponse.DebugMessage.ToString());
+                        Debug.Log("資訊：" + operationResponse.ReturnCode + " " + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
                     {
@@ -716,7 +716,11 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             RemoveFriendEvent();
                         }
-                          Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
+                        else
+                        {
+                            Global.ShowMessage(operationResponse.DebugMessage, 0);
+                        }
+                        Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
                     {
@@ -2158,7 +2162,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     {
         try
         {
-                this.peer.OpCustom((byte)MemberOperationCode.GetOnlineActorState, new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, players } }, true, 0, false); // operationCode is RoomSpeak
+            this.peer.OpCustom((byte)MemberOperationCode.GetOnlineActorState, new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, players } }, true, 0, false); // operationCode is RoomSpeak
         }
         catch
         {

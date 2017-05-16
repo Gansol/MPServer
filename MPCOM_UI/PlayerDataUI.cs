@@ -430,9 +430,9 @@ namespace MPCOM
         /// <summary>
         /// 取得朋友資料
         /// </summary>
-        /// <param name="sFriends">朋友們</param>
+        /// <param name="accounts">朋友們的帳號</param>
         /// <returns></returns>
-        public byte[] LoadFriendsData(string[] firends)
+        public byte[] LoadFriendsData(string[] accounts)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S100";
@@ -441,7 +441,7 @@ namespace MPCOM
             try
             {
                 PlayerDataLogic playerDataLogic = new PlayerDataLogic();
-                playerData = playerDataLogic.LoadFriendsData(firends.ToList());
+                playerData = playerDataLogic.LoadFriendsData(accounts.ToList());
             }
             catch (Exception e)
             {

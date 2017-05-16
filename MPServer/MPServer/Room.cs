@@ -409,11 +409,11 @@ namespace MPServer
         /// <param name="roomID"></param>
         /// <param name="myPrimaryID"></param>
         /// <returns></returns>
-        public RoomActor GetWaitingPlayer(int roomID, int primaryID)
+        public RoomActor GetWaitingPlayer(/*int roomID,*/ int primaryID)
         {
             if (_dictWaitingRoomList.Count > 0) // 是否有遊戲中房間
             {
-                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[roomID]) //用RoomID找特定遊戲中房間的玩家
+                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[1]) //用RoomID找特定遊戲中房間的玩家
                 {
                     if (item.Value.PrimaryID != primaryID) //假如不等於自己的主索引就是另一位玩家
                     {

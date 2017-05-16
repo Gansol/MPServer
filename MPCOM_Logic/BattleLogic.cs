@@ -579,7 +579,8 @@ namespace MPCOM
                 //  Log.Debug("jStringMiceData:" + jStringMiceData);
                 Dictionary<string, object> dictClientMiceData, dictClientItemData = new Dictionary<string, object>();
                 dictClientMiceData = MiniJSON.Json.Deserialize(jMicesUseCount) as Dictionary<string, object>;
-                dictClientItemData = MiniJSON.Json.Deserialize(jItemsUseCount) as Dictionary<string, object>;
+                //if (!string.IsNullOrEmpty(jItemsUseCount)) // 評審後改回 錯誤
+                //dictClientItemData = MiniJSON.Json.Deserialize(jItemsUseCount) as Dictionary<string, object>;
                 // Log.Debug("jStringMiceData:" + dictClientMiceData.Count);
                 Dictionary<string, Dictionary<string, object>> result = new Dictionary<string, Dictionary<string, object>>();
                 lostRate = GetLostRate(lostMice, spawnCount);
@@ -832,7 +833,11 @@ namespace MPCOM
                 dictServerData = MiniJSON.Json.Deserialize(playerData.PlayerItem) as Dictionary<string, object>;
 
                 List<string> clientMiceKeys = new List<string>(dictClientMiceData.Keys);
-                List<string> clientItemKeys = new List<string>(dictClientItemData.Keys);
+                //
+                List<string> clientItemKeys = new List<string>();
+                if (dictClientItemData.Count != 0) //評審改回
+                { clientItemKeys = new List<string>(dictClientItemData.Keys); }
+               // List<string> clientItemKeys = new List<string>(dictClientItemData.Keys);
                 Dictionary<string, object> prop = new Dictionary<string, object>();
 
                 #region 計算老鼠經驗等級用量
@@ -882,39 +887,31 @@ namespace MPCOM
 
                 }
                 #endregion
-
-                foreach (string key in clientItemKeys)
+                if (dictClientItemData.Count != 0)
                 {
-                    if (dictServerData.ContainsKey(key))    // itemID = itemID
+                    foreach (string key in clientItemKeys)
                     {
-                        dictServerData.TryGetValue(key, out data);  // 取出道具資料
-                        Dictionary<string, object> outServerItemData = data as Dictionary<string, object>;
-
-                        if (outServerItemData.TryGetValue(PlayerItem.ItemCount.ToString(), out sItemCount))
+                        if (dictServerData.ContainsKey(key))    // itemID = itemID
                         {
-                            if (outServerItemData.TryGetValue(PlayerItem.UseCount.ToString(), out sItemUseCount))
-                            {
-                                dictClientItemData.TryGetValue(key, out outClientData);
+                            dictServerData.TryGetValue(key, out data);  // 取出道具資料
+                            Dictionary<string, object> outServerItemData = data as Dictionary<string, object>;
 
-                                prop = outClientData as Dictionary<string, object>;
-                                prop.TryGetValue(PlayerItem.UseCount.ToString(), out cItemUseCount); // 從玩家老鼠資料中取出 使用次數
-                                prop[PlayerItem.UseCount.ToString()] = Convert.ToInt32(sItemUseCount) + Convert.ToInt32(cItemUseCount);// 計算使用量
-                                prop.Add(PlayerItem.ItemCount.ToString(), Convert.ToInt16(sItemCount) - Convert.ToInt16(cItemUseCount));// 計算數量
-                                result.Add(key, prop);
+                            if (outServerItemData.TryGetValue(PlayerItem.ItemCount.ToString(), out sItemCount))
+                            {
+                                if (outServerItemData.TryGetValue(PlayerItem.UseCount.ToString(), out sItemUseCount))
+                                {
+                                    dictClientItemData.TryGetValue(key, out outClientData);
+
+                                    prop = outClientData as Dictionary<string, object>;
+                                    prop.TryGetValue(PlayerItem.UseCount.ToString(), out cItemUseCount); // 從玩家老鼠資料中取出 使用次數
+                                    prop[PlayerItem.UseCount.ToString()] = Convert.ToInt32(sItemUseCount) + Convert.ToInt32(cItemUseCount);// 計算使用量
+                                    prop.Add(PlayerItem.ItemCount.ToString(), Convert.ToInt16(sItemCount) - Convert.ToInt16(cItemUseCount));// 計算數量
+                                    result.Add(key, prop);
+                                }
                             }
                         }
                     }
                 }
-                //Log.Debug("result.Count: " + result.Count);
-
-                //foreach (KeyValuePair<string, Dictionary<string, object>> x in result)
-                //{
-                //    foreach (KeyValuePair<string, object> y in x.Value)
-                //    {
-                //        Log.Debug("result inner.Key: " + y.Key + "  result inner.Key: " + y.Value);
-                //    }
-                //}
-
                 return result;
             }
             catch

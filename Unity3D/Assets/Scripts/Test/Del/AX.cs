@@ -1,27 +1,40 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using MPProtocol;
-using System.Security.Cryptography;
-using System.Text;
-using Gansol;
+using UnityEngine.Advertisements;
+
 public class AX : MonoBehaviour
 {
-    public GameObject f;
-    public UIInput x;
-
-    public void SXtart(GameObject go ,UIInput input)
+    void Awake()
     {
-        f = go;
-        x = input;
-        Debug.Log(go.GetComponent<UIInput>().value);
-        Debug.Log(input.value);
+        Advertisement.Initialize("1416657");
+        ShowRewardedAd();
     }
-    void Update()
+
+    public void ShowRewardedAd()
     {
-        Debug.Log(f.GetComponent<UIInput>().value);
-        Debug.Log(x.value);
+        if (Advertisement.IsReady("video"))
+        {
+            var options = new ShowOptions { resultCallback = HandleShowResult };
+            Advertisement.Show("video", options);
+        }
+    }
+
+    private void HandleShowResult(ShowResult result)
+    {
+        switch (result)
+        {
+            case ShowResult.Finished:
+                Debug.Log("The ad was successfully shown.");
+                //
+                // YOUR CODE TO REWARD THE GAMER
+                // Give coins etc.
+                break;
+            case ShowResult.Skipped:
+                Debug.Log("The ad was skipped before reaching the end.");
+                break;
+            case ShowResult.Failed:
+                Debug.LogError("The ad failed to be shown.");
+                break;
+        }
     }
 
 }

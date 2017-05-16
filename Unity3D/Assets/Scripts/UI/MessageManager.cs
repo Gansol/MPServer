@@ -49,10 +49,10 @@ public class MessageManager : MonoBehaviour
         EventMaskSwitch.Switch(messagePanel.gameObject, true);
     }
 
-    public void OnClosed()
+    public void OnClosed()  //這有錯
     {
         EventMaskSwitch.openedPanel.SetActive(false);
-        EventMaskSwitch.PrevToFirst();
+        EventMaskSwitch.PrevToFirst();//這有錯
         //EventMaskSwitch.Prev();
     }
 

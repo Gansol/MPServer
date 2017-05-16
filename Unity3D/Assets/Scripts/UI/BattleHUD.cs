@@ -55,7 +55,7 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
-        //   assetLoader.LoadPrefab("Panel/", "InvItem");
+        assetLoader.LoadPrefab("Panel/", "InvItem");
         _beautyEnergy = _beautyFever = 0f;
         //_energy = 0d;
         bLoadPrefab = true;

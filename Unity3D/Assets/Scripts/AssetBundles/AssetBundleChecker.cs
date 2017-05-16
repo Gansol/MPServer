@@ -24,7 +24,7 @@ public class AssetBundleChecker : MonoBehaviour
     AssetBundlesDownloader bundleDownloader;
 
     public int downloadCount;           // 下載數量
-    public bool bundleChk;              // 資源檢查
+    public bool bundleChk,bFristLoad;              // 資源檢查
     private string localItemListText;   // 本機 檔案列表內容
     private int reConnTimes = 0;
     #endregion
@@ -156,6 +156,7 @@ public class AssetBundleChecker : MonoBehaviour
 
         if (localItemListText == "{}" || localItemListText == "") //本機檔案 被砍光光了 下載全部檔案
         {
+            bFristLoad = true;
             bundleDownloader.DownloadListFile(Global.fullPackageFile);
         }
         else if ((localItemListText != wwwText))  // 如果 檔案不同 就儲存 進 HashSet 比對資料

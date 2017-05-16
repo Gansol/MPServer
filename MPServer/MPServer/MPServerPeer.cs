@@ -533,7 +533,7 @@ namespace MPServer
                                         actor.GameStatus = (byte)ENUM_MemberState.Matching;
 
                                         Log.Debug("Actor State = " + _server.Actors.GetActorFromGuid(peerGuid).GameStatus);
-                                        Log.Debug("等待房間列表中沒房間 建立等待房間 Create Room !" + "  Count:" + _server.room.dictWaitingRoomList.Count);
+                                        Log.Debug("等待房間列表中沒房間 建立等待房間 Create Room !" + "  Count:" + _server.room.dictWaitingRoomList.Count + " Room ID:" + _server.room.GetRoomFromGuid(peerGuid));
                                     }
                                     else //假如等待列表中有等待配對的房間
                                     {
@@ -543,7 +543,7 @@ namespace MPServer
                                             Room.RoomActor otherRoomActor;
 
                                             roomID = _server.room.GetRoomFromGuid(peerGuid);
-                                            otherRoomActor = _server.room.GetWaitingPlayer(primaryID, roomID);
+                                            otherRoomActor = _server.room.GetWaitingPlayer(primaryID/*, roomID*/);
 
 
                                             PlayerData otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherRoomActor.Account));
@@ -724,7 +724,7 @@ namespace MPServer
                                         Room.RoomActor otherRoomActor;
 
                                         roomID = _server.room.GetRoomFromGuid(peerGuid);
-                                        otherRoomActor = _server.room.GetWaitingPlayer(primaryID, roomID);
+                                        otherRoomActor = _server.room.GetWaitingPlayer(primaryID/*, roomID*/);
 
 
                                         PlayerData otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherRoomActor.Account));
@@ -1903,11 +1903,11 @@ namespace MPServer
                                         if (actor != null) actorState.Add(player, actor.GameStatus);
                                     }
                                 }
-                                    Log.Debug("取得玩家狀態成功!");
-                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.OnlineFriendsState, MiniJSON.Json.Serialize(actorState) } };
-                                    OperationResponse response = new OperationResponse((byte)MemberResponseCode.GetOnlineActorState, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "取得玩家狀態資料成功!" }; ;
-                                    SendOperationResponse(response, new SendParameters());
-                       
+                                Log.Debug("取得玩家狀態成功!");
+                                Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.OnlineFriendsState, MiniJSON.Json.Serialize(actorState) } };
+                                OperationResponse response = new OperationResponse((byte)MemberResponseCode.GetOnlineActorState, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "取得玩家狀態資料成功!" }; ;
+                                SendOperationResponse(response, new SendParameters());
+
                                 break;
                             }
                         #endregion
@@ -2033,38 +2033,109 @@ namespace MPServer
                         case (byte)PlayerDataOperationCode.RemoveFriend:
                             {//目前移除好友 只能在玩家線上時移除
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
-                                string friend = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Friend];
-                                PlayerData otherPlayerData, playerData = new PlayerData();
+                                string friendAccount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Friend];
+                                PlayerData otherPlayerData, playerData;
                                 Dictionary<string, object> actorState = new Dictionary<string, object>();
-                                Actor actor = _server.Actors.GetActorFromAccount(account);
-                                Actor rotherActor = _server.Actors.GetActorFromAccount(friend);
+                                Dictionary<string, object> otherActorState = new Dictionary<string, object>();
+                                Actor actor, otherActor, friendActor;
 
+                                playerData = otherPlayerData = new PlayerData();
+                                actor = _server.Actors.GetActorFromAccount(account);
+                                otherActor = _server.Actors.GetActorFromAccount(friendAccount);
+                                playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Friend" }));
 
-                                if (actor != null)
-                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.RemoveFriend(account, rotherActor.Account));
-                                if (rotherActor != null)
-                                    otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.RemoveFriend(rotherActor.Account, actor.Account));
-
-
-                                if (playerData.ReturnCode == "S440")
+                                if (playerData.ReturnCode == "S436")    //取得好有資料成功
                                 {
-                                    Log.Debug("移除好友成功!");
-                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Frined" }));
+                                    if (actor != null)
+                                        playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.RemoveFriend(account, friendAccount));
 
-                                    if (playerData.ReturnCode == "S401")    //取得好有資料成功
+                                    #region 移除對方版本 關閉則只移除自己
+                                    // 移除對方版本
+                                    if (otherActor != null)    // 如果對放在線上 直接移除
                                     {
-                                        foreach (string player in playerData.Friends.Split(',').ToList())
+                                        MPServerPeer otherPeer = _server.Actors.GetPeerFromGuid(otherActor.guid);
+                                        otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.RemoveFriend(otherActor.Account, actor.Account));
+
+                                        if (otherPlayerData.ReturnCode == "S440")
                                         {
-                                            actor = _server.Actors.GetActorFromAccount(player);
-                                            if (actor != null) actorState.Add(player, actor.GameStatus);
+                                            otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Friend" }));
+                                            if (otherPlayerData.ReturnCode == "S436")
+                                            {
+                                                string[] friends = otherPlayerData.Friends.Split(',').ToArray();
+
+                                                if (!string.IsNullOrEmpty(otherPlayerData.Friends))
+                                                {
+                                                    foreach (string player in friends)
+                                                    {
+                                                        friendActor = _server.Actors.GetActorFromAccount(player);
+                                                        if (friendActor != null && player != friendAccount) otherActorState.Add(player, friendActor.GameStatus);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    otherPlayerData.Friends = "";
+                                                }
+                                                // 取得詳細資料後 互傳給對方自己的資料
+                                                PlayerData friendDetail = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadFriendsData(friends));
+
+                                                
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, otherPlayerData.Friends }, { (byte)MemberParameterCode.OnlineFriendsDetail, friendDetail.Friends }, { (byte)MemberParameterCode.OnlineFriendsState, MiniJSON.Json.Serialize(otherActorState) } };
+                                                OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.RemoveFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = otherPlayerData.ReturnMessage }; ;
+                                                otherPeer.SendOperationResponse(response, new SendParameters());
+                                            }
                                         }
+                                        else
+                                        {
+                                            Log.Debug("ReturnCode:" + playerData.ReturnCode + playerData.ReturnMessage);
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, new Dictionary<byte, object>()) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = "取得好友失敗!" };
+                                            otherPeer.SendOperationResponse(actorResponse, new SendParameters());
+                                        }
+                                    }
+                                    else//如果對方不在線上 找資料並移除
+                                    {
+                                        otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(friendAccount, new string[] { "Friend" }));
+                                        List<string> friends = otherPlayerData.Friends.Split(',').ToList();
+                                        friends.Remove(account);
+                                        playerDataUI.UpdatePlayerData(friendAccount, string.Join(",", friends.ToArray()));
+                                    }
+                                    #endregion
 
-                                        // 取得詳細資料後 互傳給對方自己的資料
-                                        PlayerData friendDetail = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadFriendsData(new string[] { account }));
+                                    if (playerData.ReturnCode == "S440")
+                                    {
+                                        Log.Debug("移除好友成功!  " + playerData.Friends);
+                                        playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Friend" }));
 
-                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, playerData.Friends }, { (byte)MemberParameterCode.OnlineFriendsDetail, friendDetail.Friends }, { (byte)MemberParameterCode.OnlineFriendsState, MiniJSON.Json.Serialize(actorState) } };
-                                        OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.RemoveFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage }; ;
-                                        SendOperationResponse(response, new SendParameters());
+                                        if (playerData.ReturnCode == "S436")    //取得好友資料成功
+                                        {
+                                            string[] friends = playerData.Friends.Split(',').ToArray();
+
+                                            if (!string.IsNullOrEmpty(playerData.Friends))
+                                            {
+                                                foreach (string player in friends)
+                                                {
+                                                    friendActor = _server.Actors.GetActorFromAccount(player);
+                                                    if (friendActor != null) actorState.Add(player, friendActor.GameStatus);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                playerData.Friends = "";
+                                            }
+
+                                            // 取得詳細資料後 互傳給對方自己的資料
+                                            PlayerData friendDetail = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadFriendsData(friends));
+
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, playerData.Friends }, { (byte)MemberParameterCode.OnlineFriendsDetail, friendDetail.Friends }, { (byte)MemberParameterCode.OnlineFriendsState, MiniJSON.Json.Serialize(actorState) } };
+                                            OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.RemoveFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage }; ;
+                                            SendOperationResponse(response, new SendParameters());
+                                        }
+                                        else
+                                        {
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, "" }, { (byte)MemberParameterCode.OnlineFriendsDetail, "" }, { (byte)MemberParameterCode.OnlineFriendsState, "" } };
+                                            OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.RemoveFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage }; ;
+                                            SendOperationResponse(response, new SendParameters());
+                                        }
 
                                     }
                                     else
@@ -2396,7 +2467,12 @@ namespace MPServer
                                     int killMice = (int)operationRequest.Parameters[(byte)PlayerDataParameterCode.SumKill];
                                     string item = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.SortedItem];
                                     string jMicesUseCount = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomValue];
-                                    string jItemsUseCount = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomString];
+                                    object tmp;
+                                    string jItemsUseCount = "";
+                                    if (operationRequest.Parameters.TryGetValue((byte)BattleParameterCode.CustomString, out tmp))
+                                        jItemsUseCount = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomString];
+                                    // 評審後改回
+                                    //string jItemsUseCount = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomString];
                                     string[] columns = ((string[])operationRequest.Parameters[(byte)PlayerDataParameterCode.Columns]);
 
                                     Room.RoomActor otherActor = _server.room.GetOtherPlayer(roomID, primaryID);

@@ -375,7 +375,7 @@ public class LoginUI : MonoBehaviour
             //  ShowMatchGame();
             LoginPanel.SetActive(false);
             Global.ShowMessage("登入成功！", Global.MessageBoxType.Default);
-            EventMaskSwitch.PrevToFirst();
+            //EventMaskSwitch.PrevToFirst();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
         }

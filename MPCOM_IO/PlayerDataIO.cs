@@ -332,17 +332,17 @@ namespace MPCOM
                     else
                     {
                         playerData.ReturnCode = "S437";
-                        playerData.ReturnMessage = "取得玩家道具資料失敗！";
+                        playerData.ReturnMessage = "取得玩家特定資料失敗！";
                     }
                 }
                 return playerData;
             }
-            catch (Exception e)
+            catch 
             {
                 playerData.ReturnCode = "S499";
-                playerData.ReturnMessage = "取得玩家資料例外情況！";
-                Log.Debug("Load PlayerData Failed ! " + e.Message + " 於: " + e.StackTrace);
-                throw e;
+                playerData.ReturnMessage = "取得玩家特定資料例外情況！";
+                Log.Debug("Load PlayerData Failed ! " + playerData.ReturnCode + playerData.ReturnMessage);
+                throw ;
             }
         }
         #endregion

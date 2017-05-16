@@ -1028,7 +1028,7 @@ namespace MPCOM
 
         #region LoadFriendsData 取得朋友資料
         [AutoComplete]
-        public PlayerData LoadFriendsData(List<string> friends)
+        public PlayerData LoadFriendsData(List<string> accounts)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S300";
@@ -1037,7 +1037,7 @@ namespace MPCOM
             {
                 //如果檢查成功 進行會員資料比對
                 PlayerDataIO playerDataIO = new PlayerDataIO();
-                playerData = playerDataIO.LoadFriendsData(friends);
+                playerData = playerDataIO.LoadFriendsData(accounts);
             }
             catch (Exception e)
             {

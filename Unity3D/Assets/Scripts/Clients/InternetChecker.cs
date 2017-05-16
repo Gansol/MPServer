@@ -3,7 +3,7 @@
 public class InternetChecker : MonoBehaviour
 {
     public bool ConnStatus { get { return Global.connStatus; } }
-    private const bool allowCarrierDataNetwork = false;
+    private const bool allowCarrierDataNetwork = true;  // 同意使用 MOBILE 網路
     private const string pingAddress = "8.8.8.8"; // Google Public DNS server
     private const float waitingTime = 2.0f;
 
@@ -15,14 +15,14 @@ public class InternetChecker : MonoBehaviour
         bool internetPossiblyAvailable;
         switch (Application.internetReachability)
         {
-            case NetworkReachability.ReachableViaLocalAreaNetwork:
+            case NetworkReachability.ReachableViaLocalAreaNetwork:      // WIFI or USB NETWORK
                 internetPossiblyAvailable = true;
                 break;
-            case NetworkReachability.ReachableViaCarrierDataNetwork:
+            case NetworkReachability.ReachableViaCarrierDataNetwork:    // MOBILE NETWORK
                 internetPossiblyAvailable = allowCarrierDataNetwork;
                 break;
             default:
-                internetPossiblyAvailable = false;
+                internetPossiblyAvailable = false;                      // 沒網路
                 break;
         }
         if (!internetPossiblyAvailable)
