@@ -1,33 +1,35 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using MiniJSON;
-using System;
+using System.Collections;
 
-public class SkillMice : MonoBehaviour
+public abstract class SkillMice : SkillBase
 {
-
-    bool flag;
-    Dictionary<int, string> team;
-
-    void Start()
+    public SkillMice(SkillAttr skill)
+        : base(skill)
     {
-        flag = true;
-        team = new Dictionary<int, string>();
+    }
+    public override void Initialize()
+    {
+        throw new System.NotImplementedException();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
+    public override void UpdateEffect()
+    {
+        throw new System.NotImplementedException();
     }
 
-    void OnHit()
+    public override void Release()
     {
-        if (flag)
-        {
-            Debug.Log("Click Skill:"+transform.GetChild(0).name);
-            Global.photonService.SendSkill(transform.GetChild(0).name);
-            flag = false;
-        }
+        throw new System.NotImplementedException();
+    }
+
+    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Display()
+    {
+        throw new System.NotImplementedException();
     }
 }

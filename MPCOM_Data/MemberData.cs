@@ -28,5 +28,6 @@ namespace MPCOM
         public byte Age;                         // 年齡
         public byte Sex;                         // 性別
         public string IP;                       // IP
+        public byte MemberType;                  // 帳號類型
     }
 }

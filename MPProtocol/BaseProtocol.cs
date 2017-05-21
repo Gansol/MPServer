@@ -1,10 +1,24 @@
 ﻿namespace MPProtocol
 {
-    public enum OperationCode
+    public enum SystemOperationCode
     {
         //GetRoomInfo = 91,            // 取得單一房間資訊
         //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
+    }
 
+    public enum SystemParameterCode
+    {
+        //GetRoomInfo = 91,            // 取得單一房間資訊
+        //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
+        Ret = 0,
+        OnlineActors,
+        ActorsState,
+    }
+
+    public enum SystemResponseCode
+    {
+        //GetRoomInfo = 91,            // 取得單一房間資訊
+        //GetAllRoomInfo = 92,         // 取得列表中所有房間資訊
     }
 
     public enum ErrorCode
@@ -14,5 +28,6 @@
         InvalidParameter=3,         // 沒有參數
         CustomError=4,              // 自訂錯誤
     }
+
 
 }

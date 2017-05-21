@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ExitGames.Logging;
+using System.Linq;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -27,36 +28,55 @@ namespace MPServer
 
         private static Dictionary<int, Dictionary<Guid, RoomActor>> _dictPlayingRoomList;               // 遊戲中的會員列表
         private static Dictionary<int, Dictionary<Guid, RoomActor>> _dictWaitingRoomList;               // 等待房間中的會員列表
-        private static Dictionary<int, int> _loadedPlayer;                                         // 在房間中，已載入遊戲的玩家數量
+        private static Dictionary<int, Dictionary<Guid, RoomActor>> _dictPrivateRoomList;               // 私人等待房間中的會員列表
+        private static Dictionary<int, Dictionary<int, Guid>> _loadedPlayer;                                         // 在房間中，已載入遊戲的玩家數量
+        /// <summary>
+        /// RoomID,HP 房間內BossHP
+        /// </summary>
         private static Dictionary<int, int> _worldBossHP;                                          // 自己房間中的BOSSHP
-        private static Dictionary<Guid, int> _guidGetRoom;
-        private static int _waitIndex;
-        private static int _roomIndex;                              // ＊＊＊＊＊因為是房間起始值為1 
-        private static int _limit;
-        private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
+        private static Dictionary<Guid, int> _guidGetPlayingRoom;
+        /// <summary>
+        /// 包含等待中的私人房間
+        /// </summary>
+        private static Dictionary<Guid, int> _guidGetWaitingRoom;
+        // private static int _waitIndex;
+        //private static int _roomIndex;                              // ＊＊＊＊＊因為是房間起始值為1 
+        private static readonly int _roomStartIndex = 1;                  // 最大房間數量
+        private static readonly int _maxRoomCount = 100;                  // 最大房間數量
+        private static int _roomPlayerLimit;
+        private static List<int> _roomIndex,_playingRoomIndex;        // 遊戲房間編號
+        //private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
 
 
         //public Dictionary<string, RoomActor> gameRoom;
         public Dictionary<int, Dictionary<Guid, RoomActor>> dictWaitingRoomList { get { return _dictWaitingRoomList; } }
+        public Dictionary<int, Dictionary<Guid, RoomActor>> dictPrivateRoomList { get { return _dictPrivateRoomList; } }
         public Dictionary<int, Dictionary<Guid, RoomActor>> dictPlayingRoomList { get { return _dictPlayingRoomList; } }
-        public int myRoom { get { return _myRoom; } }
-        public int limit { get { return _limit; } }
+        //  public int myRoom { get { return _myRoom; } }
+        public int RoomPlayerLimit { get { return _roomPlayerLimit; } }
         public string roomName { get; set; }
-        public Dictionary<int, int> loadedPlayer { get { return _loadedPlayer; } }
+
+        public enum RoomStatus
+        {
+            Waiting,
+            Loading,
+            Gaming,
+        }
 
         public Room() //init
         {
             _dictWaitingRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
             _dictPlayingRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
-            _loadedPlayer = new Dictionary<int, int>();
+            _dictPrivateRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
+            _loadedPlayer = new Dictionary<int, Dictionary<int, Guid>>();
             _worldBossHP = new Dictionary<int, int>();
-            _guidGetRoom = new Dictionary<Guid, int>();
-
-            _waitIndex = 1;
-            _myRoom = 1;
-            _limit = 2;
-            _roomIndex = 1;
-
+            _guidGetPlayingRoom = new Dictionary<Guid, int>();
+            _guidGetWaitingRoom = new Dictionary<Guid, int>();
+            // _waitIndex = 1;
+            // _myRoom = 1;
+            _roomPlayerLimit = 2;
+            _roomIndex = new List<int>(Enumerable.Range(_roomStartIndex, _maxRoomCount).ToList());
+            _playingRoomIndex = new List<int>();
         }
 
         #region CreateRoom 建立房間
@@ -75,16 +95,59 @@ namespace MPServer
         {
             lock (this)                     // 鎖定程式碼區塊 避免同時間建立同樣的房間
             {
-                if (dictWaitingRoomList.Count == 0) // 限制只有1間房間 需要測後再取消
+                if (_dictWaitingRoomList.Count == 0) // 限制只有1間房間 需要測後再取消
                 {
                     //加入第一間等待房間 並把開房者標示為第一個玩家
-                    dictWaitingRoomList.Add(_waitIndex, new Dictionary<Guid, RoomActor>());
-                    dictWaitingRoomList[_waitIndex].Add(guid, new RoomActor(guid, primaryID, account, nickname, age, sex, IP));
+                    _dictWaitingRoomList.Add(_roomIndex[0], new Dictionary<Guid, RoomActor>());
+                    _dictWaitingRoomList[_roomIndex[0]].Add(guid, new RoomActor(guid, primaryID, account, nickname, age, sex, IP));
+                    _guidGetWaitingRoom.Add(guid, _roomIndex[0]);
+                    Log.Debug("Create Room _roomIndex[0] :" + _roomIndex[0]);
+
+                    _roomIndex.Remove(_roomIndex[0]);
                     //roomName = "GameRoom" + _nameIndex;
                     //_waitIndex++;
                     return true;
                 }
                 return false;
+            }
+        }
+        #endregion
+
+
+
+        #region CreatePrivateRoom 建立好友房間
+        /// <summary>
+        /// 建立房間 返回Bool
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="PrimaryID"></param>
+        /// <param name="Account"></param>
+        /// <param name="Nickname"></param>
+        /// <param name="Age"></param>
+        /// <param name="Sex"></param>
+        /// <param name="IP"></param>
+        /// <returns></returns>
+        public bool CreatePrivateRoom(Guid guid, Guid otherGuid, int primaryID, string account, string nickname, byte age, byte sex, string IP)
+        {
+            lock (this)                     // 鎖定程式碼區塊 避免同時間建立同樣的房間
+            {
+                Log.Debug("GUID 1: " + guid + "    GUID 2: " + otherGuid);
+                foreach (KeyValuePair<int, Dictionary<Guid, RoomActor>> room in _dictPrivateRoomList)
+                {
+                    if (room.Value.ContainsKey(otherGuid))
+                    {
+                        Log.Debug("CreatePrivateRoom 已建立好友房間!");
+                        return false;
+                    }
+                }
+
+                //加入第一間等待房間 並把開房者標示為第一個玩家
+                _dictPrivateRoomList.Add(_roomIndex[0], new Dictionary<Guid, RoomActor>());
+                _dictPrivateRoomList[_roomIndex[0]].Add(guid, new RoomActor(guid, primaryID, account, nickname, age, sex, IP));
+                _guidGetWaitingRoom.Add(guid, _roomIndex[0]);
+                Log.Debug("Create Priavte Room _roomIndex[0] :" + _roomIndex[0]);
+                _roomIndex.Remove(_roomIndex[0]);
+                return true;
             }
         }
         #endregion
@@ -109,25 +172,98 @@ namespace MPServer
             {
                 try
                 {
-                    foreach (KeyValuePair<int, Dictionary<Guid, RoomActor>> item in dictWaitingRoomList)  // 這是用來給很多間房間用的 找遍所有房間
+                    foreach (KeyValuePair<int, Dictionary<Guid, RoomActor>> item in _dictWaitingRoomList)  // 這是用來給很多間房間用的 找遍所有房間
                     {
-                        if (item.Value.Count < limit)   //假如房間沒有滿 加入玩家
+                        if (item.Value.Count < _roomPlayerLimit)   //假如房間沒有滿 加入玩家
                         {
-                            item.Value.Add(guid, new RoomActor(guid, primaryID, account, nickname, age, sex, IP));
+                            RoomActor actor = new RoomActor(guid, primaryID, account, nickname, age, sex, IP);
+                            actor.roomID = item.Key;
+                            item.Value.Add(guid, actor);
 
-                                _dictPlayingRoomList.Add(_roomIndex, item.Value); // 房間ID item.Value=這間房
-                                _myRoom = _roomIndex;
+                            _dictPlayingRoomList.Add(item.Key, item.Value); // 房間ID item.Value=這間房
 
                             foreach (KeyValuePair<Guid, RoomActor> player in item.Value)  // 把這間房間的玩家 加入索引 可以用GUID來取得房間ID
                             {
                                 Log.Debug("Join Player :" + player.Value.Nickname);
-                                _guidGetRoom.Add(player.Value.guid, _myRoom);
+                                _guidGetPlayingRoom.Add(player.Value.guid, item.Key);
+                                _guidGetWaitingRoom.Remove(player.Key);
                             }
-
-                            _roomIndex++;   //建立1號房間後++ 以便建立第2間房
+                            if (_roomIndex.Contains(item.Key)) _roomIndex.Remove(item.Key);
+                            if (!_playingRoomIndex.Contains(item.Key)) _playingRoomIndex.Add(item.Key);
+                            RemoveWaitingRoom(item.Key, guid);  // 可能錯誤 新增的0521 改MatchGameFriend時增加
+                            Log.Debug("in JoinRoom ID:" + item.Key);
                             return true;
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    Log.Debug("找不到房間加入:" + e + "  於程式碼:" + e.StackTrace);
+                }
+                /*
+                if (waitList[waitIndex].Count != 2)
+                {
+                    waitList[waitIndex].Add("RoomActor2", new RoomActor(guid, PrimaryID, Account, Nickname, Age, Sex, IP));
+                    
+                    return true;
+                }
+                */
+                return false;
+            }
+        }
+        #endregion
+
+
+        #region JoinPrivateRoom 加入好友房間
+
+        /// <summary>
+        /// 將玩家加入已經建立的房間 返回Bool
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="primaryID"></param>
+        /// <param name="account"></param>
+        /// <param name="nickname"></param>
+        /// <param name="age"></param>
+        /// <param name="sex"></param>
+        /// <param name="IP"></param>
+        /// <returns></returns>
+        public bool JoinPrivateRoom(Guid guid, Guid otherGuid, int primaryID, string account, string nickname, byte age, byte sex, string IP) //JoinRoom
+        {
+            Log.Debug("in JoinPrivateRoom");
+            lock (this)
+            {
+                try
+                {
+                    Log.Debug("GUID 1: " + guid + "    GUID 2: " + otherGuid);
+                    foreach (KeyValuePair<int, Dictionary<Guid, RoomActor>> item in _dictPrivateRoomList)  // 這是用來給很多間房間用的 找遍所有房間
+                    {
+
+                        if (item.Value.ContainsKey(otherGuid))
+                        {
+                            Log.Debug("JoinPrivateRoom RoomID:" + item.Key);
+
+
+
+                            RoomActor actor = new RoomActor(guid, primaryID, account, nickname, age, sex, IP);
+                            actor.roomID = item.Key;
+                            _dictPrivateRoomList[item.Key].Add(guid, actor);
+
+                            _dictPlayingRoomList.Add(item.Key, item.Value); // 房間ID item.Value=這間房
+
+                            foreach (KeyValuePair<Guid, RoomActor> player in item.Value)  // 把這間房間的玩家 加入索引 可以用GUID來取得房間ID
+                            {
+                                Log.Debug("Join Player :" + player.Value.Nickname);
+                                _guidGetPlayingRoom.Add(player.Value.guid, item.Key);
+                                _guidGetWaitingRoom.Remove(player.Key);
+                            }
+                            if (_roomIndex.Contains(item.Key)) _roomIndex.Remove(item.Key);
+                            if (!_playingRoomIndex.Contains(item.Key)) _playingRoomIndex.Add(item.Key);
+                            RemoveWaitingRoom(item.Key, guid);
+                            Log.Debug("in Join PrivareRoom ID:" + item.Key);
+                            return true;
+                        }
+                    }
+                    return false;
                 }
                 catch (Exception e)
                 {
@@ -151,41 +287,61 @@ namespace MPServer
         /// <summary>
         /// 移除等待房間
         /// </summary>
-        public void RemoveWatingRoom()
+        public void RemoveWaitingRoom(int roomID, Guid guid)
         {
             lock (this)
             {
-                if (_dictWaitingRoomList.Count != 0)    //假如 等待列表中有等代房間
+                if (_dictWaitingRoomList.ContainsKey(roomID))    //假如 等待列表中有等代房間
                 {
-                    _dictWaitingRoomList.Remove(1);  //因為等待列表中只有 1間房
-                    Log.Debug("Waiting Room " + _myRoom + " been removed!");
+                    _dictWaitingRoomList.Remove(roomID);
+                    _guidGetWaitingRoom.Remove(guid);
+                   // _roomIndex.Add(roomID);
+                    _roomIndex.Sort();
+                    Log.Debug("Waiting Room " + roomID + " been removed!");
                     //_waitIndex--;
                 }
-            }
-        }
-        #endregion
 
-        #region RemovePlayingRoom 移除遊戲中房間(使用RoomID)
-        /// <summary>
-        /// 移除遊戲中房間(使用RoomID)
-        /// </summary>
-        /// <param name="roomID"></param>
-        public void RemovePlayingRoom(int roomID)
-        {
-            lock (this)
-            {
-                if (_dictPlayingRoomList.ContainsKey(roomID))     // 假如遊戲中房間找的到
+                if (_dictPrivateRoomList.ContainsKey(roomID))    //假如 等待列表中有等代房間
                 {
-                    _dictPlayingRoomList.Remove(roomID);                              // 這看不懂是啥
-                    Log.Debug("Game Room " + roomID + " been removed!");
-                    _roomIndex--;                                           // 房間移除後 index--
+                    _dictPrivateRoomList.Remove(roomID);
+                    _guidGetWaitingRoom.Remove(guid);
+                    _roomIndex.Add(roomID);
+                    _roomIndex.Sort();
+                    Log.Debug("Private Room " + roomID + " been removed!");
+                    //_waitIndex--;
                 }
 
-                Log.Debug("RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                //if (_dictWaitingRoomList.Count != 0)    //假如 等待列表中有等代房間
+                //{
+                //    _dictWaitingRoomList.Remove(1);  //因為等待列表中只有 1間房
+                //    Log.Debug("Waiting Room " + _myRoom + " been removed!");
+                //    //_waitIndex--;
+                //}
             }
-
         }
         #endregion
+
+        //#region RemovePlayingRoom 移除遊戲中房間(使用RoomID)
+        ///// <summary>
+        ///// 移除遊戲中房間(使用RoomID)
+        ///// </summary>
+        ///// <param name="roomID"></param>
+        //public void RemovePlayingRoom(int roomID)
+        //{
+        //    lock (this)
+        //    {
+        //        if (_dictPlayingRoomList.ContainsKey(roomID))     // 假如遊戲中房間找的到
+        //        {
+        //            _dictPlayingRoomList.Remove(roomID);                              // 這看不懂是啥
+        //            Log.Debug("Game Room " + roomID + " been removed!");
+        //            _roomIndex--;                                           // 房間移除後 index--
+        //        }
+
+        //        Log.Debug("RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+        //    }
+
+        //}
+        //#endregion
 
         #region RemovePlayingRoom 移除遊戲中房間、房間中玩家(房間索引列表) (使用RoomID,GUID player1 GUID player2)
         /// <summary>
@@ -200,43 +356,95 @@ namespace MPServer
             {
                 if (_dictPlayingRoomList.ContainsKey(roomID))
                 {
-                    _dictPlayingRoomList.Remove(roomID);
-                    _guidGetRoom.Remove(player1);
-                    _guidGetRoom.Remove(player2);
                     Log.Debug("Game Room " + roomID + " been removed!");
-                    _roomIndex--;
+                    _dictPlayingRoomList.Remove(roomID);
+                    if (_guidGetPlayingRoom.ContainsKey(player1))
+                        _guidGetPlayingRoom.Remove(player1);
+                    if (_guidGetPlayingRoom.ContainsKey(player2))
+                        _guidGetPlayingRoom.Remove(player2);
+                    _roomIndex.Add(roomID);
+                    _roomIndex.Sort();
                 }
+                else
+                {
+                    if (_guidGetPlayingRoom.ContainsKey(player1))
+                        _guidGetPlayingRoom.Remove(player1);
+                    if (_guidGetPlayingRoom.ContainsKey(player2))
+                        _guidGetPlayingRoom.Remove(player2);
 
-                Log.Debug("RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                    if (!_roomIndex.Contains(roomID))
+                        if (_playingRoomIndex.Contains(roomID))
+                            _roomIndex.Add(roomID);
+
+                  //  Log.Debug("Cant't RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                }
+                _playingRoomIndex.Remove(roomID);
             }
 
         }
         #endregion
 
         #region GameLoaded 同步開始遊戲
-        public void GameLoaded(int roomID, int primaryID)
+        /// <summary>
+        /// 同步開始遊戲
+        /// </summary>
+        /// <param name="roomID"></param>
+        /// <param name="primaryID"></param>
+        /// <param name="guid"></param>
+        public void AddGameLoaded(int roomID, int primaryID, Guid guid)
         {
-            _loadedPlayer.Add(roomID, primaryID);
+            if (!_loadedPlayer.ContainsKey(roomID))
+                _loadedPlayer.Add(roomID, new Dictionary<int, Guid> { { primaryID, guid } });
+            else
+                _loadedPlayer[roomID].Add(primaryID, guid);
         }
         #endregion
 
         #region GetLoadedFromRoom 取得載入遊戲的玩家
         /// <summary>
-        /// 取得載入遊戲的玩家
+        /// 取得房間內已載入遊戲的玩家
         /// </summary>
         /// <param name="roomID"></param>
         /// <returns>回傳是否載入</returns>
-        public bool GetLoadedFromRoom(int roomID)
+        public Dictionary<int, Guid> GetLoadedPlayerFromRoom(int roomID)
         {
-            int primaryID;
-            bool result;
+            if (_loadedPlayer.ContainsKey(roomID))
+                return _loadedPlayer[roomID];
+            else
+                return null;
+        }
+        #endregion
 
-            result = _loadedPlayer.TryGetValue(roomID, out primaryID);
-            if (result)
+        #region GetLoadedFromRoom 取得載入遊戲的玩家
+        /// <summary>
+        /// 取得房間內已載入遊戲的玩家
+        /// </summary>
+        /// <param name="roomID"></param>
+        /// <returns>回傳是否載入</returns>
+        public bool bPlayerLoadedFromRoom(int roomID)
+        {
+            if (_loadedPlayer.ContainsKey(roomID))
+                return true;
+            return false;
+        }
+        #endregion
+
+        #region RemoveLoadedRoom 移除載入中房間及已載入的玩家
+        /// <summary>
+        /// 雙方載入完成時，移除載入中房間
+        /// </summary>
+        /// <param name="roomID"></param>
+        /// <returns></returns>
+        public bool RemoveLoadedRoom(int roomID)
+        {
+
+            if (_loadedPlayer.ContainsKey(roomID))
             {
                 _loadedPlayer.Remove(roomID);
+                Log.Debug("Loaded room has benn remove!" + roomID);
                 return true;
             }
+            Log.Debug("ERROR: room has't benn remove!" + roomID);
             return false;
         }
         #endregion
@@ -246,15 +454,15 @@ namespace MPServer
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>RoomID</returns>
-        public int GetRoomFromGuid(Guid guid)
+        public int GetPlayingRoomFromGuid(Guid guid)
         {
-            if (_guidGetRoom.Count > 0)
+            if (_guidGetPlayingRoom.Count > 0)
             {
                 int roomID;
-                _guidGetRoom.TryGetValue(guid, out roomID);
+                _guidGetPlayingRoom.TryGetValue(guid, out roomID);
                 return roomID;
             }
-            return 0;
+            return -1;
         }
 
         /// <summary>
@@ -262,36 +470,42 @@ namespace MPServer
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>RoomID</returns>
-        public int GetWaitingFromGuid(Guid guid)
+        public int GetWaitingRoomFromGuid(Guid guid)
         {
-            if (_guidGetRoom.Count > 0)
+            if (_guidGetWaitingRoom.Count > 0)
             {
                 int roomID;
-                _guidGetRoom.TryGetValue(guid, out roomID);
+                _guidGetWaitingRoom.TryGetValue(guid, out roomID);
+                Log.Debug("GetWaitingRoomFromGuid:" + roomID);
                 return roomID;
             }
-            return 0;
+            return -1;
         }
 
         /// <summary>
         /// 用GUID找遊戲中 房間中玩家
         /// </summary>
         /// <param name="guid"></param>
-        /// <returns>RoomActor</returns>
+        /// <returns>RoomActor or null</returns>
         public RoomActor GetActorFromGuid(Guid guid)
         {
-            Log.Debug("IN GetActorFromGuid:"+guid);
-            Log.Debug("_guidGetRoom.Count:" + _guidGetRoom.Count + "   _playingRoomList.Count:" + _dictPlayingRoomList.Count);
-            if (_guidGetRoom.Count > 0 && _dictPlayingRoomList.Count > 0)
+            //  Log.Debug("IN GetActorFromGuid:"+guid);
+            //  Log.Debug("_guidGetRoom.Count:" + _guidGetRoom.Count + "   _playingRoomList.Count:" + _dictPlayingRoomList.Count);
+            if (_guidGetPlayingRoom.Count > 0 && _dictPlayingRoomList.Count > 0)
             {
-                int roomID;
-                RoomActor roomActor;
-                _guidGetRoom.TryGetValue(guid, out roomID);
-                _dictPlayingRoomList[roomID].TryGetValue(guid, out roomActor);
-                Log.Debug("Room OtherActor:" + roomActor.Nickname);
+                int roomID = -1;
+                RoomActor roomActor = null;
+
+                if (_guidGetPlayingRoom.ContainsKey(guid))
+                    _guidGetPlayingRoom.TryGetValue(guid, out roomID);
+
+                if (roomID >= _roomStartIndex)
+                    _dictPlayingRoomList[roomID].TryGetValue(guid, out roomActor);
+                // Log.Debug("Room OtherActor:" + roomActor.Nickname);
+
                 return roomActor;
             }
-            Log.Debug("Room otherActor is null !!");
+            //  Log.Debug("Room otherActor is null !!");
             return null;
         }
 
@@ -300,12 +514,12 @@ namespace MPServer
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>RoomActor</returns>
-        public RoomActor GetWaitActorFromGuid(Guid guid) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
+        public RoomActor GetWaitActorFromGuid(Guid guid, int roomID) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
         {
-            if (_dictWaitingRoomList.Count > 0)
+            if (_dictWaitingRoomList.ContainsKey(roomID))
             {
                 RoomActor roomActor;
-                _dictWaitingRoomList[1].TryGetValue(guid ,out roomActor);
+                _dictWaitingRoomList[roomID].TryGetValue(guid, out roomActor);   // _dictWaitingRoomList[1] 1是房間ID 錯誤
                 return roomActor;
             }
             return null;
@@ -316,37 +530,52 @@ namespace MPServer
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>bool</returns>
-        public bool bGetWaitActorFromGuid(Guid guid) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
+        public bool bGetWaitActorFromGuid(Guid guid, int roomID) //＊＊＊＊＊ _waitingList[1] 一定要改成很多間房
         {
             if (_dictWaitingRoomList.Count > 0)
             {
                 RoomActor roomActor;
-                if (_dictWaitingRoomList[1].TryGetValue(guid, out roomActor))
+                if (_dictWaitingRoomList.ContainsKey(roomID))   //_dictWaitingRoomList[1] 1是房間ID 錯誤的
                 {
-                    return true;
+                    if (_dictWaitingRoomList[roomID].TryGetValue(guid, out roomActor))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
 
         /// <summary>
-        ///  用自己的房間ID 和 主索引 找到自己遊戲中房間內的其他玩家
+        ///  用自己的房間ID 和 主索引 找到自己遊戲中房間內的其他玩家(兩人版本)
         /// </summary>
         /// <param name="roomID"></param>
         /// <param name="myPrimaryID"></param>
         /// <returns></returns>
-        public RoomActor GetOtherPlayer(int myRoomID, int myPrimaryID)
+        public RoomActor GetPlayingRoomOtherPlayer(int roomID, int myPrimaryID)
         {
             if (_dictPlayingRoomList.Count > 0) // 是否有遊戲中房間
             {
-                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[myRoomID]) //用RoomID找特定遊戲中房間的玩家
+                if (_dictPlayingRoomList.ContainsKey(roomID))
                 {
-                    if (item.Value.PrimaryID != myPrimaryID) //假如不等於自己的主索引就是另一位玩家
+                    foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[roomID]) //用RoomID找特定遊戲中房間的玩家
                     {
-                        Log.Debug("ID:" + item.Value.PrimaryID + " roomActor.Nickname:" + item.Value.Nickname);
-                        return item.Value;
+                        if (item.Value.PrimaryID != myPrimaryID) //假如不等於自己的主索引就是另一位玩家
+                        {
+                              Log.Debug("GetRoom OtherPlayer ID:" + item.Value.PrimaryID + " roomActor.Nickname:" + item.Value.Nickname);
+                            return item.Value;
+                        }
                     }
                 }
+                else
+                {
+                    Log.Debug("ERROR: Can't GetOtherPlayer RoomID: " + roomID + "   PK: " + myPrimaryID);
+                    return null;
+                }
+            }
+            else
+            {
+                Log.Debug("ERROR:  _dictPlayingRoomList Count =0" + "RoomID: " + roomID + "   PK: " + myPrimaryID);
             }
             return null;
         }
@@ -361,7 +590,7 @@ namespace MPServer
         {
             if (_dictWaitingRoomList.Count > 0) // 是否有遊戲中房間
             {
-                foreach (KeyValuePair<Guid, RoomActor> item in _dictPlayingRoomList[roomID]) //用RoomID找特定遊戲中房間的玩家
+                foreach (KeyValuePair<Guid, RoomActor> item in _dictWaitingRoomList[roomID]) //用RoomID找特定遊戲中房間的玩家
                 {
                     if (item.Value.PrimaryID != primaryID) //假如不等於自己的主索引就是另一位玩家
                     {
@@ -375,14 +604,16 @@ namespace MPServer
 
         public void SpawnBoss(int roomID, int hp)
         {
+            if (_worldBossHP.ContainsKey(roomID))
+                _worldBossHP.Remove(roomID);
             _worldBossHP.Add(roomID, hp);
         }
 
-        public int UpLoadBossHP(int roomID, int damage)
+        public int UpdateBossHP(int roomID, int damage)
         {
             int hp;
             _worldBossHP.TryGetValue(roomID, out hp);
-            hp = hp - damage;
+            hp = Math.Max(0, hp - damage);
             _worldBossHP[roomID] = hp;
             return hp;
         }
@@ -390,11 +621,22 @@ namespace MPServer
 
         public void KillBoss(int roomID)
         {
-            int tmp;
-            bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
-            if (hasBoss)
-                _worldBossHP.Remove(roomID);
+            lock (this)
+            {
+                int tmp;
+                bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
+                if (hasBoss)
+                    _worldBossHP.Remove(roomID);
+            }
         }
+
+        public int GetBossHP(int roomID)
+        {
+            if (_worldBossHP.ContainsKey(roomID))
+                return _worldBossHP[roomID];
+            return 0;
+        }
+
 
         /// <summary>
         /// 移除BOSS 使用GUID
@@ -403,7 +645,7 @@ namespace MPServer
         /// <returns>是否有BOSS</returns>
         public void KillBossFromGuid(Guid guid)
         {
-            int roomID = GetRoomFromGuid(guid);
+            int roomID = GetPlayingRoomFromGuid(guid);
             int tmp;
             bool hasBoss = _worldBossHP.TryGetValue(roomID, out tmp);
             if (hasBoss)
@@ -433,11 +675,25 @@ namespace MPServer
         {
             protected DateTime joinTime; // 多增加進入房間時間的屬性，並且設為唯讀
             public DateTime JoinTime { get { return joinTime; } }
+            public List<string> roomMice { get; set; }
             public int gameScore { get; set; }
+            public int roomID { get; set; }
+            public short totalScore { get; set; }
+            public byte missionCompletedCount { get; set; }
+            public byte maxMissionCount { get; set; }
+            public short life { get; set; }
+            public float energy { get; set; }
+            public float scoreRate { get; set; }
+            public float energyRate { get; set; }
 
             public RoomActor(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP)
                 : base(guid, PrimaryID, Account, Nickname, Age, Sex, IP)
             {
+                  roomID = -1;
+                 life= -1;
+                energy = gameScore = totalScore = 0;
+                scoreRate = energyRate = 1f;
+                roomMice = new List<string>();
                 this.joinTime = System.DateTime.Now;    // 記錄加人此房間的時間
             }
         }

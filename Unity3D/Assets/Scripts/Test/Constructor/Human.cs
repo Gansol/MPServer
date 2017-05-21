@@ -3,8 +3,6 @@ using System.Collections;
 
 public class Human : MonoBehaviour
 {
-
-    public string name;
     public int age;
     public bool sex;
 

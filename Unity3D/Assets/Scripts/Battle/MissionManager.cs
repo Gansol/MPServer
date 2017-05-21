@@ -37,12 +37,13 @@ public class MissionManager : MonoBehaviour
     public int endlessTime = 1000;                              // 強制結束時間
     public GameObject[] missionICON;                            // 任務圖示
 
+    public double AvgMissionTime { get { return avgMissionTime; } } // 平均任務完成時間
+
     private int activeScore;                                    // grandmother know it!
     private int activeTime;                                     // 遊戲開始後 啟動任務時間
     private int missionTime;                                    // 任務時間限制
 
     private double avgMissionTime;                               // 平均任務完成時間
-    private double gameTime;                                     // 遊戲時間
     private double lastGameTime;                                 // 上一次完成任務的時間
     private Int16 _missionScore;                                // 任務所需分數
     private float lastScore;                                    // 任務開始前分數
@@ -50,7 +51,7 @@ public class MissionManager : MonoBehaviour
 
     private bool missionFlag;                                   // 任務是否開啟
     private bool seesawFlag;                                    // 任務蹺蹺板 (A啟動B不啟動..etc)
-    private bool _isBadMice;                                    // 是否打到壞老鼠
+//    private bool _isBadMice;                                    // 是否打到壞老鼠
 
     #endregion
 
@@ -71,7 +72,7 @@ public class MissionManager : MonoBehaviour
 
         missionFlag = false;
         seesawFlag = true;
-        _isBadMice = false;
+       // _isBadMice = false;
 
         _mission = Mission.None;
         _missionMode = MissionMode.Closed;
@@ -84,8 +85,6 @@ public class MissionManager : MonoBehaviour
         // 順序 Closed > Completed > Completing > Opeing > Open  倒著寫防止發生Update 2 次以上
         if (Global.isGameStart)
         {
-            gameTime = battleManager.gameTime;
-
             //Debug.Log("lastGameTime"+lastGameTime);
             if (missionMode == MissionMode.Closed)                                  // 任務關閉時，持續判斷是否觸發任務
                 MissionTrigger();
@@ -97,8 +96,8 @@ public class MissionManager : MonoBehaviour
                 _missionScore = 0;
                 _missionMode = MissionMode.Closed;
                 _mission = Mission.None;
-                avgMissionTime = (lastGameTime + (gameTime - lastGameTime)) / 2;            // 平均任務完成時間
-                lastGameTime = gameTime;                                                    // 任務完成時時間
+                avgMissionTime = (lastGameTime + (BattleManager.gameTime - lastGameTime)) / 2;            // 平均任務完成時間
+                lastGameTime = BattleManager.gameTime;                                                    // 任務完成時時間
             }
 
             if (missionMode == MissionMode.Completing && Global.isMissionCompleted) // 任務完成中，發送完成訊息並等待Server完成資料判斷。
@@ -137,8 +136,9 @@ public class MissionManager : MonoBehaviour
             float otherPercent = (_otherScore / (_score + _otherScore)) * 100;
             float myPercent = 100 - otherPercent;
 
-            if ((gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
+            if ((BattleManager.gameTime - lastGameTime) > missionInterval)                                // 任務間隔時間
             {
+                Debug.Log("----------MissionTrigger----------");
                 // 如果 我方或對方 分數<10%之間 啟動高平衡機制，只觸發限制次數
                 if ((otherPercent < lowestPercent || myPercent < lowestPercent) && balanceTimes > 0 && missionMode == MissionMode.Closed && _otherScore != 0 && _score != 0)
                 {
@@ -162,9 +162,10 @@ public class MissionManager : MonoBehaviour
                 }
 
                 // 如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)
-                if (gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
+                if (BattleManager.gameTime > (lastGameTime + activeTime) && seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
+                    Mission[] missionSelect = { Mission.Exchange, Mission.DrivingMice, Mission.Harvest, Mission.WorldBoss };
+                    //Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeTime += activeTime + UnityEngine.Random.Range(0, (int)(activeTime / 2));
                     _missionMode = MissionMode.Open;
@@ -172,13 +173,14 @@ public class MissionManager : MonoBehaviour
                     seesawFlag = false;
                     Debug.Log("如果遊戲時間 > 觸發時間 啟動任務(收穫、趕老鼠) (如果分數觸發 則 時間不觸發)");
 
-                    Debug.Log("gameTime" + gameTime + "lastGameTime" + lastGameTime + "activeTime" + activeTime);
+                   // Debug.Log("gameTime" + gameTime + "lastGameTime" + lastGameTime + "activeTime" + activeTime);
                 }
 
                 // 如果 任意玩家遊戲分數 > 觸發分數 啟動任務 (如果時間觸發 則 分數不觸發)
                 if ((_score > activeScore || _otherScore > activeScore) && !seesawFlag && missionMode == MissionMode.Closed)
                 {
-                    Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
+                    Mission[] missionSelect = { Mission.Exchange, Mission.DrivingMice, Mission.Harvest, Mission.WorldBoss };
+                   // Mission[] missionSelect = { Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss, Mission.WorldBoss };
                     _mission = missionSelect[UnityEngine.Random.Range(0, 4)];
                     activeScore += activeScore + UnityEngine.Random.Range(0, (int)(activeScore / 2));
                     _missionMode = MissionMode.Open;
@@ -188,7 +190,7 @@ public class MissionManager : MonoBehaviour
                 }
 
                 // 如果雙方遊戲分數、遊戲時間 > 觸發條件 出現BOSS
-                if (_score > bossActiveScore && _otherScore > bossActiveScore && gameTime > bossActiveTime && missionMode == MissionMode.Closed)
+                if (_score > bossActiveScore && _otherScore > bossActiveScore && BattleManager.gameTime > bossActiveTime && missionMode == MissionMode.Closed)
                 {
                     _mission = Mission.WorldBoss;
                     _missionMode = MissionMode.Open;
@@ -212,7 +214,7 @@ public class MissionManager : MonoBehaviour
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
                     }
-                    else if (gameTime - lastGameTime > missionTime)                            // failed
+                    else if (BattleManager.gameTime - lastGameTime > missionTime)                            // failed
                     {
                         _missionMode = MissionMode.Completed;
                         battleHUD.MissionFailedMsg(mission,0);
@@ -221,12 +223,12 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.Reduce:        // 完成後 activeScore要減少Reduce的量
                 {
-                    double endTime = gameTime - lastGameTime - missionTime;
+                    double endTime = BattleManager.gameTime - lastGameTime - missionTime;
                     if (endTime > -5 && endTime < 0) // 減少糧食 這比較特殊 需要顯示閃爍血調 還沒寫
                     {
                         battleHUD.HPBar_Shing();
                     }
-                    else if (gameTime - lastGameTime > missionTime)
+                    else if (BattleManager.gameTime - lastGameTime > missionTime)
                     {
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
@@ -235,9 +237,9 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.DrivingMice:
                 {
-                    if (gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
+                    if (BattleManager.gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
                     {
-                        if (battleManager.combo < _missionScore)
+                        if (battleManager.missionCombo > _missionScore)
                         {
                             _missionMode = MissionMode.Completed;
                             battleHUD.MissionFailedMsg(mission,0);
@@ -252,7 +254,7 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.HarvestRate:
                 {
-                    if (gameTime - lastGameTime > missionTime)
+                    if (BattleManager.gameTime - lastGameTime > missionTime)
                     {
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
@@ -261,7 +263,7 @@ public class MissionManager : MonoBehaviour
                 }
             case Mission.Exchange:
                 {
-                    if (gameTime - lastGameTime > missionTime)
+                    if (BattleManager.gameTime - lastGameTime > missionTime)
                     {
                         _missionMode = MissionMode.Completing;
                         Global.isMissionCompleted = true;
@@ -281,7 +283,7 @@ public class MissionManager : MonoBehaviour
             if (mission != Mission.HarvestRate) battleHUD.MissionMsg(mission, missionScore);
             _missionScore = missionScore;
             _mission = mission;
-            lastGameTime = gameTime;                // 任務開始時時間
+            lastGameTime = BattleManager.gameTime;                // 任務開始時時間
             _missionMode = MissionMode.Opening;
         }
 

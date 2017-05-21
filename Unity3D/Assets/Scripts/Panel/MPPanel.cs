@@ -19,7 +19,7 @@ using MiniJSON;
 
 public abstract class MPPanel : MonoBehaviour
 {
-    public AssetLoader assetLoader;
+    protected AssetLoader assetLoader;
 
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
     private GameObject _tmpActor, _clone;
@@ -33,7 +33,7 @@ public abstract class MPPanel : MonoBehaviour
     public bool LoadActor(GameObject btn_click, Transform parent, Vector3 scale)
     {
         GameObject _miceImage;
-        string assetName = btn_click.transform.GetComponentInChildren<UISprite>().name;
+        string assetName = btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Remove(btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Length - 4);
         Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 
@@ -67,7 +67,7 @@ public abstract class MPPanel : MonoBehaviour
         if (bundle != null)                  // 已載入資產時
         {
             if (!GetLoadedActor(bundle.name))
-                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale);
+                _clone = insObj.InstantiateActor(bundle, parent.transform, actorName, scale, 500); // 老鼠Depth是手動輸入的!! 錯誤
             SetLoadedActor(_clone);
             return false;
         }
@@ -123,94 +123,6 @@ public abstract class MPPanel : MonoBehaviour
     }
     #endregion
 
-    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
-    {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemType;
-            nestedData.TryGetValue("ItemType", out itemType);
-            if (itemType != null)
-                if (itemType.ToString() == type.ToString())
-                {
-                    data.Add(nestedData["ItemID"].ToString(), nestedData);
-                }
-        }
-        return data;
-    }
-    #endregion
-
-
-    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData,int type)
-    {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            object itemID;
-            nestedData.TryGetValue("ItemID", out itemID);
-            
-
-            char[] itemType = itemID.ToString().ToCharArray(0,1);
-            if (itemType[0].ToString() == type.ToString())
-                {
-                    data.Add(nestedData["ItemID"].ToString(), nestedData);
-                }
-        }
-        return data;
-    }
-    #endregion
-
-    #region -- GetItemNameFromID 從道具ID取得道具名稱 --
-    /// <summary>
-    /// 從道具ID取得道具名稱
-    /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    public string GetItemNameFromID(string itemID, Dictionary<string, object> itemData)
-    {
-        object objNested;
-
-        itemData.TryGetValue(itemID.ToString(), out objNested);
-        if (objNested != null)
-        {
-            var dictNested = objNested as Dictionary<string, object>;
-            return dictNested["ItemName"].ToString();
-        }
-        return "";
-    }
-    #endregion
-
-    #region -- GetItemNameFromID 從道具名稱取得道具ID --
-    /// <summary>
-    /// 從道具名稱取得道具ID
-    /// </summary>
-    /// <param name="itemName">道具名稱</param>
-    /// <param name="itemData">2d Dictionary</param>
-    /// <returns>itemName</returns>
-    public string GetItemIDFromName(string itemName, Dictionary<string, object> itemData)
-    {
-        object value;
-        foreach (KeyValuePair<string, object> item in itemData)
-        {
-            var nestedData = item.Value as Dictionary<string, object>;
-            nestedData.TryGetValue("ItemName", out value);
-            if (itemName == value.ToString())
-            {
-                nestedData.TryGetValue("ItemID", out value);
-                return value.ToString();
-            }
-        }
-        return "";
-    }
-    #endregion
-
     #region -- GetDontNotLoadAsset 取得未載入Asset --
     /// <summary>
     /// 取得未載入Asset
@@ -246,15 +158,15 @@ public abstract class MPPanel : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
         {
-            string imageName = GetItemNameFromID(item.Key, itemNameData);
+            string imageName = ObjectFactory.GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString();
 
-            if (!string.IsNullOrEmpty(imageName) && assetLoader.GetAsset(imageName) == null)
+            if (!string.IsNullOrEmpty(imageName) && imageName != "-1" && assetLoader.GetAsset(imageName) == null)
             {
-                dictNotLoadedAsset.Add(imageName, imageName);
+                dictNotLoadedAsset.Add(item.Key.ToString(), imageName);
             }
         }
         return dictNotLoadedAsset;
-    } 
+    }
     #endregion
 
     public void SetLoadedActor(GameObject actor)

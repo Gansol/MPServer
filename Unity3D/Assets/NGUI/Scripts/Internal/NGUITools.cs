@@ -245,13 +245,13 @@ static public class NGUITools
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public void AddWidgetCollider (GameObject go) { AddWidgetCollider(go, false); }
+	static public object AddWidgetCollider (GameObject go) { return AddWidgetCollider(go, false); }
 
 	/// <summary>
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public void AddWidgetCollider (GameObject go, bool considerInactive)
+	static public object AddWidgetCollider (GameObject go, bool considerInactive)
 	{
 		if (go != null)
 		{
@@ -262,11 +262,11 @@ static public class NGUITools
 			if (box != null)
 			{
 				UpdateWidgetCollider(box, considerInactive);
-				return;
+                return col;
 			}
 
 			// Is there already another collider present? If so, do nothing.
-			if (col != null) return;
+			if (col != null) return null;
 
 			// 2D collider
 			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
@@ -274,7 +274,7 @@ static public class NGUITools
 			if (box2 != null)
 			{
 				UpdateWidgetCollider(box2, considerInactive);
-				return;
+                return box2;
 			}
 
 			UICamera ui = UICamera.FindCameraForLayer(go.layer);
@@ -289,7 +289,7 @@ static public class NGUITools
 				UIWidget widget = go.GetComponent<UIWidget>();
 				if (widget != null) widget.autoResizeBoxCollider = true;
 				UpdateWidgetCollider(box2, considerInactive);
-				return;
+                return box2;
 			}
 			else
 			{
@@ -304,7 +304,7 @@ static public class NGUITools
 				UpdateWidgetCollider(box, considerInactive);
 			}
 		}
-		return;
+		return null;
 	}
 
 	/// <summary>

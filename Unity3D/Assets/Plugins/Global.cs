@@ -8,11 +8,12 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static readonly string serverPath = "http://49.159.128.17:58767/MicePow";//Server路徑
+    public static string serverPath = "http://180.218.164.232:58767/MicePowBETA";//Server路徑
+
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
- "/AndroidList/";
+ "/AndroidList/";//  "/AndroidList/";   
 #elif UNITY_IPHONE
     "/iOSList/";
 #elif UNITY_STANDALONE_WIN
@@ -20,10 +21,11 @@ public static class Global
 #else
  string.Empty;
 #endif
+
     //Android or iOS or Win 伺服器中的 檔案路徑
     public static readonly string assetBundlesPath = serverPath +
 #if UNITY_ANDROID
- "/AndroidBundles/";
+ "/AndroidBundles/"; // "/AndroidBundles/";
 #elif UNITY_IPHONE
     "/iOSBundles/";
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -32,12 +34,51 @@ public static class Global
  string.Empty;
 #endif
 
+    public static string perfabFolder =
+#if UNITY_ANDROID
+ "/AssetBundles/";
+#elif UNITY_IPHONE || UNITY_IOS
+    "/AssetBundles/";
+#elif UNITY_WEBPLAYER
+    "/AssetBundles/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/AssetBundles/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        "/AssetBundles/";
+#endif
+
+    public static string exportFolder =
+#if UNITY_ANDROID
+ "/_AssetBundles/Android/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    "/_AssetBundles/iOS/";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    "/_AssetBundles/STANDALONE_WIN/";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "/_AssetBundles/STANDALONE_OSX/";
+#endif
+
+    public static string dataPath =
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+ Application.dataPath + "/StreamingAssets";
+#elif UNITY_ANDROID
+    "jar:file://" + Application.dataPath + "!/assets/";
+#elif UNITY_IPHONE  || UNITY_IOS
+    Application.dataPath + "/Raw";
+#endif
+
+    public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務
 
-    public static readonly string sItemList = "ItemList.json";          // 道具列表
-    public static readonly string sVisionList = "VisionList.json";      // 版本列表
-    public static readonly string sDownloadList = "DownloadList.json";  // 下載列表
-    public static readonly string sFullPackage = "FullPackageList.json";// 完整下載列表
+    public delegate void ShowMessageHandler(string message, MessageBoxType messageBoxType);
+    public static event ShowMessageHandler ShowMessageEvent;
+
+    public static readonly string patchFile = "patch.txt"; // 資源版本
+    public static readonly string itemListFile = "ItemList.json";          // 道具列表
+    public static readonly string visionListFile = "VisionList.json";      // 版本列表
+    public static readonly string downloadListFile = "DownloadList.json";  // 下載列表
+    public static readonly string fullPackageFile = "FullPackageList.json";// 完整下載列表
+    public static readonly string bundleVersionFile = "BundleVersion.json"; // 資源版本
 
     public static bool isCheckBundle = false;       // 是否檢查資源
     public static bool isNewlyVision = true;        // 是否為新版本
@@ -50,29 +91,40 @@ public static class Global
     public static bool isPlayerItemLoaded = false;  // 是否載入玩家資料
     public static bool isCurrencyLoaded = false;    // 是否載入玩家資料
     public static bool isMiceLoaded = false;        // 是否載入老鼠資料
+    public static bool isLoadedSkill = false;       // 是否載入技能資料
     public static bool isStoreLoaded = false;        // 是否載入老鼠資料
     public static bool isItemLoaded = false;        // 是否載入老鼠資料
     public static bool isArmorLoaded = false;        // 是否載入老鼠資料
     public static bool isLoaded = false;            // 是否載入場景
 
+    public static bool connStatus = false;          // 連線狀態
     public static bool LoginStatus = false;	        // true = 已登入,  false = 未登入
     public static bool BattleStatus = false;        // 是否開始對戰
     public static bool isMatching = false;          // 是否配對成功
+    public static bool isFriendMatching = false;    // 是否配對成功
     public static bool isExitingRoom = false;       // 是否離開房間
+    public static bool isSyncGame = false;          // 是否載入場景
     public static bool isGameStart = false;         // 是否開始遊戲
     public static bool isApplySkill = false;        // 是否受到技能傷害
     public static bool spawnFlag = false;           // 是否產生完成
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
+    public static bool exitingGame = false;         // 是否執行任務
+    public static int prevScene = (int)Scene.LogoScene;  // 上一個場景
+    public static int nextScene = (int)Scene.BundleCheck;  // 要被載入的場景
 
-    public static int prevScene = (int)Scene.MainGame;  // 上一個場景
-    public static int nextScene = (int)Scene.MainGame;  // 要被載入的場景
+    public static int maxConnTimes = 5;                         // 重新連限次數
+    public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
+    public static int GameTime = 150;        // 遊戲時間
+    public static int WaitTime = 10;        // 配對等待時間
+    public static int OnlineActor = 0;        // 配對等待時間
 
-    public static int maxConnTimes = 5;  // 重新連限次數
-
+    public static string PlayerImage = "";  // 玩家圖片
     public static string Ret = "";          // 回傳值
     public static int PrimaryID = 0;       // 主索引
     public static string Account = "";      // 帳號
+    public static string Email = "";
+    public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
@@ -82,41 +134,75 @@ public static class Global
     public static Int16 Gold = 0;           // 金幣
 
     public static byte Rank = 0;            // 等級
-    public static byte EXP = 0;             // 經驗
+    public static short Exp = 0;             // 經驗
     public static Int16 MaxCombo = 0;       // 最大連擊
     public static int MaxScore = 0;         // 最高分
     public static int SumScore = 0;         // 總分
-    public static Int16 SumLost = 0;          // 總漏掉的老鼠
+    public static int SumLost = 0;          // 總漏掉的老鼠
     public static int SumKill = 0;          // 總除掉的老鼠
     public static int SumWin = 0;          // 總勝場
     public static int SumBattle = 0;          // 總場次
-
+    public static string gameVersion = "";    // 資產版本
+    public static int bundleVersion = 1;    // 資產版本
     public static int MeunObjetDepth = 10000; // 主選單物件深度
-    public static Dictionary<string, object> SortedItem = new Dictionary<string, object>();         // 全部老鼠 JSON資料;         // 漏掉的老鼠
-    public static Dictionary<string, object> MiceAll = new Dictionary<string, object>();         // 全部老鼠 JSON資料
-    public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
-    public static Dictionary<string, object> Friend = new Dictionary<string, object>();       // 好友列表 JSON資料
+
+    public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
+    public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料
+    public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();                       // 隊伍老鼠 JSON資料
+    public static List<string> dictFriends = new List<string>();                                                                        // 好友列表 List資料
+    public static Dictionary<string, object> dictOnlineFriendsDetail = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
+    public static Dictionary<string, object> dictOnlineFriendsState = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
+    public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();                     // 技能列表 JSON資料
+    public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();                   // 老鼠屬性資料 
+    public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();                   // 道具屬性資料 
+    public static Dictionary<string, object> storeItem = new Dictionary<string, object>();                      // 商店屬性資料 
+    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 商店屬性資料 
+    public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBossMice = new Dictionary<Transform, GameObject>();
+
     public static string ReturnMessage = "";       // 回傳訊息
 
     public static string ext = ".unity3d";       // AB副檔名
 
+
+    public delegate void ExitGameHandler();
+    public static event ExitGameHandler ExitGameEvent;
+
+    public enum MessageBoxType
+    {
+        NonChkBtn = -1,
+        Default,
+        YesNo,
+    }
+
+    public static void ShowMessage(string message, MessageBoxType messageBoxType)
+    {
+        ShowMessageEvent(message, messageBoxType);
+    }
+
+    public static void ExitGame()
+    {
+        exitingGame = true;
+        ExitGameEvent();
+    }
+
     public static class OtherData
     {
         public static int PrimaryID = 0;        // 主索引
+        public static string Account = "";        // 主索引
         public static string Nickname = "";     // 暱稱
         public static byte Sex = 0;              // 性別
         public static Dictionary<string, object> Team = new Dictionary<string, object>();         // 隊伍老鼠 JSON資料
         public static string RoomPlace = "";    // 另一位玩家的房間位置
+        public static string Image = "";
     }
 
     public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
 
-    public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();   // 老鼠屬性資料 
-    public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();   // 道具屬性資料 
-    public static Dictionary<string, object> storeItem = new Dictionary<string, object>();   // 商店屬性資料 
-    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();   // 商店屬性資料 
 
-    public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
+
     /*
     public class MiceProperty
     {
@@ -132,10 +218,12 @@ public static class Global
     */
     public enum Scene : int
     {
-        BundleCheck = 0,
-        MainGame = 1,
-        Battle = 2,
-        LoadScene = 3,
+        LogoScene = 0,
+        BundleCheck = 1,
+        MainGame = 2,
+        Battle = 3,
+        LoadScene = 4,
+
     }
 
     public enum UILayer
@@ -155,7 +243,7 @@ public static class Global
         MainCamera,
         HUDCamera,
     }
-    
+
     public static void RenameKey<TKey, TValue>(this IDictionary<TKey, TValue> dic,
                                   TKey fromKey, TKey toKey)
     {
@@ -173,7 +261,7 @@ public static class Global
     public static void SwapDictKeyByValue(string vaule1, string value2, Dictionary<string, object> dict)
     {
         string myKey = "", otherKey = "";
-        object myValue = "", otherValue = "";
+        //object myValue = "", otherValue = "";
 
         myKey = dict.FirstOrDefault(x => x.Value.ToString() == vaule1).Key;
         otherKey = dict.FirstOrDefault(x => x.Value.ToString() == value2).Key;
@@ -209,4 +297,6 @@ public static class Global
         stopwatch.Stop();
         return stopwatch.Elapsed;
     }
+
+
 }

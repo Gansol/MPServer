@@ -42,12 +42,27 @@ public static class AssetBundleManager
     private static int _progress = 0;
     private static int _loadedABCount = 0;
     private static int _loadedObjectCount = 0;
+//    private static char[] trimString = new char[] {
+//    // SpaceSeparator category
+//    '\u0020', '\u1680', '\u180E', '\u2000', '\u2001', '\u2002', '\u2003', 
+//    '\u2004', '\u2005', '\u2006', '\u2007', '\u2008', '\u2009', '\u200A', 
+//    '\u202F', '\u205F', '\u3000',
+//    // LineSeparator category
+//    '\u2028',
+//    // ParagraphSeparator category
+//    '\u2029',
+//    // Latin1 characters
+//    '\u0009', '\u000A', '\u000B', '\u000C', '\u000D', '\u0085', '\u00A0',
+//    // ZERO WIDTH SPACE (U+200B) & ZERO WIDTH NO-BREAK SPACE (U+FEFF)
+//    '\u200B', '\uFEFF'
+//};
 
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
 
     static AssetBundleManager()
     {
-        dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
+        if (dictAssetBundleRefs==null)
+            dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
     }
 
     public static void init()
@@ -62,7 +77,7 @@ public static class AssetBundleManager
         _Ret = "C000";
         _progress = 0;
         _loadedABCount = 0;
-        loadedObjectCount = 0;
+        _loadedObjectCount = 0;
     }
 
     public class AssetBundleRef
@@ -72,6 +87,7 @@ public static class AssetBundleManager
 
     public static IEnumerator LoadAtlas(string folder, string assetName, System.Type type)
     {
+        assetName = assetName.Replace(" ", "");
         AssetBundleRef abRef;
         string assetPath = folder + assetName;
         bool chkAtlas, chkMat, chkPrefab;
@@ -101,8 +117,10 @@ public static class AssetBundleManager
             {
                 assetPath = folder + fileName;
                 _isStartLoadAsset = true;
+                while (!Caching.ready)
+                    yield return null;
                 //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
-                WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, 1);
+                WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext,Global.bundleVersion);
                 yield return www;
 
                 _ReturnMessage = "正再載入資源... ( " + assetPath + Global.ext + " )";
@@ -111,12 +129,12 @@ public static class AssetBundleManager
                     _Ret = "C002";
                     _ReturnMessage = "載入資源失敗！ : \n" + assetPath + "\n";
                     Debug.Log(_ReturnMessage);
-                    foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
-                    {
-                        Debug.LogError("AB DICT: " + item.Key.ToString());
-                    }
+                    //foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
+                    //{
+                    //    Debug.LogError("AB DICT: " + item.Key.ToString());
+                    //}
 
-                    Debug.LogError("assetName:" + assetPath + "   Get AB: " + bLoadedAssetbundle(assetName));
+                    Debug.LogError("assetName:" + fileName + "   assetPath:" + assetPath + "   bGetAsset: " + bLoadedAssetbundle(assetName));
                     throw new Exception(www.error);
                 }
                 else if (www.isDone)
@@ -126,7 +144,7 @@ public static class AssetBundleManager
                     abRef = new AssetBundleRef();
                     abRef.assetBundle = www.assetBundle;
                     dictAssetBundleRefs.Add(fileName, abRef);
-                    AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
+                    //AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
                     if (type == typeof(Texture)) _isLoadAtlas = true;
                     else if (type == typeof(Material)) _isLoadMat = true;
                     else if (type == typeof(GameObject)) _isLoadPrefab = true;
@@ -150,18 +168,21 @@ public static class AssetBundleManager
     }
 
 
-    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 錯誤 要加一個 floder
+    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 載入遊戲物件
     {
-        //Debug.Log("( 1 ) :" + assetName);
+        assetName = assetName.Replace(" ","");
         AssetBundleRef abRef;
         string assetPath = folder + assetName;
         if (!bLoadedAssetbundle(assetName))
         {
             while (_isLoadPrefab == false)
                 yield return null;
+
+            while (!Caching.ready)
+                yield return null;
             _isStartLoadAsset = true;
             //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
-            WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, 1);
+            WWW www = WWW.LoadFromCacheOrDownload("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath + Global.ext, Global.bundleVersion);
             _progress = (int)www.progress * 100;
             yield return www;
 
@@ -170,7 +191,7 @@ public static class AssetBundleManager
             if (www.error != null)
             {
                 _Ret = "C002";
-                _ReturnMessage = "載入遊戲物件失敗！ :" + assetPath + "\n" + www.error;
+                _ReturnMessage = "載入遊戲物件失敗！ :" + " assetName:" + assetName + "\n assetPath:" + assetPath + "\n" + www.error;
                 Debug.Log("( 3 ) :" + _ReturnMessage);
                 throw new Exception(www.error);
             }
@@ -203,11 +224,11 @@ public static class AssetBundleManager
     /// <returns></returns>
     public static bool bLoadedAssetbundle(string assetName)
     {
+        assetName = assetName.Replace(" ", "");
         if (!string.IsNullOrEmpty(assetName))
         {
             AssetBundleRef abRef;
-            bool Loaded;
-            return Loaded = dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
+            return dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
         }
 
         return false;
@@ -220,6 +241,7 @@ public static class AssetBundleManager
     /// <returns></returns>
     public static AssetBundle getAssetBundle(string assetName)
     {
+        assetName = assetName.Replace(" ", "");
         AssetBundleRef abRef;
         if (dictAssetBundleRefs.TryGetValue(assetName, out abRef))
             return abRef.assetBundle;
@@ -249,7 +271,7 @@ public static class AssetBundleManager
     public static void Unload(string assetName, System.Type type, bool unloadAllObject)  // 錯誤 assetName 應該是URL
     {
         string fileName = "";
-
+        assetName = assetName.Replace(" ", "");
         if (type == typeof(Texture)) fileName = assetName + "Atlas";
         else if (type == typeof(Material)) fileName = assetName + "Mat";
         else if (type == typeof(GameObject)) fileName = assetName + "Prefab";

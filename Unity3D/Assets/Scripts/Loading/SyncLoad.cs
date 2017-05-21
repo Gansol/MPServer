@@ -10,7 +10,7 @@ public class SyncLoad : MonoBehaviour
 
 
     void Awake()
-    {
+    { 
         AssetBundleManager.UnloadUnusedAssets();
         System.GC.Collect();
     }
@@ -23,6 +23,9 @@ public class SyncLoad : MonoBehaviour
 
     void Update()
     {
+        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
+
         if (assetLoader.loadedObj && bLoadAsset)
         {
             InstantiateScene();
@@ -38,30 +41,33 @@ public class SyncLoad : MonoBehaviour
 
     private void LoadAssetCheck()
     {
+        if (Application.loadedLevel == (int)Global.Scene.BundleCheck)
+        {
+            bLoadAsset = true;
+        }
 
         if (Application.loadedLevel == (int)Global.Scene.MainGame)
         {
             assetLoader.LoadAsset("Panel/", "LiHeiProFont");
             assetLoader.LoadAsset("Panel/", "ComicFont");
+            assetLoader.LoadAsset("Panel/", "ComicFontB");
+
             assetLoader.LoadAsset("Panel/", "PanelUI");
             assetLoader.LoadAsset("Panel/", "GameScene");
             assetLoader.LoadAsset("Panel/", "MainFront");
             assetLoader.LoadAsset("Panel/", "MainBack");
             assetLoader.LoadAsset("Panel/", "ShareObject");
+
             assetLoader.LoadPrefab("Panel/", "MenuUI");
-            bLoadAsset = !bLoadAsset;
+            bLoadAsset = true;
         }
 
         if (Application.loadedLevel == (int)Global.Scene.Battle)
         {
             assetLoader.LoadAsset("Panel/", "BattleHUD");
             assetLoader.LoadPrefab("Panel/", "GameUI");
-            bLoadAsset = !bLoadAsset;
+            bLoadAsset = true;
         }
-
-
-
-
     }
 
     private void InstantiateScene()
@@ -70,6 +76,9 @@ public class SyncLoad : MonoBehaviour
 
         switch (Application.loadedLevelName)
         {
+            case "BundleCheck":
+                sceneName = "MainGame";
+                break;
             case "MainGame":
                 sceneName = "MenuUI";
                 break;
@@ -92,10 +101,12 @@ public class SyncLoad : MonoBehaviour
                 Global.dictLoadedScene[sceneName] = _clone;
         }
 
-            if (Global.prevScene == (int)Global.Scene.MainGame)
-                Global.dictLoadedScene["MenuUI"].SetActive(false);
-            if (Global.nextScene == (int)Global.Scene.MainGame)
-                Global.dictLoadedScene["MenuUI"].SetActive(true);
+        if (Global.prevScene == (int)Global.Scene.MainGame)
+            Global.dictLoadedScene["MenuUI"].SetActive(false);
+        if (Global.nextScene == (int)Global.Scene.MainGame)
+            Global.dictLoadedScene["MenuUI"].SetActive(true);
+
+
 
         if (Application.loadedLevelName != "BundleCheck")
         {
@@ -106,6 +117,8 @@ public class SyncLoad : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
         Global.prevScene = Application.loadedLevel;
+
+
     }
 
 }

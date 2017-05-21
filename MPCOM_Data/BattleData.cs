@@ -21,14 +21,25 @@ namespace MPCOM
     {
         public string ReturnCode;           // 回傳值
         public string ReturnMessage;        // 回傳說明文字<30全形字
+        public string jMiceResult;          // 遊戲結束老鼠使用量等級經驗計算結果
+        public string jItemReward;          // 遊戲獎勵(道具(Item))
+        public string evaluate;             // 評價
 
-        public Int16 score;                 // 分數
-        public Int16 missionScore;          // 任務目標
-        public Int16 customValue;           // 自訂參數1(整數)
-        public string customString;           // 自訂參數2(字串)
-        public Int16 missionReward;         // 任務獎勵
-        public Int16 sliverReward;          // 遊戲獎勵(銀幣(RICE))
-        public byte expReward;             // 經驗獎勵
-        public byte battleResult;           // 戰鬥結果
+        public short score;                 // 分數
+        public short totalScore;            // 分數
+        public short energy;                // 能量
+        public short spawnCount;            // 產生數量
+        public short missionScore;          // 任務目標
+        public short customValue;           // 自訂參數1(整數)
+        public short missionReward;         // 任務獎勵
+        public short sliverReward;          // 遊戲獎勵(銀幣(RICE))
+        public short goldReward;            // 遊戲獎勵(金幣(Gold))
+        public short expReward;             // 經驗獎勵
+        public short battleResult;          // 戰鬥結果
+        public short bossHP;                // 任務目標
+
+        public float scoreRate;             // 分數倍率
+        public float energyRate;            // 能量倍率
+        public static readonly int GameTime = 150;  // 遊戲時間
     }
 }

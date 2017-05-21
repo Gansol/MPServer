@@ -1,5 +1,5 @@
 // <copyright file="AndroidPlatformConfiguration.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
 // </copyright>
 
 #if UNITY_ANDROID
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-
 namespace GooglePlayGames.Native.Cwrapper {
-internal static class AndroidPlatformConfiguration {
+    using System;
+    using System.Runtime.InteropServices;
+
+    internal static class AndroidPlatformConfiguration {
     internal delegate void IntentHandler(
          /* from(jobject) */ IntPtr arg0,
          /* from(void *) */ IntPtr arg1);
@@ -68,6 +66,11 @@ internal static class AndroidPlatformConfiguration {
         HandleRef self,
          /* from(AndroidPlatformConfiguration_OnLaunchedWithQuestCallback_t) */ OnLaunchedWithQuestCallback callback,
          /* from(void *) */ IntPtr callback_arg);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void AndroidPlatformConfiguration_SetOptionalViewForPopups(
+            HandleRef self,
+            /* from (jobject) */ IntPtr android_view);
 }
 }
 #endif // UNITY_ANDROID

@@ -8,260 +8,409 @@ using System.IO;
 using MPProtocol;
 using GooglePlayGames;
 using MiniJSON;
+using Gansol;
+using System.Data;
+using System.Text;
+using GooglePlayGames.BasicApi;
 
 public class LoginUI : MonoBehaviour
 {
-    public GameObject[] LoginObject;
+    public GameObject LoginPanel;
+    public GameObject JoinPanel;
+    public GameObject MatchGame;
+    public GameObject LicensePanel;
+    public UIInput accountField, passwordField;
+    public UILabel LoginMessageBox;
+    public UIToggle accountToggle, passwordToggle;
+
+    public GameObject[] LoginType;
+    AssetLoader assetLoader;
+    public GameObject[] ErrorText;
+
+    TextUtility textUtility = new TextUtility();
 
     private Dictionary<string, object> FBProfiler = null;
-    private string _defaultAccout = "請輸入帳號(8~16英文數字)";
-    private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
+    //private string _defaultAccout = "請輸入帳號(8~16英文數字)";
+    //private string _defaultPassowrd = "請輸入密碼(8~16英文數字)";
 
-    private string getAccount = "";
-    private string getPassowrd = "";
-    private string getNickname = "";
-    private string getAge = "0";
-    private string getSex = "0";
+    //private string getAccount = "";
+    //private string getPassowrd = "";
+    //private string getNickname = "";
+    //private string getAge = "0";
+    //private string getSex = "0";
     private string getIP = "";
-
-    private string joinResult = "";
-    private string loginResult = "";
+    private string jFileName = "data.json";
+    private string jString;
     //private string JoinRoomResult = "";
     //private bool macthing = false;
-    private float ckeckTime;
-    private bool checkFlag = true;
     private static bool isLoginBtn = false;
+    private bool bSwitchLoginType;
+    private int emailChk, passwordChk, confirmPasswordChk, equalPassword, nicknameChk;
+    Dictionary<string, object> data;
 
-    void Awake()
+    GameObject tmpPanel;
+
+    public void OnLicenseClickOn(GameObject panel)
     {
+        panel.SetActive(false);
+        LicensePanel.SetActive(true);
+        tmpPanel = panel;
+    }
+
+    public void OnLicenseClickOff()
+    {
+        tmpPanel.SetActive(true);
+        LicensePanel.SetActive(false);
+        tmpPanel = null;
+    }
+
+    void OnEnable()
+    {
+        // if (Global.LoginStatus) ShowMatchGame();
+        LoginMessageBox.gameObject.SetActive(false);
+
+        //// 讀取帳密儲存資訊
+        //if ((string.IsNullOrEmpty(jString) || jString == "{}") && File.Exists(Global.dataPath + jFileName))
+        //{
+        //    StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+
+        //    data = Json.Deserialize(jString) as Dictionary<string, object>;
+
+        //    accountField.value = data["Account"].ToString();
+        //    passwordField.value = data["Hash"].ToString();
+        //}
+        //else if (!string.IsNullOrEmpty(jString) && jString != "{}")
+        //{
+        //    data = Json.Deserialize(jString) as Dictionary<string, object>;
+        //    accountField.value = data["Account"].ToString();
+        //    passwordField.value = data["Hash"].ToString();
+        //}
 
     }
     // 在Start裡建立好Login的回應事件
     void Start()
     {
+        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;
         Global.photonService.ReLoginEvent += OnReLogin;
         Global.photonService.GetProfileEvent += OnGetProfile;
+        // Global.photonService.ExitWaitingEvent += ShowMatchGame;
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
+
+        passwordChk = confirmPasswordChk = nicknameChk = emailChk = equalPassword = -1;
+
+        if (!Global.connStatus)
+            LoginPanel.SetActive(false);
     }
 
-    void Update()
-    {
-        if (Global.isMatching)
-        {
-            if (ckeckTime > 10 && checkFlag)
-            {
-                Global.photonService.ExitWaitingRoom();
-                ckeckTime = 0;
-                checkFlag = false;
-            }
-            else
-            {
-                checkFlag = true;
-                ckeckTime += Time.deltaTime;
-            }
-        }
-    }
+
     void OnGUI()
     {
-        # region Draw Default 預設值
-        if (UnityEngine.Event.current.type == EventType.Repaint)
-        {
-            if (GUI.GetNameOfFocusedControl() == "Account")
-            {
-                if (getAccount == _defaultAccout) getAccount = "";
-            }
-            else
-            {
-                if (getAccount == "") getAccount = _defaultAccout;
-            }
+        //if (Global.photonService.ServerConnected)  // 若已連線成功才顯示登入對話盒
+        //{
+        //    GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
+        //}
 
-            if (GUI.GetNameOfFocusedControl() == "Password")
-            {
-                if (getPassowrd == _defaultPassowrd) getPassowrd = "";
-            }
-            else
-            {
-                if (getPassowrd == "") getPassowrd = _defaultPassowrd;
-            }
-        }
-        #endregion
-
-        try
-        {
-            GUI.Label(new Rect(30, 10, 100, 20), "MicePow Test");
-
-            if (Global.photonService.ServerConnected)  // 若已連線成功才顯示登入對話盒
-            {
-                GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
-
-                if (!Global.isMatching)
-                {
-                    if (Global.LoginStatus) // 若已登入
-                    {
-
-                        foreach (GameObject item in LoginObject)
-                        {
-                            if (item != null)
-                                item.SetActive(false);
-                        }
-
-                        GUI.Label(new Rect(30, 40, 400, 20), "Your Nickname : " + Global.Nickname); // 顯示暱稱
-                        GUI.Label(new Rect(30, 60, 400, 20), "Your Sex : " + Global.Sex); // 顯示性別
-                        GUI.Label(new Rect(30, 80, 400, 20), "Your Age : " + Global.Age); // 顯示性別
-                        GUI.Label(new Rect(100, 150, 200, 40), "Matching : " + Global.Age); // 顯示性別
-
-                        if (!Global.isMatching)
-                        {
-                            if (GUI.Button(new Rect(100, 200, 250, 100), "Matching Game"))
-                            {
-                                Global.photonService.MatchGame(Global.PrimaryID, Global.Team);
-                                //Debug.Log("click");
-                                Global.isMatching = true;
-                            }
-                        }
-                    }
-                    else if (Global.isJoinMember)
-                    {
-                        // 顯示登入視窗
-                        GUI.Label(new Rect(30, 40, 200, 20), "Please Login");
-
-
-                        GUI.Label(new Rect(30, 70, 80, 20), "Account:");
-                        GUI.SetNextControlName("Account");
-                        getAccount = GUI.TextField(new Rect(110, 70, 400, 50), getAccount);
-
-                        GUI.Label(new Rect(30, 150, 80, 20), "Passowrd:");
-                        GUI.SetNextControlName("Password");
-                        getPassowrd = GUI.TextField(new Rect(110, 150, 400, 50), getPassowrd, 16);
-
-
-                        if (GUI.Button(new Rect(30, 230, 200, 50), "Login") && !isLoginBtn)
-                        {
-                            isLoginBtn = true;
-                            Global.photonService.Login(getAccount, getPassowrd, MemberType.Gansol); // 登入
-                        }
-
-                        if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
-                            Global.isJoinMember = false;
-
-                        GUI.Label(new Rect(30, 160, 600, 20), loginResult); // 顯示登入回傳
-                        GUI.Label(new Rect(30, 190, 600, 20), joinResult); // 顯示登入回傳
-                    }
-                    else
-                    {
-                        GUI.Label(new Rect(30, 70, 80, 20), "Account:");
-                        getAccount = GUI.TextField(new Rect(110, 70, 100, 20), getAccount, 16);
-
-                        GUI.Label(new Rect(30, 100, 80, 20), "Passowrd:");
-                        getPassowrd = GUI.PasswordField(new Rect(110, 100, 100, 20), getPassowrd, '*');
-
-                        GUI.Label(new Rect(30, 130, 80, 20), "Nickname:");
-                        getNickname = GUI.TextField(new Rect(110, 130, 100, 20), getNickname, 12);
-
-                        GUI.Label(new Rect(30, 160, 80, 20), "Age:");
-                        getAge = GUI.TextField(new Rect(110, 160, 100, 20), getAge, 2);
-
-                        GUI.Label(new Rect(30, 190, 80, 20), "Sex:");
-                        getSex = GUI.TextField(new Rect(110, 190, 100, 20), getSex, 1);
-
-                        //Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, getAge, getSex);
-
-                        GUI.Label(new Rect(30, 210, 600, 20), joinResult); // 顯示登入回傳
-
-                        if (GUI.Button(new Rect(250, 230, 200, 50), "Join"))
-                        {
-                            // Debug.Log(getAge);
-                            byte age = Convert.ToByte(getAge);
-                            byte sex = Convert.ToByte(getSex);
-                            Debug.Log(getPassowrd);
-                            Global.photonService.JoinMember(getAccount, getPassowrd, getNickname, age, sex, MemberType.Gansol);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                GUI.Label(new Rect(130, 10, 200, 20), "Disconnect");
-            }
-
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e.Message);
-        }
+        ShowChkMsg();
     }
 
-    public void GetPublicIP()
+
+    public void SwitchLoginType()
     {
-        WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
-        using (WebResponse response = request.GetResponse())
-        using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+        if (bSwitchLoginType)
         {
-            getIP = stream.ReadToEnd();
+            LoginType[0].SetActive(true);
+            LoginType[1].SetActive(false);
         }
-
-        //Search for the ip in the html
-        int first = getIP.IndexOf("Address: ") + 9;
-        int last = getIP.LastIndexOf("</body>");
-        getIP = getIP.Substring(first, last - first);
+        else
+        {
+            LoginType[0].SetActive(false);
+            LoginType[1].SetActive(true);
+        }
+        bSwitchLoginType = !bSwitchLoginType;
     }
 
-    public void GetHostIP()
+    private void ShowChkMsg()
     {
-
-        String strHostName = Dns.GetHostName();
-
-        /*
-
-        // 取得本機的 IpHostEntry 類別實體
-        IPHostEntry iphostentry = Dns.GetHostEntry(strHostName);
-
-        // 取得所有 IP 位址
-        int num = 1;
-        foreach (IPAddress ipaddress in iphostentry.AddressList)
+        if (!Global.LoginStatus)
         {
-            Console.WriteLine("IP #" + num + ": " + ipaddress.ToString());
-            num = num + 1;
-            getIP = ipaddress.ToString();
+            // 帳號檢查
+            if (emailChk == 0)
+            {
+                ErrorText[0].SetActive(true);
+                ErrorText[0].GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText[0].GetComponent<UILabel>().text = "X  Email Error!";
+            }
+            else if (emailChk == 1)
+            {
+                ErrorText[0].SetActive(true);
+                ErrorText[0].GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText[0].GetComponent<UILabel>().text = "O  Correct!";
+            }
+
+
+            // 密碼檢查 1
+            if (passwordChk == 0)
+            {
+                ErrorText[1].SetActive(true);
+                ErrorText[1].GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText[1].GetComponent<UILabel>().text = "X  Password Error!";
+            }
+            else if (passwordChk == 1)
+            {
+                ErrorText[1].SetActive(true);
+                ErrorText[1].GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText[1].GetComponent<UILabel>().text = "O  Correct!";
+            }
+
+
+            // 密碼檢查 2
+            if (confirmPasswordChk == 0 || equalPassword == 0)
+            {
+                ErrorText[2].SetActive(true);
+                ErrorText[2].GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText[2].GetComponent<UILabel>().text = "X  Password Error!";
+            }
+            else if (confirmPasswordChk == 1)
+            {
+                ErrorText[2].SetActive(true);
+                ErrorText[2].GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText[2].GetComponent<UILabel>().text = "O  Correct!";
+            }
+
+
+            // 暱稱檢查
+            if (nicknameChk == 0)
+            {
+                ErrorText[3].SetActive(true);
+                ErrorText[3].GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText[3].GetComponent<UILabel>().text = "X  Nickname Error!";
+            }
+            else if (nicknameChk == 1)
+            {
+                ErrorText[3].SetActive(true);
+                ErrorText[3].GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText[3].GetComponent<UILabel>().text = "O  Correct!";
+            }
         }
-        */
-        IPAddress ip = System.Net.Dns.GetHostEntry(strHostName).AddressList[0];
-        getIP = ip.ToString();
     }
+
+    public void Login(UILabel email, UIInput password)
+    {
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChkBtn);
+        LoginPanel.SetActive(false);
+        isLoginBtn = true;
+        Global.Hash = Encrypt(password.value);
+        char[] splitChar = new char[] { '@' };
+        string[] account = email.text.Split(splitChar);
+        Global.Account = account[0];
+        Global.MemberType = MemberType.Gansol;
+        Global.photonService.Login(Global.Account, Global.Hash, MemberType.Gansol); // 登入
+    }
+
+    public void OpenJoinPanel(GameObject myPanel, GameObject joinPanel)
+    {
+        EventMaskSwitch.Switch(myPanel, true);
+        myPanel.SetActive(false);
+        joinPanel.SetActive(true);
+    }
+
+    public void OpenLoginPanel(GameObject myPanel, GameObject loginPanel)
+    {
+        myPanel.SetActive(false);
+        loginPanel.SetActive(true);
+    }
+
+    public void JoinMember(UILabel email, UIInput password, UIInput confrimPassword, UILabel nickname, UILabel age, UILabel sex)
+    {
+        int getSex = -1;
+        char[] sTrim = { ' ', '-', '+' };
+
+        // 帳號檢查
+        if (!String.IsNullOrEmpty(email.text))
+            emailChk = (textUtility.EMailChk(email.text) == 1 && email.text.Length >= 8) ? 1 : 0;
+
+        // 密碼檢查 1
+        if (!String.IsNullOrEmpty(password.value))
+            passwordChk = (textUtility.SaveTextChk(password.value) == 1 && password.value.Length >= 8) ? 1 : 0;
+
+        // 密碼檢查 2
+        if (!String.IsNullOrEmpty(confrimPassword.value))
+            confirmPasswordChk = (textUtility.SaveTextChk(confrimPassword.value) == 1 && confrimPassword.value.Length >= 8) ? 1 : 0;
+
+        // 暱稱檢查
+        if (!String.IsNullOrEmpty(nickname.text))
+            nicknameChk = (textUtility.SaveTextChk(nickname.text) == 1 && nickname.text.Length >= 3) ? 1 : 0;
+
+        // 性別檢查
+        if (!String.IsNullOrEmpty(sex.text))
+            getSex = SelectGender(sex.text);
+
+        // 年齡檢查
+        if (!String.IsNullOrEmpty(sex.text))
+            getSex = SelectGender(sex.text);
+
+        if ((password.value == confrimPassword.value) && emailChk == 1 && passwordChk == 1 && confirmPasswordChk == 1 && nicknameChk == 1)
+        {
+            foreach (GameObject obj in ErrorText)
+            {
+                obj.SetActive(false);
+            }
+
+
+            char[] splitChar = new char[] { '@' };
+            string[] account = email.text.Split(splitChar);
+            Global.Account = account[0];
+            Global.Hash = Encrypt(password.value);
+            Global.MemberType = MemberType.Gansol;
+
+            //SaveLoginInfo(accountToggle.value, passwordToggle.value);
+
+
+            Global.photonService.JoinMember(email.text, Global.Hash, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
+            OpenLoginPanel(JoinPanel, LoginPanel);
+        }
+        else
+        {
+            if (password.value != confrimPassword.value) equalPassword = 0;
+            password.value = "";
+            confrimPassword.value = "";
+        }
+    }
+
+    private void SaveLoginInfo(bool memAccount, bool memPD)
+    {
+        bool bChange = false;
+        StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+
+        Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
+
+        if (memAccount)
+        {
+            if (!data.ContainsKey("Account"))
+            {
+                data.Add("Account", Global.Account);
+            }
+            else if (data["Account"] != Global.Account)
+            {
+                data["Account"] = Global.Account;
+                bChange = true;
+            }
+        }
+
+        if (memPD)
+        {
+            if (!data.ContainsKey("Hash"))
+            {
+                data.Add("Hash", Global.Hash);
+            }
+            else if (data["Hash"] != Global.Hash)
+            {
+                data["Hash"] = Global.Hash;
+                bChange = true;
+            }
+        }
+
+        if (bChange)
+        {
+            string contant = Json.Serialize(data);
+            if (File.Exists(Global.dataPath + jFileName))
+                File.Delete(Global.dataPath + jFileName);
+            using (FileStream fs = File.Create(Global.dataPath + jFileName)) //using 會自動關閉Stream 建立檔案
+            {
+                fs.Write(new UTF8Encoding(true).GetBytes(contant), 0, contant.Length); //寫入檔案
+                fs.Dispose(); //避免錯誤 在寫一次關閉
+            }
+        }
+    }
+
+    IEnumerator LoadFile(string filePath)
+    {
+        WWW www = new WWW(filePath);
+        yield return www;
+        jString = www.text;
+    }
+
+    private Dictionary<string, object> GetSkillData(DataTable dt)
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>();
+
+        if (dt != null)
+        {
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                Dictionary<string, string> tmp = new Dictionary<string, string>();
+                string id = dt.Rows[i]["SkillID"].ToString();
+                string type = dt.Rows[i]["SkillType"].ToString();
+                string name = dt.Rows[i]["SkillName"].ToString();
+                string level = dt.Rows[i]["SkillLevel"].ToString();
+                string time = dt.Rows[i]["SkillTime"].ToString();
+                string coldDown = dt.Rows[i]["ColdDown"].ToString();
+                string energy = dt.Rows[i]["Energy"].ToString();
+                string dealy = dt.Rows[i]["Delay"].ToString();
+                string attr = dt.Rows[i]["Attr"].ToString();
+
+                tmp.Add("SkillType", type);
+                tmp.Add("ItemName", name);
+                tmp.Add("SkillLevel", level);
+                tmp.Add("SkillTime", time);
+                tmp.Add("ColdDown", coldDown);
+                tmp.Add("Energy", dealy);
+                tmp.Add("Delay", dealy);
+                tmp.Add("Attr", attr);
+                data.Add(id, tmp);
+            }
+        }
+        else
+        {
+            Debug.LogError("DataTable is Null !");
+        }
+
+        return data;
+    }
+
     // Login Event
     private void OnJoinMember(bool joinStatus, string returnCode, string message)
     {
-        joinResult = message;
         Global.isJoinMember = joinStatus;
         Global.Ret = returnCode;
+        EventMaskSwitch.PrevToFirst();
+        // Global.photonService.Login(Global.Account, Global.Hash, Global.MemberType);
+        LoginMessageBox.gameObject.SetActive(true);
+        LoginMessageBox.color = Color.green;
+        LoginMessageBox.text = "O  " + message;
     }
 
-    private void OnLogin(bool loginStatus, string message, string returnCode, int primaryID, string account, string nickname, byte sex, byte age, MemberType memberType)
+    private void OnLogin(bool loginStatus, string message, string returnCode)
     {
         if (loginStatus) // 若登入成功，將會員資料存起來
         {
-            Global.Ret = returnCode;
-            Global.PrimaryID = primaryID;
-            Global.Account = account;
-            Global.Nickname = nickname;
-            Global.Sex = sex;
-            Global.Age = age;
-            Global.LoginStatus = true;
-            Global.MemberType = memberType;
+            //  ShowMatchGame();
+            LoginPanel.SetActive(false);
+            Global.ShowMessage("登入成功！", Global.MessageBoxType.Default);
+            //EventMaskSwitch.PrevToFirst();
+            Global.photonService.LoadItemData();
+            LoginPanel.SetActive(false);
         }
         else // 若登入失敗，取得錯誤回傳字串
         {
             isLoginBtn = false;
-            Global.Ret = returnCode;
-            Global.Account = "";
-            Global.LoginStatus = false;
-            loginResult = message;
+            LoginPanel.SetActive(true);
+            LoginMessageBox.gameObject.SetActive(true);
+            Global.ShowMessage(message, Global.MessageBoxType.Default);
+            LoginMessageBox.color = Color.red;
+            LoginMessageBox.text = "X  " + message;
         }
     }
+
+    //private void ShowMatchGame()
+    //{
+    //    MatchGame.SetActive(!Global.isMatching);
+    //}
+
     public void Logout(MemberType memberType)
     {
         switch ((byte)memberType)
@@ -279,22 +428,44 @@ public class LoginUI : MonoBehaviour
         }
     }
 
+    #region GoogleLogin
     public void GoogleLogin()
     {
+
         if (!isLoginBtn)
         {
+            Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+            LoginPanel.SetActive(false);
             Debug.Log("Google Logining...");
             isLoginBtn = true;
+            if (!Social.localUser.authenticated)
+                PlayGamesPlatform.Activate();
             Social.localUser.Authenticate((bool success) =>
             {
                 if (success)
                 {
                     Debug.Log("You've successfully logged in" + Social.localUser.id);
+                    if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
-                    Global.Account = Social.localUser.id;
-                    Global.Nickname = Social.localUser.userName;
+
+                    Global.MemberType = MemberType.Google;
                     Debug.Log(Global.Account);
-                    Global.photonService.Login(Global.Account, "12345678", MemberType.Google); // 登入
+
+
+                    // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
+                    Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
+                    Global.Hash = Encrypt(Global.Account);
+                    Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
+
+                    //string email = ((PlayGamesLocalUser)Social.localUser).Email;
+                    bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
+                    int age = (underage) ? 88 : 6;
+
+                    //if (String.IsNullOrEmpty(email))
+                    //    email = "example@example.com";
+
+                    Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+                    Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
                 }
                 else
                 {
@@ -303,7 +474,9 @@ public class LoginUI : MonoBehaviour
             });
         }
     }
+    #endregion
 
+    #region  FBLogin
     public void FaceBookLogin()
     {
         FB.Init(SetInit, OnHideUnity);
@@ -315,6 +488,7 @@ public class LoginUI : MonoBehaviour
         if (FB.IsLoggedIn)
         {
             Debug.Log("login");
+            FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
         }
         else
         {
@@ -347,27 +521,44 @@ public class LoginUI : MonoBehaviour
         }
     }
 
+    // 普通登入時使用
+    // FB Login
     void GetFBProfiler(FBResult result)
     {
+
         if (result.Error != null)
         {
             Debug.Log("Get FB profiler error!");
             FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
             return;
         }
-        Global.MemberType = MemberType.Facebook;
-
+        //Global.MemberType = MemberType.Facebook;
+        //if (!Global.photonService.ServerConnected) 
+        //    gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
         FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
+        Debug.Log(FBProfiler["id"].ToString());
+        Debug.Log(FBProfiler["name"].ToString());
+        Debug.Log(FBProfiler["email"].ToString());
+        Debug.Log(FBProfiler["gender"].ToString());
+        Debug.Log(FBProfiler["birthday"].ToString());
 
-        Global.Account = FBProfiler["id"].ToString();
-        Global.photonService.Login(Global.Account, "12345678", MemberType.Facebook); // 登入
+        string[] tmp = FBProfiler["email"].ToString().Split('@');
+        Global.Account = tmp[0];
+        Global.Hash = Encrypt(Global.Account);
+        Global.MemberType = MemberType.Facebook;
+        Global.photonService.Login(Global.Account, Global.Hash, MemberType.Facebook); // 登入
 
         foreach (var item in FBProfiler)
         {
             Debug.Log("KEY:" + item.Key.ToString() + "Value:" + item.Value.ToString());
         }
+
+        LoginPanel.SetActive(false);
+        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
     }
+    #endregion
+
 
     void OnExitMainGame()
     {
@@ -375,17 +566,26 @@ public class LoginUI : MonoBehaviour
         Global.photonService.JoinMemberEvent -= OnJoinMember;
         Global.photonService.LoadSceneEvent -= OnExitMainGame;
         Global.photonService.ReLoginEvent -= OnReLogin;
+        //Global.photonService.ExitWaitingEvent -= ShowMatchGame; // 注意一下是否要使用
 
     }
+
     void OnReLogin()
     {
         Global.LoginStatus = false;
         Global.isMatching = false;
         isLoginBtn = false;
+        LoginPanel.SetActive(true);
+        LoginMessageBox.gameObject.SetActive(true);
+        LoginMessageBox.color = Color.red;
+        LoginMessageBox.text = "X  " + "重複登入！";
     }
 
+    // 加入會員後 再度取得資料並登入
     void OnGetProfile()
     {
+        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+        LoginPanel.SetActive(false);
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)
         {
@@ -406,12 +606,16 @@ public class LoginUI : MonoBehaviour
                         byte sex = SelectGender(gender);
                         Debug.Log("sex" + sex);
                         Debug.Log("AGE" + age);
-                        Global.photonService.JoinMember(account, "12345678", name, Convert.ToByte(age), sex, MemberType.Facebook);
+                        // string tmpPD = "12345678";
+                        Global.Account = account;
+                        Global.Hash = Encrypt(Global.Account);
+                        Global.MemberType = MemberType.Facebook;
+                        Global.photonService.JoinMember(email, Global.Hash, name, Convert.ToByte(age), sex, GetPublicIP(), MemberType.Facebook);
                         Debug.Log("HAHA3 " + Convert.ToByte(age) + "  " + sex);
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        throw e;
+                        throw;
                     }
                     break;
                 }
@@ -421,10 +625,67 @@ public class LoginUI : MonoBehaviour
 
     byte SelectGender(string gender)
     {
-        if (gender == "female")
-            return 0;
-        if (gender == "male")
-            return 1;
+        if (!String.IsNullOrEmpty(gender))
+        {
+            if (gender == "female" || gender == "Female" || gender == "女")
+                return 0;
+            if (gender == "male" || gender == "Male" || gender == "男")
+                return 1;
+        }
         return 2;
+    }
+
+    public string GetPublicIP()
+    {
+        WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
+        using (WebResponse response = request.GetResponse())
+        using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+        {
+            getIP = stream.ReadToEnd();
+        }
+
+        //Search for the ip in the html
+        int first = getIP.IndexOf("Address: ") + 9;
+        int last = getIP.LastIndexOf("</body>");
+        getIP = getIP.Substring(first, last - first);
+        Debug.Log("ip:" + getIP);
+
+        return getIP;
+    }
+
+    public void GetHostIP()
+    {
+
+        String strHostName = Dns.GetHostName();
+
+        /*
+
+        // 取得本機的 IpHostEntry 類別實體
+        IPHostEntry iphostentry = Dns.GetHostEntry(strHostName);
+
+        // 取得所有 IP 位址
+        int num = 1;
+        foreach (IPAddress ipaddress in iphostentry.AddressList)
+        {
+            Console.WriteLine("IP #" + num + ": " + ipaddress.ToString());
+            num = num + 1;
+            getIP = ipaddress.ToString();
+        }
+        */
+        IPAddress ip = System.Net.Dns.GetHostEntry(strHostName).AddressList[0];
+        getIP = ip.ToString();
+        Debug.Log("ip:" + getIP);
+    }
+
+    /// <summary>
+    /// 破壞編碼 固定長度加密
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="length"></param>
+    /// <returns></returns>
+    private string Encrypt(string data)
+    {
+        string tmpString = TextUtility.SHA512Complier(Gansol.TextUtility.SerializeToStream(data));
+        return TextUtility.SHA1Complier(Gansol.TextUtility.SerializeToStream(tmpString));
     }
 }

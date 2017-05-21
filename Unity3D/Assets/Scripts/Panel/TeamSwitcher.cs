@@ -39,7 +39,7 @@ public class TeamSwitcher : MonoBehaviour
     [Tooltip("失效時時顏色")]
     public float disableColor = 0.5f;
     [Tooltip("隊伍離開距離")]                                 // 可以增加老鼠離開時自動加到最後
-    public float leftDist = 100f;
+    public float leftDist = 50f;
     public bool _activeBtn;                                   // 按鈕啟動狀態
 
     private GameObject _clone, _other;           // 複製物件、碰撞時對方物件、原老鼠位置
@@ -65,9 +65,10 @@ public class TeamSwitcher : MonoBehaviour
     {
         if (transform.childCount == 0)  // 如果沒有圖片 取消交換、拖曳功能、按鈕功能
         {
-            GetComponent<TeamSwitcher>().enabled = false;
             GetComponent<UIDragObject>().enabled = false;
+            GetComponent<TeamSwitcher>().enabled = false;
             _activeBtn = false;
+
         }
         MoveMotion();
     }
@@ -190,8 +191,9 @@ public class TeamSwitcher : MonoBehaviour
             _other = gameObject;
             _goTarget = _destroy = true;
             TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-            transform.GetChild(0).GetComponent<UISprite>().depth -= _depth;
-            //Debug.Log("return.");
+//            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+            DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
+         //   Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
         }
         else if (tag == "TeamIcon")
         {
@@ -200,7 +202,7 @@ public class TeamSwitcher : MonoBehaviour
                 _other = gameObject;
                 _goTarget = _destroy = true;
                 TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-                transform.GetChild(0).GetComponent<UISprite>().depth -= _depth; //有問題 UnityException: Transform child out of bounds
+                DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
                 //Debug.Log("return.");
             }
             else if (_distance > leftDist)  // B1>out
@@ -229,12 +231,12 @@ public class TeamSwitcher : MonoBehaviour
     {
         if (tag == "MiceIcon" && _other.tag == "TeamIcon" && _other != gameObject)    // A>B
         {
-            string miceName = transform.GetChild(0).name;
+            string miceID = transform.GetChild(0).name;
 
             if (_other.transform.childCount == 0)                                   // 如果移動到Team的位置"沒有"Mice 移至Team
             {
-                Mice2Team(miceName);
-                AddTeam(miceName, null);
+                Mice2Team(miceID);
+                AddTeam(miceID, null);
 
             }
             else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(_other.transform.GetChild(0).name) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
@@ -242,8 +244,8 @@ public class TeamSwitcher : MonoBehaviour
                 string otherName = _other.transform.GetChild(0).name;
                 tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
                 tm.dictLoadedTeam.Remove(otherName);                       // 之後移除參考
-                Mice2Team(miceName);
-                AddTeam(miceName, _other);
+                Mice2Team(miceID);
+                AddTeam(miceID, _other);
                 Destroy(_other.transform.GetChild(0).gameObject);
             }
             else
@@ -257,7 +259,7 @@ public class TeamSwitcher : MonoBehaviour
             {
                 string myName = transform.GetChild(0).name;
                 string otherName = _other.transform.GetChild(0).name;
-                ExchangeObject(myName, otherName, Global.Team);
+                ExchangeObject(myName, otherName, Global.dictTeam);
 
                 GameObject tmp = _other.transform.GetChild(0).gameObject;
                 transform.GetChild(0).parent = _other.transform;
@@ -281,6 +283,7 @@ public class TeamSwitcher : MonoBehaviour
         }
         else
         {
+            RetOrigin();
             Debug.LogError("SwitchBtn Error!");//RetOrigin();
         }
     }
@@ -290,11 +293,11 @@ public class TeamSwitcher : MonoBehaviour
     /// <summary>
     /// 老鼠移動至隊伍，更新按鈕字典參考(無紀錄順序)
     /// </summary>
-    /// <param name="miceName"></param>
-    void Mice2Team(string miceName)
+    /// <param name="miceID"></param>
+    void Mice2Team(string miceID)
     {
-        tm.dictLoadedTeam.Add(miceName, _clone);   // 要加Team的_clone才對
-        tm.dictLoadedMice[miceName] = _clone;      //重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
+        tm.dictLoadedTeam.Add(miceID, _clone);   // 要加Team的_clone才對
+        tm.dictLoadedMice[miceID] = _clone;      //重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
 
         _other.GetComponent<TeamSwitcher>().enabled = true;
         _other.GetComponent<TeamSwitcher>().EnableBtn();
@@ -331,9 +334,9 @@ public class TeamSwitcher : MonoBehaviour
     /// <param name="bDragOut">拉入T 或 移出F</param>
     private void TeamSequence(GameObject teamRef, bool bDragOut)
     {
-        Dictionary<string, object> team = new Dictionary<string, object>(Global.Team);
+        Dictionary<string, object> team = new Dictionary<string, object>(Global.dictTeam);
         int btnNo = int.Parse(teamRef.name.Remove(0, teamRef.name.Length - 1));
-        string miceName = teamRef.transform.GetChild(0).name;
+       // string miceName = teamRef.transform.GetChild(0).name;
 
         if (bDragOut)
         {
@@ -362,7 +365,7 @@ public class TeamSwitcher : MonoBehaviour
                     tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().enabled = true;
                     tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
                 }
-                Global.Team = team;
+                Global.dictTeam = team;
             }
         }
     }
@@ -377,7 +380,7 @@ public class TeamSwitcher : MonoBehaviour
 
             if (!tm.dictLoadedTeam.ContainsKey(miceName) && tm.dictLoadedTeam.Count != teamCountMax)  // full and same
             {
-                Dictionary<string, object> team = Global.Team;
+                Dictionary<string, object> team = Global.dictTeam;
                 GameObject teamBtn = tm.infoGroupsArea[2].transform.GetChild(team.Count).gameObject;
 
                 Move2Clone();
@@ -409,8 +412,8 @@ public class TeamSwitcher : MonoBehaviour
     /// <param name="dictServerData">對方的名稱</param>
     private void ExchangeObject(string myName, string otherName, Dictionary<string, object> dictServerData)
     {
-        Global.SwapDictKeyByValue(myName, otherName, dictServerData);
-        Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, dictServerData);
+        Global.SwapDictValueByKey(myName, otherName, dictServerData);
+        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictServerData);
     }
     #endregion
 
@@ -418,35 +421,32 @@ public class TeamSwitcher : MonoBehaviour
     /// <summary>
     /// 交換/加入隊伍(JSON)(順序採自動累計)
     /// </summary>
-    ///<param name="miceName">老鼠名稱</param>
+    ///<param name="miceID">老鼠名稱</param>
     ///<param name="teamBtn">=null時為增加成員</param>
-    private void AddTeam(string miceName, GameObject teamBtn)
+    private void AddTeam(string miceID, GameObject teamBtn)
     {
-        Dictionary<string, object> dictTeam = new Dictionary<string, object>(Global.Team);
+        Dictionary<string, object> dictTeam = new Dictionary<string, object>(Global.dictTeam);
 
         if (teamBtn != null)  // 交換隊伍成員
         {
             if (teamBtn.transform.childCount != 0)
             {
-                string teamName = teamBtn.transform.GetChild(0).name;
+                string teamID = teamBtn.transform.GetChild(0).name;
+                string spriteName = tm.GetLoadedMice(miceID).GetComponentInChildren<UISprite>().spriteName;
 
-                string itemID = dictTeam.FirstOrDefault(x => x.Value.ToString() == teamName).Key;
-                string otherItemID = Global.MiceAll.FirstOrDefault(x => x.Value.ToString() == miceName).Key;
-                dictTeam[itemID] = miceName;
-
-                Global.RenameKey(dictTeam, itemID, otherItemID);
-                Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, dictTeam);
-
-                tm.dictLoadedMice[teamName].SendMessage("EnableBtn");
+                dictTeam[teamID] = spriteName.Remove(spriteName.Length - 4);    
+                Global.RenameKey(dictTeam, teamID, miceID);
+                tm.dictLoadedMice[teamID].SendMessage("EnableBtn");
             }
         }
         else // 增加隊伍成員
         {
-            string itemID = Global.MiceAll.FirstOrDefault(x => x.Value.ToString() == miceName).Key;
-            dictTeam.Add(itemID, miceName);
+            object miceName = "";
+            Global.dictMiceAll.TryGetValue(miceID, out miceName);
+            dictTeam.Add(miceID, miceName);
         }
-        Global.Team = dictTeam;
-        Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, dictTeam);
+        Global.dictTeam = dictTeam;
+        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictTeam);
     }
     #endregion
 
@@ -455,14 +455,13 @@ public class TeamSwitcher : MonoBehaviour
     /// 減少隊伍數量(JSON)
     /// 【請先排序】後再進行移除
     /// </summary>
-    private void RemoveTeam(string name)
+    private void RemoveTeam(string itemID)
     {
         // 移除隊伍成員
-        Dictionary<string, object> dictTeam = Global.Team;
-        string itemID = dictTeam.FirstOrDefault(x => x.Value.ToString() == name).Key;
+        Dictionary<string, object> dictTeam = Global.dictTeam;
         dictTeam.Remove(itemID);
-        Global.Team = dictTeam;
-        Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, dictTeam);
+        Global.dictTeam = dictTeam;
+        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictTeam);
     }
     #endregion
 
@@ -495,10 +494,10 @@ public class TeamSwitcher : MonoBehaviour
     public void DisableBtn()
     {
         TweenColor.Begin(this.gameObject, tweenColorSpeed, new Color(disableColor, disableColor, disableColor));
-        GetComponent<TeamSwitcher>()._activeBtn = false;
-        GetComponent<TeamSwitcher>().enabled = false;
         GetComponent<UIDragObject>().enabled = false;
         GetComponent<BoxCollider>().isTrigger = false;
+        GetComponent<TeamSwitcher>()._activeBtn = false;
+        GetComponent<TeamSwitcher>().enabled = false;
         _isTrigged = false;
     }
     #endregion
@@ -506,11 +505,12 @@ public class TeamSwitcher : MonoBehaviour
     #region -- DisableBtn 關閉按鈕(外部呼叫) --
     public void EnableBtn()
     {
-        TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
         GetComponent<TeamSwitcher>().enabled = true;
         GetComponent<TeamSwitcher>()._activeBtn = true;
         GetComponent<UIDragObject>().enabled = true;
         GetComponent<BoxCollider>().isTrigger = false;
+
+        TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
         _isTrigged = false;
     }
     #endregion

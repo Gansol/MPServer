@@ -37,7 +37,7 @@ namespace MPCOM
         #region JoinMember(Gansol) 加入會員
 
         [AutoComplete]
-        public MemberData JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime)
+        public MemberData JoinMember(string account, string password, string nickname, byte age, byte sex, string IP, string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "(Logic)S100";
@@ -54,7 +54,7 @@ namespace MPCOM
                     memberData.ReturnMessage = "會員帳號內含不合法字元!!";
                     return memberData;
                 }
-                else if (account.Length < 8 || account.Length > 16)
+                else if (account.Length < 8 || account.Length > 64)
                 {
                     memberData.ReturnCode = "S102";
                     memberData.ReturnMessage = "會員帳號長度不正確(8~16字元)!!";
@@ -68,21 +68,24 @@ namespace MPCOM
                     memberData.ReturnMessage = "會員密碼內含不合法字元!!";
                     return memberData;
                 }
-                else if (password.Length < 8 || password.Length > 16)
-                {
-                    memberData.ReturnCode = "S103";
-                    memberData.ReturnMessage = "會員密碼長度不正確(8~16字元)!!";
-                    return memberData;
-                }
+                //else if (password.Length < 8 || password.Length > 16)
+                //{
+                //    memberData.ReturnCode = "S103";
+                //    memberData.ReturnMessage = "會員密碼長度不正確(8~16字元)!!";
+                //    return memberData;
+                //}
+
+                char[] charsToTrim = { '　', '*', ' ', '\'', '#', '$', '%', '^', '&', '*', '(', ')' };
+                nickname = nickname.Trim(charsToTrim);
 
                 // 檢查暱稱
-                if (textUtility.SaveTextChk(nickname, new char[] { '#', '$', '%', '^', '&', '*', '(', ')' }) != 1)
-                {
-                    memberData.ReturnCode = "S104";
-                    memberData.ReturnMessage = "會員暱稱內含不合法字元!!";
-                    return memberData;
-                }
-                else if (nickname == "" || nickname.Length <= 0 || nickname.Length > 12)
+                //if (textUtility.SaveTextChk(nickname, new char[] { '#', '$', '%', '^', '&', '*', '(', ')' }) != 1)
+                //{
+                //    memberData.ReturnCode = "S104";
+                //    memberData.ReturnMessage = "會員暱稱內含不合法字元!!";
+                //    return memberData;
+                //}
+                if (nickname == "" || nickname.Length <= 0 || nickname.Length > 32)
                 {
                     memberData.ReturnCode = "S104";
                     memberData.ReturnMessage = "會員暱稱長度不正確(1~12字元)!!";
@@ -90,7 +93,7 @@ namespace MPCOM
                 }
 
                 // 檢查年齡
-                if ((textUtility.NumTextChk(age.ToString()) !=1) || age<=0 || age>=100)
+                if ((textUtility.NumTextChk(age.ToString()) != 1) || age <= 0 || age >= 100)
                 {
                     memberData.ReturnCode = "S105";
                     memberData.ReturnMessage = "請選擇正確年齡!!";
@@ -98,15 +101,16 @@ namespace MPCOM
                 }
 
                 // 檢查性別
-                if (sex<0 || sex>1)
+                if ((sex < 0 || sex > 1) && sex != 3)
                 {
                     memberData.ReturnCode = "S106";
                     memberData.ReturnMessage = "請選擇正確性別!!";
                     return memberData;
                 }
 
+
                 // 檢查Email
-                if (textUtility.EMailChk(email)!=1)
+                if (textUtility.EMailChk(email) != 1)
                 {
                     memberData.ReturnCode = "S107";
                     memberData.ReturnMessage = "請輸入正確Email !!";
@@ -120,8 +124,8 @@ namespace MPCOM
                 }
 
                 // 驗證成功後再進行IO寫入 寫入後存入 memberData
-               MemberIO memberIO = new MemberIO();
-               memberData = memberIO.JoinMember(account, password, nickname, age, sex, IP, email, joinTime,"Gansol");
+                MemberIO memberIO = new MemberIO();
+                memberData = memberIO.JoinMember(account, password, nickname, age, sex, IP, email, joinTime, memberType);
 
             }
             catch (Exception e)
@@ -137,31 +141,17 @@ namespace MPCOM
         #region JoinMember(SNS) 加入會員
 
         [AutoComplete]
-        public MemberData JoinMember(string account, string nickname, string IP,string email, string joinTime, byte memberType)
+        public MemberData JoinMember(string account, string nickname, string IP, string email, string joinTime, byte memberType)
         {
             MemberData memberData = new MemberData();
             memberData.ReturnCode = "(Logic)S100";
             memberData.ReturnMessage = "";
-            string SNSType = "";
             try
             {
-                switch (memberType)
-                {
-                    case 2: //Google
-                        SNSType = "Google";
-                        break;
-                    case 3: //Facebook
-                        SNSType = "Facebook";
-                        break;
-                    case 4: // Twitter
-                        SNSType = "Twitter";
-                        break;
-                }
-
                 // 驗證成功後再進行IO寫入 寫入後存入 memberData
                 MemberIO memberIO = new MemberIO();
                 // memberData = memberIO.JoinMember(account,"25d55ad283aa400af464c76d713c07ad", nickname,IP,joinTime, SNSType); //MD5
-                memberData = memberIO.JoinMember(account,"12345678", nickname,IP,email,joinTime, SNSType);
+                memberData = memberIO.JoinMember(account, "80f99b1aa38deb107754bfc11286b00248daa15b", nickname, IP, email, joinTime, memberType);
 
             }
             catch (Exception e)
@@ -213,5 +203,27 @@ namespace MPCOM
         }
         #endregion
 
+
+
+        #region MemberLogin 會員登入
+        [AutoComplete]
+        public MemberData UpdateMember(string account,string jString)
+        {
+            MemberData memberData = new MemberData();
+            memberData.ReturnCode = "S200";
+            memberData.ReturnMessage = "";
+            try
+            {
+                //如果檢查成功 進行會員資料比對
+                MemberIO memberIO = new MemberIO();
+                memberData = memberIO.UpdateMember(account, jString);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return memberData;
+        }
+        #endregion
     }
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -21,29 +22,68 @@ public class AssetBundleChecker : MonoBehaviour
     #region 欄位
     CreateJSON createJSON;
     AssetBundlesDownloader bundleDownloader;
-    private string localItemListText; //本機 檔案列表內容
+
+    public int downloadCount;           // 下載數量
+    public bool bundleChk,bFristLoad;              // 資源檢查
+    private string localItemListText;   // 本機 檔案列表內容
     private int reConnTimes = 0;
-    private bool _bundleChk = false;
     #endregion
 
     void Start()
     {
         createJSON = gameObject.AddComponent<CreateJSON>();
         bundleDownloader = gameObject.AddComponent<AssetBundlesDownloader>();
-        reConnTimes = 0;
+        downloadCount = reConnTimes = 0;
+        bundleChk = false;
     }
 
     #region -- CompareAssetBundles --
     public void StartCheck() //開始檢查檔案
     {
-        StartCoroutine(CompareAssetBundle(Application.persistentDataPath + "/List/" + Global.sItemList, Global.serverListPath + Global.sItemList));
+        bundleChk = false;
+        StartCoroutine(DownloadBundleVersion(Application.persistentDataPath + "/List/" + Global.bundleVersionFile, Global.serverListPath + Global.bundleVersionFile));
+        StartCoroutine(CompareAssetBundle(Application.persistentDataPath + "/List/" + Global.itemListFile, Global.serverListPath + Global.itemListFile));
     }
+
+    private IEnumerator DownloadBundleVersion(string localPathFile, string serverPathFile) //比對 檔案
+    {
+        Global.ReturnMessage = "開始檢查遊戲資產...";
+        createJSON.AssetBundlesJSON(); //建立最新 檔案列表
+    ReCheckFlag:
+        using (WWW wwwVersionList = new WWW(serverPathFile))
+        { // 下載 伺服器 檔案列表
+            yield return wwwVersionList;
+
+            if (wwwVersionList.error != null && reConnTimes < Global.maxConnTimes)
+            {
+                reConnTimes++;
+                Global.ReturnMessage = "無法下載資源列表，嘗試重新下載(" + reConnTimes + "/" + Global.maxConnTimes + ")";
+                Debug.Log("Download Vision List Error !   " + wwwVersionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
+                yield return new WaitForSeconds(1.0f);
+                goto ReCheckFlag;
+            }
+            if (wwwVersionList.isDone && wwwVersionList.error == null)
+            {
+                Global.bundleVersion = System.Convert.ToInt16(wwwVersionList.text);
+                Debug.Log("遊戲資源版本:" + Global.bundleVersion);
+                reConnTimes = 0;
+                Global.ReturnMessage = "下載資源版本列表完成!";
+            }
+            else if (reConnTimes >= Global.maxConnTimes)
+            {
+                Global.ReturnMessage = Global.ReturnMessage = "無法連線至伺服器，請檢查網路狀態!"; ;
+                Debug.Log("Can't connecting to Server! Please check your network status.");
+                wwwVersionList.Dispose();
+            }
+        }
+    }
+
 
     private IEnumerator CompareAssetBundle(string localPathFile, string serverPathFile) //比對 檔案
     {
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
-
+    ReCheckFlag:
         using (WWW wwwItemList = new WWW(serverPathFile))
         { // 下載 伺服器 檔案列表
             yield return wwwItemList;
@@ -51,21 +91,23 @@ public class AssetBundleChecker : MonoBehaviour
             if (wwwItemList.error != null && reConnTimes < Global.maxConnTimes)
             {
                 reConnTimes++;
-                Global.ReturnMessage = "Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")";
+                Global.ReturnMessage = "無法下載檔案列表，嘗試重新下載(" + reConnTimes + "/" + Global.maxConnTimes + ")";
                 Debug.LogError("Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
                 yield return new WaitForSeconds(1.0f);
+                goto ReCheckFlag;
             }
-            if (wwwItemList.isDone)
+            if (wwwItemList.isDone && wwwItemList.error == null)
             {
                 reConnTimes = 0;
-                Global.ReturnMessage = "Item List Downloaded!";
+                Global.ReturnMessage = "檔案列表下載完成!";
                 CompareListFile(wwwItemList.text, localPathFile);
 
             }
-            else if (reConnTimes == Global.maxConnTimes)
+            else if (reConnTimes >= Global.maxConnTimes)
             {
-                Global.ReturnMessage = "Can't connecting to Server! Please check your network status.";
-                //Debug.Log("Can't connecting to Server! Please check your network status.");
+                Global.ReturnMessage = Global.ReturnMessage = "無法連線至伺服器，請檢查網路狀態!"; ;
+                Debug.Log("Can't connecting to Server! Please check your network status.");
+                wwwItemList.Dispose();
             }
         }
     }
@@ -111,10 +153,11 @@ public class AssetBundleChecker : MonoBehaviour
         HashSet<string> hashLocalList = new HashSet<string>();
         HashSet<string> hashDelorAdd = new HashSet<string>();
 
-        
+
         if (localItemListText == "{}" || localItemListText == "") //本機檔案 被砍光光了 下載全部檔案
         {
-            bundleDownloader.DownloadListFile(Global.sFullPackage);
+            bFristLoad = true;
+            bundleDownloader.DownloadListFile(Global.fullPackageFile);
         }
         else if ((localItemListText != wwwText))  // 如果 檔案不同 就儲存 進 HashSet 比對資料
         {
@@ -134,12 +177,13 @@ public class AssetBundleChecker : MonoBehaviour
                 hashLocalList.Add(localItem.Key); //把 本機 檔案列表存入HashSet等待比較
             }
             hashLocalList.ExceptWith(hashDelorAdd); // (hashLocalList)要刪除的檔案 = 本機檔案 - 要保存的檔案(無變動檔案)
+            //Debug.Log(hashLocalList.Count);
             bundleDownloader.DeleteFile(hashLocalList); //刪除檔案  //目前狀態 檔案已刪除 LocalList還是舊的
 
             hashLocalList.Clear(); //清除 本機資料列表(要刪除的檔案，不能再比對，要重新再讀一次本機資料)
             hashDelorAdd.Clear(); //清除 保留檔案列表
             createJSON.AssetBundlesJSON();//重新建立 本機 檔案列表
-        #endregion
+            #endregion
 
             #region 新增檔案
             dictJsonLocalList = MiniJSON.Json.Deserialize(File.ReadAllText(localPathFile)) as Dictionary<string, object>; //存入本機檔案列表至 dictJsonLocalList
@@ -157,28 +201,30 @@ public class AssetBundleChecker : MonoBehaviour
             }
 
             hashServerList.ExceptWith(hashDelorAdd);// hashServerList 新增檔案 = 伺服器檔案 - 已存在檔案
-            bundleDownloader.fileCount = hashServerList.Count;
-
+            downloadCount = bundleDownloader.fileCount = hashServerList.Count;
+            if (downloadCount > 0) bundleChk = true;
             if (hashServerList.Count != 0)
             {
-                foreach (string item in hashServerList) // 下載檔案
-                    bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
+                //foreach (string item in hashServerList) // 下載檔案
+                //    bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
+
+                bundleDownloader.DownloadFile(Global.assetBundlesPath, hashServerList.ToList<string>());
             }
             else
             {
-                Global.ReturnMessage = "Nothing to update.";
+                Global.ReturnMessage = "遊戲資源為最新版本!";
                 Global.isCompleted = true;
             }
             #endregion
-            
+
         }
         else // 與伺服器檔案相同
         {
-            Global.ReturnMessage = "Nothing to update.";
+            Global.ReturnMessage = "遊戲資源為最新版本!";
             //Debug.Log("Nothing to update.");
             Global.isCompleted = true;
         }
     }
     #endregion
-    
+
 }

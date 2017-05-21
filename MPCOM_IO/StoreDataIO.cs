@@ -162,11 +162,11 @@ namespace MPCOM
                                 dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
                                 j++;
 
-                                Log.Debug(dictData2[col.ColumnName]);
+                             //   Log.Debug(dictData2[col.ColumnName]);
                             }
 
                             dictData.Add(itemID, dictData2);
-                            Log.Debug(dictData[itemID]);
+                          //  Log.Debug(dictData[itemID]);
                             i++;
                         }
                         storeData.StoreItem = Json.Serialize(dictData);

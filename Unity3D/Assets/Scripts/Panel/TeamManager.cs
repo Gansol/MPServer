@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 using System.Linq;
+using MPProtocol;
+using System;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -40,13 +42,14 @@ public class TeamManager : PanelManager
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
 
-    private int _page;                                                              // 翻頁值(翻一頁+10)
+    //private int _page;                                                              // 翻頁值(翻一頁+10)
+    private int _miceCost;
     private float _lastClickTime;                                                   // 點擊間距時間
     private static bool _bFirstLoad;                                                // 是否第一次載入
-    private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
+    private bool _bLoadedIcon, _bLoadedActor, _bLoadedEffect;                                       // 是否載入圖片、是否載入角色
 
     private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
-    private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
+    private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
     #endregion
 
     void Awake()
@@ -54,15 +57,30 @@ public class TeamManager : PanelManager
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
-        _dictTeamData = new Dictionary<string, object>();
+        //_dictTeamData = new Dictionary<string, object>();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
 
-        _page = 0;
+        //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
 
-        Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
+
+    }
+
+
+    void OnEnable()
+    {
+        Global.photonService.LoadPlayerDataEvent += OnCostCheck;
+        Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
+        Global.photonService.UpdateMiceEvent += OnCostCheck;
+    }
+
+    void OnDisable()
+    {
+        Global.photonService.LoadPlayerDataEvent -= OnCostCheck;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPanel;
+        Global.photonService.UpdateMiceEvent -= OnCostCheck;
     }
 
     void Update()
@@ -71,20 +89,29 @@ public class TeamManager : PanelManager
             if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
                 Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (assetLoader.loadedObj && _bLoadedIcon)
+        if (assetLoader.loadedObj && _bLoadedIcon  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
             _bLoadedIcon = !_bLoadedIcon;
+            _bLoadedEffect = !_bLoadedEffect;
             assetLoader.init();
-            InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
-            InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
-            ActiveMice(Global.Team);
+            InstantiateIcon(Global.dictMiceAll, infoGroupsArea[0].transform);
+            LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+            InstantiateIcon(Global.dictTeam, infoGroupsArea[2].transform);
+            // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
+            ActiveMice(Global.dictTeam);
+            StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));
+            EventMaskSwitch.Resume();
+             GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+            EventMaskSwitch.Switch(gameObject, false);
+            EventMaskSwitch.lastPanel = gameObject;
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
-            InstantiateActor(_btnClick.gameObject.GetComponentInChildren<UISprite>().name, _actorParent.transform, actorScale);
+            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - 4);
+            InstantiateActor(bundleName, _actorParent.transform, actorScale);
         }
     }
 
@@ -100,20 +127,58 @@ public class TeamManager : PanelManager
         _doubleClickChk = btn_mice;
     }
 
-    IEnumerator OnClickCoroutine(GameObject btn_mice)   //Single Click
+    IEnumerator OnClickCoroutine(GameObject miceBtn)   //Single Click
     {
         yield return new WaitForSeconds(delayBetween2Clicks);
         if (Time.time - _lastClickTime < delayBetween2Clicks)
             yield break;
+        if (miceBtn.GetComponentInChildren<UISprite>())
+        {
+            _bLoadedActor = LoadActor(miceBtn, _actorParent.transform, actorScale);
+            _btnClick = miceBtn;
 
-        _bLoadedActor = LoadActor(btn_mice, _actorParent.transform, actorScale);
-        _btnClick = btn_mice;
-        
-        LoadProperty loadProerty = new LoadProperty();
-        loadProerty.LoadMiceProperty(btn_mice.transform.GetChild(0).gameObject, infoGroupsArea[1], 0);
+            LoadProperty loadProerty = new LoadProperty();
+            loadProerty.LoadItemProperty(miceBtn.GetComponentInChildren<UISprite>().gameObject, infoGroupsArea[1], Global.miceProperty, (int)MPProtocol.StoreType.Mice);    // 載入老鼠屬性   
+            LoadPlayerMiceProp(miceBtn.GetComponentInChildren<UISprite>().gameObject); // 載入玩家老鼠資料
+            // InstantiateItem(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            // InstantiateSkill(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        }
+    }
+    #endregion
 
-        //Debug.Log(btn_mice.transform.GetChild(0).name);
-        //Debug.Log("Simple click");
+    #region LoadItemCount
+    private void LoadItemCount(Dictionary<string, object> data, Transform parent)
+    {
+        object miceData;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).GetComponentInChildren<UISprite>() != null)
+                if (data.TryGetValue(parent.GetChild(i).GetComponentInChildren<UISprite>().name, out miceData))
+                {
+                    Dictionary<string, object> miceProp = miceData as Dictionary<string, object>;
+                    parent.parent.FindChild("ItemCount").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
+                }
+        }
+    }
+    #endregion
+
+    #region LoadPlayerMiceProp
+    private void LoadPlayerMiceProp(GameObject miceBtn)
+    {
+        object rank, exp, data;
+        float miceMaxExp;
+
+        Global.playerItem.TryGetValue(miceBtn.name, out data);
+
+        Dictionary<string, object> miceProp = data as Dictionary<string, object>;
+        miceProp.TryGetValue(PlayerItem.Rank.ToString(), out rank);
+        miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
+        miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
+
+        infoGroupsArea[1].transform.FindChild("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
+        infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
+        infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
     }
     #endregion
 
@@ -124,7 +189,7 @@ public class TeamManager : PanelManager
     /// <param name="dictServerData">ServerData</param>
     /// <param name="dictLoadedObject">Client Loaded Object</param>
     /// <param name="myParent">實體化父系位置</param>
-    void InstantiateIcon(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> dictLoadedObject, Transform myParent)
+    void InstantiateIcon(Dictionary<string, object> dictServerData, Transform myParent)
     {
         int i = 0;
         Dictionary<string, GameObject> tmp = new Dictionary<string, GameObject>();
@@ -134,27 +199,25 @@ public class TeamManager : PanelManager
             string bundleName = item.Value.ToString() + "ICON";
             GameObject bundle = assetLoader.GetAsset(bundleName);
 
-            if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
+            if (bundle != null)                  // 已載入資產時
             {
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
                 if (miceBtn.childCount == 0)
                 {
-                    bundle = assetLoader.GetAsset(bundleName);
                     ObjectFactory insObj = new ObjectFactory();
-                    insObj.Instantiate(bundle, miceBtn, item.Value.ToString(), Vector3.zero, Vector3.one, Vector2.zero, -1);
+                    insObj.Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
 
-                    Add2Refs(bundle, miceBtn);     // 加入物件參考
+                    Add2Refs(item.Key, miceBtn);     // 加入物件參考
 
                     miceBtn.GetComponent<TeamSwitcher>().enabled = true;           // 開啟老鼠隊伍交換功能
                     miceBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn"); // 開啟按鈕功能
                 }
                 else
                 {
-                    string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
+                    //string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
 
-                    tmp.Add(item.Value.ToString(), miceBtn.gameObject);
-                    dictLoadedObject = tmp;
-                    miceBtn.GetChild(0).name = item.Value.ToString();
+                    tmp.Add(item.Key, miceBtn.gameObject);
+                    miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;
                 }
                 i++;
@@ -168,10 +231,52 @@ public class TeamManager : PanelManager
     }
     #endregion
 
+    private void InstantiateItem(Transform parent, string objectID)
+    {
+        int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", objectID.ToString()));
+        string bundleName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
+        GameObject bundle = assetLoader.GetAsset(bundleName);
+
+        if (bundle != null)                  // 已載入資產時
+        {
+            if (parent.childCount == 0)
+            {
+                ObjectFactory insObj = new ObjectFactory();
+                insObj.Instantiate(bundle, parent, objectID.ToString(), Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
+            }
+            else
+            {
+                parent.GetComponentInChildren<UISprite>().gameObject.name = objectID.ToString();
+                parent.GetComponentInChildren<UISprite>().spriteName = bundleName;
+            }
+        }
+    }
+
+    private void InstantiateSkill(Transform parent, string objectID)
+    {
+        int skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "SkillID", objectID.ToString()));
+        string bundleName = ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillName", objectID.ToString()).ToString();
+        GameObject bundle = assetLoader.GetAsset(bundleName);
+
+        if (bundle != null)                  // 已載入資產時
+        {
+            if (parent.childCount == 0)
+            {
+                ObjectFactory insObj = new ObjectFactory();
+                insObj.Instantiate(bundle, parent, objectID.ToString(), Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
+            }
+            else
+            {
+                parent.GetComponentInChildren<UISprite>().gameObject.name = objectID.ToString();
+                parent.GetComponentInChildren<UISprite>().spriteName = bundleName;
+            }
+        }
+    }
     #region -- OnLoadPanel 載入面板--
     public override void OnLoading()
     {
         Global.photonService.LoadPlayerData(Global.Account);
+        Global.photonService.LoadPlayerItem(Global.Account);
     }
 
     protected override void OnLoadPanel()
@@ -182,46 +287,90 @@ public class TeamManager : PanelManager
 
             if (_bFirstLoad)
             {
-                dictNotLoadedAsset = Global.MiceAll;
+                dictNotLoadedAsset = Global.dictMiceAll;
                 _bFirstLoad = false;
             }
             else
             {
-                ExpectOutdataObject(Global.MiceAll, _dictMiceData, dictLoadedMice);
-                ExpectOutdataObject(Global.Team, _dictMiceData, dictLoadedTeam);
-                _dictMiceData = SelectNewData(Global.MiceAll, _dictMiceData);
+                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+                ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, dictLoadedMice);
+                ExpectOutdataObject(Global.dictTeam, _dictMiceData, dictLoadedTeam);
+                _dictMiceData = SelectNewData(Global.dictMiceAll, _dictMiceData);
 
                 dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
+
+                EventMaskSwitch.Resume();
+                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+                EventMaskSwitch.Switch(gameObject, false);
+                EventMaskSwitch.lastPanel = gameObject;
             }
-   
+
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
                 assetLoader.init();
                 assetLoader.LoadAsset(iconPath + "/", "MiceICON");
+                // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedIcon = LoadIconObject(dictNotLoadedAsset, iconPath);
             }                                   // 已載入物件 實體化
             else
             {
-                InstantiateIcon(Global.MiceAll, dictLoadedMice, infoGroupsArea[0].transform);
-                InstantiateIcon(Global.Team, dictLoadedTeam, infoGroupsArea[2].transform);
-                ActiveMice(Global.Team);
+                InstantiateIcon(Global.dictMiceAll, infoGroupsArea[0].transform);
+                InstantiateIcon(Global.dictTeam, infoGroupsArea[2].transform);
+                ActiveMice(Global.dictTeam);
             }
-            _dictMiceData = Global.MiceAll;
-            _dictTeamData = Global.Team;
+            _dictMiceData = Global.dictMiceAll;
+            //_dictTeamData = Global.Team;
             Global.isPlayerDataLoaded = false;
+
+            OnCostCheck();
         }
-    } 
+    }
     #endregion
+
+    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+    //private bool LoadEffectAsset(Dictionary<string, object> dictNotLoadedAsset)
+    //{
+    //    int itemID, skillID;
+    //    string itemName, skillName;
+
+    //    assetLoader.LoadAsset("ItemICON" + "/", "ItemICON");
+    //    assetLoader.LoadAsset("Effects" + "/", "Effects");
+    //    if (dictNotLoadedAsset != null)
+    //    {
+    //        foreach (KeyValuePair<string, object> item in dictNotLoadedAsset)
+    //        {
+    //            itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+    //            itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
+    //            skillID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "SkillID", item.Key));
+    //            skillName = ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillName", skillID.ToString()).ToString();
+
+    //            assetLoader.LoadPrefab("ItemICON" + "/", itemName + "ICON");   // 載入 ICON
+    //            assetLoader.LoadPrefab("Effects" + "/", skillName + "Effect");  // 載入 Effect
+    //        }
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    } 
+    //}
+
+    public void OnClosed(GameObject obj)
+    {
+        EventMaskSwitch.lastPanel = null;
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        // EventMaskSwitch.Prev();
+    }
 
     #region -- ActiveMice 隱藏/顯示老鼠 --
     private void ActiveMice(Dictionary<string, object> dictTeamData) // 把按鈕變成無法使用 如果老鼠已Team中
     {
         foreach (KeyValuePair<string, object> item in dictTeamData)
         {
-            if (dictLoadedMice.ContainsKey(item.Value.ToString()))
-                dictLoadedMice[item.Value.ToString()].SendMessage("DisableBtn");
+            if (dictLoadedMice.ContainsKey(item.Key.ToString()))
+                dictLoadedMice[item.Key.ToString()].SendMessage("DisableBtn");
             else
-                dictLoadedMice[item.Value.ToString()].SendMessage("EnableBtn");
+                dictLoadedMice[item.Key.ToString()].SendMessage("EnableBtn");
         }
     }
     #endregion
@@ -232,34 +381,83 @@ public class TeamManager : PanelManager
     /// </summary>
     /// <param name="bundle">AssetBundle</param>
     /// <param name="myParent">參考按鈕</param>
-    void Add2Refs(GameObject bundle, Transform myParent)
+    void Add2Refs(string bundle, Transform myParent)
     {
         string btnArea = myParent.parent.name;                          //按鈕存放區域名稱 Team / Mice 區域
-        string miceName = bundle.name.Remove(bundle.name.Length - 4);
+        //string miceName = bundle.name.Remove(bundle.name.Length - 4);
+        //string miceName = bundle.name.Remove(bundle.name.Length - 4);
 
         if (btnArea == "Mice")
-            dictLoadedMice.Add(miceName, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置
+            dictLoadedMice.Add(bundle, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置
         else
-            dictLoadedTeam.Add(miceName, myParent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
+            dictLoadedTeam.Add(bundle, myParent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
     }
     #endregion
 
     #region --字典 檢查/取值 片段程式碼 --
 
-    public GameObject GetLoadedMice(string miceName)
+    public GameObject GetLoadedMice(string miceID)
     {
         GameObject obj;
-        if (dictLoadedMice.TryGetValue(miceName, out obj))
+        if (dictLoadedMice.TryGetValue(miceID, out obj))
             return obj;
         return null;
     }
 
-    public GameObject GetLoadedTeam(string miceName)
+    public GameObject GetLoadedTeam(string miceID)
     {
         GameObject obj;
-        if (dictLoadedTeam.TryGetValue(miceName, out obj))
+        if (dictLoadedTeam.TryGetValue(miceID, out obj))
             return obj;
         return null;
     }
     #endregion
+
+    private void OnCostCheck()
+    {
+        object value;
+        int maxCost = Clac.ClacCost(Global.Rank);
+        _miceCost = 0;
+        Dictionary<string, object> data;
+        foreach (KeyValuePair<string, object> mice in Global.dictTeam)
+        {
+            data = Global.miceProperty[mice.Key] as Dictionary<string, object>;
+            data.TryGetValue("MiceCost", out value);
+            _miceCost += Convert.ToInt32(value);
+        }
+
+        
+        if (_miceCost > maxCost)
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
+        else
+            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+    }
+
+
+    //private void CheckSolt(){
+    //    if (Global.Rank < 5)
+    //        infoGroupsArea[2].transform.GetChild(1).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(1).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 10)
+    //        infoGroupsArea[2].transform.GetChild(2).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(2).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 15)
+    //        infoGroupsArea[2].transform.GetChild(3).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(3).gameObject.SetActive(true);
+
+    //    if (Global.Rank < 20)
+    //        infoGroupsArea[2].transform.GetChild(4).gameObject.SetActive(false);
+    //    else
+    //        infoGroupsArea[2].transform.GetChild(4).gameObject.SetActive(true);
+    //}
+
+    private void None()
+    {
+
+    }
 }

@@ -82,7 +82,7 @@ public class PhotonTestOnly : MonoBehaviour {
         }
         if (GUI.Button(new Rect(100, 300, 100, 100), "Test2"))
         {
-            Global.photonService.UpdateMiceData(Global.Account, Global.MiceAll, Global.Team);
+            Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, Global.dictTeam);
         }
     }
 }

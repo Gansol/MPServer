@@ -12,7 +12,6 @@ public class dem : MonoBehaviour
          loader = gameObject.AddComponent<AssetLoader>();
         loader.LoadAsset("MiceICON/", "MiceICON");
         loader.LoadPrefab("MiceICON/", "EggMiceICON");
-        Vector3 a, b;
 
         Debug.Log("coll pos:" + coll.transform.position);
         Debug.Log("coll2 pos:" + coll2.transform.position);

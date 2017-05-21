@@ -5,7 +5,7 @@ using MiniJSON;
 
 public class JsonSample : MonoBehaviour
 {
-    List<string> a = new List<string> { };
+//    List<string> a = new List<string> { };
     // Use this for initialization
     void Start()
     {

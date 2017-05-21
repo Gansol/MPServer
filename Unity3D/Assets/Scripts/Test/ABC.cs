@@ -1,15 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ABC : LoadSceneDestroyTest {
+public class ABC : MonoBehaviour  {
 
-	// Use this for initialization
-	void Start () {
-        Debug.Log(c);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+public void fuck(){
+    Global.photonService.LoadPlayerData(Global.Account);
+}
 }

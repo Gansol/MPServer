@@ -1918,16 +1918,31 @@ public class UILabel : UIWidget
 	/// by selecting a value in the UIPopupList.
 	/// </summary>
 
-	public void SetCurrentSelection ()
-	{
-		if (UIPopupList.current != null)
-		{
-			text = UIPopupList.current.isLocalized ?
-				Localization.Get(UIPopupList.current.value) :
-				UIPopupList.current.value;
-		}
-	}
-
+    //public void SetCurrentSelection ()    // 原始
+    //{
+    //    if (UIPopupList.current != null)
+    //    {
+    //        text = UIPopupList.current.isLocalized ?
+    //            Localization.Get(UIPopupList.current.value) :
+    //            UIPopupList.current.value;
+    //    }
+    //}
+    public void SetCurrentSelection()// 修改
+    {
+        if (UIPopupList.current != null)
+        {
+            text = UIPopupList.current.isLocalized ?
+                Localization.Get(UIPopupList.current.value) :
+                UIPopupList.current.value;
+        }
+        // Lumos: Scrollable popup lists
+        else if (UIScrollablePopupList.current != null)
+        {
+            text = UIScrollablePopupList.current.isLocalized ?
+                Localization.Get(UIScrollablePopupList.current.value) :
+                UIScrollablePopupList.current.value;
+        }
+    }
 	/// <summary>
 	/// Convenience function -- wrap the current text given the label's settings and unlimited height.
 	/// </summary>

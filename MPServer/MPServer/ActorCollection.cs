@@ -1,6 +1,8 @@
 ﻿using ExitGames.Logging;
 using System;
 using System.Collections.Generic;
+using MPProtocol;
+
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -30,7 +32,7 @@ namespace MPServer
         protected Dictionary<Guid, int> GuidGetPrimary { get; set; }                // 索引列表 用機器識別 找主索引  Key:guid Vaule:PrimaryID
         protected Dictionary<string, int> AccountGetPrimary { get; set; }           // 索引列表 用帳號 找主索引  Key:Account Vaule:PrimaryID
         protected Dictionary<string, int> NicknameGetPrimary { get; set; }          // 索引列表 用會員名稱 找主索引 Key:Nickname Vaule:PrimaryID
-
+        protected Dictionary<int, byte> MemberTypeGetPrimary { get; set; }    // 索引列表 用Bot 找PK Key:Nickname Vaule:PrimaryID
         private bool isKick = false;                                                // 是否被踢了
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();   // LOG
 
@@ -46,6 +48,7 @@ namespace MPServer
             GuidGetPrimary = new Dictionary<Guid, int>();
             AccountGetPrimary = new Dictionary<string, int>();
             NicknameGetPrimary = new Dictionary<string, int>();
+            MemberTypeGetPrimary = new Dictionary<int, byte>();
         }
 
         #region 線上會員 ActorOnline
@@ -62,7 +65,7 @@ namespace MPServer
         /// <param name="ServerPeer"></param>
         /// <returns></returns>
 
-        public ActorReturn ActorOnline(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP, MPServerPeer serverPeer)
+        public ActorReturn ActorOnline(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP, MPServerPeer serverPeer, byte memberType)
         {
             ActorReturn actorReturn = new ActorReturn();
             actorReturn.ReturnCode = "S300";
@@ -149,6 +152,10 @@ namespace MPServer
                         if (!NicknameGetPrimary.ContainsKey(Nickname))  // 若會員帳號暱稱索引會員編號列表沒有資料，加入索引
                             NicknameGetPrimary.Add(Nickname, PrimaryID);
 
+                        if (!MemberTypeGetPrimary.ContainsKey(PrimaryID) && memberType == (byte)MemberType.Bot)  // 若會員帳號暱稱索引會員編號列表沒有資料，加入索引
+                            MemberTypeGetPrimary.Add(PrimaryID, memberType);
+
+                        Log.Debug("MemberTypeGetPrimary:" + MemberTypeGetPrimary.Count + "PrimaryID: " + PrimaryID + "  memberType: " + memberType);
                         actorReturn.ReturnCode = "S301";                     // 加入線上會員資料成功
                         actorReturn.DebugMessage = "";
 
@@ -172,7 +179,7 @@ namespace MPServer
         /// 登出一筆會員資料，會順便移除Peer
         /// </summary>
         /// <param name="Guid"></param>
- 
+
         public void ActorOffline(Guid guid)
         {
             if (!isKick)
@@ -210,7 +217,10 @@ namespace MPServer
                                 if (NicknameGetPrimary.ContainsKey(actor.Nickname))     // 移除會員暱稱索引列表資料
                                     NicknameGetPrimary.Remove(actor.Nickname);
 
+                                if (MemberTypeGetPrimary.ContainsKey(_PrimaryID))     // 移除會員類別索引列表資料
+                                    MemberTypeGetPrimary.Remove(_PrimaryID);
 
+                                ConnectedClients.Remove(guid);
                                 PrimaryGetActor.Remove(_PrimaryID);                     // 移除會員列表資料
 
                                 actorReturn.ReturnCode = "S308";
@@ -244,15 +254,15 @@ namespace MPServer
             {
                 try
                 {
-                    
+
                     if (PrimaryGetGuid.ContainsKey(primaryID))
                     {
                         guid = GetGuidFromPrimary(primaryID);
-                        
+
                         RemoveConnectedPeer(guid); // 移除Peer
                         Log.Debug("(IN)HE Guid IS :" + guid);
                     }
-                    
+
                     Log.Debug("(OUT)HE Guid IS :" + guid);
 
                     int _PrimaryID = 0;
@@ -281,6 +291,9 @@ namespace MPServer
                             if (NicknameGetPrimary.ContainsKey(actor.Nickname))     // 移除會員暱稱索引列表資料
                                 NicknameGetPrimary.Remove(actor.Nickname);
 
+                            if (MemberTypeGetPrimary.ContainsKey(_PrimaryID))     // 移除會員類別索引列表資料
+                                MemberTypeGetPrimary.Remove(_PrimaryID);
+
                             PrimaryGetActor.Remove(_PrimaryID);                     // 移除會員列表資料
 
                             actorReturn.ReturnCode = "S308";
@@ -306,7 +319,8 @@ namespace MPServer
 
         public void RemoveConnectedPeer(Guid guid)                          // 移除連接的Peer
         {
-            ConnectedClients.Remove(guid);
+            if (guid != null)
+                ConnectedClients.Remove(guid);
         }
 
         /// <summary>
@@ -368,7 +382,7 @@ namespace MPServer
                 return GetActorFromPrimary(GuidGetPrimary[guid]);           // 用guid找PrimaryID 再用PrimaryID找 玩家資料
             }
         }
-        
+
         /// <summary>
         /// 用Guid 取得 玩家暱稱
         /// </summary>
@@ -434,6 +448,38 @@ namespace MPServer
             {
                 return GetActorFromPrimary(NicknameGetPrimary[Nickname]);   // 用Nickname找PrimaryID 再用PrimaryID找 玩家資料
             }
+        }
+
+        /// <summary>
+        /// 以玩家名稱 取得 玩家資料
+        /// </summary>
+        /// <param name="Nickname"></param>
+        /// <returns></returns>
+        public Actor GetActorFromMemberType(byte memberType)                  // 以玩家名稱 取得 玩家資料
+        {
+            Log.Debug("In GetActorFromMemberType");
+            if (!MemberTypeGetPrimary.ContainsValue(memberType))
+            {
+                foreach (KeyValuePair<int, byte> item in MemberTypeGetPrimary)
+                {
+                    Log.Debug("In Fuck: " + memberType + " KEY: " + item.Key + " Value: " + item.Value);
+                }
+
+                return null; //找不到
+            }
+            else
+            {
+                List<int> keys = new List<int>(MemberTypeGetPrimary.Keys);
+                Log.Debug("In keys:" + keys.Count);
+                Actor actor = GetActorFromPrimary(keys[0]);
+                Log.Debug("In actor:" + actor.Nickname);
+                return actor;   // 用memberType找PrimaryID 再用PrimaryID找 玩家資料
+            }
+        }
+
+        public Dictionary<Guid, MPServerPeer> GetOnlineActors()
+        {
+            return ConnectedClients;
         }
 
         /// <summary>

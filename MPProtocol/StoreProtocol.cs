@@ -43,4 +43,10 @@
         Armor = 3,
         Gashapon = 9,
     }
+
+    public enum CurrencyType : byte
+    {
+        Sliver = 0,
+        Gold,
+    }
 }

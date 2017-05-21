@@ -43,7 +43,7 @@ public class CreateJSON : MonoBehaviour
             }
         }
 
-        CreateFile(Json.Serialize(dictBundles), itemListURL, Global.sItemList); //建立 新 檔案列表
+        CreateFile(Json.Serialize(dictBundles), itemListURL, Global.itemListFile); //建立 新 檔案列表
     }
 
 
@@ -55,7 +55,6 @@ public class CreateJSON : MonoBehaviour
         using (FileStream fs = File.Create(path + fileName)) //using 會自動關閉Stream 建立檔案
         {
             fs.Write(new UTF8Encoding(true).GetBytes(contant), 0, contant.Length); //寫入檔案
-            fs.Dispose(); //避免錯誤 在寫一次關閉
         }
     }
 
@@ -63,7 +62,7 @@ public class CreateJSON : MonoBehaviour
     public IEnumerator DelList(HashSet<string> hashSet) //刪除列表值 並 重建
     {
         string pathURL = Application.persistentDataPath + "/List/";
-        string _listText = File.ReadAllText(pathURL + Global.sItemList);
+        string _listText = File.ReadAllText(pathURL + Global.itemListFile);
 
         Dictionary<string, object> dictJsonLocalList = MiniJSON.Json.Deserialize(_listText) as Dictionary<string, object>;//本機列表存入字典
 
@@ -72,7 +71,7 @@ public class CreateJSON : MonoBehaviour
 
         yield return _listText;
 
-        CreateFile(Json.Serialize(dictJsonLocalList), pathURL, Global.sItemList); //再把字典檔建立 新 檔案列表
+        CreateFile(Json.Serialize(dictJsonLocalList), pathURL, Global.itemListFile); //再把字典檔建立 新 檔案列表
     }
 
 

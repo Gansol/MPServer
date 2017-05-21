@@ -1,5 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
+using MPProtocol;
+using ExitGames.Logging;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -29,7 +31,7 @@ namespace MPCOM
     public class CurrencyLogic : ServicedComponent  // ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
         CurrencyData currencyData = new CurrencyData();
-
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         protected override bool CanBePooled()
         {
             return true;
@@ -62,7 +64,6 @@ namespace MPCOM
         #endregion
 
         #region UpdateCurrency
-
         [AutoComplete]
         public CurrencyData UpdateCurrency(string account, byte currencyType, int currency)
         {
@@ -84,11 +85,13 @@ namespace MPCOM
 
                 switch (currencyType)
                 {
-                    case 0:
+                    case (byte)CurrencyType.Sliver:
                         {
-                            if (currencyData.Rice > currency)
+                            rice = currencyData.Rice + currency;
+                            
+
+                            if (rice >= 0)
                             {
-                                rice = currencyData.Rice - currency;
                                 currencyData = currencyIO.UpdateCurrency(account, rice);
                             }
                             else
@@ -98,11 +101,13 @@ namespace MPCOM
                             }
                             break;
                         }
-                    case 1:
+                    case (byte)CurrencyType.Gold:
                         {
-                            if (currencyData.Gold > currency)
+
+                            gold =  Convert.ToInt16((currencyData.Gold + Convert.ToInt16(currency.ToString())).ToString());
+
+                            if (gold >= 0)
                             {
-                                gold = (Int16)(currencyData.Gold - (Int16)currency);
                                 currencyData = currencyIO.UpdateCurrency(account, gold);
                             }
                             else
@@ -118,15 +123,14 @@ namespace MPCOM
                         break;
                 }
             }
-            catch (Exception e)
+            catch
             {
-                throw e;
+                throw;
             }
 
             return currencyData;
 
         }
-
         #endregion
     }
 }

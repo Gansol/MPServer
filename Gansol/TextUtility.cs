@@ -127,7 +127,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw ;
+                throw;
             }
         }
         #endregion
@@ -137,7 +137,7 @@ namespace Gansol
         /// EMail字串格式是否正確
         /// </summary>
         /// <param name="EMail"></param>
-        /// <returns></returns>
+        /// <returns>1:正確,2:有空白,3:沒有@符號,4:@不能是第一碼,5:超過一個@或沒有@,6:沒有「.」</returns>
         public int EMailChk(string EMail)
         {
             try
@@ -243,7 +243,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw ;
+                throw;
             }
         }
         #endregion
@@ -279,7 +279,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw ;
+                throw;
             }
         }
         #endregion
@@ -366,7 +366,7 @@ namespace Gansol
             }
             catch (Exception e)
             {
-                throw ;
+                throw;
             }
         }
         #endregion
@@ -391,6 +391,47 @@ namespace Gansol
         }
         #endregion
 
+        #region SHA1雜湊編碼
+        /// <summary>
+        /// SHA1雜湊編碼 Notice: Broken hash string!
+        /// </summary>
+        /// <param name="bytesFile"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static string SHA1Complier(byte[] bytesFile)
+        {
+            byte[] bytes = bytesFile;
+
+            // Convert the encrypted bytes back to a string (base 16)
+            SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
+            byte[] hashBytes = sha1.ComputeHash(bytes);
+            string hashString = "";
+
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                hashString += System.Convert.ToString(hashBytes[i], 16).PadLeft(2, '0');
+            }
+            return hashString.PadLeft(40, '0');
+        }
+        #endregion
+
+        #region SHA512雜湊編碼
+        public static string SHA512Complier(byte[] bytesFile)
+        {
+            byte[] bytes = bytesFile;
+
+            // Convert the encrypted bytes back to a string (base 16)
+            SHA512CryptoServiceProvider sha1 = new SHA512CryptoServiceProvider();
+            byte[] hashBytes = sha1.ComputeHash(bytes);
+            string hashString = "";
+
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                hashString += System.Convert.ToString(hashBytes[i], 16).PadLeft(2, '0');
+            }
+            return hashString.PadLeft(64, '0');
+        }
+        #endregion
         #region 金錀加密後傳回加密字串
         public string EncryptDerivedKey(String SrcString, String Password, Byte[] Salt)
         {

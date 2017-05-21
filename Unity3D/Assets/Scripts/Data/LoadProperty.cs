@@ -10,49 +10,39 @@ public class LoadProperty
     /// <param name="name"></param>
     /// <param name="parent"></param>
     /// <param name="offset">基本=0。載入欄位偏移值</param>
-    public void LoadMiceProperty(GameObject item, GameObject parent, int offset)
+    public void LoadItemProperty(GameObject item, GameObject parent,Dictionary<string,object> itemData, int itemType)
     {
-        foreach (KeyValuePair<string, object> mice in Global.miceProperty)
+        string ColunmsName = itemType == (int)StoreType.Mice ? "MiceID" : "ItemID";
+
+        foreach (KeyValuePair<string, object> data in itemData)
         {
-            var nestedData = mice.Value as Dictionary<string, object>;
+            var nestedData = data.Value as Dictionary<string, object>;
             object value;
-            nestedData.TryGetValue("ItemID", out value);
+            nestedData.TryGetValue(ColunmsName, out value);
 
             if (item.name == value.ToString())
             {
                 int i = 0;
                 foreach (KeyValuePair<string, object> property in nestedData)
                 {
-                    if (i != 0) parent.transform.GetChild(i).GetComponent<UILabel>().text = property.Value.ToString();
+                    Transform infoField = parent.transform.FindChild(property.Key);
+                    if (infoField != null) infoField.GetComponent<UILabel>().text = property.Value.ToString();
                     i++;
                 }
             }
         }
-
-
-        //for (int i = offset; i < miceData.GetLength(0); i++)// 載入玩家擁有老鼠
-        //{
-        //    if (item.name == miceData[i, 1])                                 //如果按鈕和玩家擁有老鼠相同
-        //    {
-        //        for (int j = 0; j < miceData.GetLength(1); j++)     //載入老鼠資料
-        //        {
-        //            if (j != 0) parent.transform.GetChild(j).GetComponent<UILabel>().text = miceData[i, j];
-        //        }
-        //        break;
-        //    }
-        //}
     }
     #endregion
 
     #region LoadPrice
-    public void LoadPrice(GameObject item, GameObject parent ,int itemType)
+    public void LoadPrice(GameObject item, GameObject parent, int itemType)
     {
         int i = 0;
         foreach (KeyValuePair<string, object> mice in Global.storeItem)
         {
             var nestedData = mice.Value as Dictionary<string, object>;
             object value;
-            nestedData.TryGetValue("ItemName", out value);
+            nestedData.TryGetValue("ItemID", out value);
 
             if (item.name == value.ToString())
             {
@@ -66,25 +56,6 @@ public class LoadProperty
             }
             i++;
         }
-
-        //for (int i = 0; i < storeData.GetLength(0); i++)// 載入玩家擁有老鼠
-        //{
-        //    if (item.name == storeData[i, 1])                                 //如果按鈕和玩家擁有老鼠相同
-        //    {
-        //        for (int j = offset; j < storeData.GetLength(1); j++)     //載入老鼠資料
-        //        {
-        //            if (j != 0) parent.transform.GetChild(j).GetComponent<UILabel>().text = storeData[i, (int)StoreProperty.Price];
-        //        }
-        //        break;
-        //    }
-        //}
-    }
-    #endregion
-
-    #region LoadItemProperty
-    void LoadItemProperty()
-    {
-
     }
     #endregion
 
