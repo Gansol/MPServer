@@ -22,6 +22,8 @@ public class LoginUI : MonoBehaviour
     public UIInput accountField, passwordField;
     public UILabel LoginMessageBox;
     public UIToggle accountToggle, passwordToggle;
+
+    public GameObject[] LoginType;
     AssetLoader assetLoader;
     public GameObject[] ErrorText;
 
@@ -42,7 +44,7 @@ public class LoginUI : MonoBehaviour
     //private string JoinRoomResult = "";
     //private bool macthing = false;
     private static bool isLoginBtn = false;
-
+    private bool bSwitchLoginType;
     private int emailChk, passwordChk, confirmPasswordChk, equalPassword, nicknameChk;
     Dictionary<string, object> data;
 
@@ -116,6 +118,20 @@ public class LoginUI : MonoBehaviour
     }
 
 
+    public void SwitchLoginType()
+    {
+        if (bSwitchLoginType)
+        {
+            LoginType[0].SetActive(true);
+            LoginType[1].SetActive(false);
+        }
+        else
+        {
+            LoginType[0].SetActive(false);
+            LoginType[1].SetActive(true);
+        }
+        bSwitchLoginType = !bSwitchLoginType;
+    }
 
     private void ShowChkMsg()
     {

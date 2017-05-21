@@ -7,7 +7,11 @@ public class TutorialQuestion : MonoBehaviour {
 	void Start () {
 	
 	}
-	
+
+    void OnEnable()
+    {
+        StartCoroutine(Resume());
+    }
 	// Update is called once per frame
 	void Update () {
 	
@@ -24,4 +28,12 @@ public class TutorialQuestion : MonoBehaviour {
         transform.parent.gameObject.SetActive(true);
     }
 
+    private IEnumerator Resume()
+    {
+        yield return new WaitForSeconds(0.5f);
+        EventMaskSwitch.Resume();
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+        EventMaskSwitch.Switch(gameObject, false);
+        EventMaskSwitch.lastPanel = gameObject;
+    }
 }

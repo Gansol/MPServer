@@ -42,35 +42,45 @@ public class MatchManager : PanelManager
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
     public GameObject ok_btn;
-    public UILabel matchText,timeText;
-    //private int _page;                                                              // 翻頁值(翻一頁+10)
-    private float _lastClickTime;                                                   // 點擊間距時間
+    public UILabel matchText, timeText;
+    //private int _page;                                                              // 翻頁值(翻一頁+10)                                              
     private static bool _bFirstLoad;                                                // 是否第一次載入
     private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
 
+    private List<EventDelegate> onClickEvent;
     private GameObject _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
     private static int _miceCost, _maxCost = 100;
-    float _time, _lastTime, interval,escapeTime;
+    float _time, _lastTime, _lastClickTime, clickInterval, escapeTime;    // 點擊間距時間
     #endregion
 
     void Awake()
     {
-        interval = 2;
+        clickInterval = 2;
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
+        onClickEvent = new List<EventDelegate>();
         //_dictTeamData = new Dictionary<string, object>();
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
-        
+
         //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
+
+        UIEventListener.Get(ok_btn).onClick = OnMatchGame;
+    }
+
+
+    void OnEnable()
+    {
         Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
         Global.photonService.LoadPlayerItemEvent += None;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
         Global.photonService.UpdateMiceEvent += OnCostCheck;
 
     }
+
+
 
     void Update()
     {
@@ -81,13 +91,13 @@ public class MatchManager : PanelManager
                     Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
 
+            // 顯示 配對等待時間文字
             if (Global.isMatching && Time.time > _lastTime + 1)
             {
                 escapeTime++;
                 MatchScrollText();
                 _lastTime = Time.time;
             }
-
 
             if (assetLoader.loadedObj && _bLoadedIcon)
             {
@@ -112,7 +122,7 @@ public class MatchManager : PanelManager
     {
         try
         {
-            timeText.text = "(" +escapeTime.ToString() + ")";
+            timeText.text = "(" + escapeTime.ToString() + ")";
         }
         catch
         {
@@ -366,7 +376,7 @@ public class MatchManager : PanelManager
     }
 
     // Match按鈕使用 開始配對
-    public void OnMatchGame()
+    public void OnMatchGame(GameObject go)
     {
         if (!Global.isMatching && Global.LoginStatus)
         {
@@ -380,15 +390,55 @@ public class MatchManager : PanelManager
         }
     }
 
+    // 接收 同意好友對戰
+    private void OnApplyMatchGameFriend()
+    {
+        Panel[0].SetActive(true);
+        Panel[1].SetActive(false);
+
+        EventMaskSwitch.Resume();
+        if (EventMaskSwitch.lastPanel != gameObject)
+            EventMaskSwitch.lastPanel.SetActive(false);
+        EventMaskSwitch.Switch(gameObject, false);
+        EventMaskSwitch.lastPanel = gameObject;
+
+        UIEventListener.Get(ok_btn).onClick = MatchGameFriend;
+    }
+
+
+    private void MatchGameFriend(GameObject go)
+    {
+        if (!Global.isMatching && Global.LoginStatus)
+        {
+            matchText.text = "等待好友同意...";
+            escapeTime = 0;
+            Global.isMatching = true;
+            UIEventListener.Get(ok_btn).onClick = OnMatchGame;
+            Panel[1].SetActive(true);
+            Panel[0].SetActive(false);
+            timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
+            Global.isFriendMatching = true;
+            Global.photonService.MatchGameFriend();
+        }
+    }
+
     private void OnExitWaiting()
     {
         //matchText.text = "等待超時，請重新配對！";
-
+        EventMaskSwitch.lastPanel = null;
         Panel[0].SetActive(true);
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(transform.parent.gameObject);
+        Panel[1].SetActive(false);
+    }
+
+    void OnDisable()
+    {
+        Global.photonService.LoadPlayerDataEvent -= OnLoadPanel;
+        Global.photonService.LoadPlayerItemEvent -= None;
+        Global.photonService.ExitWaitingEvent -= OnExitWaiting;
+        Global.photonService.UpdateMiceEvent -= OnCostCheck;
         Panel[1].SetActive(false);
         Panel[1].transform.parent.parent.gameObject.SetActive(false);
-        EventMaskSwitch.lastPanel = null;
-        EventMaskSwitch.Resume();
     }
 
     //private void OnLoadScene()

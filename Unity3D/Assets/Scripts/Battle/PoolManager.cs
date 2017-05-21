@@ -106,6 +106,7 @@ public class PoolManager : MonoBehaviour
     private void OnLoadPlayerItem()
     {
         _dataFlag = true;
+        Debug.Log("OnLoadPlayerItem");
     }
 
     void Start()
@@ -115,8 +116,8 @@ public class PoolManager : MonoBehaviour
         LoadSpecialAsset();
         LoadItemAsset();
         LoadEffectAsset();
-        if (assetLoader.GetAsset("ItemICONPrefab") != null)
-            assetLoader.LoadAsset("ItemICON/", "ItemICON");
+        //if (assetLoader.GetAsset("ItemICONPrefab") != null)
+        //    assetLoader.LoadAsset("ItemICON/", "ItemICON");
 
     }
 
@@ -205,7 +206,9 @@ public class PoolManager : MonoBehaviour
 
             //_dictMiceObject.Add(10003, "Bali");
             InstantiateObject(_dictMiceObject);
+            Debug.Log("Instantiate Mice Completed!");
             InstantiateObject(_dictSpecialObject);
+            Debug.Log("Instantiate SpecialMice Completed!");
             InstantiateSkillMice(_dictSkillMice);
           //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
             _poolingFlag = true;
@@ -240,6 +243,8 @@ public class PoolManager : MonoBehaviour
             if (bundle != null)
                 Instantiate(item.Key.ToString(), bundle);
         }
+
+
     }
 
     void InstantiateSkillMice(Dictionary<string, object> objectData)
@@ -311,6 +316,8 @@ public class PoolManager : MonoBehaviour
             }
 
         }
+
+        Debug.Log("InstantiateSkillMice Completed!");
     }
 
     /// <summary>

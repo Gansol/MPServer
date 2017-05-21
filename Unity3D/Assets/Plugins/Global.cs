@@ -8,12 +8,12 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static readonly string serverPath = "http://180.218.164.232:58767/MicePow";//Server路徑
+    public static string serverPath = "http://180.218.164.232:58767/MicePowBETA";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
 #if UNITY_ANDROID
- "/DevList/";//  "/AndroidList/";   
+ "/AndroidList/";//  "/AndroidList/";   
 #elif UNITY_IPHONE
     "/iOSList/";
 #elif UNITY_STANDALONE_WIN
@@ -25,7 +25,7 @@ public static class Global
     //Android or iOS or Win 伺服器中的 檔案路徑
     public static readonly string assetBundlesPath = serverPath +
 #if UNITY_ANDROID
- "/DevBundles/"; // "/AndroidBundles/";
+ "/AndroidBundles/"; // "/AndroidBundles/";
 #elif UNITY_IPHONE
     "/iOSBundles/";
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -73,6 +73,7 @@ public static class Global
     public delegate void ShowMessageHandler(string message, MessageBoxType messageBoxType);
     public static event ShowMessageHandler ShowMessageEvent;
 
+    public static readonly string patchFile = "patch.txt"; // 資源版本
     public static readonly string itemListFile = "ItemList.json";          // 道具列表
     public static readonly string visionListFile = "VisionList.json";      // 版本列表
     public static readonly string downloadListFile = "DownloadList.json";  // 下載列表
@@ -100,13 +101,15 @@ public static class Global
     public static bool LoginStatus = false;	        // true = 已登入,  false = 未登入
     public static bool BattleStatus = false;        // 是否開始對戰
     public static bool isMatching = false;          // 是否配對成功
+    public static bool isFriendMatching = false;    // 是否配對成功
     public static bool isExitingRoom = false;       // 是否離開房間
+    public static bool isSyncGame = false;          // 是否載入場景
     public static bool isGameStart = false;         // 是否開始遊戲
     public static bool isApplySkill = false;        // 是否受到技能傷害
     public static bool spawnFlag = false;           // 是否產生完成
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
-
+    public static bool exitingGame = false;         // 是否執行任務
     public static int prevScene = (int)Scene.LogoScene;  // 上一個場景
     public static int nextScene = (int)Scene.BundleCheck;  // 要被載入的場景
 
@@ -163,6 +166,10 @@ public static class Global
 
     public static string ext = ".unity3d";       // AB副檔名
 
+
+    public delegate void ExitGameHandler();
+    public static event ExitGameHandler ExitGameEvent;
+
     public enum MessageBoxType
     {
         NonChkBtn = -1,
@@ -175,6 +182,11 @@ public static class Global
         ShowMessageEvent(message, messageBoxType);
     }
 
+    public static void ExitGame()
+    {
+        exitingGame = true;
+        ExitGameEvent();
+    }
 
     public static class OtherData
     {

@@ -1,40 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.Advertisements;
+using System;
+using System.Collections.Generic;
+using Gansol;
 
 public class AX : MonoBehaviour
 {
-    void Awake()
+    void Start()
     {
-        Advertisement.Initialize("1416657");
-        ShowRewardedAd();
-    }
-
-    public void ShowRewardedAd()
-    {
-        if (Advertisement.IsReady("video"))
-        {
-            var options = new ShowOptions { resultCallback = HandleShowResult };
-            Advertisement.Show("video", options);
-        }
-    }
-
-    private void HandleShowResult(ShowResult result)
-    {
-        switch (result)
-        {
-            case ShowResult.Finished:
-                Debug.Log("The ad was successfully shown.");
-                //
-                // YOUR CODE TO REWARD THE GAMER
-                // Give coins etc.
-                break;
-            case ShowResult.Skipped:
-                Debug.Log("The ad was skipped before reaching the end.");
-                break;
-            case ShowResult.Failed:
-                Debug.LogError("The ad failed to be shown.");
-                break;
-        }
+        string b;
+        Gansol.TextUtility tx = new TextUtility();
+        Debug.Log(b = tx.EncryptBase64String("http://180.218.164.232:58767/MicePowBETA"));
+        tx = new TextUtility();
+        Debug.Log(tx.DecryptBase64String("aHR0cDovLzE4MC4yMTguMTY0LjIzMjo1ODc2Ny9NaWNlUG93QkVUQQ=="));
     }
 
 }

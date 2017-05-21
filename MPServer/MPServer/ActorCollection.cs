@@ -220,6 +220,7 @@ namespace MPServer
                                 if (MemberTypeGetPrimary.ContainsKey(_PrimaryID))     // 移除會員類別索引列表資料
                                     MemberTypeGetPrimary.Remove(_PrimaryID);
 
+                                ConnectedClients.Remove(guid);
                                 PrimaryGetActor.Remove(_PrimaryID);                     // 移除會員列表資料
 
                                 actorReturn.ReturnCode = "S308";

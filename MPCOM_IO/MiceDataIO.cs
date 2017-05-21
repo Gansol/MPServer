@@ -67,7 +67,7 @@ namespace MPCOM
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
 
-                    Log.Debug("連線資訊 :" + sqlConn.ToString());
+                  //  Log.Debug("連線資訊 :" + sqlConn.ToString());
 
                     // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();

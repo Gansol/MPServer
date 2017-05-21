@@ -77,7 +77,7 @@ public static class AssetBundleManager
         _Ret = "C000";
         _progress = 0;
         _loadedABCount = 0;
-        loadedObjectCount = 0;
+        _loadedObjectCount = 0;
     }
 
     public class AssetBundleRef

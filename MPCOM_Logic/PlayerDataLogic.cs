@@ -595,7 +595,7 @@ namespace MPCOM
             List<string> columns = new List<string>(col);
 
             Dictionary<string, Dictionary<string, object>> dictSendData = new Dictionary<string, Dictionary<string, object>>();
-            Log.Debug("FUCK");
+           // Log.Debug("FUCK");
             //Log.Debug("dictServerItem.Count:" + dictServerItem.Count + "dictClient.Count:" + dictClient.Count);
 
             //object itemProp;
@@ -608,7 +608,7 @@ namespace MPCOM
 
                 foreach (KeyValuePair<string, object> dictNestedServerData in dictServerData)   // 伺服器道具資料 迴圈
                 {
-                    Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
+                  //  Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
 
 
                     object itemID; // 道具ID
@@ -620,7 +620,7 @@ namespace MPCOM
                     var dictServerItem = serverItemObejct as Dictionary<string, object>;
 
 
-                    Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
+                //    Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
 
 
 
@@ -645,10 +645,10 @@ namespace MPCOM
                     //dictServerItem.TryGetValue(PlayerItem.Rank.ToString(), out serverRank);
                     //dictServerItem.TryGetValue(PlayerItem.Exp.ToString(), out serverExp);
 
-                    foreach (KeyValuePair<string, object> item in dictClient)
-                    {
-                        Log.Debug("dictClient:" + item.Key);
-                    }
+                    //foreach (KeyValuePair<string, object> item in dictClient)
+                    //{
+                    //    Log.Debug("dictClient:" + item.Key);
+                    //}
 
                     if (bGetCount = dictClient.ContainsKey(PlayerItem.ItemCount.ToString()))
                         dictClient.TryGetValue(PlayerItem.ItemCount.ToString(), out clientCount);
@@ -657,8 +657,8 @@ namespace MPCOM
                     //bGetRank = dictClient.TryGetValue(PlayerItem.Rank.ToString(), out clientRank);
                     //bGetExp = dictClient.TryGetValue(PlayerItem.Exp.ToString(), out clientExp);
 
-                    Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientUseage: " + clientUseCount);
-                    Log.Debug(serverCount + "  " + clientUseCount);
+                  //  Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientUseage: " + clientUseCount);
+                  //  Log.Debug(serverCount + "  " + clientUseCount);
 
                     int sCount = Convert.ToInt32(serverCount);
                     int sUseage = Convert.ToInt32(serverUseage);
@@ -686,7 +686,7 @@ namespace MPCOM
                             useCount = cUseage + sUseage;
                             dictClient[PlayerItem.ItemCount.ToString()] = itemCount.ToString();
                             dictClient[PlayerItem.UseCount.ToString()] = useCount.ToString();
-                            Log.Debug("ItemCount: " + itemCount + "  UseCount: " + useCount);
+                          ///  Log.Debug("ItemCount: " + itemCount + "  UseCount: " + useCount);
                         }
                         else
                         {
@@ -798,7 +798,7 @@ namespace MPCOM
                     }
                     else
                     {
-                        Log.Debug(friend + "  " + account);
+                       // Log.Debug(friend + "  " + account);
                         playerData.ReturnCode = "S441";
                         playerData.ReturnMessage = "刪除好友失敗，不在好友列表！";
                         return playerData;

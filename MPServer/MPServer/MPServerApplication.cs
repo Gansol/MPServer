@@ -46,7 +46,6 @@ namespace MPServer
         protected override PeerBase CreatePeer(InitRequest initRequest) 
         {
             return new MPServerPeer(initRequest.Protocol, initRequest.PhotonPeer,this);
-            
         }
 
         // 伺服器初始化時

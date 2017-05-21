@@ -26,7 +26,7 @@ public class PhotonConnect : MonoBehaviour
 
     public void ConnectToServer()
     {
-        if (!Global.photonService.ServerConnected)
+        if (!Global.photonService.ServerConnected && !Global.exitingGame)
         {
             Global.photonService.ConnectEvent += doConnectEvent;
             Global.photonService.Connect(ServerIP, ServerPort, ServerName);
@@ -83,7 +83,7 @@ public class PhotonConnect : MonoBehaviour
             
             flag = true;
             ConnectStatus = true;
-            if(!firstLogin) Global.photonService.Login(Global.Account, Global.Hash, Global.MemberType);
+            if(!firstLogin && !Global.exitingGame) Global.photonService.Login(Global.Account, Global.Hash, Global.MemberType);
             firstLogin = false;
         }
         else

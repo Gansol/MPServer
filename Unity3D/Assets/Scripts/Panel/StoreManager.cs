@@ -67,7 +67,10 @@ public class StoreManager : PanelManager
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
         buyingGoodsData = new string[5];
+    }
 
+    void OnEnable()
+    {
         Global.photonService.LoadStoreDataEvent += OnLoadPanel;
         Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
     }
@@ -190,6 +193,7 @@ public class StoreManager : PanelManager
             infoGroupsArea[4].transform.Find("Item").gameObject.SetActive(false);
             infoGroupsArea[4].transform.Find("Mice").gameObject.SetActive(true);
 
+            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, Global.miceProperty, _itemType);
             loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemData, _itemType);
             loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemType);
 
@@ -581,5 +585,11 @@ public class StoreManager : PanelManager
                 _itemData = Global.itemProperty;
                 break;
         }
+    }
+
+    void OnDisable()
+    {
+        Global.photonService.LoadStoreDataEvent -= OnLoadPanel;
+        Global.photonService.UpdateCurrencyEvent -= LoadPlayerInfo;
     }
 }

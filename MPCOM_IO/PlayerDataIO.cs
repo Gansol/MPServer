@@ -70,7 +70,7 @@ namespace MPCOM
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
 
-                    Log.Debug("連線資訊 :" + sqlConn.ToString());
+                   // Log.Debug("連線資訊 :" + sqlConn.ToString());
 
                     // 讀取玩家資料 填入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
@@ -144,7 +144,7 @@ namespace MPCOM
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
 
-                    Log.Debug("連線資訊 :" + sqlConn.ToString());
+                   // Log.Debug("連線資訊 :" + sqlConn.ToString());
 
                     // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
@@ -224,7 +224,7 @@ namespace MPCOM
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
 
-                    Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
+                   // Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
 
                     // 讀取玩家資料 填入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
@@ -237,7 +237,7 @@ namespace MPCOM
                         playerData.ItemID = itemID;
                         playerData.ItemCount = Convert.ToInt16(DS.Tables[0].Rows[0]["ItemCount"]);
                         playerData.ItemType = Convert.ToByte(DS.Tables[0].Rows[0]["ItemType"]);
-                        Log.Debug(playerData.ReturnMessage + "playerData.ItemCount:" + playerData.ItemCount);
+                       // Log.Debug(playerData.ReturnMessage + "playerData.ItemCount:" + playerData.ItemCount);
                         playerData.ReturnCode = "S425"; //true
                         playerData.ReturnMessage = "取得玩家道具資料成功！";
                     }
@@ -288,7 +288,7 @@ namespace MPCOM
                     sqlCmd.Connection = sqlConn;
                     sqlConn.Open();
 
-                    Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
+                    //Log.Debug("(PlayerIO)連線資訊 :" + sqlConn.ToString());
 
                     // 讀取玩家資料 填入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
@@ -302,14 +302,14 @@ namespace MPCOM
 
                     selectString = selectString.TrimEnd(charsToTrim) + String.Format("  FROM Player_PlayerData WITH(NOLOCK) WHERE Account='{0}'", account);
 
-                    Log.Debug("selectString:" + selectString);
+                 //   Log.Debug("selectString:" + selectString);
                     adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
                     adapter.Fill(DS);
 
                     // 若有讀到則取得所有資料
                     if (DS.Tables[0].Rows.Count > 0)
                     {
-                        Log.Debug("columns.Contains(Friend):" + columns.Contains("Friend"));
+                       // Log.Debug("columns.Contains(Friend):" + columns.Contains("Friend"));
                         if (columns.Contains("PrimaryID")) playerData.PrimaryID = Convert.ToInt32(DS.Tables[0].Rows[0]["PrimaryID"]);
                         if (columns.Contains("Account")) playerData.Account = Convert.ToString(DS.Tables[0].Rows[0]["Account"]);
                         if (columns.Contains("Rank")) playerData.Rank = Convert.ToByte(DS.Tables[0].Rows[0]["Rank"]);
@@ -716,7 +716,7 @@ namespace MPCOM
             playerData.ReturnCode = "(IO)S400";
             playerData.ReturnMessage = "";
             DataSet DS = new DataSet();
-            Log.Debug("account:" + account + "itemName:" + itemID + "itemType:" + itemType + "itemCount:" + itemCount);
+         //   Log.Debug("account:" + account + "itemName:" + itemID + "itemType:" + itemType + "itemCount:" + itemCount);
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
@@ -849,7 +849,7 @@ namespace MPCOM
             updateString2 = updateString2.TrimEnd(charsToTrim);
             updateString += " WHERE " + PlayerItem.ItemID.ToString() + " in (" + updateString2 + ") AND Account='" + account + "'"; // unique
 
-            Log.Debug("PlayerData IO updateString:" + updateString);
+       //     Log.Debug("PlayerData IO updateString:" + updateString);
 
             try
             {
@@ -985,7 +985,7 @@ namespace MPCOM
                     command.Parameters.AddWithValue("@itemID", itemID);
                     command.Parameters.AddWithValue("@isEquip", isEquip);
                     command.ExecuteNonQuery();
-                    Log.Debug("Update OK");
+                    //Log.Debug("Update OK");
                     playerData.ReturnCode = "S422";
                     playerData.ReturnMessage = "更新玩家道具資料成功！";
                     //}
@@ -1026,7 +1026,7 @@ namespace MPCOM
                     command.Parameters.AddWithValue("@account", account);
                     command.Parameters.AddWithValue("@item", jString);
                     command.ExecuteNonQuery();
-                    Log.Debug("Update OK");
+                   // Log.Debug("Update OK");
                     playerData.ReturnCode = "S428";
                     playerData.ReturnMessage = "排序玩家道具資料成功！";
                 }
@@ -1066,7 +1066,7 @@ namespace MPCOM
                         selectString += "Player_PlayerData.Account = '" + account + "' OR ";
 
                     selectString = selectString.Remove(selectString.Length - 3);
-                    Log.Debug("FUCK: " + selectString);
+                   // Log.Debug("FUCK: " + selectString);
                     adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
                     adapter.Fill(DS);
 
@@ -1077,7 +1077,6 @@ namespace MPCOM
 
                         foreach (DataTable table in DS.Tables)
                         {
-                            string account = "";
                             Dictionary<string, object> dictFirends = new Dictionary<string, object>();
 
                             foreach (DataRow row in table.Rows)

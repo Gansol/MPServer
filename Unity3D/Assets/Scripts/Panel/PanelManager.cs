@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -30,7 +31,7 @@ public class PanelManager : MPPanel
     private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject _lastPanel;                           // 暫存Panel
     private string _panelName;                                      // panel名稱
-    private bool _loadedPanel, _loginStatus, _checkFlag;             // 載入的Panel 登入狀態
+    private bool _loadedPanel, _loginStatus, _checkFlag, _bApplyMatchGameFriend;             // 載入的Panel 登入狀態
     private int _panelNo;                                           // Panel編號
     private float _ckeckTime;
 
@@ -46,17 +47,33 @@ public class PanelManager : MPPanel
 
     void Awake()
     {
-        Global.photonService.LoginEvent += OnLogin;
-        //Global.photonService.ConnectEvent += OnConnect;
         assetLoader = gameObject.AddMissingComponent<AssetLoader>();
-        insObj = new ObjectFactory();
+
+        if (insObj == null) insObj = new ObjectFactory();
         if (dictPanelRefs == null) dictPanelRefs = new Dictionary<string, PanelState>();
+
+
+        scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
+    }
+
+
+    void OnEnable()
+    {
+
+        Global.photonService.LoginEvent += OnLogin;
+        Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
+    }
+
+    void OnDisabel()
+    {
+        Global.photonService.LoginEvent -= OnLogin;
+        Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
     }
 
     void Start()
     {
         PanelRefs = Panel;
-        scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
+
     }
 
     void Update()
@@ -65,21 +82,48 @@ public class PanelManager : MPPanel
         //    if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //        Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Global.ShowMessage("確定要離開遊戲嗎?", Global.MessageBoxType.YesNo);
+            Global.ExitGame();
+        }
+
         if (assetLoader.loadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
+
             InstantiatePanel();
             PanelSwitch();
+
+            // 如果收到 好友配對事件 傳送配對事件
+            if (_bApplyMatchGameFriend)
+            {
+                _lastPanel.transform.GetChild(0).SendMessage("OnApplyMatchGameFriend");
+                _bApplyMatchGameFriend = false;
+            }
         }
 
         MatchStatusChk();
     }
 
-
     #region -- InstantiatePanel 實體化Panel--
     private void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     {
         PanelState panelState = new PanelState();
+
+        if (_bApplyMatchGameFriend)
+        {
+            int no = 0;
+            foreach (GameObject go in Panel)
+            {
+                if (go.name == _panelName + "(Panel)")
+                    break;
+                no++;
+            }
+            this._panelNo = no;
+        }
+
+
         GameObject bundle = assetLoader.GetAsset(_panelName);
         panelState.obj = insObj.Instantiate(bundle, Panel[_panelNo].transform, _panelName, Vector3.zero, Vector3.one, Vector3.zero, -1);
         panelState.obj = panelState.obj.transform.parent.gameObject;
@@ -104,36 +148,38 @@ public class PanelManager : MPPanel
                 break;
             _panelNo++;
         }
+        _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
 
-        if (panel.name != "Tutorial(Panel)")
+        if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
-
-            _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
-
-            if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
-            {
-                assetLoader.init();
-                assetLoader.LoadAsset("Panel/", "PanelUI");
-                assetLoader.LoadPrefab("Panel/", _panelName);
-                _loadedPanel = true;
-            }
-            else
-            {
-                PanelSwitch();// 已載入AB 顯示Panel
-            }
+            assetLoader.init();
+            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadPrefab("Panel/", _panelName);
+            _loadedPanel = true;
         }
         else
         {
-            _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
-            if (!dictPanelRefs.ContainsKey(_panelName))
-            {
-                PanelState panelState = new PanelState();
-                panelState.obj = panel;
-                panelState.onOff = false;
-                dictPanelRefs.Add(_panelName, panelState);
-            }
+            PanelSwitch();// 已載入AB 顯示Panel
+        }
+    }
+    #endregion
 
-            PanelSwitch();
+
+    #region LoadPanel 亂寫的 給 叫出未實體的Panel使用
+    private void LoadPanelByName(string panelName)
+    {
+        _panelName = panelName;
+
+        if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
+        {
+            assetLoader.init();
+            assetLoader.LoadAsset("Panel/", "PanelUI");
+            assetLoader.LoadPrefab("Panel/", _panelName);
+            _loadedPanel = true;
+        }
+        else
+        {
+            PanelSwitch();// 已載入AB 顯示Panel
         }
     }
     #endregion
@@ -286,7 +332,7 @@ public class PanelManager : MPPanel
     /// Panel 開/關狀態
     /// </summary>
     /// <param name="panelNo">Panel編號</param>
-    private void PanelSwitch()
+    private GameObject PanelSwitch()
     {
 
         PanelState panelState = dictPanelRefs[_panelName];      // 取得目前Panel狀態
@@ -305,19 +351,25 @@ public class PanelManager : MPPanel
 
                 EventMaskSwitch.Switch(Panel[5], false);
                 EventMaskSwitch.lastPanel = Panel[5];
+
+                return _lastPanel;
             }                                                   // 如果Panel已開啟
             else
             {
                 scrollView.scroll = true;
                 EventMaskSwitch.Resume();
                 panelState.obj.SetActive(false);
+                _lastPanel = panelState.obj;
                 panelState.onOff = !panelState.onOff;
                 Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
+                return _lastPanel;
             }
         }
         else
         {
             Debug.LogError("PanelNo unknow or not login !");
+            return null;
+
         }
     }
     #endregion
@@ -394,11 +446,20 @@ public class PanelManager : MPPanel
     {
         if (Global.isMatching)
         {
-            if ((_ckeckTime > Global.WaitTime) && _checkFlag)
+            int waitTime = Global.WaitTime;
+            if (Global.isFriendMatching) waitTime = Global.WaitTime * 2;
+
+            if ((_ckeckTime > waitTime) && _checkFlag)
             {
                 //  Global.photonService.ExitWaitingRoom();
+                if (!Global.isFriendMatching)
+                { Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam); }
+                else
+                {
+                    Global.photonService.ExitWaitingRoom();
+                    Global.isFriendMatching = false;
+                }
 
-                Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam);
                 _ckeckTime = 0;
                 _checkFlag = false;
             }
@@ -431,5 +492,27 @@ public class PanelManager : MPPanel
     protected override void OnLoadPanel()
     {
         throw new System.NotImplementedException();
+    }
+
+    // 同意配對 並開起配對視窗
+    private void OnApplyMatchGameFriend()
+    {
+        if (Global.LoginStatus && !Global.isMatching)
+        {
+            _bApplyMatchGameFriend = true;
+            string panelName = "Match";
+            if (dictPanelRefs.ContainsKey(panelName))
+            {
+                LoadPanelByName(panelName);
+
+                if (_lastPanel.name == panelName + "(Panel)") _lastPanel.SetActive(true);
+                _lastPanel.transform.GetChild(0).SendMessage("OnApplyMatchGameFriend");
+                _bApplyMatchGameFriend = false;
+            }
+            else
+            {
+                LoadPanelByName(panelName);
+            }
+        }
     }
 }

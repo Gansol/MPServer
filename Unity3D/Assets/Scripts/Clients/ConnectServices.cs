@@ -10,22 +10,4 @@ public class ConnectServices : MonoBehaviour
         Global.photonService.Service();
     }
 
-    void OnApplicationQuit()
-    {
-        // 若玩家關閉遊戲時呼叫斷線，若沒呼叫就必須等到Timeout才會斷線
-
-       // StartCoroutine("ExitGame"); // ＊＊＊＊＊　這還要測試看看有沒有用　＊＊＊＊＊
-        Global.photonService.Disconnect();
-    }
-
-    IEnumerable ExitGame()
-    {
-        if (Global.BattleStatus)
-        {
-            Global.photonService.KickOther();
-            Global.photonService.ExitRoom();
-        }
-
-        yield return new WaitForSeconds(5);
-    }
 }

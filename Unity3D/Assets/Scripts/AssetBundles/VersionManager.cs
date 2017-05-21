@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.IO;
+using Gansol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -31,6 +32,7 @@ public class VersionManager : MonoBehaviour
     void Awake()
     {
         connCheck = gameObject.AddComponent<InternetChecker>();
+        CreateJSON c = new CreateJSON();
     }
 
     void Start() //開始檢查版本
@@ -126,7 +128,7 @@ public class VersionManager : MonoBehaviour
         if (Global.isCompleted && bTwiceChk && !bCompleted)
         {
             bCompleted = true;
-            if (!bundleChecker.bundleChk)   // 如果沒有新增檔案
+            if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
             {
                 if (Global.connStatus) StartCoroutine(visionChecker.ReplaceVisionList());
                 syncLoad = gameObject.AddComponent<SyncLoad>();

@@ -27,8 +27,8 @@ public class BattleManager : MonoBehaviour
     private static Int16 _maxCombo = 0;     // 最大連擊數
     private static Int16 _tmpCombo = 0;     // 達到多少連擊 用來判斷連擊中
     private Int16 _killMice = 0;            // 計算打了幾隻老鼠 統計用
-    private Int16 _combo = 0;               //  任務用連擊 連擊數
-    public int feverEnergy = 0, life = 0, otherLife = 0, _healthValue, maxLife;           // FeverTime 能量
+    private Int16 _combo = 0;    //  任務用連擊 連擊數
+    public int feverEnergy = 0, _healthValue, maxLife;           // FeverTime 能量
     private static int _energy = 0, _tmpEnergy;       // 能量
     private float _maxScore = 0;            // 最高得分
     private float _gameScore = 0;           // 遊戲進行時所得到的分數
@@ -40,6 +40,7 @@ public class BattleManager : MonoBehaviour
     private float _score = 0;               // 分數
     private float _otherScore = 0;          // 對手分數
     private int _otherEnergy = 0;           // 對手能量
+    private short _life = 0, _otherLife = 0;  // 生命 對手生命
     private float checkTime = 0;             // 檢查時間
     private float checkPoint = 15;          // 檢查時間點
     private static float _elapsedGameTime = 0;     // 經過時間
@@ -77,10 +78,13 @@ public class BattleManager : MonoBehaviour
         dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
 
         Global.dictBattleMice.Clear();
-        Global.photonService.OtherScoreEvent += OnOtherScore;
+
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
         Global.photonService.ApplyMissionEvent += OnApplyMission;
         Global.photonService.UpdateScoreEvent += OnUpdateScore;
+        Global.photonService.OtherScoreEvent += OnOtherScore;
+        Global.photonService.UpdateLifeEvent += OnUpdateLife;
+        Global.photonService.GetLifeEvent += OnGetLife;
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
         Global.photonService.GameStartEvent += OnGameStart;
         Global.photonService.GameOverEvent += OnGameOver;
@@ -94,14 +98,14 @@ public class BattleManager : MonoBehaviour
         _isCombo = false;
         isSyncStart = true;
 
-        maxLife = life = _combo = _maxCombo = _tmpCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
+        maxLife = _life = _combo = _maxCombo = _tmpCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
         _elapsedGameTime = _score = _maxScore = _gameScore = _otherScore = 0;
         _energy = 0;
         checkPoint = 3;
         _healthValue = 25;
         initUseCount();
         GetLife();
-        maxLife = life;
+        maxLife = _life;
     }
 
     /// <summary>
@@ -183,6 +187,7 @@ public class BattleManager : MonoBehaviour
         if (!Global.isGameStart)
             _lastTime = Time.time; // 沒作用
 
+        Debug.Log("poolManager.mergeFlag: " + poolManager.mergeFlag + " poolManager.poolingFlag: " + poolManager.poolingFlag + " isSyncStart: " + isSyncStart + " poolManager.dataFlag: " + poolManager.dataFlag);
         // 同步開始遊戲
         if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart && poolManager.dataFlag)
         {
@@ -212,7 +217,7 @@ public class BattleManager : MonoBehaviour
                 BotAI.UpdateAI();
 
             // 遊戲結束判斷
-            if (_elapsedGameTime >= Global.GameTime || life == 0)
+            if (_elapsedGameTime >= Global.GameTime || _life == 0 || _otherLife == 0)
             {
                 Global.isGameStart = false;
                 List<string> columns = new List<string>();
@@ -272,7 +277,7 @@ public class BattleManager : MonoBehaviour
                 if (!_isPropected)
                 {
                     BreakCombo();
-                    life = Math.Max(life - 1, 0);
+                    Global.photonService.UpdateLife(-1, false);
                 }
                 Global.photonService.UpdateScore(miceID, _combo, aliveTime);
                 _spawnCount++;
@@ -319,8 +324,12 @@ public class BattleManager : MonoBehaviour
             _tmpCombo = 0;
         }
 
-        if (_combo!=0 && _combo % _healthValue == 0) // 補血
-            life = Math.Min(life + 1, maxLife);
+        // 補血
+        if (_combo != 0 && _combo % _healthValue == 0)
+        {
+            if (_life + 1 <= maxLife)
+                Global.photonService.UpdateLife(1, false);
+        }
 
         if (_isCombo)
             battleHUD.ComboMsg(_combo);
@@ -341,7 +350,7 @@ public class BattleManager : MonoBehaviour
     void OnUpdateScore(Int16 score, Int16 energy)    // 更新分數時
     {
         //Debug.Log("Get Energy:" + energy);
-        _tmpEnergy = energy * 10;
+        _tmpEnergy = energy /** 10*/;
 
         if (_isPropected || _isInvincible)
             score = Math.Max((short)0, score);
@@ -585,24 +594,24 @@ public class BattleManager : MonoBehaviour
         return poolManager.gameObject.GetComponent<AssetLoader>();
     }
 
-
-
     private void GetLife()
     {
         foreach (KeyValuePair<string, object> item in Global.dictTeam)
         {
             Int16 value;
             value = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
-            life += value;
+            _life += value;
         }
+
+        Global.photonService.UpdateLife(_life, true);
 
         foreach (KeyValuePair<string, object> item in Global.OtherData.Team)
         {
             Int16 value;
             value = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
-            otherLife += value;
+            _otherLife += value;
         }
-
+        
     }
 
 
@@ -623,7 +632,15 @@ public class BattleManager : MonoBehaviour
         this.battleAIState.SetAIController(this);
     }
 
+    void OnUpdateLife(short value)
+    {
+        _life = value;
+    }
 
+    void OnGetLife(short value)
+    {
+        _otherLife = value;
+    }
 
 
     void OnApplySkillMice(short miceID)     // 收到技能攻擊 
@@ -716,6 +733,8 @@ public class BattleManager : MonoBehaviour
     public static float Energy { get { return _energy; } }
     public bool isCombo { get { return _isCombo; } }
 
+    public short life { get { return _life; } }
+    public short otherLife { get { return _otherLife; } }
     /* 超亂亂數
 * using System;
 public Guid RNGGuid() // 超亂亂數

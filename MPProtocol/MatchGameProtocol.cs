@@ -10,6 +10,7 @@
         MatchGameBot = 37,          // Bot配對
         MatchGameFriend = 38,       // 好友配對
         InviteMatchGame = 39,       // 邀請對戰
+        ApplyMatchGameFriend = 40,  // 同意好友配對邀請
     }
 
     public enum MatchGameResponseCode
@@ -20,11 +21,12 @@
         WaitingGameStart = 37,      // 等待同步遊戲
         MatchGameFriend = 38,       // 好友配對
         InviteMatchGame = 39,       // 邀請對戰
+        ApplyMatchGameFriend = 40,  // 同意好友配對邀請
     }
 
     public enum MatchGameParameterCode
     {
-        PrimaryID,                  // 主索引
+        PrimaryID = 0,              // 主索引
         RoomID,                     // 房間ID
         Nickname,                   // 暱稱
         Team,                       // 隊伍資料

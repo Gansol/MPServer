@@ -137,6 +137,8 @@
         UpdateEnergyRate = 60,      // 更新分數倍率
         SkillBoss = 61,             // 技能老鼠發動技能判斷
         RoomMice = 62,              // 房間老鼠
+        UpdateLife = 63,            // 更新生命值
+        //GetLife = 64,               // 取得對方生命
     }
 
     public enum BattleParameterCode
@@ -171,6 +173,7 @@
         SpawnCount = 26,                // 產生數量
         Evaluate = 27,                  // 評價
         Combo = 28,                     // COMBO
+        Life = 29,                     // COMBO
     }
 
     public enum BattleResponseCode
@@ -194,5 +197,7 @@
         UpdatedScoreRate = 59,      // 更新分數倍率
         UpdatedEnergyRate = 60,     // 更新能量倍率
         SkillBoss = 61,             // 技能老鼠發動技能判斷
+        UpdateLife = 63,            // 更新生命值
+        GetLife = 64,               // 取得對方生命
     }
 }

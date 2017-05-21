@@ -65,9 +65,22 @@ public class TeamManager : PanelManager
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
 
+
+    }
+
+
+    void OnEnable()
+    {
         Global.photonService.LoadPlayerDataEvent += OnCostCheck;
         Global.photonService.LoadPlayerItemEvent += OnLoadPanel;
         Global.photonService.UpdateMiceEvent += OnCostCheck;
+    }
+
+    void OnDisable()
+    {
+        Global.photonService.LoadPlayerDataEvent -= OnCostCheck;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPanel;
+        Global.photonService.UpdateMiceEvent -= OnCostCheck;
     }
 
     void Update()

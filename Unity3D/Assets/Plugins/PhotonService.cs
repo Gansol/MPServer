@@ -66,7 +66,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event SceneHandler WaitingPlayerEvent;
     public event SceneHandler ExitWaitingEvent;
     public event SceneHandler ActorOnlineEvent;
-    public event SceneHandler InviteMatchGameEvent;
+    public event SceneHandler ApplyMatchGameFriendEvent;
 
     //委派事件 接收任務
     public delegate void ApplyMissionHandler(Mission mission, Int16 missionScore);
@@ -99,11 +99,16 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     public event LoadDataHandler ApplyInviteFriendEvent;
     public event LoadDataHandler RemoveFriendEvent;
 
-    public delegate void InviteFriendHandler(string value);
-    public event InviteFriendHandler InviteFriendEvent;
+    public delegate void FriendHandler(string value);
+    public event FriendHandler InviteFriendEvent;
+    public event FriendHandler InviteMatchGameEvent;
 
     public delegate void ActorStateHandler();
     public event ActorStateHandler GetOnlineActorStateEvent;
+
+    public delegate void UpdateValueHandler(short value);
+     public event UpdateValueHandler UpdateLifeEvent;
+     public event UpdateValueHandler GetLifeEvent;
 
     public class PlayerItemData
     {
@@ -268,10 +273,13 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
             case (byte)BattleResponseCode.GetScore:
                 Int16 otherScore = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.OtherScore];
                 Int16 otherEnergy = Convert.ToInt16(eventResponse.Parameters[(byte)BattleParameterCode.Energy]);
-                //                Debug.Log("Recive otherScore!" + otherEnergy);
-
-
                 OtherScoreEvent(otherScore, otherEnergy);
+                break;
+
+            //取得對方生命
+            case (byte)BattleResponseCode.GetLife:
+                short life = (short)eventResponse.Parameters[(byte)BattleParameterCode.Life];
+                GetLifeEvent(life);
                 break;
 
             //取得任務
@@ -310,10 +318,17 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                 BossSkillEvent((ENUM_Skill)skillID);
                 //Debug.Log("GET OTHER:" + damage);
                 break;
+
             case (byte)MatchGameResponseCode.InviteMatchGame:
                 Global.OtherData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
-                Global.OtherData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherTeam]) as Dictionary<string, object>;
-                InviteMatchGameEvent();
+                Global.OtherData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
+                Global.ShowMessage(Global.OtherData.Nickname + " 邀請對戰", Global.MessageBoxType.YesNo);
+                InviteMatchGameEvent(Global.OtherData.Account);
+                break;
+
+            case (byte)MatchGameResponseCode.ApplyMatchGameFriend:
+                Global.OtherData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
+                ApplyMatchGameFriendEvent();
                 break;
         }
 
@@ -515,7 +530,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
 
                             string friends = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend];
                             if (!string.IsNullOrEmpty(friends)) Global.dictFriends = friends.Split(',').ToList();
-
+                            Global.dictFriends.Sort();
                             Global.PlayerImage = Convert.ToString(operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage]);
                             Global.photonService.LoadCurrency(Global.Account);      // 載入玩家資料時一起載入貨幣資料
                             //Debug.Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!Team"+Global.dictTeam.Count);
@@ -688,6 +703,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
                             Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
+                            Global.dictFriends.Sort();
                             Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             ApplyInviteFriendEvent();
@@ -712,6 +728,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
                             Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
+                            Global.dictFriends.Sort();
                             Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             RemoveFriendEvent();
@@ -867,6 +884,27 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
                             Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];
                             Int16 energy = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Energy];
                             UpdateScoreEvent(score, energy);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region UpdateScore 更新分數 取得對方分數資料
+
+            case (byte)BattleResponseCode.UpdateLife:// 取得對方分數資料
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            short life = (short)operationResponse.Parameters[(byte)BattleParameterCode.Life];
+                            UpdateLifeEvent(life);
                         }
                     }
                     catch (Exception e)
@@ -1431,7 +1469,7 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                  { (byte)MatchGameParameterCode.PrimaryID,Global.PrimaryID},{ (byte)MatchGameParameterCode.OtherAccount,Global.OtherData.Account},
-                 { (byte)MatchGameParameterCode.Team,Json.Serialize(Global.dictTeam)}, { (byte)MatchGameParameterCode.OtherTeam,Json.Serialize(Global.OtherData.Team)}, { (byte)MemberParameterCode.MemberType,Global.MemberType}
+                 { (byte)MatchGameParameterCode.Team,Json.Serialize(Global.dictTeam)}, { (byte)MemberParameterCode.MemberType,Global.MemberType}
             };
 
             this.peer.OpCustom((byte)MatchGameOperationCode.MatchGameFriend, parameter, true, 0, true);
@@ -1449,14 +1487,37 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// </summary>
     public void InviteMatchGame(string otherAccount)
     {
+        Debug.Log(otherAccount);
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                  { (byte)MatchGameParameterCode.Account,Global.Account},{ (byte)MatchGameParameterCode.OtherAccount,otherAccount},
-                 { (byte)MatchGameParameterCode.Team,Json.Serialize(Global.dictTeam)}, { (byte)MemberParameterCode.MemberType,Global.MemberType}
+                 { (byte)MemberParameterCode.MemberType,Global.MemberType}
             };
 
             this.peer.OpCustom((byte)MatchGameOperationCode.InviteMatchGame, parameter, true, 0, true);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region ApplyMatchGameFriend 邀請好友配對遊戲
+    /// <summary>
+    /// 邀請好友配對遊戲
+    /// </summary>
+    public void ApplyMatchGameFriend(string otherAccount)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                 { (byte)MatchGameParameterCode.Account,Global.Account},{ (byte)MatchGameParameterCode.OtherAccount,otherAccount},
+                 { (byte)MemberParameterCode.MemberType,Global.MemberType}
+            };
+
+            this.peer.OpCustom((byte)MatchGameOperationCode.ApplyMatchGameFriend, parameter, true, 0, true);
         }
         catch (Exception e)
         {
@@ -1864,6 +1925,26 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
+    #region UpdateLife 更新分數 地鼠用
+    /// <summary>
+    /// 更新生命 地鼠用
+    /// </summary>
+    public void UpdateLife(short life, bool bSetDefaultLife)
+    {
+        try
+        {
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID },{ (byte)BattleParameterCode.RoomID, Global.RoomID },{ (byte)BattleParameterCode.Life, life },{ (byte)BattleParameterCode.CustomValue, bSetDefaultLife }};
+         
+            this.peer.OpCustom((byte)BattleOperationCode.UpdateLife, parameter, true, 0, false); // operationCode is RoomSpeak
+        }
+        catch 
+        {
+            throw;
+        }
+    }
+    #endregion
+
     #region SendMission 傳送任務
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
@@ -2190,9 +2271,9 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     }
     #endregion
 
-    #region RemoveFriend 移除好友
+    #region ApplyInviteFriend 同意好友邀請
     /// <summary>
-    /// 移除好友
+    /// 同意好友邀請
     /// </summary>
     /// <param name="friend">玩家暱稱或帳號</param>
     public void ApplyInviteFriend(string friend)

@@ -39,7 +39,7 @@ namespace MPCOM
         }
         #region variable 變數區
         private Int16 harvest = 200;
-        private Int16 drivingMice = 35;
+        private Int16 drivingMice = 15;
         private Int16 harvestRate = 50;               // 分數倍率
         private Int16 reduce = -500;                  // 減少分數
 
@@ -346,17 +346,34 @@ namespace MPCOM
             battleData.energy = 0;
             if (score > 0)
             {
-                //battleData.energy = Convert.ToInt16(Math.Round(2 * energyRate, 0, MidpointRounding.AwayFromZero));
-                //if (combo > 25)
-                //    battleData.energy = Convert.ToInt16(Math.Round(3 * energyRate, 0, MidpointRounding.AwayFromZero));
-                //if (combo > 50)
-                //    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
-                //if (combo > 100)
-                //    battleData.energy = Convert.ToInt16(Math.Round(5 * energyRate, 0, MidpointRounding.AwayFromZero));
-                battleData.energy = Convert.ToInt16(1 * energyRate);
+                if (combo > 100)
+                {
+                    battleData.score = Convert.ToInt16(Math.Round(2.5f * score, 0, MidpointRounding.AwayFromZero));
+                    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
+                }
+                else if (combo > 50)
+                {
+                    battleData.score = Convert.ToInt16(Math.Round(2f * score, 0, MidpointRounding.AwayFromZero));
+                    battleData.energy = Convert.ToInt16(Math.Round(4 * energyRate, 0, MidpointRounding.AwayFromZero));
+
+                }
+                else if (combo > 25)
+                {
+                    battleData.score = Convert.ToInt16(Math.Round(1.5f * score, 0, MidpointRounding.AwayFromZero));
+                    battleData.energy = Convert.ToInt16(Math.Round(3 * energyRate, 0, MidpointRounding.AwayFromZero));
+                }
+                else
+                {
+                    battleData.score = score;
+                    battleData.energy = Convert.ToInt16(Math.Round(2 * energyRate, 0, MidpointRounding.AwayFromZero));
+                }
+                //battleData.energy = Convert.ToInt16(1 * energyRate);  // default
+            }
+            else
+            {
+                battleData.score = score;
             }
 
-            battleData.score = score;
             battleData.totalScore = totalScore;
             battleData.ReturnCode = "S501";
             battleData.ReturnMessage = "驗證分數成功！";
@@ -837,7 +854,7 @@ namespace MPCOM
                 List<string> clientItemKeys = new List<string>();
                 if (dictClientItemData.Count != 0) //評審改回
                 { clientItemKeys = new List<string>(dictClientItemData.Keys); }
-               // List<string> clientItemKeys = new List<string>(dictClientItemData.Keys);
+                // List<string> clientItemKeys = new List<string>(dictClientItemData.Keys);
                 Dictionary<string, object> prop = new Dictionary<string, object>();
 
                 #region 計算老鼠經驗等級用量

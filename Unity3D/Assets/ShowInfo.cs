@@ -7,6 +7,7 @@ using System;
 
 public class ShowInfo : MonoBehaviour
 {
+    private static bool bFirstLoad = true;
     public UILabel vision, frinedLabel;
     public float _updateInfoInterval;
     private float _lastTime;
@@ -15,9 +16,13 @@ public class ShowInfo : MonoBehaviour
     {
         _lastTime = 0;
         _updateInfoInterval = 60;
-        Global.photonService.ActorOnlineEvent += OnGetActorOnline;
-        Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
-        Global.photonService.ApplyInviteFriendEvent += OnGetOnlineActorState;
+        if (bFirstLoad)
+        {
+            Global.photonService.ActorOnlineEvent += OnGetActorOnline;
+            Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
+            Global.photonService.ApplyInviteFriendEvent += OnGetOnlineActorState;
+            bFirstLoad = false;
+        }
     }
 
     void Start()
