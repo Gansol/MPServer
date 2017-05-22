@@ -427,8 +427,9 @@ public class MatchManager : PanelManager
         //matchText.text = "等待超時，請重新配對！";
         EventMaskSwitch.lastPanel = null;
         Panel[0].SetActive(true);
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(transform.parent.gameObject);
         Panel[1].SetActive(false);
+        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(transform.parent.gameObject);
+        
     }
 
     void OnDisable()
