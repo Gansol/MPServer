@@ -646,6 +646,7 @@ namespace MPCOM
             }
             catch
             {
+                Log.Debug("LOGIC");
                 throw;
             }
         }

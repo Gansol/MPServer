@@ -53,6 +53,7 @@ public class Bali : MiceBase
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            Global.photonService.UpdateLife(-1, false);
         }
         else
         {

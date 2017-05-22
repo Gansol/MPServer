@@ -45,17 +45,18 @@ public class MatchManager : PanelManager
     public UILabel matchText, timeText;
     //private int _page;                                                              // 翻頁值(翻一頁+10)                                              
     private static bool _bFirstLoad;                                                // 是否第一次載入
-    private bool _bLoadedIcon, _bLoadedActor;                                       // 是否載入圖片、是否載入角色
+    private bool _bLoadedIcon, _bLoadedActor, _checkFlag;                                       // 是否載入圖片、是否載入角色
 
     private List<EventDelegate> onClickEvent;
     private GameObject _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
     private static int _miceCost, _maxCost = 100;
-    float _time, _lastTime, _lastClickTime, clickInterval, escapeTime;    // 點擊間距時間
+    float _time, _lastTime, _lastClickTime, clickInterval, escapeTime,_checkTime;    // 點擊間距時間
     #endregion
 
     void Awake()
     {
+        _checkTime = 0;
         clickInterval = 2;
         dictLoadedMice = new Dictionary<string, GameObject>();
         dictLoadedTeam = new Dictionary<string, GameObject>();
@@ -77,7 +78,7 @@ public class MatchManager : PanelManager
         Global.photonService.LoadPlayerItemEvent += None;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
         Global.photonService.UpdateMiceEvent += OnCostCheck;
-
+        _checkTime = 0;
     }
 
 
@@ -114,6 +115,38 @@ public class MatchManager : PanelManager
                 GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
                 EventMaskSwitch.Switch(gameObject, false);
                 EventMaskSwitch.lastPanel = gameObject;
+            }
+        }
+
+        MatchStatusChk();
+    }
+
+    private void MatchStatusChk()
+    {
+        if (Global.isMatching)
+        {
+            int waitTime = Global.WaitTime;
+            if (Global.isFriendMatching) waitTime = Global.WaitTime * 2;
+
+            if ((_checkTime > waitTime) && _checkFlag)
+            {
+                //  Global.photonService.ExitWaitingRoom();
+                if (!Global.isFriendMatching)
+                {
+                    Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam);
+                }
+                else
+                {
+                    Global.photonService.ExitWaitingRoom();
+                    Global.isFriendMatching = false;
+                }
+                _checkTime = 0;
+                _checkFlag = false;
+            }
+            else
+            {
+                _checkFlag = true;
+                _checkTime += Time.deltaTime;
             }
         }
     }

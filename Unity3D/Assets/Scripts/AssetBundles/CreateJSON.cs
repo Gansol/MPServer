@@ -6,7 +6,7 @@ using System.Text;
 using MiniJSON;
 
 //目前只比較bytes差別，本檔案沒有判斷檔案關開等例外情況
-public class CreateJSON : MonoBehaviour
+public class CreateJSON
 {
     //    AssetBundlesHash bundleHash ;
 

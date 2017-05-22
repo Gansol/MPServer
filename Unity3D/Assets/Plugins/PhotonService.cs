@@ -11,7 +11,7 @@ using System.Linq;
  *
  * 
 */
-public class PhotonService : MonoBehaviour, IPhotonPeerListener
+public class PhotonService : IPhotonPeerListener
 {
     // ConvertUtility convertUtility = new ConvertUtility();
 
@@ -2186,16 +2186,17 @@ public class PhotonService : MonoBehaviour, IPhotonPeerListener
     /// <param name="rate">倍率</param>
     public void SendRoomMice(int roomID, string[] roomMice)
     {
-        //try
-        //{
-        //    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-        //    { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
-        //    this.peer.OpCustom((byte)BattleOperationCode., parameter, true, 0, true); // operationCode is RoomSpeak
-        //}
-        //catch (Exception e)
-        //{
-        //    throw e;
-        //}
+        try
+        {
+            Debug.Log("IN SendRoomMice: " + roomMice.Length);
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
+            this.peer.OpCustom((byte)BattleOperationCode.RoomMice, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
     }
     #endregion
 

@@ -44,7 +44,7 @@ namespace MPServer
         private static readonly int _roomStartIndex = 1;                  // 最大房間數量
         private static readonly int _maxRoomCount = 100;                  // 最大房間數量
         private static int _roomPlayerLimit;
-        private static List<int> _roomIndex,_playingRoomIndex;        // 遊戲房間編號
+        private static List<int> _roomIndex, _playingRoomIndex;        // 遊戲房間編號
         //private int _myRoom;                                        // ＊＊＊＊＊因為是房間起始值為1
 
 
@@ -295,8 +295,11 @@ namespace MPServer
                 {
                     _dictWaitingRoomList.Remove(roomID);
                     _guidGetWaitingRoom.Remove(guid);
-                   // _roomIndex.Add(roomID);
+
+                    if (!_dictPlayingRoomList.ContainsKey(roomID) && roomID > 0)
+                        _roomIndex.Add(roomID);
                     _roomIndex.Sort();
+
                     Log.Debug("Waiting Room " + roomID + " been removed!");
                     //_waitIndex--;
                 }
@@ -305,7 +308,9 @@ namespace MPServer
                 {
                     _dictPrivateRoomList.Remove(roomID);
                     _guidGetWaitingRoom.Remove(guid);
-                    _roomIndex.Add(roomID);
+
+                    if (!_dictPlayingRoomList.ContainsKey(roomID) && roomID > 0)
+                        _roomIndex.Add(roomID);
                     _roomIndex.Sort();
                     Log.Debug("Private Room " + roomID + " been removed!");
                     //_waitIndex--;
@@ -362,7 +367,8 @@ namespace MPServer
                         _guidGetPlayingRoom.Remove(player1);
                     if (_guidGetPlayingRoom.ContainsKey(player2))
                         _guidGetPlayingRoom.Remove(player2);
-                    _roomIndex.Add(roomID);
+                    if (roomID > 0)
+                        _roomIndex.Add(roomID);
                     _roomIndex.Sort();
                 }
                 else
@@ -373,10 +379,10 @@ namespace MPServer
                         _guidGetPlayingRoom.Remove(player2);
 
                     if (!_roomIndex.Contains(roomID))
-                        if (_playingRoomIndex.Contains(roomID))
+                        if (_playingRoomIndex.Contains(roomID) && roomID > 0)
                             _roomIndex.Add(roomID);
 
-                  //  Log.Debug("Cant't RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                    //  Log.Debug("Cant't RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
                 }
                 _playingRoomIndex.Remove(roomID);
             }
@@ -562,7 +568,7 @@ namespace MPServer
                     {
                         if (item.Value.PrimaryID != myPrimaryID) //假如不等於自己的主索引就是另一位玩家
                         {
-                              Log.Debug("GetRoom OtherPlayer ID:" + item.Value.PrimaryID + " roomActor.Nickname:" + item.Value.Nickname);
+                            Log.Debug("GetRoom OtherPlayer ID:" + item.Value.PrimaryID + " roomActor.Nickname:" + item.Value.Nickname);
                             return item.Value;
                         }
                     }
@@ -680,7 +686,7 @@ namespace MPServer
             public int roomID { get; set; }
             public short totalScore { get; set; }
             public byte missionCompletedCount { get; set; }
-            public byte maxMissionCount { get; set; }
+            public short maxMissionCount { get; set; }
             public short life { get; set; }
             public float energy { get; set; }
             public float scoreRate { get; set; }
@@ -689,8 +695,11 @@ namespace MPServer
             public RoomActor(Guid guid, int PrimaryID, string Account, string Nickname, byte Age, byte Sex, string IP)
                 : base(guid, PrimaryID, Account, Nickname, Age, Sex, IP)
             {
-                  roomID = -1;
-                 life= -1;
+                joinTime = DateTime.Now;
+                roomID = -1;
+                life = -1;
+                missionCompletedCount = 0;
+                maxMissionCount = 0;
                 energy = gameScore = totalScore = 0;
                 scoreRate = energyRate = 1f;
                 roomMice = new List<string>();

@@ -32,11 +32,11 @@ public class PlayerManager : PanelManager
     public static Dictionary<string, GameObject> dictLoadedItem { get; set; }
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
-    public GameObject playerInfoArea, equipArea, playerRecordArea, imageArea,inventoryArea;
+    public GameObject playerInfoArea, equipArea, playerRecordArea, imageArea, inventoryArea;
     public Vector3 actorScale;
     public Vector2 itemOffset, iconSize;
     public int itemCount = 8, row = 2, _itemType, iconDepth = 310;
-    private bool _bFirstLoad, _LoadedIcon,_bImgActive, _bInvActive, _bPanelFirstLoad;
+    private bool _bFirstLoad, _LoadedIcon, _bImgActive, _bInvActive, _bPanelFirstLoad;
 
     public static UISprite playerImage;
     ObjectFactory objFactory;
@@ -52,7 +52,7 @@ public class PlayerManager : PanelManager
         objFactory = new ObjectFactory();
         _dictItemData = Global.dictSortedItem;
         _itemType = (int)StoreType.Armor;
-        _bImgActive= _bInvActive = false;
+        _bImgActive = _bInvActive = false;
         _bPanelFirstLoad = _bFirstLoad = true;
     }
 
@@ -76,15 +76,15 @@ public class PlayerManager : PanelManager
             _LoadedIcon = !_LoadedIcon;
             assetLoader.init();
 
-            Transform imageParent =playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
+            Transform imageParent = playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
             imageParent.GetComponent<UISprite>().spriteName = Global.PlayerImage;
             playerImage = imageParent.GetComponent<UISprite>();
             imageParent.parent.tag = "EquipICON";
-           // imageParent.GetComponent<ButtonSwitcher>().SendMessage("EnableBtn");
+            // imageParent.GetComponent<ButtonSwitcher>().SendMessage("EnableBtn");
 
-     //      string key =  Global.dictMiceAll.FirstOrDefault(x => x.Value == imageParent.GetComponent<UISprite>().spriteName).Key;
-           
-          //  if (!dictLoadedICON.ContainsKey(key)) dictLoadedICON.Add(key, imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
+            //      string key =  Global.dictMiceAll.FirstOrDefault(x => x.Value == imageParent.GetComponent<UISprite>().spriteName).Key;
+
+            //  if (!dictLoadedICON.ContainsKey(key)) dictLoadedICON.Add(key, imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
             InstantiateEquipIcon(Global.playerItem, equipArea.transform, (int)StoreType.Armor);
             EventMaskSwitch.Resume();
             GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
@@ -97,8 +97,8 @@ public class PlayerManager : PanelManager
     private void LoadPlayerInfo()
     {
         Transform parent = playerInfoArea.transform;
-        int exp = Clac.ClacExp(Global.Rank);
-        
+        int exp = Clac.ClacExp(Mathf.Min(Global.Rank + 1, 100));
+
         parent.FindChild("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
         parent.FindChild("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
         parent.FindChild("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
@@ -201,8 +201,8 @@ public class PlayerManager : PanelManager
     /// <param name="itemType">道具類別</param>
     private void InstantiateItemIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
-        if (itemType!=-1)
-         itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
+        if (itemType != -1)
+            itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
 
         if (itemData.Count != 0)
         {
@@ -289,8 +289,8 @@ public class PlayerManager : PanelManager
             InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
         }
 
-            inventoryArea.SetActive(false);   // 開關防止Item按鈕失效
-            inventoryArea.SetActive(true);
+        inventoryArea.SetActive(false);   // 開關防止Item按鈕失效
+        inventoryArea.SetActive(true);
     }
 
     private void GetMustLoadAsset()
@@ -349,7 +349,7 @@ public class PlayerManager : PanelManager
 
     public override void OnLoading()
     {
-        _bImgActive= _bInvActive = false;
+        _bImgActive = _bInvActive = false;
 
         imageArea.transform.parent.parent.parent.gameObject.SetActive(_bImgActive);
         inventoryArea.transform.parent.parent.parent.gameObject.SetActive(_bInvActive);
@@ -358,7 +358,7 @@ public class PlayerManager : PanelManager
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
-    protected override void  OnLoadPanel()
+    protected override void OnLoadPanel()
     {
         GetMustLoadAsset();
 

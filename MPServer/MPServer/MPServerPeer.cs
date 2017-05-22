@@ -38,7 +38,7 @@ namespace MPServer
         // private int roomID;
         //private int primaryID;
         //   private byte memberType;
-      //  MPServerPeer peerOther; // 錯誤
+        //  MPServerPeer peerOther; // 錯誤
 
         private BattleUI battleUI;
         private CurrencyUI currencyUI;
@@ -46,7 +46,8 @@ namespace MPServer
         private MiceDataUI miceDataUI;
         private PlayerDataUI playerDataUI;
         private SkillUI skillUI;
-        private StoreDataUI skillDataUI;
+        private StoreDataUI storeDataUI;
+        private ItemUI itemUI;
 
         private static readonly int GameTime = 180;
         private static readonly int maxNumPlayer = 2;
@@ -67,9 +68,9 @@ namespace MPServer
             miceDataUI = new MiceDataUI();
             playerDataUI = new PlayerDataUI();
             skillUI = new SkillUI();
-            skillDataUI = new StoreDataUI();
+            storeDataUI = new StoreDataUI();
             currencyUI = new CurrencyUI();
-
+            itemUI = new ItemUI();
             if (_server.Actors.GetOnlineActors().Count >= 100)
             {
                 string reasonDetail = "線上玩家數過多";
@@ -112,7 +113,7 @@ namespace MPServer
                 }
 
                 Actor player = _server.Actors.GetActorFromGuid(peerGuid);
-                if(player!=null) player.GameStatus = (byte)ENUM_MemberState.Offline;
+                if (player != null) player.GameStatus = (byte)ENUM_MemberState.Offline;
                 //_server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);
                 _server.Actors.ActorOffline(peerGuid); // 把玩家離線
                 _server.Actors.RemoveConnectedPeer(peerGuid);
@@ -885,7 +886,7 @@ namespace MPServer
                                     }
                                     else// 如果已經載入房間的玩家 = 房間上限 同步開始
                                     {
-                                        MPServerPeer peerOther =null;
+                                        MPServerPeer peerOther = null;
                                         Room.RoomActor otherActor;
 
                                         Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
@@ -893,7 +894,7 @@ namespace MPServer
 
 
                                         Log.Debug("RoomID:" + roomID);
-                                        Log.Debug("otherActor"+ otherActor.guid);
+                                        Log.Debug("otherActor" + otherActor.guid);
                                         peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
 
 
@@ -901,7 +902,7 @@ namespace MPServer
                                         if (otherActor == null)
                                         {
                                             Log.Debug("IN ExitRoom");
-                                            
+
                                             // 移除BOSS資訊 如果有的話
                                             _server.room.KillBoss(roomID);
                                             _server.room.RemovePlayingRoom(roomID, actor.guid, peerGuid);
@@ -973,7 +974,7 @@ namespace MPServer
                                     if (otherRoomActor != null)
                                     {
                                         Log.Debug("找到要踢的玩家房間 RoomID: " + roomID);
-                                       MPServerPeer peerOther = _server.Actors.GetPeerFromGuid(otherRoomActor.guid);
+                                        MPServerPeer peerOther = _server.Actors.GetPeerFromGuid(otherRoomActor.guid);
 
                                         actor = _server.Actors.GetActorFromGuid(peerOther.peerGuid);
                                         actor.GameStatus = (byte)ENUM_MemberState.Idle;
@@ -1091,7 +1092,7 @@ namespace MPServer
                                     if (otherRoomActor != null)
                                     {
                                         Log.Debug("找到要踢的玩家房間 RoomID: " + roomID);
-                                       MPServerPeer peerOther = _server.Actors.GetPeerFromGuid(otherRoomActor.guid);
+                                        MPServerPeer peerOther = _server.Actors.GetPeerFromGuid(otherRoomActor.guid);
 
                                         Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
                                         actor.GameStatus = (byte)ENUM_MemberState.Idle;
@@ -1307,13 +1308,10 @@ namespace MPServer
                                     string friend = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Friend];          // Json資料
 
                                     PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
-                                    Log.Debug("IO OK");
                                     PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, rank, exp, maxCombo, maxScore, sumScore, sumLost, sumKill, item, miceAll, team, friend)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("Data OK");
 
                                     if (playerData.ReturnCode == "S403")//取得玩家資料成功 回傳玩家資料
                                     {
-                                        Log.Debug("playerData.ReturnCode == S403");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp }, 
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
@@ -1338,25 +1336,18 @@ namespace MPServer
                         #region UpdateMiceData 更新玩家(Team)資料
                         case (byte)PlayerDataOperationCode.UpdateMice:
                             {
-                                Log.Debug("IN UpdateMiceData");
-
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                 string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];        // Json資料
                                 string team = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Team];              // Json資料
 
                                 PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
-                                Log.Debug("IO OK");
                                 PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, miceAll, team)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                Log.Debug("Data OK");
 
                                 if (playerData.ReturnCode == "S420")//取得玩家資料成功 回傳玩家資料
                                 {
-                                    Log.Debug("playerData.ReturnCode == S420");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode },{ (byte)PlayerDataParameterCode.MiceAll, miceAll } , { (byte)PlayerDataParameterCode.Team, team }
                                         };
-
-
                                     OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
@@ -1642,7 +1633,7 @@ namespace MPServer
                                         // 回傳給另外一位玩家
                                         if (roomOtherActor != null)
                                         {
-                                            Log.Debug("Other GUID:"+ roomOtherActor.guid);
+                                            Log.Debug("Other GUID:" + roomOtherActor.guid);
                                             otherPeer = _server.Actors.GetPeerFromGuid(roomOtherActor.guid);
                                             parameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.Life, roomActor.life }, { (byte)BattleResponseCode.DebugMessage, "取得對方生命資料." } };
                                             EventData eventData = new EventData((byte)BattleResponseCode.GetLife, parameter);
@@ -1717,20 +1708,17 @@ namespace MPServer
                         #region LoadCurrency 載入貨幣資料
                         case (byte)CurrencyOperationCode.Load:
                             {
-                                Log.Debug("IN LoadCurrency");
+                                // Log.Debug("IN LoadCurrency");
 
                                 string account = (string)operationRequest.Parameters[(byte)CurrencyParameterCode.Account];
-                                Log.Debug("Account:" + account);
-                                Log.Debug("IO OK");
                                 CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
-                                Log.Debug("Data OK");
 
                                 int rice = currencyData.Rice;
                                 Int16 gold = currencyData.Gold;
 
                                 if (currencyData.ReturnCode == "S701")  // 取得遊戲貨幣成功 回傳玩家資料
                                 {
-                                    Log.Debug("currencyData.ReturnCode == S701");
+                                    // Log.Debug("currencyData.ReturnCode == S701");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Rice, rice }, { (byte)CurrencyParameterCode.Gold, gold } 
                                     };
@@ -1751,19 +1739,17 @@ namespace MPServer
                         #region LoadRice 載入遊戲幣資料
                         case (byte)CurrencyOperationCode.LoadRice:
                             {
-                                Log.Debug("IN LoadRice");
+                                //  Log.Debug("IN LoadRice");
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
 
-                                Log.Debug("IO OK");
                                 CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                Log.Debug("Data OK");
 
                                 int rice = currencyData.Rice;
 
                                 if (currencyData.ReturnCode == "S703")//取得遊戲幣成功 回傳玩家資料
                                 {
-                                    Log.Debug("currencyData.ReturnCode == S703");
+                                    // Log.Debug("currencyData.ReturnCode == S703");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Rice, rice }
                                     };
@@ -1789,15 +1775,13 @@ namespace MPServer
 
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
 
-                                Log.Debug("IO OK");
                                 CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
-                                Log.Debug("Data OK");
 
                                 Int16 gold = currencyData.Gold;
 
                                 if (currencyData.ReturnCode == "S705")//取得金幣成功 回傳玩家資料
                                 {
-                                    Log.Debug("currencyData.ReturnCode == S705");
+                                    //  Log.Debug("currencyData.ReturnCode == S705");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Gold, gold } 
                                     };
@@ -1859,16 +1843,13 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    Log.Debug("IN LoadSkill");
+                                    //  Log.Debug("IN LoadSkill");
 
-                                    SkillUI skillUI = new SkillUI(); //實體化 IO (連結資料庫拿資料)
-                                    Log.Debug("LoadSkill IO OK");
                                     SkillData skillData = (SkillData)TextUtility.DeserializeFromStream(skillUI.LoadSkillProperty()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("LoadSkill Data OK");
                                     //Log.Debug("Server Data: " + miceData.miceProperty);
                                     if (skillData.ReturnCode == "S1001")//取得老鼠資料成功 回傳玩家資料
                                     {
-                                        Log.Debug("skillData.ReturnCode == S1001");
+                                        //  Log.Debug("skillData.ReturnCode == S1001");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)MiceParameterCode.Ret, skillData.ReturnCode }, { (byte)MiceParameterCode.MiceData,skillData.skillProperty } 
                                     };
@@ -1897,16 +1878,13 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    Log.Debug("IN LoadStore");
+                                    //  Log.Debug("IN LoadStore");
 
-                                    StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
-                                    Log.Debug("LoadStore IO OK");
                                     StoreData storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("LoadStore Data OK");
                                     //Log.Debug("Server Data: " + storeData.StoreItem);
                                     if (storeData.ReturnCode == "S901")//取得老鼠資料成功 回傳玩家資料
                                     {
-                                        Log.Debug("LoadStore.ReturnCode == S901");
+                                        //    Log.Debug("LoadStore.ReturnCode == S901");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                         { (byte)StoreParameterCode.Ret, storeData.ReturnCode }, { (byte)StoreParameterCode.StoreData,storeData.StoreItem } 
                                     };
@@ -1937,10 +1915,7 @@ namespace MPServer
                                 {
                                     Log.Debug("IN LoadItem");
 
-                                    ItemUI ItemUI = new ItemUI(); //實體化 IO (連結資料庫拿資料)
-                                    Log.Debug("LoadItem IO OK");
-                                    ItemData itemData = (ItemData)TextUtility.DeserializeFromStream(ItemUI.LoadItemData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("LoadItem Data OK");
+                                    ItemData itemData = (ItemData)TextUtility.DeserializeFromStream(itemUI.LoadItemData()); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
                                     //Log.Debug("Server Data: " + itemData.itemProperty);
                                     if (itemData.ReturnCode == "S601")//取得老鼠資料成功 回傳玩家資料
                                     {
@@ -2327,25 +2302,24 @@ namespace MPServer
                                     BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.SelectMission(mission, missionRate));
                                     Int16 missionMethod = battleData.missionScore;
                                     Log.Debug("missionMethod:" + missionMethod);
+
                                     if (mission == (byte)Mission.WorldBoss)
                                     {
                                         // missionMethod = 10004;   // 白癡版本
 
                                         // 固定值 隨機版本
                                         Random rnd = new Random();
-                                        missionMethod = Convert.ToInt16(rnd.Next(10001, 10005 + 1));
+                                        //missionMethod = Convert.ToInt16(rnd.Next(10001, 10005 + 1));
+                                        missionMethod = Convert.ToInt16(10001);
                                         Log.Debug("----------DevTest-------------");
                                         Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
 
-                                        if (roomActor != null)
                                             if (roomActor.roomMice.Count != 0)
+                                            {
                                                 missionMethod = Convert.ToInt16(roomActor.roomMice[rnd.Next(0, roomActor.roomMice.Count)]);
-
-                                        Log.Debug(missionMethod);
+                                                Log.Debug("Room Mice Count: " + roomActor.roomMice.Count + "  missionMethod: " + missionMethod);
+                                            }
                                         Log.Debug("----------DevTest-------------");
-                                        // 正式版 還未測試
-                                        //Room.RoomActor actor = _server.room.GetActorFromGuid(peerGuid);
-                                        //missionMethod = Convert.ToInt16(actor.roomMice[rnd.Next(0, actor.roomMice.Count)]);
                                         _server.room.SpawnBoss(roomID, battleData.bossHP);  // 產生BOSS血量 missionScore是BOSS HP
                                     }
 
@@ -2365,6 +2339,7 @@ namespace MPServer
                                     else
                                     {
                                         // to do
+                                        Log.Debug("快點寫程式好嗎!!!!!!!!!!");
                                     }
 
                                     SendOperationResponse(response, new SendParameters());          // 回傳
@@ -2666,7 +2641,7 @@ namespace MPServer
                                     Log.Debug("GameOver Data  : " + account + " " + score + " " + otherScore + " " + gameTime + " " + maxCombo + " " + lostMice + " " + spawnCount + " " + killMice + " " + item + " " + jMicesUseCount + " " + jItemsUseCount + " " + columns.Length + " ");
 
                                     BattleData battleData = (BattleData)TextUtility.DeserializeFromStream(battleUI.GameOver(account, score, otherScore, gameTime, lostMice, roomActor.totalScore, spawnCount, roomActor.missionCompletedCount, roomActor.maxMissionCount, maxCombo, jMicesUseCount, jItemsUseCount, columns)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("GameOver Data OK : " + battleData.ReturnCode);
+                                    if (string.IsNullOrEmpty(battleData.ReturnMessage)) Log.Debug("GameOver Data is null ! ");
 
                                     if (battleData.ReturnCode == "S514")
                                     {
@@ -2745,7 +2720,7 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    Log.Debug("IN BuyItem");
+                                    // Log.Debug("IN BuyItem");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];
                                     Int16 itemID = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
@@ -2756,16 +2731,14 @@ namespace MPServer
 
                                     Log.Debug(string.Format("itemName={0}   itemType={1}   currencyType={2}   buyCount={3}", itemID, itemType, currencyType, buyCount));
                                     StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
-                                    Log.Debug("BuyItem IO OK");
                                     StoreData storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData(itemID, itemType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-                                    Log.Debug("BuyItem Data OK" + storeData.Price);
 
                                     if (storeData.ReturnCode == "S901") // 更新玩家貨幣
                                     {
                                         CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, currencyType, -(storeData.Price * buyCount)));
 
-                                        Log.Debug("花費金錢:" + -(storeData.Price * buyCount));
-                                        Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode + "Rice:" + currencyData.Rice);
+                                        //Log.Debug("花費金錢:" + -(storeData.Price * buyCount));
+                                        //Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode + "Rice:" + currencyData.Rice);
 
                                         if (currencyData.ReturnCode == "S703") // 更新商店資料
                                         {
@@ -2775,7 +2748,7 @@ namespace MPServer
                                             if (storeData.ReturnCode == "S902") // 更新玩家資料
                                             {
                                                 currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
-                                                Log.Debug("Get currencyData  :" + "Rice:" + currencyData.Rice);
+
                                                 #region UpdatePlayerData
                                                 PlayerDataUI playerUI = new PlayerDataUI();
                                                 PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.UpdatePlayerItem(account, itemID, itemName, itemType, buyCount));
@@ -2783,7 +2756,7 @@ namespace MPServer
                                                 if (playerData.ReturnCode == "S422" || playerData.ReturnCode == "S423") //更新玩家道具資料成功 回傳玩家資料
                                                 {
                                                     playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.LoadPlayerData(account));
-                                                    Log.Debug("BuyItem playerData OK");
+                                                    // Log.Debug("BuyItem playerData OK");
 
                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                      { (byte)MiceParameterCode.Ret, storeData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,
@@ -2842,10 +2815,12 @@ namespace MPServer
                                 try
                                 {
                                     int roomID = _server.room.GetPlayingRoomFromGuid(peerGuid);
-                                    List<string> roomMice = (List<string>)operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
+                                    string[] roomMice = (string[])operationRequest.Parameters[(byte)BattleParameterCode.MiceID];
 
                                     Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
-                                    if (roomActor != null) roomActor.roomMice = roomMice;
+                                    if (roomActor != null) roomActor.roomMice = roomMice.ToList();
+
+                                    Log.Debug("IN RoomMice: " + roomActor.roomMice.Count);
                                 }
                                 catch
                                 {
