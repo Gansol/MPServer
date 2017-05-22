@@ -33,7 +33,8 @@ public abstract class MPPanel : MonoBehaviour
     public bool LoadActor(GameObject btn_click, Transform parent, Vector3 scale)
     {
         GameObject _miceImage;
-        string assetName = btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Remove(btn_click.transform.GetComponentInChildren<UISprite>().spriteName.Length - 4);
+        UISprite sprite = btn_click.transform.GetComponentInChildren<UISprite>();
+        string assetName = sprite.spriteName.Remove(sprite.spriteName.Length - 4);
         Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 

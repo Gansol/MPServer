@@ -31,7 +31,7 @@ public class AssetBundleChecker : MonoBehaviour
 
     void Start()
     {
-        createJSON = gameObject.AddComponent<CreateJSON>();
+        createJSON = new CreateJSON();
         bundleDownloader = gameObject.AddComponent<AssetBundlesDownloader>();
         downloadCount = reConnTimes = 0;
         bundleChk = false;

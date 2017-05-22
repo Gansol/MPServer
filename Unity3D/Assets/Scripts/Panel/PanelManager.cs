@@ -31,9 +31,8 @@ public class PanelManager : MPPanel
     private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject _lastPanel;                           // 暫存Panel
     private string _panelName;                                      // panel名稱
-    private bool _loadedPanel, _loginStatus, _checkFlag, _bApplyMatchGameFriend;             // 載入的Panel 登入狀態
+    private bool _loadedPanel, _loginStatus, _bApplyMatchGameFriend;             // 載入的Panel 登入狀態
     private int _panelNo;                                           // Panel編號
-    private float _ckeckTime;
 
 
     ObjectFactory insObj;
@@ -59,12 +58,11 @@ public class PanelManager : MPPanel
 
     void OnEnable()
     {
-
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
 
-    void OnDisabel()
+    void OnDisable()
     {
         Global.photonService.LoginEvent -= OnLogin;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
@@ -72,8 +70,6 @@ public class PanelManager : MPPanel
 
     void Start()
     {
-        PanelRefs = Panel;
-
     }
 
     void Update()
@@ -102,8 +98,6 @@ public class PanelManager : MPPanel
                 _bApplyMatchGameFriend = false;
             }
         }
-
-        MatchStatusChk();
     }
 
     #region -- InstantiatePanel 實體化Panel--
@@ -442,34 +436,6 @@ public class PanelManager : MPPanel
         return newObject;
     }
     #endregion
-    private void MatchStatusChk()
-    {
-        if (Global.isMatching)
-        {
-            int waitTime = Global.WaitTime;
-            if (Global.isFriendMatching) waitTime = Global.WaitTime * 2;
-
-            if ((_ckeckTime > waitTime) && _checkFlag)
-            {
-                //  Global.photonService.ExitWaitingRoom();
-                if (!Global.isFriendMatching)
-                { Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam); }
-                else
-                {
-                    Global.photonService.ExitWaitingRoom();
-                    Global.isFriendMatching = false;
-                }
-
-                _ckeckTime = 0;
-                _checkFlag = false;
-            }
-            else
-            {
-                _checkFlag = true;
-                _ckeckTime += Time.deltaTime;
-            }
-        }
-    }
 
     //private void OnConnect(bool status)
     //{

@@ -41,7 +41,7 @@ public class TeamManager : PanelManager
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
-
+    public GameObject startShowActor;                                               // 起始顯示老鼠
     //private int _page;                                                              // 翻頁值(翻一頁+10)
     private int _miceCost;
     private float _lastClickTime;                                                   // 點擊間距時間
@@ -99,11 +99,13 @@ public class TeamManager : PanelManager
             InstantiateIcon(Global.dictTeam, infoGroupsArea[2].transform);
             // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
             ActiveMice(Global.dictTeam);
-            StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));
+            StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));   // 第一次顯示老鼠角色 Actor
             EventMaskSwitch.Resume();
              GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
             EventMaskSwitch.Switch(gameObject, false);
             EventMaskSwitch.lastPanel = gameObject;
+
+           // OnMiceClick(startShowActor);    // 顯示第一隻老鼠
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)

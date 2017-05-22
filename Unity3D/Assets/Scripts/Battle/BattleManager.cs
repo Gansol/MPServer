@@ -279,6 +279,7 @@ public class BattleManager : MonoBehaviour
                     BreakCombo();
                     Global.photonService.UpdateLife(-1, false);
                 }
+
                 Global.photonService.UpdateScore(miceID, _combo, aliveTime);
                 _spawnCount++;
                 _lostMice++;

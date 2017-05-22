@@ -213,6 +213,8 @@ public class PoolManager : MonoBehaviour
           //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
             _poolingFlag = true;
             Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
+
+            Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.Select(x=>(x).ToString()).ToArray());
         }
 
         _currentTime = Time.time;
