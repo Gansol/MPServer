@@ -65,7 +65,7 @@ public class HeroMice : MiceBase
     protected override void OnHit()
     {
         Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + gameObject.layer + " enabled:" + enabled + " m_Arribute.GetHP():" + m_Arribute.GetHP());
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && GetComponent<BoxCollider2D>().enabled)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && GetComponent<BoxCollider2D>().enabled)
         {
             GetComponent<BoxCollider2D>().enabled = false;
             hitSound.Play();

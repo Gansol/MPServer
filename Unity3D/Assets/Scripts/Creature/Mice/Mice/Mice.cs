@@ -49,7 +49,7 @@ public class Mice : MiceBase
     protected override void OnHit()
     {
       //  gameObject.layer = cam.eventReceiverMask;
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
         {
             hitSound.Play();
             m_AnimState.SetMotion(true);

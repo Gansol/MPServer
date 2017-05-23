@@ -36,8 +36,10 @@ public class PlayerInput : MonoBehaviour
 
                 if (hit.transform.childCount != 0)
                 {
-                    if (hit.transform.GetChild(0).name == "anims") hit.transform.SendMessage("OnHit");
-                    if (hit.transform.name == "anims") hit.transform.parent.SendMessage("OnHit");
+                    if (hit.transform.GetChild(0).name == "anims") 
+                        hit.transform.SendMessage("OnHit");
+                    if (hit.transform.name == "anims") 
+                        hit.transform.parent.SendMessage("OnHit");
                 }
                 if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
                     hit.transform.SendMessage("OnHit");

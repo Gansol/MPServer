@@ -113,7 +113,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void initUseCount()
     {
-        Debug.Log(Global.dictTeam.Count);
+//        Debug.Log(Global.dictTeam.Count);
         List<string> keys = new List<string>(Global.dictTeam.Keys);
         Dictionary<string, object> data;
 
@@ -277,7 +277,6 @@ public class BattleManager : MonoBehaviour
                 if (!_isPropected)
                 {
                     BreakCombo();
-                    Global.photonService.UpdateLife(-1, false);
                 }
 
                 Global.photonService.UpdateScore(miceID, _combo, aliveTime);
@@ -340,6 +339,7 @@ public class BattleManager : MonoBehaviour
     {
         if (!_isInvincible || !_isPropected && _combo != 0)
         {
+            Global.photonService.UpdateLife(-1, false);
             _isCombo = false;           // 結束 連擊
             _combo = 0;                 // 恢復0
             _tmpCombo = 0;
