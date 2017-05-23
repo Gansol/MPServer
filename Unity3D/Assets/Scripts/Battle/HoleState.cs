@@ -3,6 +3,7 @@
 public class HoleState : MonoBehaviour
 {
     public State holeState = State.Open;
+    BoxCollider collider;
 
     public enum State   // 老鼠洞狀態
     {
@@ -11,8 +12,9 @@ public class HoleState : MonoBehaviour
         Moving,
     }
 
-    void Awake()
+    void Start()
     {
+        collider = GetComponent<BoxCollider>();
         holeState = State.Open;
     }
 
@@ -23,12 +25,12 @@ public class HoleState : MonoBehaviour
         {
             if (transform.childCount > 1)
             {
-                GetComponent<BoxCollider>().enabled = false;
+                collider.enabled = false;
                 holeState = State.Closed;
             }
             else
             {
-                GetComponent<BoxCollider>().enabled = true;
+                collider.enabled = true;
                 holeState = State.Open;
             }
         }
@@ -36,12 +38,12 @@ public class HoleState : MonoBehaviour
         {
             if (transform.childCount > 3)
             {
-                GetComponent<BoxCollider>().enabled = false;
+                collider.enabled = false;
                 holeState = State.Closed;
             }
             else
             {
-                GetComponent<BoxCollider>().enabled = true;
+                collider.enabled = true;
                 holeState = State.Open;
             }
         }

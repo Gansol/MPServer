@@ -185,6 +185,8 @@ namespace MPServer
                             foreach (KeyValuePair<Guid, RoomActor> player in item.Value)  // 把這間房間的玩家 加入索引 可以用GUID來取得房間ID
                             {
                                 Log.Debug("Join Player :" + player.Value.Nickname);
+                                if (_guidGetPlayingRoom.ContainsKey(player.Value.guid)) 
+                                    _guidGetPlayingRoom.Remove(player.Value.guid);
                                 _guidGetPlayingRoom.Add(player.Value.guid, item.Key);
                                 _guidGetWaitingRoom.Remove(player.Key);
                             }
@@ -253,6 +255,8 @@ namespace MPServer
                             foreach (KeyValuePair<Guid, RoomActor> player in item.Value)  // 把這間房間的玩家 加入索引 可以用GUID來取得房間ID
                             {
                                 Log.Debug("Join Player :" + player.Value.Nickname);
+                                if (_guidGetPlayingRoom.ContainsKey(player.Value.guid))
+                                    _guidGetPlayingRoom.Remove(player.Value.guid);
                                 _guidGetPlayingRoom.Add(player.Value.guid, item.Key);
                                 _guidGetWaitingRoom.Remove(player.Key);
                             }
@@ -359,34 +363,89 @@ namespace MPServer
         {
             lock (this)
             {
-                if (_dictPlayingRoomList.ContainsKey(roomID))
+                if (roomID > 0)
                 {
+                    //Dictionary<Guid, RoomActor> room;
                     Log.Debug("Game Room " + roomID + " been removed!");
+                    _guidGetPlayingRoom.Remove(player1);
+                    _guidGetPlayingRoom.Remove(player2);
                     _dictPlayingRoomList.Remove(roomID);
-                    if (_guidGetPlayingRoom.ContainsKey(player1))
-                        _guidGetPlayingRoom.Remove(player1);
-                    if (_guidGetPlayingRoom.ContainsKey(player2))
-                        _guidGetPlayingRoom.Remove(player2);
-                    if (roomID > 0)
-                        _roomIndex.Add(roomID);
+
+                    _roomIndex.Add(roomID);
                     _roomIndex.Sort();
                 }
                 else
                 {
-                    if (_guidGetPlayingRoom.ContainsKey(player1))
-                        _guidGetPlayingRoom.Remove(player1);
-                    if (_guidGetPlayingRoom.ContainsKey(player2))
-                        _guidGetPlayingRoom.Remove(player2);
+                    if (_guidGetPlayingRoom.ContainsKey(player1)) _guidGetPlayingRoom.TryGetValue(player1, out roomID);
+                    if (_guidGetPlayingRoom.ContainsKey(player2)) _guidGetPlayingRoom.TryGetValue(player2, out roomID);
 
-                    if (!_roomIndex.Contains(roomID))
-                        if (_playingRoomIndex.Contains(roomID) && roomID > 0)
-                            _roomIndex.Add(roomID);
+                    _dictPlayingRoomList.Remove(roomID);
 
-                    //  Log.Debug("Cant't RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                    Log.Debug("(2)Game Room " + roomID + " been removed!");
+
+                    if (roomID > 0)
+                        _roomIndex.Add(roomID);
+                    _roomIndex.Sort();
                 }
-                _playingRoomIndex.Remove(roomID);
-            }
 
+                _playingRoomIndex.Remove(roomID);
+
+                //    if (_guidGetPlayingRoom.ContainsKey(player1))
+                //    {
+                //        _guidGetPlayingRoom.Remove(player1);
+                //        _dictPlayingRoomList.TryGetValue(roomID, out room);
+                //        List<Guid> keys = new List<Guid>(room.Keys);
+
+                //        foreach (Guid key in keys)
+                //        {
+                //            _guidGetPlayingRoom.Remove(key);
+                //        }
+                //    }
+
+                //    if (_guidGetPlayingRoom.ContainsKey(player2))
+                //    {
+                //        _guidGetPlayingRoom.Remove(player2);
+                //    }
+                //}
+
+
+
+
+
+                //if (_dictPlayingRoomList.ContainsKey(roomID))
+                //{
+                //    Log.Debug("Game Room " + roomID + " been removed!");
+                //    _dictPlayingRoomList.Remove(roomID);
+                //    if (_guidGetPlayingRoom.ContainsKey(player1))
+                //        _guidGetPlayingRoom.Remove(player1);
+                //    if (_guidGetPlayingRoom.ContainsKey(player2))
+                //        _guidGetPlayingRoom.Remove(player2);
+
+
+
+
+
+
+                //    if (roomID > 0)
+
+                //}
+                //else
+                //{
+                //    if (_guidGetPlayingRoom.ContainsKey(player1))
+                //        _guidGetPlayingRoom.Remove(player1);
+                //    if (_guidGetPlayingRoom.ContainsKey(player2))
+                //        _guidGetPlayingRoom.Remove(player2);
+
+                //    if (!_roomIndex.Contains(roomID))
+                //        if (_playingRoomIndex.Contains(roomID) && roomID > 0)
+                //            _roomIndex.Add(roomID);
+
+                //    //  Log.Debug("Cant't RemovePlayingRoom = " + _dictPlayingRoomList.ContainsKey(roomID));
+                //}
+
+                //}
+
+            }
         }
         #endregion
 

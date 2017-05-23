@@ -21,7 +21,7 @@ public class AudioManager : MonoBehaviour
         audio.clip = BGSound;
         audio.Stop();
         flag = true;
-        Debug.Log(audio.name);
+//        Debug.Log(audio.name);
 
     }
 

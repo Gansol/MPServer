@@ -46,14 +46,13 @@ public class Bali : MiceBase
     /// </summary>
     protected override void OnHit()
     {
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
         {
             hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
-            Global.photonService.UpdateLife(-1, false);
         }
         else
         {
@@ -70,8 +69,12 @@ public class Bali : MiceBase
     {
         if (Global.isGameStart)
         {
-            if(m_Arribute.GetHP()==0)
+            if (m_Arribute.GetHP() == 0)
+            {
                 battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
+                battleManager.BreakCombo(); // 如果上面修正了 這裡要取消 錯誤
+            }
+
             Global.dictBattleMice.Remove(transform.parent);
             gameObject.SetActive(false);
             this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
