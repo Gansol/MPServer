@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 //預備改寫仲介者模式
-public abstract class GameSystem {
-    protected MPGame m_MPSystem = null;
+public abstract class GameSystem  {
+    protected MPGame m_MPGame = null;
 
-    public GameSystem(MPGame MPSystem)
+    public GameSystem(MPGame MPGame)
     {
-        m_MPSystem = MPSystem;
+        m_MPGame = MPGame;
     }
 
-    public virtual void Start(){}
+    public virtual void Initinal(){}
     public virtual void Update(){}
     public virtual void Release(){}
 }

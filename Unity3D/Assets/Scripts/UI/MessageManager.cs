@@ -1,19 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MessageManager : MonoBehaviour
+public class MessageManager : GameSystem
 {
 
-    public Transform messagePanel;
-    private GameObject _msgBox, _chkBtn, _lastMsgBox;
+    public Transform messagePanel = null;
+    private GameObject _msgBox, _chkBtn,_clsBtn, _lastMsgBox;
     private string friend;
     private static bool bFirstLoad = true;
 
     // Use this for initialization
-    void Awake()
+
+    public MessageManager(MPGame MPGame) :base(MPGame)
     {
         if (bFirstLoad)
         {
+
             Global.photonService.ShowMessageEvent += OnMessage;
             Global.photonService.InviteFriendEvent += OnInviteFriend;
             Global.photonService.InviteMatchGameEvent += OnInviteMatchGame;
@@ -23,6 +25,19 @@ public class MessageManager : MonoBehaviour
         }
     }
 
+    //void Awake()
+    //{
+    //    if (bFirstLoad)
+    //    {
+    //        Global.photonService.ShowMessageEvent += OnMessage;
+    //        Global.photonService.InviteFriendEvent += OnInviteFriend;
+    //        Global.photonService.InviteMatchGameEvent += OnInviteMatchGame;
+    //        Global.ExitGameEvent += OnExitGame;
+    //        Global.ShowMessageEvent += OnMessage;
+    //        bFirstLoad = false;
+    //    }
+    //}
+
     void OnMessage(string message, Global.MessageBoxType messageBoxType)
     {
         try
@@ -31,6 +46,8 @@ public class MessageManager : MonoBehaviour
             {
                 if (_lastMsgBox != null) _lastMsgBox.SetActive(false);
 
+                if (messagePanel==null)
+                    messagePanel = GameObject.Find("Message(Panel)").transform;
                 messagePanel.gameObject.SetActive(true);
 
                 switch (messageBoxType)
@@ -43,8 +60,11 @@ public class MessageManager : MonoBehaviour
                     case Global.MessageBoxType.YesNo:
                         _msgBox = messagePanel.Find("MsgBox_YesNo").gameObject;
                         _chkBtn = _msgBox.transform.Find("OK_Btn").gameObject;
+                        _clsBtn = _msgBox.transform.Find("Close_Btn").gameObject;
                         _msgBox.SetActive(true);
                         messagePanel.Find("MsgBox_YesNo").transform.Find("Message").GetComponent<UILabel>().text = message;
+                        //UIEventListener.Get(_chkBtn).onClick = OnClosed;
+                        //UIEventListener.Get(_clsBtn).onClick = OnClosed;
                         break;
                     //case Global.MessageBoxType.InviteFriend:
                     //    break;
@@ -53,6 +73,7 @@ public class MessageManager : MonoBehaviour
                         _chkBtn = _msgBox.transform.Find("OK_Btn").gameObject;
                         _msgBox.SetActive(true);
                         messagePanel.Find("MsgBox_Yes").transform.Find("Message").GetComponent<UILabel>().text = message;
+                        UIEventListener.Get(_chkBtn).onClick = OnClosed;
                         break;
                 }
                 _lastMsgBox = _msgBox;
@@ -66,9 +87,10 @@ public class MessageManager : MonoBehaviour
     
     }
 
-    public void OnClosed()  //這有錯
+    public void OnClosed(GameObject go)  //這有錯
     {
-        EventMaskSwitch.openedPanel.SetActive(false);
+        //EventMaskSwitch.openedPanel.SetActive(false); 舊版20171020
+        go.transform.parent.gameObject.SetActive(false);
         EventMaskSwitch.PrevToFirst();//這有錯
         //EventMaskSwitch.Prev();
     }

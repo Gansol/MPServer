@@ -18,14 +18,18 @@ using System.Collections.Generic;
  * ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
-    public int _objCount = 0, _loadedCount = 0;
+    private int _objCount = 0, _loadedCount = 0;
     public bool loadedObj;
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;
+    private GameLoop _gameLoop;
 
-    private void Awake()
+    public AssetLoader(/*GameLoop gameLoop*/)
     {
         init();
+       // _gameLoop = gameLoop;
+        //Debug.Log( GameObject.Find("GameLoop").name);
+       // Debug.Log(gameLoop.name);
     }
 
     private void Update()
@@ -64,7 +68,7 @@ public class AssetLoader : MonoBehaviour
         AssetBundleManager.init();
         try
         {
-            StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
+            /*_gameLoop.*/StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
         }
         catch
         {
@@ -78,7 +82,7 @@ public class AssetLoader : MonoBehaviour
         loadedObj = false;
         if (!AssetBundleManager.bLoadedAssetbundle(assetName))
         {
-            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
+           /* _gameLoop.*/StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
         }
         else
         {

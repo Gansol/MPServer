@@ -129,7 +129,7 @@ public class MissionManager : MonoBehaviour
     // 任務事件處發者
     void MissionTrigger()
     {
-        if (Global.OtherData.RoomPlace != "Host")       // 如果我是主機才會當任務事件判斷者
+        if (Global.OpponentData.RoomPlace != "Host")       // 如果我是主機才會當任務事件判斷者
         {
             float _otherScore = battleManager.otherScore;
             float _score = battleManager.score;

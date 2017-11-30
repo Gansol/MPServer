@@ -14,7 +14,7 @@ using UnityEngine;
  *                           ChangeLog
  * 20160914 v1.0.0 新增實體化物件、角色                         
  * ****************************************************************/
-public class ObjectFactory
+public class ObjectFactory : FactoryBase
 {
     GameObject _clone;
 
@@ -121,7 +121,7 @@ public class ObjectFactory
     /// <param name="miceName"></param>
     /// <returns></returns>
     #region -- GetIDFromName --
-    public static int GetIDFromName(Dictionary<string, object> dictionary, string columns, string miceName)
+    public int GetIDFromName(Dictionary<string, object> dictionary, string columns, string miceName)
     {
         object value;
         foreach (KeyValuePair<string, object> item in dictionary)
@@ -139,7 +139,7 @@ public class ObjectFactory
     #endregion
 
 
-    public static object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string miceID)
+    public object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string miceID)
     {
         object value;
 
@@ -159,7 +159,7 @@ public class ObjectFactory
 
 
     #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public static Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
+    public Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -179,7 +179,7 @@ public class ObjectFactory
     #endregion
 
     #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public static Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData, string columns, int type)
+    public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData, string columns, int type)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 

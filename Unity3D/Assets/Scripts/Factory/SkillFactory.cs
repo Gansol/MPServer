@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MPProtocol;
 using System;
-public class SkillFactory
+public class SkillFactory : FactoryBase
 {
     static SkillBase skill = null;
     static SkillAttr skillData = null;
@@ -17,7 +17,7 @@ public class SkillFactory
     public SkillBase GetSkill(Dictionary<string, object> dictionary, short objectID)
     {
 
-        short skillID = (short)System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(dictionary, "SkillID", objectID.ToString()));
+        short skillID = (short)System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(dictionary, "SkillID", objectID.ToString()));
         Debug.Log("skillID:" + skillID + "   objectID: " + objectID);
 
         GetSkillProperty(skillID);

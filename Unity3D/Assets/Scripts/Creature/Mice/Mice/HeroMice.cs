@@ -44,7 +44,7 @@ public class HeroMice : MiceBase
         {
             bDead = true;
             GetComponent<BoxCollider2D>().enabled = false;
-            if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
+            if (Global.isGameStart && enabled /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& m_Arribute.GetHP() > 0)
             {
                 m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Eat);
                 Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMice);

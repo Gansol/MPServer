@@ -17,7 +17,7 @@ public class SyncLoad : MonoBehaviour
 
     void Start()
     {
-        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
+        assetLoader = MPGame.Instance.AssetLoader();
         LoadAssetCheck();
     }
 

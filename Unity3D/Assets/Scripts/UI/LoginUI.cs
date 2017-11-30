@@ -90,7 +90,7 @@ public class LoginUI : MonoBehaviour
     // 在Start裡建立好Login的回應事件
     void Start()
     {
-        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
+        assetLoader = MPGame.Instance.AssetLoader();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;

@@ -200,9 +200,34 @@ public class AssetBundleChecker : MonoBehaviour
                 }
             }
 
+            //Debug.Log("Equal= :"+ (hashServerList == hashDelorAdd));
+            //HashSet<string> test = new HashSet<string>();
+
+            string str = "", str2 = "";
+            foreach (string a in hashServerList)
+            {
+               str+=a;
+            }
+            Debug.Log(str);
+
+            foreach (string b in hashDelorAdd)
+            {
+                str2 += b;
+            }
+            Debug.Log(str2);
+
             hashServerList.ExceptWith(hashDelorAdd);// hashServerList 新增檔案 = 伺服器檔案 - 已存在檔案
+            
+            
+            //foreach (string a in hashServerList)
+            //{
+            //    Debug.Log(a);
+            //}
             downloadCount = bundleDownloader.fileCount = hashServerList.Count;
             if (downloadCount > 0) bundleChk = true;
+
+           // if (bundleDownloader.fileCount > 0) bundleChk = true;
+
             if (hashServerList.Count != 0)
             {
                 //foreach (string item in hashServerList) // 下載檔案

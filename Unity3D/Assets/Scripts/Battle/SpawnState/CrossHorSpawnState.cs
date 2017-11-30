@@ -7,7 +7,7 @@ public class CrossHorSpawnState : SpawnState
     {
     }
 
-    public override IEnumerator Spawn(MPFactory spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
+    public override IEnumerator Spawn(SpawnAI spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
     {
         spawnIntervalTime = 6f * spawnIntervalTimes;
         yield return new WaitForSeconds(1f * spawnIntervalTimes);

@@ -21,7 +21,7 @@ using System.Linq;
  * 
  * ***************************************************************/
 
-public class ObjectPool : MonoBehaviour
+public class ObjectPool 
 {
     private Dictionary<int, string> _dictObject;
 
@@ -76,7 +76,7 @@ public class ObjectPool : MonoBehaviour
 
             for (int i = 0; i < spawnCount; i++)
             {
-                clone = (GameObject)Instantiate(ObjectDeck[item.Key]);   //　等傳老鼠ID名稱近來這要改
+                clone = (GameObject)GameObject.Instantiate(ObjectDeck[item.Key]);   //　等傳老鼠ID名稱近來這要改
                 clone.name = item.Key.ToString();
                 clone.transform.parent = Pool.transform.FindChild(item.Key.ToString()).transform;
                 clone.transform.localScale = Vector3.one;
@@ -101,7 +101,7 @@ public class ObjectPool : MonoBehaviour
 
         if (Pool.transform.FindChild(objectName).childCount == 0)
         {
-            clone = (GameObject)Instantiate(ObjectDeck[objectID], Vector3.zero, Quaternion.identity);
+            clone = (GameObject)GameObject.Instantiate(ObjectDeck[objectID], Vector3.zero, Quaternion.identity);
             clone.name = objectName;
             clone.transform.parent = Pool.transform.FindChild(objectName).transform;
             clone.transform.localScale = Vector3.one;
@@ -168,7 +168,7 @@ public class ObjectPool : MonoBehaviour
                 {
                     for (int j = 0; j < Pool.transform.GetChild(i).childCount - reserveCount; j++)    // 銷毀物件
                     {
-                        Destroy(Pool.transform.GetChild(i).GetChild(j).gameObject);
+                        GameObject.Destroy(Pool.transform.GetChild(i).GetChild(j).gameObject);
                     }
                 }
             }

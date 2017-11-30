@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class SkillBtn : MonoBehaviour
 {
-    AttrFactory attrFactory;
     MiceAttr attr;
 
     private int _energyValue;
@@ -19,7 +18,6 @@ public class SkillBtn : MonoBehaviour
     // 初始化
     public void init(short miceID, float lerpSpeed, float upDistance, int energyValue)
     {
-        attrFactory = new AttrFactory();
         attr = new MiceAttr();
 
         _upFlag = true;
@@ -34,12 +32,12 @@ public class SkillBtn : MonoBehaviour
         _energyValue = energyValue;
 
         _skillTimes = GetSkillTimes();
-        _miceCount = System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemCount", miceID.ToString()));
-        _itemID = System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", miceID.ToString()));
-        _itemCount = System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.playerItem, "ItemCount", _itemID.ToString()));
-        _skillID = System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "SkillID", _itemID.ToString()));
-        _skillType = System.Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.dictSkills, "SkillType", _skillID.ToString()));
-        _cost = System.Convert.ToByte(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "MiceCost", miceID.ToString()));
+        _miceCount = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.playerItem, "ItemCount", miceID.ToString()));
+        _itemID = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", miceID.ToString()));
+        _itemCount = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.playerItem, "ItemCount", _itemID.ToString()));
+        _skillID = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "SkillID", _itemID.ToString()));
+        _skillType = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.dictSkills, "SkillType", _skillID.ToString()));
+        _cost = System.Convert.ToByte(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "MiceCost", miceID.ToString()));
         Debug.Log("ItemID:" + _itemID + "  " + _itemCount);
         //if(energyValue=4)
         sprite = transform.parent.Find("SkillBg").GetChild(_energyValue).GetComponent<UISprite>();
@@ -222,7 +220,7 @@ public class SkillBtn : MonoBehaviour
     // 取得技能次數
     private byte GetSkillTimes()
     {
-        MiceAttr attr = attrFactory.GetMiceProperty(_miceID.ToString());
+        MiceAttr attr = MPGFactory.GetAttrFactory().GetMiceProperty(_miceID.ToString());
         return attr.SkillTimes;
     }
 }

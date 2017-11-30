@@ -9,7 +9,7 @@ public class dem : MonoBehaviour
     AssetLoader loader;
     void Start()
     {
-         loader = gameObject.AddComponent<AssetLoader>();
+        loader = MPGame.Instance.AssetLoader();
         loader.LoadAsset("MiceICON/", "MiceICON");
         loader.LoadPrefab("MiceICON/", "EggMiceICON");
 

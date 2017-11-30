@@ -52,6 +52,9 @@ namespace MPServer
         public Dictionary<int, Dictionary<Guid, RoomActor>> dictWaitingRoomList { get { return _dictWaitingRoomList; } }
         public Dictionary<int, Dictionary<Guid, RoomActor>> dictPrivateRoomList { get { return _dictPrivateRoomList; } }
         public Dictionary<int, Dictionary<Guid, RoomActor>> dictPlayingRoomList { get { return _dictPlayingRoomList; } }
+
+        private List<int> _dictGameOverRoom;
+
         //  public int myRoom { get { return _myRoom; } }
         public int RoomPlayerLimit { get { return _roomPlayerLimit; } }
         public string roomName { get; set; }
@@ -68,6 +71,7 @@ namespace MPServer
             _dictWaitingRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
             _dictPlayingRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
             _dictPrivateRoomList = new Dictionary<int, Dictionary<Guid, RoomActor>>();
+            _dictGameOverRoom = new List<int>();
             _loadedPlayer = new Dictionary<int, Dictionary<int, Guid>>();
             _worldBossHP = new Dictionary<int, int>();
             _guidGetPlayingRoom = new Dictionary<Guid, int>();
@@ -185,7 +189,7 @@ namespace MPServer
                             foreach (KeyValuePair<Guid, RoomActor> player in item.Value)  // 把這間房間的玩家 加入索引 可以用GUID來取得房間ID
                             {
                                 Log.Debug("Join Player :" + player.Value.Nickname);
-                                if (_guidGetPlayingRoom.ContainsKey(player.Value.guid)) 
+                                if (_guidGetPlayingRoom.ContainsKey(player.Value.guid))
                                     _guidGetPlayingRoom.Remove(player.Value.guid);
                                 _guidGetPlayingRoom.Add(player.Value.guid, item.Key);
                                 _guidGetWaitingRoom.Remove(player.Key);
@@ -358,37 +362,70 @@ namespace MPServer
         /// </summary>
         /// <param name="roomID"></param>
         /// <param name="player1"></param>
-        /// <param name="player2"></param>
-        public void RemovePlayingRoom(int roomID, Guid player1, Guid player2)
+        /// <param name="primaryID">沒有斷線填入-1</param>
+        public void RemovePlayingRoom(int roomID, Guid player1, int primaryID)
         {
             lock (this)
             {
                 if (roomID > 0)
                 {
-                    //Dictionary<Guid, RoomActor> room;
+                    Dictionary<Guid, RoomActor> room;
+                    _dictPlayingRoomList.TryGetValue(roomID, out room);
                     Log.Debug("Game Room " + roomID + " been removed!");
-                    _guidGetPlayingRoom.Remove(player1);
-                    _guidGetPlayingRoom.Remove(player2);
-                    _dictPlayingRoomList.Remove(roomID);
 
-                    _roomIndex.Add(roomID);
-                    _roomIndex.Sort();
+                    if (primaryID > 0)
+                    {
+                        RoomActor disconnectPlayer = GetPlayingRoomOtherPlayer(roomID, primaryID);
+                        if (disconnectPlayer != null)
+                        {
+                            _guidGetPlayingRoom.Remove(player1);
+                            _guidGetPlayingRoom.Remove(disconnectPlayer.guid);
+                            Log.Debug("Remove disconnectPlayer");
+
+                            _dictPlayingRoomList.Remove(roomID);
+                            _playingRoomIndex.Remove(roomID);
+                            _roomIndex.Add(roomID);
+                            _roomIndex.Sort();
+
+                            Log.Debug("Remove _dictPlayingRoomList");
+                        }
+                    }
+                    else
+                    {
+                        if (!_dictGameOverRoom.Contains(roomID))
+                        {
+                            _dictGameOverRoom.Add(roomID);
+                            Log.Debug("ADD _dictGameOverRoom");
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<Guid, RoomActor> player in room)
+                                _guidGetPlayingRoom.Remove(player.Key);
+
+                            _dictGameOverRoom.Remove(roomID);
+                            _dictPlayingRoomList.Remove(roomID);
+                            _playingRoomIndex.Remove(roomID);
+                            _roomIndex.Add(roomID);
+                            _roomIndex.Sort();
+
+                            Log.Debug("Remove _dictPlayingRoomList");
+                        }
+                    }
+
                 }
-                else
-                {
-                    if (_guidGetPlayingRoom.ContainsKey(player1)) _guidGetPlayingRoom.TryGetValue(player1, out roomID);
-                    if (_guidGetPlayingRoom.ContainsKey(player2)) _guidGetPlayingRoom.TryGetValue(player2, out roomID);
+                //else
+                //{
+                //    if (_guidGetPlayingRoom.ContainsKey(player1)) _guidGetPlayingRoom.TryGetValue(player1, out roomID);
+                //    if (_guidGetPlayingRoom.ContainsKey(player2)) _guidGetPlayingRoom.TryGetValue(player2, out roomID);
 
-                    _dictPlayingRoomList.Remove(roomID);
+                //    Log.Debug("(2)Game Room " + roomID + " been removed!");
 
-                    Log.Debug("(2)Game Room " + roomID + " been removed!");
-
-                    if (roomID > 0)
-                        _roomIndex.Add(roomID);
-                    _roomIndex.Sort();
-                }
-
-                _playingRoomIndex.Remove(roomID);
+                //    if (roomID > 0)
+                //        _roomIndex.Add(roomID);
+                //    _roomIndex.Sort();
+                //}
+                //_dictPlayingRoomList.Remove(roomID);
+                //_playingRoomIndex.Remove(roomID);
 
                 //    if (_guidGetPlayingRoom.ContainsKey(player1))
                 //    {

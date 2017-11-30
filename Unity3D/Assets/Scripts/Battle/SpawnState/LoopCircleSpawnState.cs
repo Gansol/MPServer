@@ -8,7 +8,7 @@ public class LoopCircleSpawnState : SpawnState {
     {
     }
 
-    public override IEnumerator Spawn(MPFactory spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
+    public override IEnumerator Spawn(SpawnAI spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
     {
        // int startPos = reSpawn ? ((sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.CircleLD)).Length - 2 - 1 : -1y;
 

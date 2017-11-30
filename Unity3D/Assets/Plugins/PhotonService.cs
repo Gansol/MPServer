@@ -94,6 +94,8 @@ public class PhotonService : IPhotonPeerListener
     public event LoadDataHandler LoadPlayerDataEvent;
     public event LoadDataHandler LoadStoreDataEvent;
     public event LoadDataHandler LoadPlayerItemEvent;
+    public event LoadDataHandler LoadItemDataEvent;
+    public event LoadDataHandler LoadCurrencyEvent;
     public event LoadDataHandler UpdateMiceEvent;
     public event LoadDataHandler LoadFriendsDataEvent;
     public event LoadDataHandler ApplyInviteFriendEvent;
@@ -209,11 +211,11 @@ public class PhotonService : IPhotonPeerListener
             // 配對成功 傳入 房間ID、對手資料、老鼠資料
             case (byte)MatchGameResponseCode.Match:
                 Global.RoomID = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomID];
-                Global.OtherData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
-                Global.OtherData.PrimaryID = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.PrimaryID];
-                Global.OtherData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.Team]) as Dictionary<string, object>;
-                Global.OtherData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
-                Global.OtherData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
+                Global.OpponentData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
+                Global.OpponentData.PrimaryID = (int)eventResponse.Parameters[(byte)MatchGameParameterCode.PrimaryID];
+                Global.OpponentData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.Team]) as Dictionary<string, object>;
+                Global.OpponentData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
+                Global.OpponentData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
                 Global.nextScene = (int)Global.Scene.Battle;
                 ExitWaitingRoom();
                 LoadSceneEvent();
@@ -320,14 +322,14 @@ public class PhotonService : IPhotonPeerListener
                 break;
 
             case (byte)MatchGameResponseCode.InviteMatchGame:
-                Global.OtherData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
-                Global.OtherData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
-                Global.ShowMessage(Global.OtherData.Nickname + " 邀請對戰", Global.MessageBoxType.YesNo);
-                InviteMatchGameEvent(Global.OtherData.Account);
+                Global.OpponentData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
+                Global.OpponentData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
+                Global.ShowMessage(Global.OpponentData.Nickname + " 邀請對戰", Global.MessageBoxType.YesNo);
+                InviteMatchGameEvent(Global.OpponentData.Account);
                 break;
 
             case (byte)MatchGameResponseCode.ApplyMatchGameFriend:
-                Global.OtherData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
+                Global.OpponentData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
                 ApplyMatchGameFriendEvent();
                 break;
         }
@@ -788,6 +790,8 @@ public class PhotonService : IPhotonPeerListener
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
 
                             Global.isCurrencyLoaded = true;
+
+                            LoadCurrencyEvent();
                         }
                     }
                     catch (Exception e)
@@ -868,6 +872,7 @@ public class PhotonService : IPhotonPeerListener
                         string itemData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
                         Global.itemProperty = Json.Deserialize(itemData) as Dictionary<string, object>;
                         Global.isItemLoaded = true;
+                        LoadItemDataEvent();
                     }
                 }
                 break;
@@ -1468,7 +1473,7 @@ public class PhotonService : IPhotonPeerListener
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 { (byte)MatchGameParameterCode.PrimaryID,Global.PrimaryID},{ (byte)MatchGameParameterCode.OtherAccount,Global.OtherData.Account},
+                 { (byte)MatchGameParameterCode.PrimaryID,Global.PrimaryID},{ (byte)MatchGameParameterCode.OtherAccount,Global.OpponentData.Account},
                  { (byte)MatchGameParameterCode.Team,Json.Serialize(Global.dictTeam)}, { (byte)MemberParameterCode.MemberType,Global.MemberType}
             };
 

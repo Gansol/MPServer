@@ -4,8 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 using MPProtocol;
+
 /* ***************************************************************
- * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----Copyright © 2018 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
  * -----------  @Website:  EasyUnity@blogspot.com    -------------
  * -----------  @Email:    GansolTW@gmail.com        -------------
@@ -13,15 +14,16 @@ using MPProtocol;
  * ***************************************************************
  *                          Description
  * ***************************************************************
- * 
+ * 現在會錯誤是正常的 因為還沒有Gashpon 暫時會少載入一下ICON
  * ***************************************************************
  *                           ChangeLog
+ * 20171119 v1.1.0   修正載入流程 
  * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
  * 20160914 v1.0.1b  2次重構，獨立實體化物件                          
  * 20160711 v1.0.1a  1次重構，獨立AssetLoader                       
- * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                     
+ * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改     
  * ****************************************************************/
-public class StoreManager : PanelManager
+public class StoreManager : MPPanel
 {
     #region 欄位
     public GameObject[] infoGroupsArea;                         // 物件存放區
@@ -46,23 +48,20 @@ public class StoreManager : PanelManager
     private string[] buyingGoodsData;
     private string _folderString;                               // 資料夾名稱
     private int _itemType;                                      // 道具形態
-    private bool _bFirstLoad,_bLoadedGashapon, _bLoadedIcon, _bLoadedActor; // 是否載入轉蛋、是否載入圖片、是否載入角色
+    private bool _bFirstLoad, _bLoadedGashapon, _bLoadedAsset, _bLoadedActor, _bLoadedStoreData, _bLoadedItemData, _bLoadedCurrency, _bLoadedPlayerItem, _bLoadedPanel; // 是否載入轉蛋、是否載入圖片、是否載入角色
     private static GameObject _tmpTab, _lastItem;               // 暫存分頁、暫存按下
     private Dictionary<string, object> _itemData;               // 道具資料
 
-    private ObjectFactory insObj;
-
     private Dictionary<string, GameObject> dictItemRefs;
     #endregion
+    public StoreManager(MPGame MPGame) : base(MPGame) { }
 
     private void Awake()
     {
         _bFirstLoad = true;
-        insObj = new ObjectFactory();
-        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
         dictItemRefs = new Dictionary<string, GameObject>();
 
-        _itemType = -1;
+        _itemType = 1;
         tablePageCount = 9;
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
@@ -71,8 +70,12 @@ public class StoreManager : PanelManager
 
     void OnEnable()
     {
-        Global.photonService.LoadStoreDataEvent += OnLoadPanel;
+        _bLoadedPanel = false;
+        Global.photonService.LoadStoreDataEvent += OnLoadStoreData;
+        Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
+        Global.photonService.LoadItemDataEvent += OnLoadItemData;
         Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
+
     }
 
     private void Update()
@@ -84,48 +87,74 @@ public class StoreManager : PanelManager
         if (assetLoader.loadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
         {
             _bLoadedGashapon = !_bLoadedGashapon;
-            assetLoader.init();
+            //  assetLoader.init();
             //_tmpTab = infoGroupsArea[2];
             //  InstantiateGashapon(infoGroupsArea[2].transform, assetFolder[0]);
-            GameObject go = new GameObject();
-            go.name = "Tab2";
-            OnTabClick(go);
+
         }
 
-        if (assetLoader.loadedObj && _bLoadedIcon)                      // 載入道具完成後 實體化 道具
+        if (_bLoadedStoreData && _bLoadedPlayerItem && _bLoadedItemData && !_bLoadedPanel)
         {
-            _bLoadedIcon = !_bLoadedIcon;
+            _bLoadedPanel = true;
+
+            if (!_bFirstLoad)
+            {
+                OnTabClick(null, 2);
+                ResumeToggleTarget();
+            }
+
+            OnLoadPanel();
+        }
+
+
+        if (assetLoader.loadedObj && _bLoadedAsset)                      // 載入道具完成後 實體化 道具
+        {
             assetLoader.init();
-            //itemData = Global.storeItem;
-
-            Dictionary<string, GameObject> tmpDict;
-            tmpDict = InstantiateItem(_itemData, "Item", _itemType, infoGroupsArea[3].transform, itemOffset, tablePageCount, tableRowCount);
-
-            if (tmpDict != null) dictItemRefs = dictItemRefs.Concat(tmpDict).GroupBy(d => d.Key).ToDictionary(d => d.Key, d => d.First().Value);
-            Transform parent = infoGroupsArea[3].transform.FindChild(_itemType.ToString());
-
-            SelectItemProperty(_itemType);
-            //LoadItemData(_itemData, parent, _itemType);                 // 載入道具資訊資料
-
-            SelectStoreItemData(_itemType);                                  // 選擇商店資料
-            InstantiateItemIcon(_itemData, parent);
+            _bLoadedAsset = !_bLoadedAsset;
+            InstantiateStoreItem();
             LoadPrice(_itemData, _itemType);
-            EventMaskSwitch.Resume();
-            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-            EventMaskSwitch.Switch(gameObject, false);
-            EventMaskSwitch.lastPanel = gameObject;
+            ResumeToggleTarget();
         }
 
         if (assetLoader.loadedObj && _bLoadedActor)                     // 載入角色完成後 實體化 角色
         {
             _bLoadedActor = !_bLoadedActor;
-            assetLoader.init();
             _bLoadedActor = InstantiateActor(_lastItem.GetComponentInChildren<UISprite>().name, infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Image"), actorScale);
         }
     }
 
+    private void InstantiateStoreItem()
+    {
+        //itemData = Global.storeItem;
+
+        Dictionary<string, GameObject> itemBtnDict;
+        itemBtnDict = InstantiateItem(_itemData, "Item", _itemType, infoGroupsArea[3].transform, itemOffset, tablePageCount, tableRowCount);
+
+        if (itemBtnDict != null)
+        {
+            dictItemRefs = dictItemRefs.Concat(itemBtnDict).GroupBy(d => d.Key).ToDictionary(d => d.Key, d => d.First().Value);
+            AddItemBtnEvent_OnClick(itemBtnDict);
+        }
+        Transform parent = infoGroupsArea[3].transform.FindChild(_itemType.ToString());
+
+        //SelectItemProperty(_itemType);
+        //LoadItemData(_itemData, parent, _itemType);                 // 載入道具資訊資料
+
+        SelectStoreItemData(_itemType);                                  // 選擇商店資料
+        InstantiateItemIcon(_itemData, parent);
+
+    }
+
+    private void AddItemBtnEvent_OnClick(Dictionary<string, GameObject> itemBtnDict)
+    {
+        foreach (KeyValuePair<string, GameObject> item in itemBtnDict)
+        {
+            UIEventListener.Get(item.Value).onClick += OnItemClick;
+        }
+    }
+
     #region -- OnLoadPanel 載入面板 --
-    public override void OnLoading()
+    protected override void OnLoading()
     {
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
@@ -133,25 +162,36 @@ public class StoreManager : PanelManager
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
+    private void OnLoadStoreData()
+    {
+        _bLoadedStoreData = true;
+    }
+
+    private void OnLoadItemData()
+    {
+        _bLoadedItemData = true;
+    }
+    //private void OnLoadCurrency()
+    //{
+    //    _bLoadedCurrency = true;
+    //}
+    private void OnLoadPlayerItem()
+    {
+        _bLoadedPlayerItem = true;
+    }
+
     protected override void OnLoadPanel()
     {
         if (transform.parent.gameObject.activeSelf)
         {
             if (_bFirstLoad)
-            {
                 _bFirstLoad = false;
-            }
-            else
-            {
-                EventMaskSwitch.Resume();
-                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-                EventMaskSwitch.Switch(gameObject, false);
-                EventMaskSwitch.lastPanel = gameObject;
-            }
 
             _itemData = Global.storeItem;
-            assetLoader.LoadAsset(assetFolder[0] + "/", assetFolder[0]);
-            LoadGashapon(assetFolder[0]);
+
+
+            LoadGashaponAsset(assetFolder[0]);
+            LoadStoreAsset();
             LoadPlayerInfo();
             EventMaskSwitch.lastPanel = gameObject;
         }
@@ -176,10 +216,9 @@ public class StoreManager : PanelManager
 
     public void OnItemClick(GameObject obj)
     {
-
         _lastItem = obj;
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItem.name] as Dictionary<string, object>;
-        Dictionary<string, object> playerItemData = new Dictionary<string,object>();
+        Dictionary<string, object> playerItemData = new Dictionary<string, object>();
         if (Global.playerItem.ContainsKey(_lastItem.name))
             playerItemData = Global.playerItem[_lastItem.name] as Dictionary<string, object>;
         object value;
@@ -188,23 +227,19 @@ public class StoreManager : PanelManager
 
         if ((StoreType)_itemType == StoreType.Mice)
         {
-            LoadProperty loadProperty = new LoadProperty();
             infoGroupsArea[4].SetActive(true);
             infoGroupsArea[4].transform.Find("Item").gameObject.SetActive(false);
             infoGroupsArea[4].transform.Find("Mice").gameObject.SetActive(true);
 
-            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, Global.miceProperty, _itemType);
-            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemData, _itemType);
-            loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemType);
+            LoadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, Global.miceProperty, _itemType);
+            LoadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemData, _itemType);
+            LoadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).gameObject, _itemType);
 
+            infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
             if (playerItemData.Count != 0)
             {
                 playerItemData.TryGetValue("ItemCount", out value);
                 infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
-            }
-            else
-            {
-                infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
             }
 
             _bLoadedActor = LoadActor(obj, infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Image"), actorScale);
@@ -213,41 +248,34 @@ public class StoreManager : PanelManager
             infoGroupsArea[4].layer = LayerMask.NameToLayer("ItemInfo");
 
             dictItemProperty.TryGetValue("Description", out value);
-            infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString(); 
+            infoGroupsArea[4].transform.Find("Mice").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString();
 
             EventMaskSwitch.Switch(infoGroupsArea[4], true);
         }
         else if ((StoreType)_itemType == StoreType.Item || (StoreType)_itemType == StoreType.Armor)
         {
-            LoadProperty loadProperty = new LoadProperty();
+
             infoGroupsArea[4].SetActive(true);
             infoGroupsArea[4].transform.Find("Item").gameObject.SetActive(true);
             infoGroupsArea[4].transform.Find("Mice").gameObject.SetActive(false);
 
-            loadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemData, _itemType);
-            loadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemType);
+            LoadProperty.LoadItemProperty(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemData, _itemType);
+            LoadProperty.LoadPrice(obj, infoGroupsArea[4].transform.Find("Item").GetChild(0).gameObject, _itemType);
 
-
-            
-
-            
             dictItemProperty.TryGetValue("ItemName", out value);
             infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItem.GetComponentInChildren<UISprite>().atlas;
             infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + "ICON";
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
 
             if (playerItemData.Count != 0)
             {
                 playerItemData.TryGetValue("ItemCount", out value);
                 infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
+            }
 
-            }
-            else
-            {
-                infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
-            }
 
             dictItemProperty.TryGetValue("Description", out value);
-            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString(); 
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Description").GetComponent<UILabel>().text = value.ToString();
 
 
             infoGroupsArea[4].transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
@@ -321,7 +349,6 @@ public class StoreManager : PanelManager
     public void OnComfirm(GameObject myPanel)
     {
         myPanel.SetActive(false);
-
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
@@ -343,12 +370,20 @@ public class StoreManager : PanelManager
         int level = int.Parse(obj.name);
         EventMaskSwitch.openedPanel.SetActive(false);
         EventMaskSwitch.Prev(level);
-
     }
 
-    public void OnTabClick(GameObject obj)
+    public void OnTabClick(GameObject obj, int tabNum)
     {
-        int value = int.Parse(obj.name.Remove(0, 3));
+        int value = -1;
+
+        if (obj != null)
+        {
+            value = int.Parse(obj.name.Remove(0, 3));
+        }
+        else
+        {
+            value = tabNum;
+        }
 
         switch (value)
         {
@@ -380,25 +415,41 @@ public class StoreManager : PanelManager
 
         if (_itemType != (int)StoreType.Gashapon)
         {
-            SelectStoreItemData(_itemType);
-            _itemData = ObjectFactory.GetItemInfoFromType(_itemData, _itemType);
-//            if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
-            assetLoader.init();
-            assetLoader.LoadAsset(_folderString + "/", _folderString);
-            _bLoadedIcon = LoadIconObject(SelectIconData(_itemData), _folderString);
-            assetLoader.LoadPrefab("Panel/", "Item");
-            infoGroupsArea[3].SetActive(true);
-            _tmpTab = infoGroupsArea[3];
+            LoadStoreAsset();
+        }
+        else
+        {
+            //LoadGashaponAsset();
         }
 
 
+        infoGroupsArea[3].SetActive(true);
+        _tmpTab = infoGroupsArea[3];
 
     }
     #endregion
 
-    #region -- LoadGashapon 載入轉蛋物件(亂寫) --
-    private void LoadGashapon(string folder)
+    private void LoadStoreAsset()
     {
+        SelectStoreItemData(_itemType);
+        _itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(_itemData, _itemType);
+        //            if (_tmpTab != infoGroupsArea[3]) _tmpTab.SetActive(false);
+
+        if (!assetLoader.GetAsset(_folderString))
+        {
+            assetLoader.init();
+            assetLoader.LoadAsset(_folderString + "/", _folderString);
+            assetLoader.LoadPrefab("Panel/", "Item");
+            _bLoadedAsset = LoadIconObject(SelectIconData(_itemData), _folderString);
+        }
+    }
+
+
+    #region -- LoadGashapon 載入轉蛋物件(亂寫) --
+    private void LoadGashaponAsset(string folder)
+    {
+        assetLoader.init();
+        assetLoader.LoadAsset(folder + "/", folder);
         for (int i = 1; i <= 3; i++)
             assetLoader.LoadPrefab(folder + "/", folder + i);
     }
@@ -416,7 +467,7 @@ public class StoreManager : PanelManager
         object price;
 
         // 取得分類好的道具資料
-        itemData = ObjectFactory.GetItemInfoFromType(itemData, itemType);
+        itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(itemData, itemType);
 
         // 載入資料
         foreach (KeyValuePair<string, object> item in itemData)
@@ -471,7 +522,7 @@ public class StoreManager : PanelManager
                 GameObject bundle = assetLoader.GetAsset(folder + (i + 1).ToString());
                 Transform parent = myParent.GetChild(1).GetChild(i).GetChild(0);
 
-                insObj.Instantiate(bundle, parent, folder + (i + 1).ToString(), new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
+                MPGFactory.GetObjFactory().Instantiate(bundle, parent, folder + (i + 1).ToString(), new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
             }
             else
             {
@@ -486,7 +537,7 @@ public class StoreManager : PanelManager
     //private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
     //{
     //    int i = 0, j = 0;
-    //    itemData = ObjectFactory.GetItemInfoFromID(itemData, "ItemID", _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
+    //    itemData = MPGFactory.GetObjFactory().GetItemInfoFromID(itemData, "ItemID", _itemType); /// 這一定要有 但是 道具類別(有兩類)沒有ItemType可以分辨資料
     //    foreach (KeyValuePair<string, object> item in itemData)
     //    {
     //        var nestedData = item.Value as Dictionary<string, object>;
@@ -500,7 +551,7 @@ public class StoreManager : PanelManager
     //        i++;
     //    }
 
-    //    itemData = ObjectFactory.GetItemInfoFromType(Global.storeItem, _itemType);
+    //    itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(Global.storeItem, _itemType);
     //    i = j = 0;
 
     //    foreach (KeyValuePair<string, object> item in itemData)
@@ -527,7 +578,7 @@ public class StoreManager : PanelManager
     private void InstantiateItemIcon(Dictionary<string, object> itemData, Transform myParent)
     {
         int i = 0;
-        itemData = ObjectFactory.GetItemInfoFromType(itemData, _itemType);
+        itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(itemData, _itemType);
         // to do check has icon object
         foreach (KeyValuePair<string, object> item in itemData)
         {
@@ -542,16 +593,16 @@ public class StoreManager : PanelManager
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
                 if (imageParent.childCount == 0)   // 如果沒有ICON才實體化
                 {
-                    insObj.Instantiate(bundle, imageParent, itemName.ToString(), new Vector3(0, -30), Vector3.one, new Vector2(140, 140), 400);
+                    MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName.ToString(), new Vector3(0, -30), Vector3.one, new Vector2(140, 140), 400);
                 }
             }
             else
             {
-                Debug.LogError("Assetbundle reference not set to an instance.");
+                Debug.LogError("Assetbundle reference not set to an instance. BundleName:" + bundleName);
             }
             i++;
         }
-        _bLoadedIcon = false;
+        _bLoadedAsset = false;
     }
     #endregion
 
@@ -589,7 +640,9 @@ public class StoreManager : PanelManager
 
     void OnDisable()
     {
-        Global.photonService.LoadStoreDataEvent -= OnLoadPanel;
+        Global.photonService.LoadStoreDataEvent -= OnLoadStoreData;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+        Global.photonService.LoadItemDataEvent -= OnLoadItemData;
         Global.photonService.UpdateCurrencyEvent -= LoadPlayerInfo;
     }
 }

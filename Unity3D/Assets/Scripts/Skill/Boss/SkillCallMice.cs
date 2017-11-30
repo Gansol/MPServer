@@ -6,7 +6,7 @@ using System.Linq;
 public class SkillCallMice : SkillBoss
 {
     PoolManager poolManager = GameObject.FindGameObjectWithTag("GM").GetComponent<PoolManager>();
-    MPFactory spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
+    SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().GetSpawnAI();
     Dictionary<Transform, GameObject> dictMice, buffer;
     ObjectFactory objFactory;
 
@@ -46,7 +46,7 @@ public class SkillCallMice : SkillBoss
 
         for (int i = 0; i < spawnCount; i++)
         {
-            dictMice.Add(spawner.hole[data[i]].transform, objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawner.hole[rndHole[i]], true));
+            dictMice.Add(spawnAI.GetHole(i), objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawnAI.GetHole(rndHole[i]).gameObject, true));
         }
 
         buffer = new Dictionary<Transform, GameObject>(dictMice);

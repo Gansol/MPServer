@@ -17,10 +17,6 @@ public class PlayerAIState
         this.battleManager = battleManager;
     }
 
-    public AssetLoader GetAssetLoader()
-    {
-        return battleManager.GetAssetLoader();
-    }
     // Update is called once per frame
     public void UpdatePlayerState()
     {

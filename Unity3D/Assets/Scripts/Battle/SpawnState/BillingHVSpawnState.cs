@@ -9,7 +9,7 @@ public class BillingHVSpawnState : SpawnState
     {
     }
 
-    public override IEnumerator Spawn(MPFactory spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
+    public override IEnumerator Spawn(SpawnAI spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
     {
         spawnTime *= spawnIntervalTimes;
         spawnIntervalTime = 10f * spawnIntervalTimes;

@@ -25,7 +25,7 @@ using System;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
  * ****************************************************************/
 
-public class MatchManager : PanelManager
+public class MatchManager : MPPanel
 {
     #region 欄位
     public GameObject[] infoGroupsArea;                                             // 物件群組位置
@@ -42,6 +42,7 @@ public class MatchManager : PanelManager
     public Vector3 actorScale;                                                      // 角色縮放
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
     public GameObject ok_btn;
+    public GameObject[] Panel;
     public UILabel matchText, timeText;
     //private int _page;                                                              // 翻頁值(翻一頁+10)                                              
     private static bool _bFirstLoad;                                                // 是否第一次載入
@@ -51,8 +52,11 @@ public class MatchManager : PanelManager
     private GameObject _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private static Dictionary<string, object> _dictMiceData/*, _dictTeamData*/;         // Json老鼠、隊伍資料
     private static int _miceCost, _maxCost = 100;
-    float _time, _lastTime, _lastClickTime, clickInterval, escapeTime,_checkTime;    // 點擊間距時間
+    float _time, _lastTime, _lastClickTime, clickInterval, escapeTime, _checkTime;    // 點擊間距時間
     #endregion
+
+
+    public MatchManager(MPGame MPGame) : base(MPGame) { }
 
     void Awake()
     {
@@ -63,7 +67,6 @@ public class MatchManager : PanelManager
         _dictMiceData = new Dictionary<string, object>();
         onClickEvent = new List<EventDelegate>();
         //_dictTeamData = new Dictionary<string, object>();
-        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
 
         //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
@@ -77,7 +80,7 @@ public class MatchManager : PanelManager
         Global.photonService.LoadPlayerDataEvent += OnLoadPanel;
         Global.photonService.LoadPlayerItemEvent += None;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
-        Global.photonService.UpdateMiceEvent += OnCostCheck;
+        Global.photonService.UpdateMiceEvent += OnUpdateMice;
         _checkTime = 0;
     }
 
@@ -236,8 +239,7 @@ public class MatchManager : PanelManager
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
                 if (miceBtn.childCount == 0)
                 {
-                    ObjectFactory insObj = new ObjectFactory();
-                    insObj.Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(130, 130), -1);
+                    MPGFactory.GetObjFactory().Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(130, 130), -1);
 
                     Add2Refs(item.Key, miceBtn);     // 加入物件參考
 
@@ -264,7 +266,7 @@ public class MatchManager : PanelManager
     #endregion
 
     #region -- OnLoadPanel 載入面板--
-    public override void OnLoading()
+    protected override void OnLoading()
     {
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
@@ -283,16 +285,13 @@ public class MatchManager : PanelManager
             }
             else
             {
-                ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, dictLoadedMice);
-                ExpectOutdataObject(Global.dictTeam, _dictMiceData, dictLoadedTeam);
-                _dictMiceData = SelectNewData(Global.dictMiceAll, _dictMiceData);
+                LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, dictLoadedMice);
+                LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, dictLoadedTeam);
+                _dictMiceData = LoadProperty.SelectNewData(Global.dictMiceAll, _dictMiceData);
 
                 dictNotLoadedAsset = GetDontNotLoadAsset(_dictMiceData);
 
-                EventMaskSwitch.Resume();
-                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-                EventMaskSwitch.Switch(gameObject, false);
-                EventMaskSwitch.lastPanel = gameObject;
+                ResumeToggleTarget();
             }
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
@@ -316,8 +315,12 @@ public class MatchManager : PanelManager
     #endregion
 
 
+    private void OnUpdateMice()
+    {
+        OnCostCheck();
+    }
 
-    public void OnCostCheck()
+    public bool OnCostCheck()
     {
         object value;
         int maxCost = Clac.ClacCost(Global.Rank);
@@ -336,7 +339,11 @@ public class MatchManager : PanelManager
         {
             infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
             ok_btn.SetActive(false);
-
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 
@@ -408,18 +415,26 @@ public class MatchManager : PanelManager
 
     }
 
+    private bool TeamCountChk()
+    {
+        return (Global.dictTeam.Count > 0 && Global.dictTeam.Count <= 5) ? true : false;
+    }
+
     // Match按鈕使用 開始配對
     public void OnMatchGame(GameObject go)
     {
         if (!Global.isMatching && Global.LoginStatus)
         {
-            matchText.text = "尋找玩家...";
-            escapeTime = 0;
-            Global.isMatching = true;
-            Panel[1].SetActive(true);
-            Panel[0].SetActive(false);
-            timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
-            Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
+            if (TeamCountChk())
+            {
+                matchText.text = "尋找玩家...";
+                escapeTime = 0;
+                Global.isMatching = true;
+                Panel[1].SetActive(true);
+                Panel[0].SetActive(false);
+                timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
+                Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
+            }
         }
     }
 
@@ -441,7 +456,7 @@ public class MatchManager : PanelManager
 
     private void MatchGameFriend(GameObject go)
     {
-        if (!Global.isMatching && Global.LoginStatus)
+        if (!Global.isMatching && Global.LoginStatus && OnCostCheck())
         {
             matchText.text = "等待好友同意...";
             escapeTime = 0;
@@ -462,7 +477,7 @@ public class MatchManager : PanelManager
         Panel[0].SetActive(true);
         Panel[1].SetActive(false);
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(transform.parent.gameObject);
-        
+
     }
 
     void OnDisable()
@@ -470,7 +485,7 @@ public class MatchManager : PanelManager
         Global.photonService.LoadPlayerDataEvent -= OnLoadPanel;
         Global.photonService.LoadPlayerItemEvent -= None;
         Global.photonService.ExitWaitingEvent -= OnExitWaiting;
-        Global.photonService.UpdateMiceEvent -= OnCostCheck;
+        Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Panel[1].SetActive(false);
         Panel[1].transform.parent.parent.gameObject.SetActive(false);
     }
