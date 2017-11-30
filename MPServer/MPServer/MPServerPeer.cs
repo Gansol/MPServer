@@ -87,30 +87,28 @@ namespace MPServer
             try
             {
                 int roomID = _server.room.GetPlayingRoomFromGuid(peerGuid);
+
                 if (_server.room.GetPlayingRoomFromGuid(peerGuid) > 0)                                                 // 假如用離開的玩家guid 從GameRoomList中找的到房間 (遊戲中中斷)
                 {
                     Log.Debug("RoomID:" + _server.room.GetPlayingRoomFromGuid(peerGuid));
                     //取得房間ID
                     Room.RoomActor otherRoomActor = _server.room.GetPlayingRoomOtherPlayer(roomID, existPlayer.PrimaryID);     // 取得房間內的其他玩家
 
-
+                    MPServerPeer peerOther;
                     // 玩家斷線時，踢房間內其他玩家(兩人版本)
                     if (otherRoomActor != null)
                     {
-                        MPServerPeer peerOther = _server.Actors.GetPeerFromPrimary(otherRoomActor.PrimaryID);
+                        peerOther = _server.Actors.GetPeerFromPrimary(otherRoomActor.PrimaryID);
                         Dictionary<byte, object> parameter = new Dictionary<byte, object>() { { (byte)BattleResponseCode.DebugMessage, "配對的玩家已經離開房間！" } };
                         EventData exitEventData = new EventData((byte)BattleResponseCode.KickOther, parameter);
                         peerOther.SendEvent(exitEventData, new SendParameters());
                     }
-
                     _server.room.KillBossFromGuid(peerGuid);                                                    // 移除房間中的BOSS(如果有)
-                    _server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);                          // 移除房間 與房間內玩家
+                    _server.room.RemovePlayingRoom(roomID, peerGuid, existPlayer.PrimaryID);                    // 移除房間 與房間內玩家
                 }
 
                 if (_server.room.bGetWaitActorFromGuid(peerGuid, roomID))                                               // 如果這個玩家在等待房間中 
-                {
-                    _server.room.RemoveWaitingRoom(roomID, peerGuid);                                                            // 移除等待房間(這裡要改應位以後可能有很多等待房間)
-                }
+                    _server.room.RemoveWaitingRoom(roomID, peerGuid);                                                   // 移除等待房間(這裡要改應位以後可能有很多等待房間)
 
                 Actor player = _server.Actors.GetActorFromGuid(peerGuid);
                 if (player != null) player.GameStatus = (byte)ENUM_MemberState.Offline;
@@ -868,63 +866,75 @@ namespace MPServer
                                 {
                                     int primaryID = (int)operationRequest.Parameters[(byte)MatchGameParameterCode.PrimaryID];
                                     int roomID = _server.room.GetPlayingRoomFromGuid(peerGuid);
-
+                                    Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
                                     Log.Debug("------------------SyncGameStart-------------------\n primaryID:" + primaryID + " peerGuid:" + peerGuid + " roomID:" + roomID);
 
-                                    if (roomID > 0) _server.room.AddGameLoaded(roomID, primaryID, peerGuid);
-                                    Dictionary<int, Guid> loadedPlayer = new Dictionary<int, Guid>(_server.room.GetLoadedPlayerFromRoom(roomID));
-
-                                    foreach (KeyValuePair<int, Guid> item in loadedPlayer)
-                                        Log.Debug(" loadedPlayer ID:" + item.Key + " Guid:" + item.Value);
-
-                                    // 如果還沒載入 回傳 請等待開始
-                                    if (loadedPlayer.Count != maxNumPlayer)
+                                    if (roomID > 0)
                                     {
-                                        Dictionary<byte, object> parameter = new Dictionary<byte, object>();
-                                        OperationResponse response = new OperationResponse((byte)MatchGameResponseCode.WaitingGameStart, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "WaitingPlayer" };
-                                        SendOperationResponse(response, new SendParameters());
-                                    }
-                                    else// 如果已經載入房間的玩家 = 房間上限 同步開始
-                                    {
-                                        MPServerPeer peerOther = null;
-                                        Room.RoomActor otherActor;
+                                        _server.room.AddGameLoaded(roomID, primaryID, peerGuid);
+                                        Dictionary<int, Guid> loadedPlayer = new Dictionary<int, Guid>(_server.room.GetLoadedPlayerFromRoom(roomID));
 
-                                        Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
-                                        otherActor = _server.room.GetPlayingRoomOtherPlayer(roomID, primaryID);
+                                        foreach (KeyValuePair<int, Guid> item in loadedPlayer)
+                                            Log.Debug(" loadedPlayer ID:" + item.Key + " Guid:" + item.Value);
 
-
-                                        Log.Debug("RoomID:" + roomID);
-                                        Log.Debug("otherActor" + otherActor.guid);
-                                        peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
-
-
-                                        // 如果再同步時，對方斷線，離開房間
-                                        if (otherActor == null)
+                                        // 如果還沒載入 回傳 請等待開始
+                                        if (loadedPlayer.Count != maxNumPlayer)
                                         {
-                                            Log.Debug("IN ExitRoom");
-
-                                            // 移除BOSS資訊 如果有的話
-                                            _server.room.KillBoss(roomID);
-                                            _server.room.RemovePlayingRoom(roomID, actor.guid, peerGuid);
-                                            Log.Debug("playingRoomList Count:" + _server.room.dictPlayingRoomList.Count);
-
-                                            if (actor != null) actor.GameStatus = (byte)ENUM_MemberState.Idle;
-                                            OperationResponse response = new OperationResponse((byte)BattleOperationCode.ExitRoom, new Dictionary<byte, object> { }) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object>();
+                                            OperationResponse response = new OperationResponse((byte)MatchGameResponseCode.WaitingGameStart, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "WaitingPlayer" };
                                             SendOperationResponse(response, new SendParameters());
                                         }
-                                        else
+                                        else// 如果已經載入房間的玩家 = 房間上限 同步開始
                                         {
-                                            Log.Debug("SyncGameStart RoomID: " + roomID + "Account:" + actor.Account + " peerGuid:" + peerGuid);
-                                            Log.Debug("SyncGameStart RoomID: " + roomID + "Account:" + otherActor.Account + " peerGuid:" + otherActor.guid);
+                                            MPServerPeer peerOther = null;
+                                            Room.RoomActor otherActor;
 
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.ServerTime, DateTime.Now.ToString("yyyyMMddHHmmss") }, { (byte)MatchGameParameterCode.GameTime, GameTime } };
-                                            EventData eventData = new EventData((byte)MatchGameResponseCode.SyncGameStart, parameter);
-                                            peerOther.SendEvent(eventData, new SendParameters());    // 回傳給另外一位玩家
-                                            this.SendEvent(eventData, new SendParameters());         // 回傳給自己
+
+                                            otherActor = _server.room.GetPlayingRoomOtherPlayer(roomID, primaryID);
+
+
+                                            Log.Debug("RoomID:" + roomID);
+                                            Log.Debug("otherActor" + otherActor.guid);
+                                            peerOther = _server.Actors.GetPeerFromGuid(otherActor.guid);
+
+
+                                            // 如果再同步時，對方斷線，離開房間
+                                            if (otherActor == null)
+                                            {
+                                                Log.Debug("IN ExitRoom");
+
+                                                // 移除BOSS資訊 如果有的話
+                                                _server.room.KillBoss(roomID);
+                                                _server.room.RemovePlayingRoom(roomID, actor.guid, actor.PrimaryID);
+                                                Log.Debug("playingRoomList Count:" + _server.room.dictPlayingRoomList.Count);
+
+                                                if (actor != null) actor.GameStatus = (byte)ENUM_MemberState.Idle;
+                                                OperationResponse response = new OperationResponse((byte)BattleOperationCode.ExitRoom, new Dictionary<byte, object> { }) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
+                                                SendOperationResponse(response, new SendParameters());
+                                            }
+                                            else
+                                            {
+                                                Log.Debug("SyncGameStart RoomID: " + roomID + "Account:" + actor.Account + " peerGuid:" + peerGuid);
+                                                Log.Debug("SyncGameStart RoomID: " + roomID + "Account:" + otherActor.Account + " peerGuid:" + otherActor.guid);
+
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object>() { { (byte)MatchGameParameterCode.ServerTime, DateTime.Now.ToString("yyyyMMddHHmmss") }, { (byte)MatchGameParameterCode.GameTime, GameTime } };
+                                                EventData eventData = new EventData((byte)MatchGameResponseCode.SyncGameStart, parameter);
+                                                peerOther.SendEvent(eventData, new SendParameters());    // 回傳給另外一位玩家
+                                                this.SendEvent(eventData, new SendParameters());         // 回傳給自己
+                                            }
+                                            _server.room.RemoveLoadedRoom(roomID);
                                         }
-                                        _server.room.RemoveLoadedRoom(roomID);
                                     }
+                                    else // 同步前斷線了 房間被移除
+                                    {
+                                        _server.room.KillBoss(roomID);
+                                        _server.room.RemovePlayingRoom(roomID, actor.guid, actor.PrimaryID);
+                                        Log.Debug("playingRoomList Count:" + _server.room.dictPlayingRoomList.Count);
 
+                                        if (actor != null) actor.GameStatus = (byte)ENUM_MemberState.Idle;
+                                        OperationResponse response = new OperationResponse((byte)BattleOperationCode.ExitRoom, new Dictionary<byte, object> { }) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已離開房間！" };
+                                        SendOperationResponse(response, new SendParameters());
+                                    }
                                 }
                                 catch (Exception e)
                                 {
@@ -954,9 +964,10 @@ namespace MPServer
 
                                     // 移除遊戲中房間、玩家
                                     if (otherRoomActor != null)
-                                        _server.room.RemovePlayingRoom(roomID, actor.guid, otherRoomActor.guid);
+                                        _server.room.RemovePlayingRoom(roomID, actor.guid, -1);
                                     else
-                                        _server.room.RemovePlayingRoom(roomID, actor.guid, peerGuid);
+                                        _server.room.RemovePlayingRoom(roomID, actor.guid, actor.PrimaryID);
+
                                     Log.Debug("playingRoomList Count:" + _server.room.dictPlayingRoomList.Count);
 
                                     actor = _server.Actors.GetActorFromGuid(peerGuid);
@@ -1032,7 +1043,6 @@ namespace MPServer
                                 {
                                     Log.Debug("IN Exit Waiting Room");
                                     int roomID = _server.room.GetWaitingRoomFromGuid(peerGuid);
-                                    //int roomID = _server.room.GetPlayingRoomFromGuid(peerGuid);
                                     _server.room.RemoveWaitingRoom(roomID, peerGuid);    // 移除等待房間
                                     Log.Debug("Remove WaitingRoom : " + roomID);
                                     Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
@@ -1084,10 +1094,12 @@ namespace MPServer
                                     otherRoomActor = _server.room.GetPlayingRoomOtherPlayer(roomID, primaryID);
 
                                     // 移除遊戲中房間、玩家
-                                    if (otherRoomActor != null)
-                                        _server.room.RemovePlayingRoom(roomID, peerGuid, otherRoomActor.guid);
-                                    else
-                                        _server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);
+
+                                    //if (otherRoomActor != null)
+                                    //    _server.room.RemovePlayingRoom(roomID, peerGuid, -1);
+                                    //else
+                                    _server.room.RemovePlayingRoom(roomID, peerGuid, primaryID);
+
 
                                     if (otherRoomActor != null)
                                     {
@@ -1130,7 +1142,8 @@ namespace MPServer
 
                                     if (otherActor == null) // 如果他跑了 我也玩不了 離開房間
                                     {
-                                        _server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);
+
+                                        _server.room.RemovePlayingRoom(roomID, peerGuid, primaryID);
                                         peer = _server.Actors.GetPeerFromGuid(peerGuid);
                                         Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
                                         actor.GameStatus = (byte)ENUM_MemberState.Idle;
@@ -1587,7 +1600,9 @@ namespace MPServer
                                         EventData eventData = new EventData((byte)BattleResponseCode.Offline, new Dictionary<byte, object>());
                                         SendEvent(eventData, new SendParameters());
                                         _server.room.KillBoss(roomID);
-                                        _server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);
+                                        // 移除遊戲中房間、玩家
+                                        _server.room.RemovePlayingRoom(roomID, peerGuid, primaryID);
+
                                     }
                                 }
                                 catch (Exception e)
@@ -2314,11 +2329,11 @@ namespace MPServer
                                         Log.Debug("----------DevTest-------------");
                                         Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
 
-                                            if (roomActor.roomMice.Count != 0)
-                                            {
-                                                missionMethod = Convert.ToInt16(roomActor.roomMice[rnd.Next(0, roomActor.roomMice.Count)]);
-                                                Log.Debug("Room Mice Count: " + roomActor.roomMice.Count + "  missionMethod: " + missionMethod);
-                                            }
+                                        if (roomActor.roomMice.Count != 0)
+                                        {
+                                            missionMethod = Convert.ToInt16(roomActor.roomMice[rnd.Next(0, roomActor.roomMice.Count)]);
+                                            Log.Debug("Room Mice Count: " + roomActor.roomMice.Count + "  missionMethod: " + missionMethod);
+                                        }
                                         Log.Debug("----------DevTest-------------");
                                         _server.room.SpawnBoss(roomID, battleData.bossHP);  // 產生BOSS血量 missionScore是BOSS HP
                                     }
@@ -2541,7 +2556,7 @@ namespace MPServer
                                         }
                                         else
                                         {
-                                            _server.room.RemovePlayingRoom(roomID, peerGuid, peerGuid);
+                                            _server.room.RemovePlayingRoom(roomID, peerGuid, primaryID);
                                             Log.Debug("配對的玩家已經離開房間！");
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object>() { { (byte)BattleResponseCode.DebugMessage, "配對的玩家已經離開房間！" } };
                                             EventData eventData = new EventData((byte)BattleResponseCode.Offline, parameter);
@@ -2606,8 +2621,8 @@ namespace MPServer
                             {
                                 try
                                 {
-                                    Log.Debug("IN GameOver");
 
+                                    Log.Debug("IN GameOver");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     int primaryID = (int)operationRequest.Parameters[(byte)LoginParameterCode.PrimaryID];
                                     Int16 score = (Int16)operationRequest.Parameters[(byte)BattleParameterCode.Score];
@@ -2628,8 +2643,10 @@ namespace MPServer
                                     //string jItemsUseCount = (string)operationRequest.Parameters[(byte)BattleParameterCode.CustomString];
                                     string[] columns = ((string[])operationRequest.Parameters[(byte)PlayerDataParameterCode.Columns]);
 
+                                    Log.Debug("IN GameOver : " + account);
+
                                     Room.RoomActor otherRoomActor = _server.room.GetPlayingRoomOtherPlayer(roomID, primaryID);
-                                    Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
+                                    Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid); // 這被移除
 
                                     char[] trim = new char[] { '"' };
                                     jMicesUseCount = jMicesUseCount.TrimStart(trim);
@@ -2647,7 +2664,7 @@ namespace MPServer
                                     {
                                         Log.Debug(roomActor.Nickname + "Player Score : " + roomActor.gameScore + "  " + otherRoomActor.Nickname + "   Other Score : " + otherRoomActor.gameScore);
 
-                                        battleData.battleResult = (roomActor.gameScore > otherRoomActor.gameScore) ? (byte)1 : (byte)0;
+                                        battleData.battleResult = (roomActor.gameScore > otherRoomActor.gameScore && roomActor.life > 0) ? (byte)1 : (byte)0;
 
                                         Log.Debug("GameOver Peer: " + roomActor.gameScore + " " + battleData.expReward + " " + maxCombo + " " + score + " " + lostMice + " " + killMice + " " + battleData.battleResult + " " + item);
                                         PlayerDataUI playerDataUI = new PlayerDataUI(); //實體化 IO (連結資料庫拿資料)
@@ -2676,10 +2693,20 @@ namespace MPServer
                                         {
 
                                             Actor actor = _server.Actors.GetActorFromGuid(peerGuid);
-                                            Actor otherActor = _server.room.GetPlayingRoomOtherPlayer(roomID, primaryID);
+                                            Actor otherActor = _server.Actors.GetActorFromGuid(otherRoomActor.guid);
                                             actor.GameStatus = (byte)ENUM_MemberState.Idle;
 
-                                            if (otherActor != null) _server.room.RemovePlayingRoom(roomID, peerGuid, otherActor.guid);
+
+                                            if (otherActor != null)
+                                            {
+                                                _server.room.RemovePlayingRoom(roomID, peerGuid, -1);
+                                                Log.Debug("Gameover OK");
+                                            }
+                                            else
+                                            {
+                                                Log.Debug(" Gameover FUCK");
+                                                _server.room.RemovePlayingRoom(roomID, peerGuid, primaryID);
+                                            }
 
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                      { (byte)BattleParameterCode.Ret, battleData.ReturnCode },{ (byte)BattleParameterCode.Score, roomActor.gameScore },{ (byte)BattleParameterCode.SliverReward, battleData.sliverReward },{ (byte)BattleParameterCode.GoldReward, battleData.goldReward },

@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-public class AttrFactory
+public class AttrFactory : FactoryBase
 {
     /*
     /// <summary>
@@ -14,7 +14,7 @@ public class AttrFactory
     public float GetMiceProperty(string miceName, string property)
     {
         object miceProperty;
-        int itemID = ObjectFactory.GetIDFromName(Global.miceProperty, "ItemID", miceName);
+        int itemID = MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "ItemID", miceName);
         Global.miceProperty.TryGetValue(itemID.ToString(), out miceProperty);
         Dictionary<string, object> dictMiceProperty = miceProperty as Dictionary<string, object>;
         dictMiceProperty.TryGetValue(property, out miceProperty);

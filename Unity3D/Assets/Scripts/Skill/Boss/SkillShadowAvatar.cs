@@ -5,7 +5,7 @@ public class ShadowAvatarSkill : SkillBoss
 {
 
     PoolManager poolManager = GameObject.FindGameObjectWithTag("GM").GetComponent<PoolManager>();
-    MPFactory spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
+    SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().GetSpawnAI();
     ObjectFactory objFactory;
 
     Dictionary<Transform, GameObject> dictMice, buffer, buffer2;
@@ -51,8 +51,8 @@ public class ShadowAvatarSkill : SkillBoss
 
         for (int i = 0; i < data.Length; i++)
         {
-            dictMice.Add(spawner.hole[data[i]].transform, objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawner.hole[data[i]], true));
-            if (i == rnd) correctMice = spawner.hole[data[i]].transform;
+            dictMice.Add(spawnAI.GetHole(data[i]).transform, objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawnAI.GetHole(data[i]).gameObject, true));
+            if (i == rnd) correctMice =spawnAI.GetHole(data[i]).transform;
         }
 
         buffer = new Dictionary<Transform, GameObject>(dictMice);

@@ -23,7 +23,7 @@ public class VersionManager : MonoBehaviour
     private AssetBundleChecker bundleChecker;
     private SyncLoad syncLoad;
     private VersionChecker visionChecker;
-    private AssetLoader assetLoader;
+   // private AssetLoader assetLoader;
     InternetChecker connCheck;
     private bool bundleCheckComplete, flag, bFirstDownload, reConnChk, bTwiceChk, bThreeChk, bCompleted, bDownload, bGoStore;
     //private bool bLoadAsset;
@@ -38,7 +38,7 @@ public class VersionManager : MonoBehaviour
     void Start() //開始檢查版本
     {
         Global.nextScene = (int)Global.Scene.MainGame;
-        assetLoader = gameObject.AddComponent<AssetLoader>();
+       // assetLoader = new AssetLoader();
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VersionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
@@ -60,8 +60,8 @@ public class VersionManager : MonoBehaviour
         if (!string.IsNullOrEmpty(Global.ReturnMessage))
             downloadName.text = Global.ReturnMessage;
 
-        if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            downloadName.text = assetLoader.ReturnMessage;
+        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    downloadName.text = assetLoader.ReturnMessage;
 
         if (!connCheck.ConnStatus)
         {
@@ -90,7 +90,7 @@ public class VersionManager : MonoBehaviour
                 if (!bGoStore)
                 {
                     bGoStore = !bGoStore;
-                    Debug.Log("Go Google Play!");
+                    Debug.Log("Yo~Yo~ Checkout Google Play!");
                     Application.OpenURL("https://play.google.com/store/apps/details?id=com.Gansol.MicePow1");
                 }
             }

@@ -12,18 +12,17 @@ public class FriendManager : MPPanel
     public string iconPath, slotItemName;
     public Transform itemPanel;
     public Vector2 offset;
-    private ObjectFactory objFactory;
-    private bool _bFirstLoad, _bLoadedIcon, _bLoadActorState, _bLoadFriendsData, _bAddFriend, _bRemoveFriend,_bClick;
-    private string _selectPlayerNickname,_tmpFriend;
+    private bool _bFirstLoad, _bLoadedIcon, _bLoadActorState, _bLoadFriendsData, _bAddFriend, _bRemoveFriend, _bClick;
+    private string _selectPlayerNickname, _tmpFriend;
     private List<string> _tmpFriends;
     private Vector2 itemPos;
     private GameObject _lastMsgPanel;
-    private float _lastClickTime,_clickInterval;
+    private float _lastClickTime, _clickInterval;
+
+    public FriendManager(MPGame MPGame) : base(MPGame) { }
 
     void Awake()
     {
-        assetLoader = gameObject.AddMissingComponent<AssetLoader>();
-        objFactory = new ObjectFactory();
         itemPos = new Vector2(0, 0);
 
         _bFirstLoad = true;
@@ -54,20 +53,17 @@ public class FriendManager : MPPanel
             LoadFriendState();
 
             //改變事件遮罩
-            EventMaskSwitch.Resume();
-            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-            EventMaskSwitch.Switch(gameObject, false);
-            EventMaskSwitch.lastPanel = gameObject;
+            ResumeToggleTarget();
         }
 
-        if ( Time.time > _lastClickTime + _clickInterval  && _bClick)
+        if (Time.time > _lastClickTime + _clickInterval && _bClick)
         {
             _bClick = false;
             itemPanel.Find(_tmpFriend).Find("Match").gameObject.SetActive(true);
         }
     }
 
-    public override void OnLoading()
+    protected override void OnLoading()
     {
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadFriendsData(Global.dictFriends.ToArray());
@@ -96,31 +92,23 @@ public class FriendManager : MPPanel
                 assetLoader.LoadPrefab("Panel/", slotItemName);
                 _bFirstLoad = false;
             }
-            else
-            {
-                EventMaskSwitch.Resume();
-                GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-                EventMaskSwitch.Switch(gameObject, false);
-                EventMaskSwitch.lastPanel = gameObject;
-            }
         }
         else
         {
-            EventMaskSwitch.Resume();
-            GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-            EventMaskSwitch.Switch(gameObject, false);
-            EventMaskSwitch.lastPanel = gameObject;
             Debug.Log("dictFriends is null");
         }
+
+        ResumeToggleTarget();
     }
 
     /// <summary>
-    /// 重新窄入
+    /// 重新載入好友
     /// </summary>
     private void ReloadFriend()
     {
         List<string> buffer = new List<string>();
         int i = 0;
+
         if (Global.dictFriends.Count >= _tmpFriends.Count && !string.IsNullOrEmpty(Global.dictFriends[0]))    // 新增朋友
         {
             foreach (string friend in Global.dictFriends)
@@ -137,7 +125,7 @@ public class FriendManager : MPPanel
         }
         else if (Global.dictFriends.Count < _tmpFriends.Count || string.IsNullOrEmpty(Global.dictFriends[0]))   //移除朋友  如果舊資料比新資料大 且 薪資料是空值
         {
-            
+
             _bRemoveFriend = true;
 
             foreach (string friend in _tmpFriends)
@@ -181,7 +169,7 @@ public class FriendManager : MPPanel
     private GameObject InstantiateItem(Vector2 offset)
     {
         GameObject bundle = assetLoader.GetAsset(slotItemName);
-        GameObject item = objFactory.Instantiate(bundle, itemPanel, slotItemName, offset, Vector2.one, Vector2.zero, -1);
+        GameObject item = MPGFactory.GetObjFactory().Instantiate(bundle, itemPanel, slotItemName, offset, Vector2.one, Vector2.zero, -1);
         UIEventListener.Get(item).onClick = SelectPlayer;
         return item;
     }
@@ -189,7 +177,7 @@ public class FriendManager : MPPanel
     private void InstantiateICON(string imageName, Transform friendItemSlot)
     {
         GameObject bundle = assetLoader.GetAsset(imageName.ToString());
-        objFactory.Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
+        MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
     }
 
     private void LoadFriendState()

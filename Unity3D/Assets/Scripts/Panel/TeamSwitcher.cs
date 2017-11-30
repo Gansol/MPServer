@@ -49,6 +49,16 @@ public class TeamSwitcher : MonoBehaviour
     private Vector3 _originPos, _toPos;                       // 原始座標、目標作標
 
     TeamManager tm;
+
+    enum enum_BtnMethod
+    {
+        Return = 0, // 返回原位
+        Delete, // 移除Clone
+        Switch, // 交換位置
+        Add,    // 增加隊員
+        Change, // 改變老鼠
+    }
+
     #endregion
 
     void Awake()
@@ -88,7 +98,7 @@ public class TeamSwitcher : MonoBehaviour
             else
             {
                 GetComponent<BoxCollider>().isTrigger = false;
-                RetOrSwitch();
+                BtnMethod();
             }
         }
     }
@@ -136,13 +146,15 @@ public class TeamSwitcher : MonoBehaviour
         // 如果物件距離 非常接近時 且 _goTarget(前往目標)為真 
         if (Vector3.Distance(transform.localPosition, _toPos) < 3f && _goTarget)
         {
-            transform.localPosition = _toPos;                       // 移到正確作標上 因為Lerp永遠到不了 會差0.00001
+
             if (_other.tag == "TeamIcon" && tag == "MiceIcon")      // A>B
             {
+                //_other.transform.GetComponent<UISprite>().spriteName = transform.GetChild(0).GetComponent<UISprite>().spriteName;
                 transform.GetChild(0).parent = _other.transform;    // MiceIcon移到TeamBtn內
+                _other.transform.GetChild(0).localPosition = Vector3.zero;                       // 移到正確作標上 因為Lerp永遠到不了 會差0.00001
                 EnDisableBtn(_other, true);                         // 啟動TeamBtn功能
                 Destroy(gameObject);                                // 移除移動的物件
-                TeamSequence(_other, true);
+                tm.TeamSequence(_other, true);
             }
             // A>A B>B 
             _originPos = _toPos;                                    // B1>B2時會改變原始做標，所以要儲存移動後的座標位置
@@ -157,137 +169,168 @@ public class TeamSwitcher : MonoBehaviour
     }
     #endregion
 
-    #region -- RetOrSwitch 交換或返回選擇 --
-    void RetOrSwitch()
-    {
-        if (!_isTrigged && _other != gameObject && _other.tag != "MiceIcon")    // 按下時發生碰撞 且 放開時 交換物件   OnPress>RetOrSwitch 所以已經放開了
-        {
-            SwitchBtn();
-        }
-        else if (_isTrigged && _other.name != gameObject.name && _other.tag != "MiceIcon")
-        {
-            SwitchBtn();
-        }
-        else if (!_isTrigged || _other.name == gameObject.name)  // 無碰撞且放開時 或撞到自己的分身 返回 
-        {                                                        // _other.name == gameObject.name 
-            RetOrigin();                                         // 因為TriggerExit時會=自己(沒撞到) 或撞到自己時
-            Destroy(_clone);
-        }
-        else
-        {
-            RetOrigin();
-        }
-    }
-    #endregion
-
-    #region -- RetOrigin 返回原位 --
-    void RetOrigin()
+    #region -- BtnMethod 交換或返回選擇 --
+    void BtnMethod()
     {
         _toPos = _originPos;
         _distance = Vector3.Distance(transform.localPosition, _toPos);
+        bool bActiveBtn = false;
 
-        if (tag == "MiceIcon")
+        if (_other.tag == "MiceIcon" || _other.tag == "TeamIcon")
+            bActiveBtn = _other.GetComponent<TeamSwitcher>()._activeBtn;
+
+        if (tag == _other.tag && _other.transform.childCount == 1 && _other.name != gameObject.name && bActiveBtn)
         {
-            _other = gameObject;
-            _goTarget = _destroy = true;
-            TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-//            Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
-            DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
-         //   Debug.Log(transform.GetChild(0).GetComponent<UISprite>().depth);
+            // 成員交換
+            SwitchMember(tag);
         }
-        else if (tag == "TeamIcon")
+        else if (tag != "TeamIcon" && _other.tag == "TeamIcon" && _other.transform.childCount == 0)
         {
-            if (_distance <= leftDist)  // B1>return
-            {
-                _other = gameObject;
-                _goTarget = _destroy = true;
-                TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
-                DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
-                //Debug.Log("return.");
-            }
-            else if (_distance > leftDist)  // B1>out
-            {
-
-                string teamName = transform.GetChild(0).name;
-                _other = gameObject;
-
-                TeamSequence(gameObject, false);
-                RemoveTeam(teamName);
-                tm.dictLoadedMice[transform.GetChild(0).name].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
-                tm.dictLoadedMice[transform.GetChild(0).name].SendMessage("EnableBtn");                    // 啟動按鈕
-                tm.dictLoadedTeam.Remove(teamName);                                                        // 移除隊伍參考
-
-                gameObject.transform.localPosition = _originPos;
-                Destroy(transform.GetChild(0).gameObject);
-                Destroy(gameObject.GetComponent<TweenColor>());
-                Destroy(_clone);
-            }
+            // 將老鼠加入隊伍
+            AddTeamMember();
         }
-    }
-    #endregion
-
-    #region -- SwitchBtn 按鈕交換 --
-    void SwitchBtn()
-    {
-        if (tag == "MiceIcon" && _other.tag == "TeamIcon" && _other != gameObject)    // A>B
+        else if (tag == "MiceIcon" && _other.tag == "TeamIcon" || tag == "TeamIcon" && _other.tag == "MiceIcon" && _other.transform.childCount != 0 && bActiveBtn && _other.transform.GetChild(0).name != transform.GetChild(0).name)
         {
-            string miceID = transform.GetChild(0).name;
-
-            if (_other.transform.childCount == 0)                                   // 如果移動到Team的位置"沒有"Mice 移至Team
-            {
-                Mice2Team(miceID);
-                AddTeam(miceID, null);
-
-            }
-            else if (_other.transform.childCount != 0 && tm.GetLoadedTeam(_other.transform.GetChild(0).name) != null) // 如果移動到Team的位置有Mice移至Team Team老鼠返回
-            {
-                string otherName = _other.transform.GetChild(0).name;
-                tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
-                tm.dictLoadedTeam.Remove(otherName);                       // 之後移除參考
-                Mice2Team(miceID);
-                AddTeam(miceID, _other);
-                Destroy(_other.transform.GetChild(0).gameObject);
-            }
-            else
-            {
-                Debug.LogError("A>B Bug!");
-            }
+            // 改變隊伍成員 Mice>Team
+            ChangeTeamMember();
         }
-        else if (tag == "TeamIcon" && _other.tag == "TeamIcon") // B1 > B2
+        else if (tag == "TeamIcon" && _distance > leftDist)  // B1>out
         {
-            if (_other.transform.childCount == 1 && _other.name != gameObject.name)  // 有物件作交換
-            {
-                string myName = transform.GetChild(0).name;
-                string otherName = _other.transform.GetChild(0).name;
-                ExchangeObject(myName, otherName, Global.dictTeam);
+            // 移除隊伍成員
+            RemoveTeamMember();
 
-                GameObject tmp = _other.transform.GetChild(0).gameObject;
-                transform.GetChild(0).parent = _other.transform;
-                tmp.transform.parent = transform;
-                transform.GetChild(0).localPosition = Vector3.zero;
-
-                _other.transform.GetChild(0).localPosition = Vector3.zero;
-                _other.GetComponent<TeamSwitcher>()._toPos = _originPos;
-                _other.transform.GetChild(0).GetComponent<UISprite>().depth -= _depth;
-                _toPos = _originPos;
-
-                Destroy(GetComponent<TweenColor>());            // NGUI BUG!!
-                Destroy(_other.GetComponent<TweenColor>());     // NGUI BUG!!
-                _goTarget = true;
-                Destroy(_clone);
-            }
-            else
-            {
-                RetOrigin();
-            }
         }
         else
         {
-            RetOrigin();
-            Debug.LogError("SwitchBtn Error!");//RetOrigin();
+            // 返回
+            ReturnOriginLocation();
+            Destroy(_clone);
         }
+
+        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, Global.dictTeam);
     }
     #endregion
+
+    private void RemoveTeamMember()
+    {
+        string teamName = transform.GetChild(0).name;
+        _other = gameObject;
+
+        tm.TeamSequence(gameObject, false);
+        tm.RemoveTeamMember(teamName);
+
+        gameObject.transform.localPosition = _originPos;
+        Destroy(transform.GetChild(0).gameObject);
+        Destroy(gameObject.GetComponent<TweenColor>());
+        Destroy(_clone);
+    }
+
+    private void ReturnOriginLocation()
+    {
+        _other = gameObject;
+        _goTarget = _destroy = true;
+        TweenColor.Begin(this.gameObject, tweenColorSpeed, Color.white);
+        DepthManager.SwitchDepthLayer(gameObject, transform, -Global.MeunObjetDepth);
+    }
+
+
+    private void AddTeamMember()
+    {
+        if (_other.transform.childCount == 0)                                   // 如果移動到Team的位置"沒有"Mice 移至Team
+        {
+            _toPos = _other.transform.localPosition + new Vector3(0, 10, 0);
+            _distance = Vector3.Distance(transform.localPosition, _toPos);
+            string miceID = transform.GetChild(0).name;
+            Mice2Team(miceID);
+            AddTeam(miceID, null);
+        }
+    }
+
+    /// <summary>
+    /// 交換隊伍成員 by Tag
+    /// </summary>
+    /// <param name="tag">tag</param>
+    private void SwitchMember(string tag)
+    {
+        Dictionary<string, object> data = Global.dictMiceAll;
+
+        if (tag == "TeamIcon")
+            data = Global.dictTeam;
+
+        // Team Switch
+        string myName = transform.GetChild(0).name;
+        string otherName = _other.transform.GetChild(0).name;
+
+        tm.SwitchMemeber(myName, otherName, data);
+        GameObject tmp = _other.transform.GetChild(0).gameObject;
+        transform.GetChild(0).parent = _other.transform;
+        tmp.transform.parent = transform;
+        transform.GetChild(0).localPosition = Vector3.zero;
+
+        _other.transform.GetChild(0).localPosition = Vector3.zero;
+        _other.GetComponent<TeamSwitcher>()._toPos = _originPos;
+        _other.transform.GetChild(0).GetComponent<UISprite>().depth -= _depth * 2;
+        _toPos = _originPos;
+
+        Destroy(GetComponent<TweenColor>());            // NGUI BUG!!
+        Destroy(_other.GetComponent<TweenColor>());     // NGUI BUG!!
+        _goTarget = true;
+        Destroy(_clone);
+
+        SortChildren.SortChildrenByID(transform.parent.gameObject);
+        // Mice Switch
+
+        foreach (KeyValuePair<string, object> item in data)
+        {
+            Debug.Log("Exchange Object" + item.Key + "  " + item.Value);
+        }
+    }
+
+
+    private void ChangeTeamMember()
+    {
+        if (_other.transform.GetChild(0).name != transform.GetChild(0).name)
+        {
+            string miceID = transform.GetChild(0).name;
+            string otherName = _other.transform.GetChild(0).name;
+
+            _toPos = _other.transform.localPosition + new Vector3(0, 10, 0);
+            _distance = Vector3.Distance(transform.localPosition, _toPos);
+
+            if (tag == "MiceIcon")
+            {
+                tm.GetLoadedMice(otherName).SendMessage("EnableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
+                tm.RemoveTeamMemberRefs(otherName);           // 之後移除參考
+                Mice2Team(miceID);
+                AddTeam(miceID, _other.transform);
+                Destroy(_other.transform.GetChild(0).gameObject);
+            }
+            else if (tag == "TeamIcon")
+            {
+                //tm.GetLoadedMice(otherName).SendMessage("DisableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
+                //tm.dictLoadedTeam.Remove(miceID);                                   // 之後移除參考
+                //Mice2Team(otherName);
+                //_clone.transform.GetChild(0).name = _other.transform.GetChild(0).name;
+                //_clone.transform.GetChild(0).GetComponent<UISprite>().spriteName = _other.transform.GetChild(0).GetComponent<UISprite>().spriteName;
+                //AddTeam(otherName, _clone);
+                //tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");
+
+                //Destroy(gameObject);
+
+
+
+
+                tm.GetLoadedMice(otherName).SendMessage("DisableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
+                UpdateTeam(otherName, _clone);
+                _clone.transform.GetChild(0).name = _other.transform.GetChild(0).name;
+                _clone.transform.GetChild(0).GetComponent<UISprite>().spriteName = _other.transform.GetChild(0).GetComponent<UISprite>().spriteName;
+                _clone.SendMessage("EnableBtn");
+                Destroy(gameObject);
+                SortChildren.SortChildrenByID(_clone.transform.parent.gameObject);
+                Debug.Log("BUG");
+            }
+        }
+    }
 
     #region -- Mice2Team 更新按鈕字典參考 --
     /// <summary>
@@ -296,14 +339,15 @@ public class TeamSwitcher : MonoBehaviour
     /// <param name="miceID"></param>
     void Mice2Team(string miceID)
     {
-        tm.dictLoadedTeam.Add(miceID, _clone);   // 要加Team的_clone才對
-        tm.dictLoadedMice[miceID] = _clone;      //重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
+        tm.AddTeamMemberRefs(miceID, _clone); // 新增_clone的按鈕參考
+        tm.ModifyMiceRefs(miceID, null, _clone);//重新參考至黑掉的Clone物件(新的Mice按鈕)，原本的Mice按鈕會被銷毀
 
         _other.GetComponent<TeamSwitcher>().enabled = true;
         _other.GetComponent<TeamSwitcher>().EnableBtn();
 
         _clone.GetComponent<TeamSwitcher>().DisableBtn();
-        transform.GetChild(0).GetComponent<UISprite>().depth -= _depth; // 恢復深度值
+        Debug.Log(transform.GetChild(0).GetComponent<UISprite>().name + "  " + transform.GetChild(0).GetComponent<UISprite>().depth);
+        transform.GetChild(0).GetComponent<UISprite>().depth -= _depth * 2; // 恢復深度值
         _goTarget = true;
         _destroy = false;
     }
@@ -326,50 +370,7 @@ public class TeamSwitcher : MonoBehaviour
     }
     #endregion
 
-    #region -- TeamSequence 隊伍整理佇列 --
-    /// <summary>
-    /// 隊伍整理佇列
-    /// </summary>
-    /// <param name="teamRef">整理索引物件</param>
-    /// <param name="bDragOut">拉入T 或 移出F</param>
-    private void TeamSequence(GameObject teamRef, bool bDragOut)
-    {
-        Dictionary<string, object> team = new Dictionary<string, object>(Global.dictTeam);
-        int btnNo = int.Parse(teamRef.name.Remove(0, teamRef.name.Length - 1));
-       // string miceName = teamRef.transform.GetChild(0).name;
 
-        if (bDragOut)
-        {
-            if (btnNo >= team.Count)
-            {
-                int offset;
-                offset = team.Count == 0 ? 0 : 1;
-                _other.transform.GetChild(0).parent = tm.infoGroupsArea[2].transform.GetChild(team.Count - offset);
-                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetChild(0).localPosition = Vector3.zero;
-                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().enabled = true;
-                tm.infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
-            }
-        }
-        else
-        {
-            if (btnNo < team.Count)                                           // 2<5
-            {
-                for (int i = 0; i < (team.Count - btnNo); i++)                  // 5-2=3  
-                {
-                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0).parent = tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1); // team[2+i]=team[2+i-1] parent =>team[2]=team[1]
-                    if (i == 0)     // 因為第一個物件會有2個Child所以要GetChild(1) 下一個按鈕移過來的Mice
-                        tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(1).localPosition = Vector3.zero;
-                    else
-                        tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().enabled = true;
-                    tm.infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
-                }
-                Global.dictTeam = team;
-            }
-        }
-    }
-    #endregion
 
     #region -- Mice2Click 雙擊老鼠 返回原始位置 (注意Mice Team不同) --
     void Mice2Click()
@@ -378,15 +379,15 @@ public class TeamSwitcher : MonoBehaviour
         {
             string miceName = transform.GetChild(0).name;
 
-            if (!tm.dictLoadedTeam.ContainsKey(miceName) && tm.dictLoadedTeam.Count != teamCountMax)  // full and same
+            if (!tm.GetLoadedMice(miceName) && tm.GetTeamMemberCount() != teamCountMax)  // full and same
             {
                 Dictionary<string, object> team = Global.dictTeam;
                 GameObject teamBtn = tm.infoGroupsArea[2].transform.GetChild(team.Count).gameObject;
 
                 Move2Clone();
 
-                tm.dictLoadedTeam.Add(miceName, _clone);
-                tm.dictLoadedMice[miceName] = _clone;
+                tm.AddTeamMemberRefs(miceName, _clone);
+                tm.ModifyMiceRefs(miceName, null, _clone);
                 AddTeam(miceName, null);
 
                 transform.GetChild(0).parent = teamBtn.transform;
@@ -409,11 +410,11 @@ public class TeamSwitcher : MonoBehaviour
     /// </summary>
     /// <param name="myName">自己的名稱</param>
     /// <param name="otherName">對方的名稱</param>
-    /// <param name="dictServerData">對方的名稱</param>
+    /// <param name="dictServerData">要交換內容位子的字典</param>
     private void ExchangeObject(string myName, string otherName, Dictionary<string, object> dictServerData)
     {
         Global.SwapDictValueByKey(myName, otherName, dictServerData);
-        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictServerData);
+
     }
     #endregion
 
@@ -423,7 +424,50 @@ public class TeamSwitcher : MonoBehaviour
     /// </summary>
     ///<param name="miceID">老鼠名稱</param>
     ///<param name="teamBtn">=null時為增加成員</param>
-    private void AddTeam(string miceID, GameObject teamBtn)
+    private void AddTeam(string miceID, Transform teamBtn)
+    {
+        Dictionary<string, object> dictTeam = new Dictionary<string, object>(Global.dictTeam);
+
+        if (teamBtn != null)  // 交換隊伍成員
+        {
+            if (teamBtn.childCount != 0)
+            {
+                string teamID = teamBtn.transform.GetChild(0).name;
+                string spriteName = tm.GetLoadedMice(miceID).GetComponentInChildren<UISprite>().spriteName;
+
+                dictTeam[teamID] = spriteName.Remove(spriteName.Length - 4);
+                Global.RenameKey(dictTeam, teamID, miceID);
+                tm.GetLoadedMice(teamID).SendMessage("EnableBtn");
+
+            }
+        }
+        else // 增加隊伍成員
+        {
+            object miceName = "";
+            Global.dictMiceAll.TryGetValue(miceID, out miceName);
+            // tm.Add2Refs(tm.dictLoadedTeamBtnRefs, dictTeam.Count, miceID, teamBtn);
+            dictTeam.Add(miceID, miceName);
+        }
+        Global.dictTeam = dictTeam;
+        //foreach (KeyValuePair<string, object> item in dictTeam)
+        //{
+        //    Debug.Log("AddTeam Team" + item.Key + "  " + item.Value);
+        //}
+
+        //foreach (KeyValuePair<string, GameObject> item in tm.dictLoadedMiceBtnRefs)
+        //{
+        //    Debug.Log("tm.dictLoadedMiceBtnRefs " + item.Key + "  " + item.Value);
+        //}
+
+    }
+    #endregion
+
+    #region -- UpdateTeam 更新隊伍 --
+    /// <summary>
+    /// 減少隊伍數量(JSON)
+    /// 【請先排序】後再進行移除
+    /// </summary>
+    private void UpdateTeam(string toID, GameObject teamBtn)
     {
         Dictionary<string, object> dictTeam = new Dictionary<string, object>(Global.dictTeam);
 
@@ -432,36 +476,22 @@ public class TeamSwitcher : MonoBehaviour
             if (teamBtn.transform.childCount != 0)
             {
                 string teamID = teamBtn.transform.GetChild(0).name;
-                string spriteName = tm.GetLoadedMice(miceID).GetComponentInChildren<UISprite>().spriteName;
+                string spriteName = tm.GetLoadedMice(toID).GetComponentInChildren<UISprite>().spriteName;
 
-                dictTeam[teamID] = spriteName.Remove(spriteName.Length - 4);    
-                Global.RenameKey(dictTeam, teamID, miceID);
-                tm.dictLoadedMice[teamID].SendMessage("EnableBtn");
+                dictTeam[teamID] = spriteName.Remove(spriteName.Length - 4);
+                Global.RenameKey(dictTeam, teamID, toID);
+                tm.GetLoadedMice(teamID).SendMessage("EnableBtn");
+                tm.ModifyTeamRefs(teamID, toID, null);
+                tm.ModifyTeamRefs(toID, null, teamBtn);   // 要加Team的_clone才對
             }
         }
-        else // 增加隊伍成員
-        {
-            object miceName = "";
-            Global.dictMiceAll.TryGetValue(miceID, out miceName);
-            dictTeam.Add(miceID, miceName);
-        }
-        Global.dictTeam = dictTeam;
-        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictTeam);
-    }
-    #endregion
 
-    #region -- RemoveTeam 移除隊伍 --
-    /// <summary>
-    /// 減少隊伍數量(JSON)
-    /// 【請先排序】後再進行移除
-    /// </summary>
-    private void RemoveTeam(string itemID)
-    {
-        // 移除隊伍成員
-        Dictionary<string, object> dictTeam = Global.dictTeam;
-        dictTeam.Remove(itemID);
+        foreach (KeyValuePair<string, object> item in dictTeam)
+        {
+            Debug.Log("Upadate Team" + item.Key + "  " + item.Value);
+        }
+
         Global.dictTeam = dictTeam;
-        Global.photonService.UpdateMiceData(Global.Account, Global.dictMiceAll, dictTeam);
     }
     #endregion
 
@@ -502,7 +532,7 @@ public class TeamSwitcher : MonoBehaviour
     }
     #endregion
 
-    #region -- DisableBtn 關閉按鈕(外部呼叫) --
+    #region -- EnableBtn 開啟按鈕(外部呼叫) --
     public void EnableBtn()
     {
         GetComponent<TeamSwitcher>().enabled = true;

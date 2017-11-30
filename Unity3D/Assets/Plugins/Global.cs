@@ -188,7 +188,7 @@ public static class Global
         ExitGameEvent();
     }
 
-    public static class OtherData
+    public static class OpponentData
     {
         public static int PrimaryID = 0;        // 主索引
         public static string Account = "";        // 主索引
@@ -276,18 +276,44 @@ public static class Global
     /// <summary>
     /// 交換字典物件
     /// </summary>
-    /// <param name="vaule1"></param>
+    /// <param name="key1"></param>
     /// <param name="key2"></param>
     /// <param name="dict"></param>
-    public static void SwapDictValueByKey(string key1, string key2, Dictionary<string, object> dict)
+    public static bool SwapDictValueByKey<TKey, TValue>(TKey key1, TKey key2, Dictionary<TKey, TValue> dict)
     {
-        object value1 = "", value2 = "";
+        if (dict.ContainsKey(key1) && dict.ContainsKey(key2))
+        {
+            TValue value1 , value2 ;
 
-        dict.TryGetValue(key1, out value1);
-        dict.TryGetValue(key2, out value2);
+            dict.TryGetValue(key1, out value1);
+            dict.TryGetValue(key2, out value2);
 
-        dict[key1] = value2;
-        dict[key2] = value1;
+            dict[key1] = value2;
+            dict[key2] = value1;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 交換字典Key
+    /// </summary>
+    /// <param name="key1"></param>
+    /// <param name="key2"></param>
+    /// <param name="tmpKey">交換用臨時Key</param>
+    /// <param name="dict"></param>
+    public static bool SwapDictKey<TKey, TValue>(TKey key1, TKey key2,TKey tmpKey, Dictionary<TKey, TValue> dict)
+    {
+        if (dict.ContainsKey(key1) && dict.ContainsKey(key2))
+        {
+            RenameKey(dict, key1, tmpKey);
+            RenameKey(dict, key2, key1);
+            RenameKey(dict, tmpKey, key2);
+            return true;
+        }
+        return false;
     }
 
     public static TimeSpan Time(Action action)

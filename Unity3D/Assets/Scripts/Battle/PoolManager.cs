@@ -24,8 +24,6 @@ using System.Linq;
 public class PoolManager : MonoBehaviour
 {
     private AssetLoader assetLoader;
-    private ObjectFactory objFactory;
-    private AttrFactory attrFactory;
     //private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictMiceObject;
     private Dictionary<int, string> _dictSpecialObject;
@@ -79,9 +77,7 @@ public class PoolManager : MonoBehaviour
     {
         Global.photonService.LoadPlayerItem(Global.Account);
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
-        assetLoader = gameObject.AddComponent<AssetLoader>();
-        attrFactory = new AttrFactory();
-        objFactory = new ObjectFactory();
+        assetLoader = MPGame.Instance.AssetLoader();
         _lastTime = 0;
         _currentTime = 0;
         clearTime = 10;
@@ -182,8 +178,8 @@ public class PoolManager : MonoBehaviour
 
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
             {
-                int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
+                int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
                 assetLoader.LoadPrefab("Effects" + "/", itemName + "Effect");
             }
@@ -197,7 +193,7 @@ public class PoolManager : MonoBehaviour
     void Update()
     {
         if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log("Message:" + assetLoader.ReturnMessage + "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount);
+            Debug.Log("Message:" + assetLoader.ReturnMessage /*+ "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount*/);
 
         if (assetLoader.loadedObj && !_poolingFlag)
         {
@@ -268,7 +264,7 @@ public class PoolManager : MonoBehaviour
                 scale = (i == 4) ? bossScale : skillScale;
 
                 // instantiate skill btn
-                clone = objFactory.Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, 100);
+                clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, 100);
                 Destroy(clone.GetComponent<BoxCollider2D>());
                 clone.transform.parent.gameObject.AddComponent<SkillBtn>();
                 clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, i);
@@ -279,14 +275,14 @@ public class PoolManager : MonoBehaviour
 
 
                 // instantiate Item btn
-                int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
+                int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
 
 
                 if (assetLoader.GetAsset(itemName) != null)
                 {
                     bundle = assetLoader.GetAsset(itemName);
-                    clone = objFactory.Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
+                    clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
                     clone.SetActive(false);
                     //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
                 }
@@ -338,7 +334,7 @@ public class PoolManager : MonoBehaviour
         }
         else if (ObjectPool.transform.FindChild(objectID).childCount == 0)
         {
-            string bundleName = (string)ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
+            string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
             GameObject bundle = assetLoader.GetAsset(bundleName);
             if (bundle != null)
                 Instantiate(objectID, bundle);
@@ -351,7 +347,7 @@ public class PoolManager : MonoBehaviour
             {
                 GameObject clone = ObjectPool.transform.FindChild(objectID).GetChild(i).gameObject;
                 MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
-                MiceAttr miceAttr = attrFactory.GetMiceProperty(objectID);
+                MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
                 if (mice.enabled == false) mice.enabled = true;
 
                 if (clone.name == objectID && !clone.gameObject.activeSelf)
@@ -390,8 +386,8 @@ public class PoolManager : MonoBehaviour
         }
         for (int i = 0; i < spawnCount; i++)
         {
-            clone = objFactory.Instantiate(bundle, objGroup, objectID, Vector3.zero, Vector3.one, Vector2.zero, -1);
-            MiceAttr miceAttr = attrFactory.GetMiceProperty(objectID);
+            clone = MPGFactory.GetObjFactory().Instantiate(bundle, objGroup, objectID, Vector3.zero, Vector3.one, Vector2.zero, -1);
+            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
             miceAttr.SetMaxHP(1);
 
             MiceBase mice;
@@ -436,17 +432,17 @@ public class PoolManager : MonoBehaviour
     public void MergeMice()
     {
         Dictionary<string, object> dictMyMice = Global.dictTeam;
-        Dictionary<string, object> dictOtherMice = Global.OtherData.Team;
+        Dictionary<string, object> dictOtherMice = Global.OpponentData.Team;
 
         foreach (KeyValuePair<string, object> item in dictMyMice)
         {
-            _dictMiceObject.Add(ObjectFactory.GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
+            _dictMiceObject.Add(MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
         }
 
         foreach (KeyValuePair<string, object> item in dictOtherMice)
         {
             if (!dictMyMice.ContainsValue(item.Value))
-                _dictMiceObject.Add(ObjectFactory.GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
+                _dictMiceObject.Add(MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
         }
 
         if (!_dictMiceObject.ContainsKey(10001))
@@ -461,8 +457,8 @@ public class PoolManager : MonoBehaviour
     {
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
         {
-            int itemID = Convert.ToInt16(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-            string itemName = ObjectFactory.GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
+            int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+            string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
             _dictSkillObject.Add(itemID, itemName);
         }
     }
@@ -473,7 +469,7 @@ public class PoolManager : MonoBehaviour
         return _dictMiceObject.Keys.ToList();
     }
 
-    public List<int> GetPoolSkillIDs()
+    public List<int> GetPoolSkillMiceIDs()
     {
         // 先把key轉換成list 再把list轉換int型態
         return _dictSkillMice.Keys.ToList().Select(s => int.Parse(s)).ToList();

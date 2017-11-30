@@ -38,7 +38,7 @@ public class EnergyPlus : SkillItem
     public override void Display()
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = playerAIState.GetAssetLoader();
+        AssetLoader assetLoader = MPGame.Instance.AssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
         ObjectFactory objFactory = new ObjectFactory();
 

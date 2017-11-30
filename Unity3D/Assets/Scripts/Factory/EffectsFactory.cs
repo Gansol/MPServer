@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EffectsFactory
+public class EffectsFactory : FactoryBase
 {
 
     private AssetLoader assetLoader;

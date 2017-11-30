@@ -45,7 +45,7 @@ public abstract class MiceBossBase : Creature
     /// </summary>
     protected virtual void OnHit()
     {
-        Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
+//        Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
         if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
@@ -85,7 +85,7 @@ public abstract class MiceBossBase : Creature
         else
         {
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
-            if (Global.OtherData.RoomPlace != "Host")
+            if (Global.OpponentData.RoomPlace != "Host")
             {
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
                 Global.photonService.MissionCompleted((byte)MPProtocol.Mission.WorldBoss, 1, percent, "");

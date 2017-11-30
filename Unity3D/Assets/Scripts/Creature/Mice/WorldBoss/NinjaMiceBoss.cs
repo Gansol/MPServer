@@ -15,7 +15,7 @@ public class NinjaMiceBoss : MiceBossBase
 
     protected override void OnHit()
     {
-        if (Global.isGameStart && ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& enabled && m_Arribute.GetHP() > 0)
         {
             m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
             ShadowAvatarSkill skill = m_Skill as ShadowAvatarSkill;

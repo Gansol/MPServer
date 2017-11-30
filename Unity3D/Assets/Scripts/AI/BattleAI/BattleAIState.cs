@@ -8,7 +8,7 @@ public abstract class BattleAIState
     protected static double lastTime = 0d;
     protected static int  wave = 0, nextBali = 27, nextMuch = 4, nextHero = 50;
     protected BattleManager battleManager = null;
-    protected MPFactory spawner = null;
+    protected SpawnAI spawner = null;
     protected SpawnState spawnState = null;
     protected ENUM_BattleAIState battleAIState = ENUM_BattleAIState.EasyMode;
     protected SpawnStatus spawnStatus = SpawnStatus.LineL;
@@ -17,6 +17,12 @@ public abstract class BattleAIState
     protected Coroutine coroutine;
 
     protected short defaultMice = 10001,bali = 11001,much =11002,hero=11003;
+
+    public BattleAIState()
+    {
+
+    }
+
     public abstract void UpdateState();
 
     public SpawnStatus GetSpawnStatus()
@@ -27,6 +33,7 @@ public abstract class BattleAIState
     public void SetAIController(BattleManager battleManager)
     {
         this.battleManager = battleManager;
+        spawner = battleManager.GetSpawnAI();
     }
 
     /// <summary>
@@ -39,7 +46,7 @@ public abstract class BattleAIState
         //        Debug.Log(Time.time);
         Random.seed = unchecked((int)System.DateTime.Now.Ticks);
         bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
-        spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
+       // spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<SpawnAI>();
         if (spawner != null)
         {
             coroutine = spawner.Spawn(new Vector2(minStatus, maxStatus), miceID, spawnTime, intervalTime, lerpTime, spawnCount, true, false, reSpawn);
@@ -86,7 +93,7 @@ public abstract class BattleAIState
         spawnState = SelectSpawnState(spawnValue, intervalTimes);
         Random.seed = unchecked((int)System.DateTime.Now.Ticks);
         bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
-        spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<MPFactory>();
+     //   spawner = battleManager.GetSpawnAI();
 
         if (spawner != null)
         {

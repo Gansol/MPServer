@@ -50,7 +50,7 @@ public class BattleHUD : MonoBehaviour
     {
         WaitObject.transform.gameObject.SetActive(true);
         battleManager = GetComponent<BattleManager>();
-        assetLoader = GetComponent<AssetLoader>();
+        assetLoader = MPGame.Instance.AssetLoader();
         objFactory = new ObjectFactory();
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
@@ -60,11 +60,11 @@ public class BattleHUD : MonoBehaviour
         //_energy = 0d;
         bLoadPrefab = true;
         myName.text = Global.Nickname;
-        otherName.text = Global.OtherData.Nickname;
+        otherName.text = Global.OpponentData.Nickname;
         rewardPanel = GGObject.transform.Find("Result").Find("Reward").GetChild(0).GetChild(0).GetChild(0);
 
         myImage.spriteName = Global.PlayerImage;
-        otherImage.spriteName = Global.OtherData.Image;
+        otherImage.spriteName = Global.OpponentData.Image;
 
 
         _tmpLife = battleManager.life;
@@ -149,7 +149,7 @@ public class BattleHUD : MonoBehaviour
                 Dictionary<string, object> itemData = item.Value as Dictionary<string, object>;   // ItemCount:1
 
                 string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
-                string itemName = Convert.ToString(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
+                string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
                 GameObject bundle = assetLoader.GetAsset(itemName + "ICON");
                 Debug.Log("Bundle:" + bundle);
                 if (bundle != null)
@@ -498,7 +498,7 @@ public class BattleHUD : MonoBehaviour
             // dictItemReward {"10001":{"ItemCount":"0"}}
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
-                string itemName = Convert.ToString(ObjectFactory.GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
+                string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
                 if (assetLoader.GetAsset(itemName + "ICON") == null)
                     assetLoader.LoadPrefab("MiceICON/", itemName + "ICON");
             }
