@@ -265,6 +265,10 @@ public class TeamSwitcher : MonoBehaviour
         GameObject tmp = _other.transform.GetChild(0).gameObject;
         transform.GetChild(0).parent = _other.transform;
         tmp.transform.parent = transform;
+
+        
+
+
         transform.GetChild(0).localPosition = Vector3.zero;
 
         _other.transform.GetChild(0).localPosition = Vector3.zero;
@@ -307,19 +311,6 @@ public class TeamSwitcher : MonoBehaviour
             }
             else if (tag == "TeamIcon")
             {
-                //tm.GetLoadedMice(otherName).SendMessage("DisableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
-                //tm.dictLoadedTeam.Remove(miceID);                                   // 之後移除參考
-                //Mice2Team(otherName);
-                //_clone.transform.GetChild(0).name = _other.transform.GetChild(0).name;
-                //_clone.transform.GetChild(0).GetComponent<UISprite>().spriteName = _other.transform.GetChild(0).GetComponent<UISprite>().spriteName;
-                //AddTeam(otherName, _clone);
-                //tm.GetLoadedTeam(otherName).SendMessage("EnableBtn");
-
-                //Destroy(gameObject);
-
-
-
-
                 tm.GetLoadedMice(otherName).SendMessage("DisableBtn");               // 將移出的的老鼠回復至Mice並恢復Btn功能
                 UpdateTeam(otherName, _clone);
                 _clone.transform.GetChild(0).name = _other.transform.GetChild(0).name;
@@ -327,7 +318,6 @@ public class TeamSwitcher : MonoBehaviour
                 _clone.SendMessage("EnableBtn");
                 Destroy(gameObject);
                 SortChildren.SortChildrenByID(_clone.transform.parent.gameObject);
-                Debug.Log("BUG");
             }
         }
     }

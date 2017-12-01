@@ -202,6 +202,7 @@ public class TeamManager : MPPanel
     }
     #endregion
 
+
     #region -- InstantiateIcon 實體化老鼠物件--
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
@@ -209,9 +210,12 @@ public class TeamManager : MPPanel
     /// <param name="dictServerData">ServerData</param>
     /// <param name="dictLoadedObject">Client Loaded Object</param>
     /// <param name="myParent">實體化父系位置</param>
-    void InstantiateIcon(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> loadedBtnRefs, Transform myParent)
+    /// <returns>true=ok false=有重複Key沒有實體化完成</returns>
+    bool InstantiateIcon(Dictionary<string, object> dictServerData, Dictionary<string, GameObject> loadedBtnRefs, Transform myParent)
     {
         int i = 0;
+        bool bComplete = true; //是否完成實體化
+
         Dictionary<string, GameObject> tmp = new Dictionary<string, GameObject>();
         List<string> keys = loadedBtnRefs.Keys.ToList();
         foreach (KeyValuePair<string, object> item in dictServerData)
@@ -220,42 +224,31 @@ public class TeamManager : MPPanel
             if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
             {
                 GameObject bundle = assetLoader.GetAsset(bundleName);
-
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
-                if (miceBtn.childCount == 0)
+
+                if (miceBtn.childCount == 0)    // 如果 按鈕下 沒有物件 實體化物件
                 {
                     MPGFactory.GetObjFactory().Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-
-                    Add2Refs(loadedBtnRefs, i, item.Key, miceBtn);     // 加入物件參考
-
                     miceBtn.GetComponent<TeamSwitcher>().enabled = true;           // 開啟老鼠隊伍交換功能
                     miceBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn"); // 開啟按鈕功能
                 }
-                else if (item.Key.ToString() != keys[i])
+                else if (item.Key.ToString() != keys[i])    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
                 {
-                    //string imageName = miceBtn.GetComponentInChildren<UISprite>().gameObject.name;
-
-                    tmp.Add(item.Key, miceBtn.gameObject);
-                    // 檢查 重複Key 如果有先改X 在改回
-                    if (!loadedBtnRefs.ContainsKey(item.Key.ToString()))
-                    {
-                        Global.RenameKey(loadedBtnRefs, keys[i], item.Key);
-                        miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;
-                        miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;
-                    }
-                    else
-                    {
-                        Debug.LogError("Same Key!");
-                    }
+                    miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;  // 如果Key不相同 重新載入ICON 修正ICON ID
+                    miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;     // 如果Key不相同 重新載入ICON 修正ICON SPRITE
                 }
+                Add2Refs(loadedBtnRefs, i, item.Key, miceBtn.gameObject);     // 加入物件參考
                 i++;
             }
             else
             {
+                bComplete = false;
                 Debug.LogError("Assetbundle reference not set to an instance. at InstantiateIcon (Line:154).");
             }
         }
+
         _bLoadedAsset = false; // 實體化完成 關閉載入
+        return bComplete ? true : false;
     }
     #endregion
 
@@ -347,6 +340,7 @@ public class TeamManager : MPPanel
 
         _dictMiceData = Global.dictMiceAll;
         _dictTeamData = Global.dictTeam;
+
         OnCostCheck();
     }
     #endregion
@@ -459,56 +453,44 @@ public class TeamManager : MPPanel
     /// <param name="loadedBtnRefs">按鈕參考字典</param>
     /// <param name="itemID">按鈕ID</param>
     /// <param name="myParent"></param>
-    void Add2Refs(Dictionary<string, GameObject> loadedBtnRefs, int position, string itemID, Transform myParent)
+    void Add2Refs(Dictionary<string, GameObject> loadedBtnRefs, int position, string itemID, GameObject myParent)
     {
-
         List<string> keys = loadedBtnRefs.Keys.ToList();
-        Dictionary<string, string> itemPositionRefs = new Dictionary<string, string>();
-        int i = 0;
-        string key = "";
 
-        foreach (var item in loadedBtnRefs)
+        if (position < loadedBtnRefs.Count && loadedBtnRefs.Count > 0)
         {
-            itemPositionRefs.Add(i.ToString(), item.Key.ToString());
-            i++;
-        }
-
-        if (!loadedBtnRefs.ContainsKey(itemID))
-        {
-            loadedBtnRefs.Add(itemID, myParent.gameObject);          // 加入索引 老鼠所在的MiceBtn位置
-        }
-        else
-        {
-            // 如果存在索引 移除已存在索引 加入新索引
-            if (itemPositionRefs.ContainsValue(itemID))
+            if (loadedBtnRefs.ContainsKey(itemID))
             {
-                loadedBtnRefs.Remove(itemID);
-                if (position > loadedBtnRefs.Count)
+                if (keys[position] != itemID)
                 {
-                    loadedBtnRefs.Add(itemID, myParent.gameObject);
+                    loadedBtnRefs.Remove(itemID);
+
+                    if (position < loadedBtnRefs.Count)
+                    {
+                        Global.RenameKey(loadedBtnRefs, keys[position], itemID);
+                        loadedBtnRefs[itemID] = myParent;
+                    }
+                    else
+                    {
+                        loadedBtnRefs.Add(itemID, myParent);
+                    }
                 }
                 else
                 {
-                    key = itemPositionRefs[(position - 1).ToString()];
-                    loadedBtnRefs[key] = myParent.gameObject;
-                    Global.RenameKey(loadedBtnRefs, key, itemID);
+                    loadedBtnRefs[itemID] = myParent;
                 }
             }
             else
             {
-                loadedBtnRefs.Add(itemID, myParent.gameObject);
+                Global.RenameKey(loadedBtnRefs, keys[position], itemID);
+                loadedBtnRefs[itemID] = myParent;
             }
-
-
-
-            //Debug.Log("----------------------------------------------------------");
-            //Debug.Log("   Error LoadedBtnRefs has Key:" + itemID);
-            //Debug.Log("----------------------------------------------------------");
-            //foreach (KeyValuePair<string, GameObject> item in dictLoadedTeamBtnRefs)
-            //{
-            //    Debug.Log("Key:" + item.Key + "  Value:" + item.Value);
-            //}
         }
+        else
+        {
+            loadedBtnRefs.Add(itemID, myParent.gameObject);
+        }
+
     }
     #endregion
 
@@ -525,14 +507,15 @@ public class TeamManager : MPPanel
 
         if (dict == Global.dictTeam)
             tmpDict = _dictLoadedTeamBtnRefs;
-        Global.SwapDictValueByKey(key1, key2, dict);
+
+        // clientData
         Global.SwapDictKey(key1, key2, "x", dict);
+        Global.SwapDictValueByKey(key1, key2, dict);
 
-
-        GameObject tmpBtn = tmpDict[key1];
-        tmpDict[key1] = tmpDict[key2];
-
+        //btnRefs
         Global.SwapDictKey(key1, key2, "x", tmpDict);
+        Global.SwapDictValueByKey(key1, key2, tmpDict);
+
         //Global.RenameKey(tmpDict, key1, "x");
         //Global.RenameKey(tmpDict, key2, key1);
         //Global.RenameKey(tmpDict, "x", key2);
@@ -652,22 +635,19 @@ public class TeamManager : MPPanel
         if (loadedBtnRefs.Count == serverData.Count)
         {//ok
             // 數量相同時 重新載入入圖檔資料
-            InstantiateIcon(serverData, loadedBtnRefs, parent);
-            clinetData = serverData;
-            Debug.Log("MemberChk Same");
-            return true;
+            if (InstantiateIcon(serverData, loadedBtnRefs, parent))
+                return true;
+
+            Debug.Log("MemberChk Same Count");
         }
         else if (serverData.Count > loadedBtnRefs.Count)
         {
             // 新增成員時
             List<string> keys = serverData.Keys.ToList();
             key = keys[serverData.Count - 1];
-            clinetData.Add("x" + key, serverData[key]);
-            InstantiateIcon(serverData, loadedBtnRefs, parent);
-
-            clinetData = serverData;
             Debug.Log("MemberChk Add");
-            return true;
+            if (InstantiateIcon(serverData, loadedBtnRefs, parent))
+                return true;
         }
         else if (serverData.Count < loadedBtnRefs.Count)
         {
@@ -675,17 +655,16 @@ public class TeamManager : MPPanel
             List<string> keys = loadedBtnRefs.Keys.ToList();
             for (int i = 0; loadedBtnRefs.Count > serverData.Count; i++)
             {
-                key = keys[clinetData.Count - 1];
-                clinetData.Remove(key);
+                key = keys[loadedBtnRefs.Count - 1];
                 Destroy(loadedBtnRefs[key].transform.GetChild(0).gameObject);
                 loadedBtnRefs.Remove(key);
             }
+
             Debug.Log("MemberChk Minus");
-            if (loadedBtnRefs.Count == 0)
-                return true;
-            else
-                InstantiateIcon(serverData, loadedBtnRefs, parent);
-            clinetData = serverData;
+
+            if (loadedBtnRefs.Count != 0)
+                if (InstantiateIcon(serverData, loadedBtnRefs, parent))
+                    return true;
         }
 
 
@@ -700,12 +679,11 @@ public class TeamManager : MPPanel
             List<string> loadedGameObjectKeys = loadedBtnRefsBuffer.Keys.ToList();
             List<string> serverDataKeys = serverData.Keys.ToList();
 
-
             Debug.Log("Server: " + serverData.Count + "    Client: " + loadedBtnRefs.Count);
             foreach (KeyValuePair<string, object> item in serverData)
             {
                 key = loadedGameObjectKeys[i];
-                if (item.Key != loadedBtnRefsBuffer[key].transform.GetChild(0).name) // child out 
+                if (item.Key.ToString() != key.ToString()) // child out 
                 {
                     loadedBtnRefsBuffer[key].transform.GetChild(0).GetComponent<UISprite>().spriteName = item.Value.ToString() + "ICON";
                     loadedBtnRefs[key].transform.GetChild(0).name = item.Key;
@@ -727,9 +705,9 @@ public class TeamManager : MPPanel
             foreach (KeyValuePair<string, GameObject> item in loadedBtnRefsBuffer)
             {
                 Global.RenameKey(loadedBtnRefs, item.Key, serverDataKeys[i]);
+                loadedBtnRefs[serverDataKeys[i]] = parent.GetChild(i).gameObject;
                 i++;
             }
-            clinetData = serverData;
         }
         return true;
     }
