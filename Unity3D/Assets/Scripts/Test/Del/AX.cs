@@ -13,6 +13,8 @@ public class AX : MonoBehaviour
         Debug.Log(b = tx.EncryptBase64String("http://180.218.164.232:58767/MicePowBETA"));
         tx = new TextUtility();
         Debug.Log(tx.DecryptBase64String("aHR0cDovLzE4MC4yMTguMTY0LjIzMjo1ODc2Ny9NaWNlUG93QkVUQQ=="));
+
+
     }
 
 }

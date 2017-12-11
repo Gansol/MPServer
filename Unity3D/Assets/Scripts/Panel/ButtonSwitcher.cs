@@ -220,7 +220,7 @@ public class ButtonSwitcher : MPButton
 
     void SwitchICON()
     {
-        string imageName = _pressingIcon.name.Remove(_pressingIcon.name.Length - 4);
+        string imageName = _pressingIcon.name.Remove(_pressingIcon.name.Length - Global.extIconLength);
         _other.name = imageName;
         _pressingIcon.transform.parent = _other.transform.Find("Image");
         _pressingIcon.transform.localScale = Vector3.one;
@@ -254,7 +254,7 @@ public class ButtonSwitcher : MPButton
                     EnDisableBtn(_clone, false);
 
                     PlayerManager.dictLoadedEquiped.Add(itemID, _other);   // 在A>B時 改變索引至Clone 、 B>A空倉庫時，加入道具索引
-                    _other.GetComponentInChildren<UISprite>().depth -= Global.MeunObjetDepth;
+                    _other.GetComponentInChildren<UISprite>().depth -= Global.MenuObjetDepth;
                     Global.photonService.UpdatePlayerItem(short.Parse(itemID), true);
                 }// A>B B has object > switch
                 else if (_other.transform.GetChild(0).childCount != 0)
@@ -366,7 +366,7 @@ public class ButtonSwitcher : MPButton
             _clone.name = gameObject.name;
             _clone.tag = gameObject.tag;
             UIEventListener.Get(_clone).onClick += GetComponentInParent<PlayerManager>().OnEquipClick;
-            _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MeunObjetDepth); // 移動時深度提到最高防止遮擋
+            _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MenuObjetDepth); // 移動時深度提到最高防止遮擋
         }
     }
     #endregion

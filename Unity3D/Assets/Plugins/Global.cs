@@ -112,7 +112,7 @@ public static class Global
     public static bool exitingGame = false;         // 是否執行任務
     public static int prevScene = (int)Scene.LogoScene;  // 上一個場景
     public static int nextScene = (int)Scene.BundleCheck;  // 要被載入的場景
-
+    public static int extIconLength = 4;            // 圖片名稱(副檔)長度
     public static int maxConnTimes = 5;                         // 重新連限次數
     public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
     public static int GameTime = 150;        // 遊戲時間
@@ -126,6 +126,9 @@ public static class Global
     public static string Email = "";
     public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
+
+    public static string IconSuffix = "ICON";  // ICON附檔名
+
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
     public static byte Age = 0;              // 年齡
@@ -144,7 +147,7 @@ public static class Global
     public static int SumBattle = 0;          // 總場次
     public static string gameVersion = "";    // 資產版本
     public static int bundleVersion = 1;    // 資產版本
-    public static int MeunObjetDepth = 10000; // 主選單物件深度
+    public static int MenuObjetDepth = 10000; // 主選單物件深度
 
     public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
     public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料

@@ -283,7 +283,7 @@ public class FriendManager : MPPanel
         _bLoadFriendsData = true;
     }
 
-    public void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
