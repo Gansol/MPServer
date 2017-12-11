@@ -25,12 +25,12 @@ public class ObjectFactory : FactoryBase
     /// <param name="bundle">實體化物件</param>
     /// <param name="parent">上層</param>
     /// <param name="name">名稱</param>
-    /// <param name="position">位置</param>
-    /// <param name="scale">縮放</param>
+    /// <param name="localPosition">位置</param>
+    /// <param name="localScale">縮放</param>
     /// <param name="spriteScale">2D圖形縮放(Witdh Height) Vetor2.zero = not scale</param>
     /// <param name="depth">深度值 -1=不改變</param>
     /// <returns></returns>
-    public GameObject Instantiate(GameObject bundle, Transform parent, string name, Vector3 position, Vector3 scale, Vector2 spriteScale, int depth)
+    public GameObject Instantiate(GameObject bundle, Transform parent, string name, Vector3 localPosition, Vector3 localScale, Vector2 spriteScale, int depth)
     {
         if (bundle != null)
         {
@@ -39,8 +39,8 @@ public class ObjectFactory : FactoryBase
             _clone.transform.parent = parent;
             _clone.name = name;
 
-            _clone.transform.localPosition = position;
-            _clone.transform.localScale = scale;
+            _clone.transform.localPosition = localPosition;
+            _clone.transform.localScale = localScale;
 
 
             if (spriteScale != Vector2.zero && _clone.GetComponent<UISprite>() != null)

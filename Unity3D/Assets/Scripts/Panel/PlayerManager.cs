@@ -39,7 +39,7 @@ public class PlayerManager : MPPanel
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
-    private static string _MiceIconPath = "MiceICON", _ItemIconPath = "ItemICON", _PanelPath = "Panel", _InvItem = "InvItem", _IconSuffix = "ICON";
+    private static string _MiceIconPath = "MiceICON", _ItemIconPath = "ItemICON", _PanelPath = "Panel", _InvItem = "InvItem";
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
@@ -194,7 +194,7 @@ public class PlayerManager : MPPanel
         }
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
-            assetLoader.LoadPrefab(_MiceIconPath + "/", item.Value + _IconSuffix);
+            assetLoader.LoadPrefab(_MiceIconPath + "/", item.Value + Global.IconSuffix);
         _dictItemData = Global.playerItem;
     }
 
@@ -238,7 +238,7 @@ public class PlayerManager : MPPanel
 
                 nestedData.TryGetValue("ItemID", out itemID);
                 itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-                bundleName = itemName + "ICON";
+                bundleName = itemName + Global.IconSuffix;
 
                 // 已載入資產時
                 if (assetLoader.GetAsset(bundleName) != null)                  
@@ -310,7 +310,7 @@ public class PlayerManager : MPPanel
 
                 if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                 {
-                    string bundleName = itemName + "ICON";
+                    string bundleName = itemName + Global.IconSuffix;
                     // 已載入資產時
                     if (assetLoader.GetAsset(bundleName) != null)                   
                     {
@@ -439,7 +439,7 @@ public class PlayerManager : MPPanel
     /// 關閉Panel
     /// </summary>
     /// <param name="obj">Panel</param>
-    public void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);

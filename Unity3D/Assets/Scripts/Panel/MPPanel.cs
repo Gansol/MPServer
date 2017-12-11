@@ -45,7 +45,7 @@ public abstract class MPPanel : MonoBehaviour
     {
         GameObject _miceImage;
         UISprite sprite = btn_click.transform.GetComponentInChildren<UISprite>();
-        string assetName = sprite.spriteName.Remove(sprite.spriteName.Length - 4);
+        string assetName = sprite.spriteName.Remove(sprite.spriteName.Length - Global.extIconLength);
 //        Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 
@@ -116,7 +116,7 @@ public abstract class MPPanel : MonoBehaviour
                     pos = sortItemPos(12, 5, offset, pos, i);
                     bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
-                    string iconName = item.Value + "ICON";
+                    string iconName = item.Value + Global.IconSuffix;
                     if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
                     {
                         GameObject icon = assetLoader.GetAsset(iconName);
@@ -243,7 +243,7 @@ public abstract class MPPanel : MonoBehaviour
         {
             foreach (KeyValuePair<string, object> item in itemData)
             {
-                if (!string.IsNullOrEmpty(item.Value.ToString())) assetLoader.LoadPrefab(folder + "/", item.Value.ToString() + "ICON");
+                if (!string.IsNullOrEmpty(item.Value.ToString())) assetLoader.LoadPrefab(folder + "/", item.Value.ToString() + Global.IconSuffix);
             }
             return true;
         }
@@ -352,4 +352,6 @@ public abstract class MPPanel : MonoBehaviour
     protected abstract void OnLoading();
 
     protected abstract void OnLoadPanel();
+
+    public abstract void OnClosed(GameObject obj);
 }

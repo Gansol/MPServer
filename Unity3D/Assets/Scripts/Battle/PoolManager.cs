@@ -160,7 +160,7 @@ public class PoolManager : MonoBehaviour
 
             foreach (KeyValuePair<int, string> item in _dictSkillObject)
             {
-                assetLoader.LoadPrefab("ItemICON" + "/", item.Value + "ICON");
+                assetLoader.LoadPrefab("ItemICON" + "/", item.Value + Global.IconSuffix);
             }
         }
         catch
@@ -276,7 +276,7 @@ public class PoolManager : MonoBehaviour
 
                 // instantiate Item btn
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
+                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + Global.IconSuffix;
 
 
                 if (assetLoader.GetAsset(itemName) != null)

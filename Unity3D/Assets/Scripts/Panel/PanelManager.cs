@@ -276,4 +276,9 @@ public class PanelManager : MPPanel
             }
         }
     }
+
+    public override void OnClosed(GameObject obj)
+    {
+        throw new System.NotImplementedException();
+    }
 }

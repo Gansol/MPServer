@@ -6,27 +6,25 @@ using System;
 
 public class del : MonoBehaviour
 {
+    int c = 0;
+    static Dictionary<string, GameObject> a;
 
     void Start()
     {
-        Dictionary<string, object> a = new Dictionary<string, object>();
 
-        a.Add("1", 0);
-        a.Add("2", 0);
-        a.Add("3", 0);
-       RenameKey(a,"2","4");
-     
-
-        foreach (KeyValuePair<string, object> item in a)
-            Debug.Log(item.Key);
     }
 
-    public void RenameKey<TKey, TValue>(this IDictionary<TKey, TValue> dic,
-                                          TKey fromKey, TKey toKey)
+
+    public void Message(){
+        Debug.Log("FUCK");
+        enabled = false;
+    }
+
+    public void Send(ref Dictionary<string, GameObject> f)
     {
-        TValue value = dic[fromKey];
-        dic.Remove(fromKey);
-        dic[toKey] = value;
+        a = f;
+        a["1"].GetComponent<del2>().enabled = false;
+        a["1"].SendMessage("Active");
+        //a["1"].GetComponent<del2>().Active();
     }
-
 }

@@ -61,4 +61,9 @@ public class PurchaseManager : MPPanel
     {
         throw new System.NotImplementedException();
     }
+
+    public override void OnClosed(GameObject obj)
+    {
+        throw new System.NotImplementedException();
+    }
 }

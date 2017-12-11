@@ -19,6 +19,8 @@ using System;
  * + pageVaule 還沒加入翻頁值
  * ***************************************************************
  *                           ChangeLog
+ * 20171211 v1.1.2   修正索引問題                  
+ * 20171201 v1.1.1   修正隊伍交換問題         
  * 20171119 v1.1.0   修正載入流程 
  * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
  * 20160914 v1.0.1b  2次重購，獨立實體化物件  
@@ -30,16 +32,7 @@ public class TeamManager : MPPanel
 {
     #region 欄位
     public GameObject[] infoGroupsArea;                                             // 物件群組位置
-    /// <summary>
-    /// MiceIcon名稱、Mice按鈕
-    /// </summary>
-    //public Dictionary<string, GameObject> dictLoadedMiceBtnRefs { get { return dictLoadedMiceBtnRefs.Count; } }
-    private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs;             // Icon名稱、Icon的按鈕
-    /// <summary>
-    /// TeamIcon名稱、Mice按鈕索引物件
-    /// </summary>
-    //public Dictionary<string, GameObject> dictLoadedTeamBtnRefs { get { return _dictLoadedTeamBtnRefs; } }
-    private Dictionary<string, GameObject> _dictLoadedTeamBtnRefs;            // Icon名稱、Icon的按鈕
+    private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
     [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
     public string iconPath = "MiceICON";                                            // 圖片資料夾位置
@@ -64,7 +57,7 @@ public class TeamManager : MPPanel
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
-        //_dictTeamData = new Dictionary<string, object>();
+        _dictTeamData = new Dictionary<string, object>();
 
         //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
@@ -82,7 +75,8 @@ public class TeamManager : MPPanel
 
     void Update()
     {
-        if (_bLoadedActor || _bLoadedAsset)                                          // 除錯訊息
+        // 除錯訊息
+        if (_bLoadedActor || _bLoadedAsset)
             if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
                 Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
@@ -91,6 +85,7 @@ public class TeamManager : MPPanel
         {
             if (!_bFirstLoad)
                 ResumeToggleTarget();
+
             _bLoadedPanel = true;
             OnLoadPanel();
         }
@@ -101,25 +96,28 @@ public class TeamManager : MPPanel
             _bLoadedAsset = !_bLoadedAsset;
             _bLoadedEffect = !_bLoadedEffect;
 
+            // 實體化按鈕
             InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform);
             InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform);
 
+            // 載入道具數量資訊
             LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
             // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
 
+            // Enable按鈕
             ActiveMice(Global.dictTeam);
-            StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));   // 顯示老鼠角色 Actor
+            // 顯示老鼠角色 Actor
+            StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));
 
             ResumeToggleTarget();
-            // OnMiceClick(startShowActor);    // 顯示第一隻老鼠
         }
 
-        // 按下圖是按鈕後 載入角色完成時 實體化角色
+        // 按下圖示按鈕後 載入角色完成時 實體化角色
         if (assetLoader.loadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
-            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - 4);
+            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - Global.extIconLength);
             InstantiateActor(bundleName, _actorParent.transform, actorScale);
         }
     }
@@ -220,24 +218,28 @@ public class TeamManager : MPPanel
         List<string> keys = loadedBtnRefs.Keys.ToList();
         foreach (KeyValuePair<string, object> item in dictServerData)
         {
-            string bundleName = item.Value.ToString() + "ICON";
-            if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
+            string bundleName = item.Value.ToString() + Global.IconSuffix;
+
+            if (assetLoader.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
                 GameObject bundle = assetLoader.GetAsset(bundleName);
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
 
-                if (miceBtn.childCount == 0)    // 如果 按鈕下 沒有物件 實體化物件
+                if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
                 {
                     MPGFactory.GetObjFactory().Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-                    miceBtn.GetComponent<TeamSwitcher>().enabled = true;           // 開啟老鼠隊伍交換功能
-                    miceBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn"); // 開啟按鈕功能
+                    miceBtn.gameObject.AddMissingComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
+                    miceBtn.GetComponent<BtnSwitch>().SendMessage("EnableBtn");          // 開啟按鈕功能
                 }
-                else if (item.Key.ToString() != keys[i])    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
+                else if (item.Key.ToString() != keys[i])                                    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
                 {
                     miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;  // 如果Key不相同 重新載入ICON 修正ICON ID
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;     // 如果Key不相同 重新載入ICON 修正ICON SPRITE
                 }
-                Add2Refs(loadedBtnRefs, i, item.Key, miceBtn.gameObject);     // 加入物件參考
+
+                //Debug.Log("Btn: " + miceBtn.parent.parent.parent.name + "   " + miceBtn.parent.parent.parent.parent.name);
+
+                Add2Refs(loadedBtnRefs, i, item.Key, miceBtn.gameObject);                   // 加入物件參考
                 i++;
             }
             else
@@ -252,32 +254,33 @@ public class TeamManager : MPPanel
     }
     #endregion
 
-    #region -- InstantiateItem 實體化道具 --
-    /// <summary>
-    /// 實體化道具
-    /// </summary>
-    /// <param name="parent">物件位置</param>
-    /// <param name="objectID">ID</param>
-    private void InstantiateItem(Transform parent, string objectID)
-    {
-        int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", objectID.ToString()));
-        string bundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + "ICON";
-        GameObject bundle = assetLoader.GetAsset(bundleName);
+    //#region -- InstantiateItem 實體化道具(按鈕) --
+    ///// <summary>
+    ///// 實體化道具(按鈕)
+    ///// </summary>
+    ///// <param name="parent">物件位置</param>
+    ///// <param name="objectID">ID</param>
+    //private void InstantiateItem(Transform parent, string objectID)
+    //{
+    //    int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", objectID.ToString()));
+    //    string bundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + Global.IconSuffix;
+    //    GameObject bundle = assetLoader.GetAsset(bundleName);
 
-        if (bundle != null)                  // 已載入資產時
-        {
-            if (parent.childCount == 0)
-            {
-                MPGFactory.GetObjFactory().Instantiate(bundle, parent, objectID.ToString(), Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-            }
-            else
-            {
-                parent.GetComponentInChildren<UISprite>().gameObject.name = objectID.ToString();
-                parent.GetComponentInChildren<UISprite>().spriteName = bundleName;
-            }
-        }
-    }
-    #endregion
+    //    // 已載入資產時
+    //    if (bundle != null)                  
+    //    {
+    //        if (parent.childCount == 0)
+    //        {
+    //            MPGFactory.GetObjFactory().Instantiate(bundle, parent, objectID.ToString(), Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
+    //        }
+    //        else
+    //        {
+    //            parent.GetComponentInChildren<UISprite>().gameObject.name = objectID.ToString();
+    //            parent.GetComponentInChildren<UISprite>().spriteName = bundleName;
+    //        }
+    //    }
+    //}
+    //#endregion
 
     #region -- InstantiateSkill 實體化技能 --
     /// <summary>
@@ -352,6 +355,7 @@ public class TeamManager : MPPanel
         {
             Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
 
+            // 如果是第一次載入 載入全部資產 否則 載入必要資產
             if (_bFirstLoad)
             {
                 dictNotLoadedAsset = _dictMiceData = Global.dictMiceAll;
@@ -417,7 +421,7 @@ public class TeamManager : MPPanel
     //    } 
     //}
 
-    public void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
@@ -455,170 +459,168 @@ public class TeamManager : MPPanel
     /// <param name="myParent"></param>
     void Add2Refs(Dictionary<string, GameObject> loadedBtnRefs, int position, string itemID, GameObject myParent)
     {
+        Transform btnArea = myParent.transform.parent;
         List<string> keys = loadedBtnRefs.Keys.ToList();
 
+        // 檢查長度 防止溢位 position 初始值0
         if (position < loadedBtnRefs.Count && loadedBtnRefs.Count > 0)
         {
+            // 如果已載入按鈕有重複Key
             if (loadedBtnRefs.ContainsKey(itemID))
             {
+                // 如果Key值不同 移除舊資料
                 if (keys[position] != itemID)
                 {
                     loadedBtnRefs.Remove(itemID);
 
+                    // 如果小於 載入按鈕的索引長度 直接修改索引 超過則新增
                     if (position < loadedBtnRefs.Count)
                     {
                         Global.RenameKey(loadedBtnRefs, keys[position], itemID);
                         loadedBtnRefs[itemID] = myParent;
+                        loadedBtnRefs[itemID].GetComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref btnArea);
                     }
                     else
                     {
+                        //Debug.Log("T new *******Ref ID:" + itemID + "  BtnName:" + myParent + "     Local:" + myParent.transform.parent.parent.parent.parent.name+"*************");
                         loadedBtnRefs.Add(itemID, myParent);
+                        //loadedBtnRefs[itemID].GetComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref btnArea);
                     }
                 }
                 else
                 {
+                    Debug.Log("T re *******Ref ID:" + itemID + "  BtnName:" + myParent + "     Local:" + myParent.transform.parent.parent.parent.parent.name + "*************");
+                    // 重新索引按鈕對應位置
                     loadedBtnRefs[itemID] = myParent;
+                    loadedBtnRefs[itemID].GetComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref btnArea);
                 }
             }
             else
             {
+                // 如果小於 載入按鈕的索引長度 直接修改索引
                 Global.RenameKey(loadedBtnRefs, keys[position], itemID);
                 loadedBtnRefs[itemID] = myParent;
+                loadedBtnRefs[itemID].GetComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref btnArea);
             }
         }
         else
         {
+            // 大於 載入按鈕的索引長度 則新增索引
             loadedBtnRefs.Add(itemID, myParent.gameObject);
+            //Debug.Log("T > *******Ref ID:" + itemID + "  BtnName:" + myParent + "     Local:" + myParent.transform.parent.parent.parent.parent.name + "*************");
         }
 
     }
     #endregion
 
-    #region -- SwitchMemeber 交換隊伍成員 --
-    /// <summary>
-    /// 交換隊伍成員
-    /// </summary>
-    /// <param name="key1">要交換的物件Key值</param>
-    /// <param name="key2">要交換的物件Key值</param>
-    /// <param name="data">來源資料字典</param>
-    public void SwitchMemeber(string key1, string key2, Dictionary<string, object> dict)
-    {
-        Dictionary<string, GameObject> tmpDict = _dictLoadedMiceBtnRefs;
+    //#region -- SwitchMemeber 交換隊伍成員 --
+    ///// <summary>
+    ///// 交換隊伍成員
+    ///// </summary>
+    ///// <param name="key1">要交換的物件Key值</param>
+    ///// <param name="key2">要交換的物件Key值</param>
+    ///// <param name="dict">來源資料字典</param>
+    //public void SwitchMemeber(string key1, string key2, Dictionary<string, object> dict)
+    //{
+    //    Dictionary<string, GameObject> tmpDict = _dictLoadedMiceBtnRefs;
 
-        if (dict == Global.dictTeam)
-            tmpDict = _dictLoadedTeamBtnRefs;
+    //    if (dict == Global.dictTeam)
+    //        tmpDict = _dictLoadedTeamBtnRefs;
 
-        // clientData
-        Global.SwapDictKey(key1, key2, "x", dict);
-        Global.SwapDictValueByKey(key1, key2, dict);
+    //    // 交換 clientData Key and Value
+    //    Global.SwapDictKey(key1, key2, "x", dict);
+    //    Global.SwapDictValueByKey(key1, key2, dict);
 
-        //btnRefs
-        Global.SwapDictKey(key1, key2, "x", tmpDict);
-        Global.SwapDictValueByKey(key1, key2, tmpDict);
+    //    // 交換 btnRefs Key and Value
+    //    Global.SwapDictKey(key1, key2, "x", tmpDict);
+    //    Global.SwapDictValueByKey(key1, key2, tmpDict);
+    //}
+    //#endregion
 
-        //Global.RenameKey(tmpDict, key1, "x");
-        //Global.RenameKey(tmpDict, key2, key1);
-        //Global.RenameKey(tmpDict, "x", key2);
-    }
-    #endregion
+    //#region -- TeamSequence 隊伍整理佇列 --
+    ///// <summary>
+    ///// 隊伍整理佇列 bDragOut=True : 拉出隊伍整理   bDragOut=False : 拉入隊伍整理
+    ///// </summary>
+    ///// <param name="btnRefs">受影響的按鈕</param>
+    ///// <param name="bDragOut">拉入T 或 移出F</param>
+    //public void TeamSequence(GameObject btnRefs, bool bDragOut)
+    //{
+    //    Dictionary<string, object> team = new Dictionary<string, object>(Global.dictTeam);
+    //    int btnNo = int.Parse(btnRefs.name.Remove(0, btnRefs.name.Length - 1));
+    //    // string miceName = teamRef.transform.GetChild(0).name;
 
-    #region -- TeamSequence 隊伍整理佇列 --
-    /// <summary>
-    /// 隊伍整理佇列 bDragOut=True : 拉出隊伍整理   bDragOut=False : 拉入隊伍整理
-    /// </summary>
-    /// <param name="btnRefs">受影響的按鈕</param>
-    /// <param name="bDragOut">拉入T 或 移出F</param>
-    public void TeamSequence(GameObject btnRefs, bool bDragOut)
-    {
-        Dictionary<string, object> team = new Dictionary<string, object>(Global.dictTeam);
-        int btnNo = int.Parse(btnRefs.name.Remove(0, btnRefs.name.Length - 1));
-        // string miceName = teamRef.transform.GetChild(0).name;
+    //    // 整理隊伍排序位置
+    //    if (bDragOut)
+    //    {
+    //        // 拉出對隊伍時
+    //        if (btnNo >= team.Count)
+    //        {
+    //            int offset = team.Count == 0 ? 0 : 1; ; // 當Btn=0時 防止溢位
+    //            Transform teamBtn = infoGroupsArea[2].transform.GetChild(team.Count - offset);
 
-        if (bDragOut)
-        {
-            if (btnNo >= team.Count)
-            {
-                int offset;
-                offset = team.Count == 0 ? 0 : 1;
-                btnRefs.transform.GetChild(0).parent = infoGroupsArea[2].transform.GetChild(team.Count - offset);
-                infoGroupsArea[2].transform.GetChild(team.Count - offset).GetChild(0).localPosition = Vector3.zero;
-                infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().enabled = true;
-                infoGroupsArea[2].transform.GetChild(team.Count - offset).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
-            }
-        }
-        else
-        {
-            if (btnNo < team.Count)                                           // 2<5
-            {
-                for (int i = 0; i < (team.Count - btnNo); i++)                  // 5-2=3  
-                {
-                    GameObject teamBtn;
-                    if (_dictLoadedTeamBtnRefs.TryGetValue(infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0).name, out teamBtn))
-                    {
-                        _dictLoadedTeamBtnRefs[infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0).name] = infoGroupsArea[2].transform.GetChild(btnNo + i - 1).gameObject;
-                    }
-                    infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0).parent = infoGroupsArea[2].transform.GetChild(btnNo + i - 1); // team[2+i]=team[2+i-1] parent =>team[2]=team[1]
+    //            btnRefs.transform.GetChild(0).parent = infoGroupsArea[2].transform.GetChild(team.Count - offset);
+    //            teamBtn.GetChild(0).localPosition = Vector3.zero;
+    //            teamBtn.GetComponent<TeamSwitcher>().enabled = true;
+    //            teamBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
+    //        }
+    //    }
+    //    else
+    //    {
+    //        // 拉入隊伍時
+    //        if (btnNo < team.Count)                                           // 2<5
+    //        {
+    //            for (int i = 0; i < (team.Count - btnNo); i++)                  // 5-2=3  
+    //            {
+    //                GameObject outBtn;
+    //                Transform teamIcon = infoGroupsArea[2].transform.GetChild(btnNo + i).GetChild(0);
+    //                Transform pervTeamBtn = infoGroupsArea[2].transform.GetChild(btnNo + i - 1);
 
+    //                if (_dictLoadedTeamBtnRefs.TryGetValue(teamIcon.name, out outBtn))
+    //                {
+    //                    _dictLoadedTeamBtnRefs[teamIcon.name] = pervTeamBtn.gameObject; //teamIcon.name  = ID
+    //                }
+    //                teamIcon.parent = pervTeamBtn; // team[2+i]=team[2+i-1] parent =>team[2]=team[1]
 
+    //                if (i == 0)     // 因為第一個物件會有2個Child所以要GetChild(1) 下一個按鈕移過來的Mice
+    //                    pervTeamBtn.GetChild(1).localPosition = Vector3.zero;
+    //                else
+    //                    pervTeamBtn.GetChild(0).localPosition = Vector3.zero;
 
-                    if (i == 0)     // 因為第一個物件會有2個Child所以要GetChild(1) 下一個按鈕移過來的Mice
-                        infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(1).localPosition = Vector3.zero;
-                    else
-                        infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetChild(0).localPosition = Vector3.zero;
-                    infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().enabled = true;
-                    infoGroupsArea[2].transform.GetChild(btnNo + i - 1).GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
-                }
-                Global.dictTeam = team;
-            }
-        }
-    }
-    #endregion
+    //                pervTeamBtn.GetChild(0).localPosition = Vector3.zero;
+    //                pervTeamBtn.GetComponent<TeamSwitcher>().enabled = true;
+    //                pervTeamBtn.GetComponent<TeamSwitcher>().SendMessage("EnableBtn");
+    //            }
+    //            Global.dictTeam = team;
+    //        }
+    //    }
+    //}
+    //#endregion
 
-    public void RemoveTeamMember(string teamName)
-    {
-        // 移除隊伍成員
-        Global.dictTeam.Remove(teamName);
+    //public void RemoveTeamMember(string teamName)
+    //{
+    //    // 移除隊伍成員
+    //    Global.dictTeam.Remove(teamName);
 
-        _dictLoadedMiceBtnRefs[teamName].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
-        _dictLoadedMiceBtnRefs[teamName].SendMessage("EnableBtn");                    // 啟動按鈕
-        _dictLoadedTeamBtnRefs.Remove(teamName);                                                        // 移除隊伍參考
+    //    _dictLoadedMiceBtnRefs[teamName].GetComponent<TeamSwitcher>().enabled = true; // 要先Active 才能SendMessage
+    //    _dictLoadedMiceBtnRefs[teamName].SendMessage("EnableBtn");                    // 啟動按鈕
+    //    _dictLoadedTeamBtnRefs.Remove(teamName);                                                        // 移除隊伍參考
 
-        Dictionary<string, GameObject> buffer = new Dictionary<string, GameObject>(_dictLoadedTeamBtnRefs);
+    //    Dictionary<string, GameObject> buffer = new Dictionary<string, GameObject>(_dictLoadedTeamBtnRefs);
 
-        int i = 0;
-        foreach (KeyValuePair<string, GameObject> item in buffer)
-        {
-            Global.RenameKey(_dictLoadedTeamBtnRefs, item.Key, i.ToString());
-            i++;
-        }
+    //    int i = 0;
+    //    foreach (KeyValuePair<string, GameObject> item in buffer)
+    //    {
+    //        Global.RenameKey(_dictLoadedTeamBtnRefs, item.Key, i.ToString());
+    //        i++;
+    //    }
 
-        i = 0;
-        foreach (KeyValuePair<string, object> item in Global.dictTeam)
-        {
-            Global.RenameKey(_dictLoadedTeamBtnRefs, i.ToString(), item.Key);
-            i++;
-        }
-    }
-
-    #region --字典 檢查/取值 片段程式碼 --
-
-    public GameObject GetLoadedMice(string miceID)
-    {
-        GameObject obj;
-        if (_dictLoadedMiceBtnRefs.TryGetValue(miceID, out obj))
-            return obj;
-        return null;
-    }
-
-    public GameObject GetLoadedTeam(string miceID)
-    {
-        GameObject obj;
-        if (_dictLoadedTeamBtnRefs.TryGetValue(miceID, out obj))
-            return obj;
-        return null;
-    }
-    #endregion
+    //    i = 0;
+    //    foreach (KeyValuePair<string, object> item in Global.dictTeam)
+    //    {
+    //        Global.RenameKey(_dictLoadedTeamBtnRefs, i.ToString(), item.Key);
+    //        i++;
+    //    }
+    //}
 
     /// <summary>
     /// 檢查成員變動
@@ -656,7 +658,8 @@ public class TeamManager : MPPanel
             for (int i = 0; loadedBtnRefs.Count > serverData.Count; i++)
             {
                 key = keys[loadedBtnRefs.Count - 1];
-                Destroy(loadedBtnRefs[key].transform.GetChild(0).gameObject);
+                if (loadedBtnRefs.ContainsKey(key) && loadedBtnRefs[key].transform.childCount > 0)
+                    Destroy(loadedBtnRefs[key].transform.GetChild(0).gameObject);
                 loadedBtnRefs.Remove(key);
             }
 
@@ -685,9 +688,9 @@ public class TeamManager : MPPanel
                 key = loadedGameObjectKeys[i];
                 if (item.Key.ToString() != key.ToString()) // child out 
                 {
-                    loadedBtnRefsBuffer[key].transform.GetChild(0).GetComponent<UISprite>().spriteName = item.Value.ToString() + "ICON";
+                    loadedBtnRefsBuffer[key].transform.GetChild(0).GetComponent<UISprite>().spriteName = item.Value.ToString() + Global.IconSuffix;
                     loadedBtnRefs[key].transform.GetChild(0).name = item.Key;
-                    loadedBtnRefsBuffer[key].transform.GetComponent<TeamSwitcher>().EnableBtn();
+                    loadedBtnRefsBuffer[key].SendMessage("EnableBtn");
                     Global.RenameKey(loadedBtnRefs, key, "x" + i);
                     j++;
                 }
@@ -712,72 +715,64 @@ public class TeamManager : MPPanel
         return true;
     }
 
-    public int GetMiceMemberCount()
-    {
-        return _dictLoadedMiceBtnRefs.Count;
-    }
-
-    public int GetTeamMemberCount()
-    {
-        return _dictLoadedTeamBtnRefs.Count;
-    }
-
-    /// <summary>
-    /// 修改物件參考 toID= null 、修改ID newRef= null
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="toID"></param>
-    /// <param name="newRef"></param>
-    public void ModifyMiceRefs(string id, string toID, GameObject newRef)
-    {
-        if (newRef != null)
-            _dictLoadedMiceBtnRefs[id] = newRef;
-
-        if (!string.IsNullOrEmpty(toID))
-            Global.RenameKey(_dictLoadedMiceBtnRefs, id, toID);
-    }
-
-    public void ModifyTeamRefs(string id, string toID, GameObject newRef)
-    {
-        if (newRef != null)
-            _dictLoadedTeamBtnRefs[id] = newRef;
-
-        if (!string.IsNullOrEmpty(toID))
-            Global.RenameKey(_dictLoadedTeamBtnRefs, id, toID);
-    }
 
 
-    public bool AddMiceMemberRefs(string key, GameObject value)
-    {
-        if (!_dictLoadedMiceBtnRefs.ContainsKey(key))
-        {
-            _dictLoadedMiceBtnRefs.Add(key, value);
-            return true;
-        }
-        return false;
-    }
+    ///// <summary>
+    ///// 修改物件參考 toID= null 、修改ID newRef= null
+    ///// </summary>
+    ///// <param name="id"></param>
+    ///// <param name="toID"></param>
+    ///// <param name="newRef"></param>
+    //public void ModifyMiceRefs(string id, string toID, GameObject newRef)
+    //{
+    //    if (newRef != null)
+    //        _dictLoadedMiceBtnRefs[id] = newRef;
 
-    public bool AddTeamMemberRefs(string key, GameObject value)
-    {
-        if (!_dictLoadedTeamBtnRefs.ContainsKey(key))
-        {
-            _dictLoadedTeamBtnRefs.Add(key, value);
-            return true;
-        }
-        return false;
-    }
+    //    if (!string.IsNullOrEmpty(toID))
+    //        Global.RenameKey(_dictLoadedMiceBtnRefs, id, toID);
+    //}
 
-    public bool RemoveMiceMemberRefs(string key)
-    {
-        _dictLoadedMiceBtnRefs.Remove(key);
-        return _dictLoadedMiceBtnRefs.ContainsKey(key) ? true : false;
-    }
+    //public void ModifyTeamRefs(string id, string toID, GameObject newRef)
+    //{
+    //    if (newRef != null)
+    //        _dictLoadedTeamBtnRefs[id] = newRef;
 
-    public bool RemoveTeamMemberRefs(string key)
-    {
-        _dictLoadedTeamBtnRefs.Remove(key);
-        return _dictLoadedTeamBtnRefs.ContainsKey(key) ? true : false;
-    }
+    //    if (!string.IsNullOrEmpty(toID))
+    //        Global.RenameKey(_dictLoadedTeamBtnRefs, id, toID);
+    //}
+
+
+    //public bool AddMiceMemberRefs(string key, GameObject value)
+    //{
+    //    if (!_dictLoadedMiceBtnRefs.ContainsKey(key))
+    //    {
+    //        _dictLoadedMiceBtnRefs.Add(key, value);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    //public bool AddTeamMemberRefs(string key, GameObject value)
+    //{
+    //    if (!_dictLoadedTeamBtnRefs.ContainsKey(key))
+    //    {
+    //        _dictLoadedTeamBtnRefs.Add(key, value);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    //public bool RemoveMiceMemberRefs(string key)
+    //{
+    //    _dictLoadedMiceBtnRefs.Remove(key);
+    //    return _dictLoadedMiceBtnRefs.ContainsKey(key) ? true : false;
+    //}
+
+    //public bool RemoveTeamMemberRefs(string key)
+    //{
+    //    _dictLoadedTeamBtnRefs.Remove(key);
+    //    return _dictLoadedTeamBtnRefs.ContainsKey(key) ? true : false;
+    //}
 
     private bool DictionaryCompare<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2)
     {
@@ -844,6 +839,18 @@ public class TeamManager : MPPanel
             infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
     }
 
+    void OnDisable()
+    {
+        Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+        Global.photonService.UpdateMiceEvent -= OnCostCheck;
+    }
+
+
+
+
+
+
 
     //private void CheckSolt(){
     //    if (Global.Rank < 5)
@@ -866,11 +873,4 @@ public class TeamManager : MPPanel
     //    else
     //        infoGroupsArea[2].transform.GetChild(4).gameObject.SetActive(true);
     //}
-
-    void OnDisable()
-    {
-        Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
-        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
-        Global.photonService.UpdateMiceEvent += OnCostCheck;
-    }
 }

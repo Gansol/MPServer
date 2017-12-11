@@ -110,7 +110,7 @@ public class AssetBundlesCreator : EditorWindow
 
     [MenuItem("Gansol/Build AssetBundle %&b")]
     static void Init()  // 初始化編輯視窗
-    {
+    { 
         AssetBundlesCreator window = (AssetBundlesCreator)EditorWindow.GetWindow(typeof(AssetBundlesCreator));
         window.Show();
     }

@@ -264,7 +264,7 @@ public class StoreManager : MPPanel
 
             dictItemProperty.TryGetValue("ItemName", out value);
             infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItem.GetComponentInChildren<UISprite>().atlas;
-            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + "ICON";
+            infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + Global.IconSuffix;
             infoGroupsArea[4].transform.Find("Item").GetChild(0).Find("Count").GetComponent<UILabel>().text = "0";
 
             if (playerItemData.Count != 0)
@@ -315,7 +315,7 @@ public class StoreManager : MPPanel
 
         dictItemProperty.TryGetValue("ItemName", out value);
         infoGroupsArea[5].transform.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItem.GetComponentInChildren<UISprite>().atlas;
-        infoGroupsArea[5].transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + "ICON";
+        infoGroupsArea[5].transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + Global.IconSuffix;
 
 
         infoGroupsArea[5].transform.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
@@ -352,7 +352,7 @@ public class StoreManager : MPPanel
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
-    public void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
         GameObject root = obj.transform.parent.gameObject;
@@ -585,7 +585,7 @@ public class StoreManager : MPPanel
             object itemName;
             var nestedData = item.Value as Dictionary<string, object>;
             nestedData.TryGetValue("ItemName", out itemName);
-            string bundleName = itemName.ToString() + "ICON";
+            string bundleName = itemName.ToString() + Global.IconSuffix;
 
             if (assetLoader.GetAsset(bundleName) != null)                  // 已載入資產時
             {

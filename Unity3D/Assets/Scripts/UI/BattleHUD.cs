@@ -150,7 +150,7 @@ public class BattleHUD : MonoBehaviour
 
                 string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                GameObject bundle = assetLoader.GetAsset(itemName + "ICON");
+                GameObject bundle = assetLoader.GetAsset(itemName + Global.IconSuffix);
                 Debug.Log("Bundle:" + bundle);
                 if (bundle != null)
                     bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).FindChild("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
@@ -499,8 +499,8 @@ public class BattleHUD : MonoBehaviour
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                if (assetLoader.GetAsset(itemName + "ICON") == null)
-                    assetLoader.LoadPrefab("MiceICON/", itemName + "ICON");
+                if (assetLoader.GetAsset(itemName + Global.IconSuffix) == null)
+                    assetLoader.LoadPrefab("MiceICON/", itemName + Global.IconSuffix);
             }
             return false;
         }
