@@ -9,7 +9,9 @@ public class del2 :MonoBehaviour
     {
         a = new Dictionary<string, GameObject>();
         a.Add("1", gameObject);
-        transform.GetChild(0).GetComponent<del>().Send(ref a);
+        transform.GetChild(0).GetComponent<del>().Send(ref a,a);
+
+        Debug.Log(a["1"]);
     }
 
 

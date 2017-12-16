@@ -130,7 +130,8 @@ public class VersionManager : MonoBehaviour
             bCompleted = true;
             if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
             {
-                if (Global.connStatus) StartCoroutine(visionChecker.ReplaceVisionList());
+                if (Global.connStatus) 
+                    StartCoroutine(visionChecker.ReplaceVisionList());
                 syncLoad = gameObject.AddComponent<SyncLoad>();
                 syncLoad.OnLoadScene();
             }

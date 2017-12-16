@@ -26,7 +26,7 @@ public abstract class MPPanel : MonoBehaviour
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
     private GameObject _tmpActor, _clone;
 
-    public MPPanel( MPGame MPGame)
+    public MPPanel(MPGame MPGame)
     {
         m_MPGame = MPGame;
         assetLoader = m_MPGame.AssetLoader();
@@ -46,7 +46,7 @@ public abstract class MPPanel : MonoBehaviour
         GameObject _miceImage;
         UISprite sprite = btn_click.transform.GetComponentInChildren<UISprite>();
         string assetName = sprite.spriteName.Remove(sprite.spriteName.Length - Global.extIconLength);
-//        Debug.Log(_dictActor.Count);
+        //        Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 
         if (_dictActor.TryGetValue(assetName, out _miceImage))       // 假如已經載入老鼠圖片了 直接顯示
@@ -90,63 +90,14 @@ public abstract class MPPanel : MonoBehaviour
     }
     #endregion
 
-
-    #region -- InstantiateICON 實體化背包物件背景--
+    #region -- InstantiateItemBG 實體化背包物件背景--
     /// <summary>
-    /// 實體化商店物件背景
+    /// 實體化道具物件背景
     /// </summary>
     /// <param name="itemData">資料字典</param>
     /// <param name="itemPanel">實體化父系位置</param>
     /// <param name="itemType">道具類別</param>
-    public Dictionary<string, GameObject> InstantiateICON(Dictionary<string, object> itemData, string itemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
-    {
-        if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
-        {
-            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, 1);
-            Vector2 pos = new Vector2();
-            Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
-
-            int i = 0;
-            foreach (KeyValuePair<string, object> item in itemData)
-            {
-                if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
-                {
-
-                    GameObject bundle = assetLoader.GetAsset(itemName);
-                    pos = sortItemPos(12, 5, offset, pos, i);
-                    bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-
-                    string iconName = item.Value + Global.IconSuffix;
-                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
-                    {
-                        GameObject icon = assetLoader.GetAsset(iconName);
-                        bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.FindChild("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
-                        bundle.transform.parent.parent.gameObject.tag = "InventoryICON";
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<ButtonSwitcher>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragScrollView>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<Rigidbody>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragObject>());
-                        bundle.transform.parent.parent.gameObject.AddComponent<ChangeICON>();
-                    }
-                    pos.x += offset.x;
-                }
-
-                i++;
-            }
-        }
-        return null;
-    }
-
-    #endregion
-
-    #region -- InstantiateItem 實體化背包物件背景--
-    /// <summary>
-    /// 實體化商店物件背景
-    /// </summary>
-    /// <param name="itemData">資料字典</param>
-    /// <param name="itemPanel">實體化父系位置</param>
-    /// <param name="itemType">道具類別</param>
-    public virtual Dictionary<string, GameObject> InstantiateItem(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    public virtual Dictionary<string, GameObject> InstantiateItemBG(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
         if (itemType != -1)
             itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
@@ -154,28 +105,29 @@ public abstract class MPPanel : MonoBehaviour
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
             _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
-            return InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
-        }                                                       // 已建立道具時
+            return InstantiateItemBGSub(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+        }
         else
-        {
+        {// 已建立道具時
+
             if (itemPanel.FindChild(itemType.ToString()))       // 如果有對應道具類別
             {
                 _lastEmptyItemGroup.SetActive(false);
                 _lastEmptyItemGroup = itemPanel.FindChild(itemType.ToString()).gameObject;
-                _lastEmptyItemGroup.SetActive(true);
-            }                                                   // 如果沒有對應道具類別資料 建立道具
-            else if (_lastEmptyItemGroup != itemPanel.FindChild(itemType.ToString()))
+                _lastEmptyItemGroup.SetActive(true);                                                  // 如果沒有對應道具類別資料 建立道具
+            }
+            else if ((_lastEmptyItemGroup != itemPanel.FindChild(itemType.ToString())))
             {
+
                 _lastEmptyItemGroup.SetActive(false);
                 _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
-                return InstantiateItem2(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
+                return InstantiateItemBGSub(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
             }
         }
-
         return null;
     }
 
-    private Dictionary<string, GameObject> InstantiateItem2(Dictionary<string, object> itemData, string itemName, int itemType, Transform parent, int itemCount, Vector2 offset, int tableCount, int rowCount)
+    private Dictionary<string, GameObject> InstantiateItemBGSub(Dictionary<string, object> itemData, string itemName, int itemType, Transform parent, int itemCount, Vector2 offset, int tableCount, int rowCount)
     {
         Vector2 pos = new Vector2();
         Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
@@ -243,7 +195,8 @@ public abstract class MPPanel : MonoBehaviour
         {
             foreach (KeyValuePair<string, object> item in itemData)
             {
-                if (!string.IsNullOrEmpty(item.Value.ToString())) assetLoader.LoadPrefab(folder + "/", item.Value.ToString() + Global.IconSuffix);
+                if (!string.IsNullOrEmpty(item.Value.ToString()))
+                    assetLoader.LoadPrefab(folder + "/", item.Value.ToString() + Global.IconSuffix);
             }
             return true;
         }
@@ -254,7 +207,6 @@ public abstract class MPPanel : MonoBehaviour
         }
     }
     #endregion
-
 
     #region -- CreateEmptyObject 建立空物件 --
     /// <summary>
@@ -352,6 +304,8 @@ public abstract class MPPanel : MonoBehaviour
     protected abstract void OnLoading();
 
     protected abstract void OnLoadPanel();
+
+    protected abstract void GetMustLoadAsset();
 
     public abstract void OnClosed(GameObject obj);
 }

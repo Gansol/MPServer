@@ -18,10 +18,10 @@ public class SpawnAI
 {
     [Range(2, 5)]
     private float miceSize;
-    private List<GameObject> hole;
+    private List<GameObject> _hole;
     private BattleManager _battleManager;
     private PoolManager poolManager;
-
+    private static ObjectFactory objFactory;
     private Vector3 _miceSize;
     private Coroutine coroutine;
     //private SpawnState spawnState = null;
@@ -35,22 +35,25 @@ public class SpawnAI
     //    Initinal();
     //}
 
-    public SpawnAI(BattleManager battleManager)
+    public SpawnAI(BattleManager battleManager, List<GameObject> hole)
     {
         _battleManager = battleManager;
         poolManager = battleManager.GetComponent<PoolManager>();
+        objFactory = MPGFactory.GetObjFactory();
+        objFactory.TestMethod();
+        miceSize = 3.5f;
+        _hole = hole;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
     }
 
 
-     void Start()
+    void Start()
     {
-        miceSize = 3.5f;
+
         //battleManager = GetComponent<BattleManager>();
         //poolManager = GetComponent<PoolManager>();
 
 
-
-        Global.photonService.LoadSceneEvent += OnLoadScene;
     }
 
 
@@ -84,7 +87,7 @@ public class SpawnAI
         for (holePos = 0; count < spawnCount; holePos++)
         {
             holePos = SetStartPos(holeArray.Length, holePos, false);
-            MPGFactory.GetObjFactory().InstantiateMice(poolManager, miceID, miceSize, hole[rndHoleArray[holePos]], false);
+            objFactory.InstantiateMice(poolManager, miceID, miceSize, _hole[rndHoleArray[holePos]], false);
             count++;
             yield return new WaitForSeconds(spawnTime);
         }
@@ -194,7 +197,8 @@ public class SpawnAI
         {
             try
             {
-                MPGFactory.GetObjFactory().InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[holePos]], impose);
+                objFactory.TestMethod();
+                objFactory.InstantiateMice(poolManager, miceID, miceSize, _hole[holeArray[holePos]], impose);
             }
             catch (Exception e)
             {
@@ -311,7 +315,7 @@ public class SpawnAI
 
             while (j >= 0 && j < holeArray.GetLength(1) && count < spawnCount)    // 2D陣列
             {
-                MPGFactory.GetObjFactory().InstantiateMice(poolManager, miceID, miceSize, hole[holeArray[i, j]], false);
+                objFactory.InstantiateMice(poolManager, miceID, miceSize, _hole[holeArray[i, j]], false);
                 count++;
                 //Debug.Log("count:" + count + "  i:" + i + "  j:" + j);
                 j += (reSpawn) ? -1 : 1;
@@ -332,28 +336,28 @@ public class SpawnAI
         try
         {
             // 如果Hole上有Mice 移除Mice
-            if (hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
+            if (_hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
             {
-                Global.dictBattleMice.Remove(hole[4].transform);
-                if (hole[4].transform.GetComponentInChildren<Mice>())
-                    hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
+                Global.dictBattleMice.Remove(_hole[4].transform);
+                if (_hole[4].transform.GetComponentInChildren<Mice>())
+                    _hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
             }
 
             // 播放洞口動畫
-            hole[4].GetComponent<Animator>().enabled = true;
-            hole[4].GetComponent<Animator>().Play("HoleScale");
+            _hole[4].GetComponent<Animator>().enabled = true;
+            _hole[4].GetComponent<Animator>().Play("HoleScale");
 
             // 產生MicBoss 並移除Mice Component
 
             GameObject clone = poolManager.ActiveObject(miceID.ToString());
-           // MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
+            // MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
             MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
 
-           // if (mice.enabled) mice.enabled = false;
+            // if (mice.enabled) mice.enabled = false;
             GameObject.Destroy(clone.GetComponent<MiceBase>());
 
             clone.transform.gameObject.SetActive(false);
-            clone.transform.parent = hole[4].transform;
+            clone.transform.parent = _hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
             clone.transform.localPosition = new Vector3(0, 0, 0);
             clone.AddComponent(miceAttr.name + "Boss");
@@ -363,7 +367,7 @@ public class SpawnAI
             MiceBossBase boss = clone.GetComponent(typeof(MiceBossBase)) as MiceBossBase;
             SkillBase skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
             MiceAnimState animState = new MiceAnimState(clone, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
-            
+
             boss.SetAnimState(animState);
             boss.SetArribute(miceAttr);
             boss.SetSkill(skill);
@@ -540,11 +544,17 @@ public class SpawnAI
     #endregion
 
 
-    public Transform GetHole(int index){
-        return hole[index].transform;
+    public Transform GetHole(int index)
+    {
+        return _hole[index].transform;
     }
 
     void OnLoadScene()
+    {
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
+    }
+
+    ~SpawnAI()
     {
         Global.photonService.LoadSceneEvent -= OnLoadScene;
     }

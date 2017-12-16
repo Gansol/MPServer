@@ -74,6 +74,16 @@ public class FriendManager : MPPanel
 
     protected override void OnLoadPanel()
     {
+        GetMustLoadAsset();
+        ResumeToggleTarget();
+    }
+
+
+    /// <summary>
+    /// 取得必須載入的Asset
+    /// </summary>
+    protected override void GetMustLoadAsset()
+    {
         if (enabled)
         {
             if (_bFirstLoad)
@@ -87,7 +97,7 @@ public class FriendManager : MPPanel
                     dictMice.Add(item.Key, itemName);
                 }
                 _tmpFriends = Global.dictFriends;
-                assetLoader.LoadAsset(iconPath + "/", "MiceICON");
+                assetLoader.LoadAsset(iconPath + "/", iconPath);
                 _bLoadedIcon = LoadIconObject(dictMice, iconPath);
                 assetLoader.LoadPrefab("Panel/", slotItemName);
                 _bFirstLoad = false;
@@ -97,8 +107,6 @@ public class FriendManager : MPPanel
         {
             Debug.Log("dictFriends is null");
         }
-
-        ResumeToggleTarget();
     }
 
     /// <summary>

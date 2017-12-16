@@ -176,6 +176,10 @@ public class BtnSwitch : MonoBehaviour
                 Destroy(gameObject);                                // 移除移動的物件
                 TeamSequence(_other, true);
             }
+            else
+            {
+                Debug.Log("FUCK");
+            }
             // A>A B>B 
             _originPos = _toPos;                                    // B1>B2時會改變原始做標，所以要儲存移動後的座標位置
             _bMoveMotion= _goTarget = false;                                      // 到達目標
@@ -299,10 +303,10 @@ public class BtnSwitch : MonoBehaviour
 
         Destroy(GetComponent<TweenColor>());            // NGUI BUG!!
         Destroy(_other.GetComponent<TweenColor>());     // NGUI BUG!!
-        _goTarget = true;
+        _bMoveMotion = _goTarget = true;
         Destroy(_clone);
 
-        SortChildren.SortChildrenByID(transform.parent.gameObject);
+        SortChildren.SortChildrenByID(transform.parent.gameObject, Global.extIconLength);
         // Mice Switch
 
         foreach (KeyValuePair<string, object> item in data)
@@ -338,7 +342,7 @@ public class BtnSwitch : MonoBehaviour
                 _clone.transform.GetChild(0).GetComponent<UISprite>().spriteName = _other.transform.GetChild(0).GetComponent<UISprite>().spriteName;
                 EnDisableBtn(_clone, true);
                 Destroy(gameObject);
-                SortChildren.SortChildrenByID(_clone.transform.parent.gameObject);
+                SortChildren.SortChildrenByID(_clone.transform.parent.gameObject, Global.extIconLength);
             }
         }
     }
@@ -358,7 +362,7 @@ public class BtnSwitch : MonoBehaviour
 
         Debug.Log(transform.GetChild(0).GetComponent<UISprite>().name + "  " + transform.GetChild(0).GetComponent<UISprite>().depth);
         transform.GetChild(0).GetComponent<UISprite>().depth -= _depth; // 恢復深度值
-        _goTarget = true;
+       _bMoveMotion= _goTarget = true;
         _destroy = false;
     }
     #endregion

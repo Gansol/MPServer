@@ -255,6 +255,10 @@ public class PanelManager : MPPanel
         throw new System.NotImplementedException();
     }
 
+    protected override void GetMustLoadAsset()
+    {
+        throw new System.NotImplementedException();
+    }
     // 同意配對 並開起配對視窗
     private void OnApplyMatchGameFriend()
     {

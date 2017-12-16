@@ -62,6 +62,11 @@ public class PurchaseManager : MPPanel
         throw new System.NotImplementedException();
     }
 
+    protected override void GetMustLoadAsset()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void OnClosed(GameObject obj)
     {
         throw new System.NotImplementedException();

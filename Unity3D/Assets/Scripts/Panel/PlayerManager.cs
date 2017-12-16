@@ -45,9 +45,7 @@ public class PlayerManager : MPPanel
 
     public PlayerManager(MPGame MPGame) : base(MPGame) { }
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
+    //init
     void Awake()
     {
         dictLoadedEquiped = new Dictionary<string, GameObject>();
@@ -70,7 +68,6 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -155,12 +152,12 @@ public class PlayerManager : MPPanel
     /// <summary>
     /// 取得必須載入的Asset
     /// </summary>
-    private void GetMustLoadAsset()
+    protected override void GetMustLoadAsset()
     {
         Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
 
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
-        if (_bFirstLoad)                        
+        if (_bFirstLoad)
         {
             assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
@@ -178,7 +175,7 @@ public class PlayerManager : MPPanel
         }
 
         // 如果 有未載入物件 載入AB
-        if (dictNotLoadedAsset.Count != 0) 
+        if (dictNotLoadedAsset.Count != 0)
         {
             assetLoader.init();
             //assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
@@ -241,13 +238,13 @@ public class PlayerManager : MPPanel
                 bundleName = itemName + Global.IconSuffix;
 
                 // 已載入資產時
-                if (assetLoader.GetAsset(bundleName) != null)                  
+                if (assetLoader.GetAsset(bundleName) != null)
                 {
                     GameObject bundle = assetLoader.GetAsset(bundleName);
                     Transform imageParent = itemPanel.GetChild(i).GetChild(0);
 
                     // 如果沒有ICON才實體化
-                    if (imageParent.childCount == 0)   
+                    if (imageParent.childCount == 0)
                     {
                         imageParent.parent.name = itemID.ToString();
                         imageParent.parent.tag = "Inventory";
@@ -259,7 +256,7 @@ public class PlayerManager : MPPanel
 
                         // 加入索引 老鼠所在的MiceBtn位置
                         if (itemType.ToString() == value.ToString())
-                            if (!dictLoadedItem.ContainsKey(itemID.ToString())) 
+                            if (!dictLoadedItem.ContainsKey(itemID.ToString()))
                                 dictLoadedItem.Add(itemID.ToString(), imageParent.parent.gameObject);
 
                         // 如果已經裝備道具 顯示 已裝備狀態
@@ -283,7 +280,7 @@ public class PlayerManager : MPPanel
 
     #region -- InstantiateEquipIcon 實體化裝備中物件--
     /// <summary>
-    /// 實體化載入完成的遊戲物件，利用玩家JASON資料判斷必要實體物件
+    /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
     /// </summary>
     /// <param name="itemData">資料字典</param>
     /// <param name="parent">圖片位置</param>
@@ -302,7 +299,7 @@ public class PlayerManager : MPPanel
             itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
             // 如果道具不在裝備欄位 
-            if (!dictLoadedEquiped.ContainsKey(itemName))                                 
+            if (!dictLoadedEquiped.ContainsKey(itemName))
             {
                 object isEquip, type;
                 nestedData.TryGetValue("IsEquip", out isEquip);
@@ -312,10 +309,10 @@ public class PlayerManager : MPPanel
                 {
                     string bundleName = itemName + Global.IconSuffix;
                     // 已載入資產時
-                    if (assetLoader.GetAsset(bundleName) != null)                   
+                    if (assetLoader.GetAsset(bundleName) != null)
                     {
                         // 如果沒有ICON才實體化
-                        if (imageParent.childCount == 0)   
+                        if (imageParent.childCount == 0)
                         {
                             imageParent.parent.name = itemID.ToString();
                             imageParent.parent.tag = "Equip";
@@ -325,9 +322,9 @@ public class PlayerManager : MPPanel
                             _clone.GetComponentInParent<ButtonSwitcher>().enabled = true;
                             _clone.GetComponentInParent<ButtonSwitcher>().SendMessage("EnableBtn");
 
-                            if (!dictLoadedEquiped.ContainsKey(itemID.ToString())) 
+                            if (!dictLoadedEquiped.ContainsKey(itemID.ToString()))
                                 dictLoadedEquiped.Add(itemID.ToString(), imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
-                            
+
                             i++;
                         }
                     }
@@ -387,7 +384,7 @@ public class PlayerManager : MPPanel
         _playerIconInventoryPanel.SetActive(_bImgActive);
 
         // 如果裝備背包開啟 則 關閉
-        if (_playerEquipInventoryPanel.activeSelf) 
+        if (_playerEquipInventoryPanel.activeSelf)
             _playerEquipInventoryPanel.SetActive(false);
 
         // 如果 頭像背包為空 實體化按鈕圖示
@@ -395,9 +392,57 @@ public class PlayerManager : MPPanel
             InstantiateICON(Global.dictMiceAll, "InvItem", playerAvatarIconGrid.transform, itemOffset, itemCount, row);
 
         // 開關防止Item按鈕失效
-        playerAvatarIconGrid.SetActive(false);   
+        playerAvatarIconGrid.SetActive(false);
         playerAvatarIconGrid.SetActive(true);
     }
+
+    #region -- InstantiateICON 實體化背包物件背景--
+    /// <summary>
+    /// 實體化商店物件背景
+    /// </summary>
+    /// <param name="itemData">資料字典</param>
+    /// <param name="itemPanel">實體化父系位置</param>
+    /// <param name="itemType">道具類別</param>
+    public Dictionary<string, GameObject> InstantiateICON(Dictionary<string, object> itemData, string itemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    {
+        if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
+        {
+            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, 1);
+            Vector2 pos = new Vector2();
+            Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
+
+            int i = 0;
+            foreach (KeyValuePair<string, object> item in itemData)
+            {
+                if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
+                {
+
+                    GameObject bundle = assetLoader.GetAsset(itemName);
+                    pos = sortItemPos(12, 5, offset, pos, i);
+                    bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+
+                    string iconName = item.Value + Global.IconSuffix;
+                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
+                    {
+                        GameObject icon = assetLoader.GetAsset(iconName);
+                        bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.FindChild("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                        bundle.transform.parent.parent.gameObject.tag = "InventoryICON";
+                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<ButtonSwitcher>());
+                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragScrollView>());
+                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<Rigidbody>());
+                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragObject>());
+                        bundle.transform.parent.parent.gameObject.AddComponent<ChangeICON>();
+                    }
+                    pos.x += offset.x;
+                }
+
+                i++;
+            }
+        }
+        return null;
+    }
+
+    #endregion
 
     /// <summary>
     /// 開啟裝備背包
@@ -408,7 +453,7 @@ public class PlayerManager : MPPanel
         _bInvActive = !_bInvActive;
 
         //如果 背包為開啟 關閉
-        if (_playerIconInventoryPanel.activeSelf) 
+        if (_playerIconInventoryPanel.activeSelf)
             _playerIconInventoryPanel.SetActive(false);
 
         _playerEquipInventoryPanel.SetActive(_bInvActive);
@@ -426,7 +471,10 @@ public class PlayerManager : MPPanel
                 _itemType = int.Parse(obj.transform.parent.name);
 
             //實體化道具格、圖示
-            Dictionary<string, GameObject> bag = InstantiateItem(_dictItemData, _InvItem, _itemType, inventoryArea.transform, itemOffset, itemCount, row);
+            Dictionary<string, GameObject> bag = InstantiateItemBG(_dictItemData, _InvItem, _itemType, inventoryArea.transform, itemOffset, itemCount, row);
+
+
+
             InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
         }
 
