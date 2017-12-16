@@ -20,7 +20,7 @@ using System.Collections.Generic;
 public class VersionChecker
 {
     //    AssetBundlesHash bundleHash; //hash文件用
-    private byte[] _bVisionFile; //暫存 伺服器版本列表
+    private static byte[] _bVisionFile; //暫存 伺服器版本列表
     private int reConnTimes = 0;
     private bool _visionChk;
     private bool _isNewlyVision;
@@ -83,7 +83,8 @@ public class VersionChecker
                 }
 
                 string clientVersionText = File.ReadAllText(localVisionListFile);
-
+                if (string.IsNullOrEmpty(clientVersionText))
+                    clientVersionText = Global.defaultVersion;
                 Dictionary<string, object> clientVersion = MiniJSON.Json.Deserialize(clientVersionText) as Dictionary<string, object>;
                 Dictionary<string, object> serverVersion = MiniJSON.Json.Deserialize(wwwVisionList.text) as Dictionary<string, object>;
                 List<string> clientkeys = new List<string>(clientVersion.Keys);
@@ -135,6 +136,7 @@ public class VersionChecker
         yield return new WaitForSeconds(1.0f);
         _visionChk = true;
         Global.isNewlyVision = true;
+        _bVisionFile = null;
     }
     #endregion
 }

@@ -75,7 +75,7 @@ public static class Global
 
     public static readonly string patchFile = "patch.txt"; // 資源版本
     public static readonly string itemListFile = "ItemList.json";          // 道具列表
-    public static readonly string visionListFile = "VisionList.json";      // 版本列表
+    public static readonly string visionListFile = "VersionList.json";      // 版本列表
     public static readonly string downloadListFile = "DownloadList.json";  // 下載列表
     public static readonly string fullPackageFile = "FullPackageList.json";// 完整下載列表
     public static readonly string bundleVersionFile = "BundleVersion.json"; // 資源版本
@@ -317,6 +317,47 @@ public static class Global
             return true;
         }
         return false;
+    }
+    public static bool DictionaryCompare<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2)
+    {
+        // early-exit checks
+        if (null == dict2)
+            return null == dict1;
+        if (null == dict1)
+            return false;
+        if (object.ReferenceEquals(dict1, dict2))
+            return true;
+        if (dict1.Count != dict2.Count)
+            return false;
+
+        int i = 0;
+        foreach (KeyValuePair<TKey, TValue> dict1Item in dict1)
+        {
+            foreach (KeyValuePair<TKey, TValue> dict2Item in dict2)
+            {
+                int j = 0;
+                if (i == j)
+                {
+                    if (!dict1Item.Key.Equals(dict2Item.Key) || !dict1Item.Value.Equals(dict2Item.Value))
+                        return false;
+                    break;
+                }
+                j++;
+            }
+            i++;
+        }
+
+        // check keys are the same
+        foreach (TKey k in dict1.Keys)
+            if (!dict2.ContainsKey(k))
+                return false;
+
+        // check values are the same
+        foreach (TKey k in dict1.Keys)
+            if (!dict1[k].Equals(dict2[k]))
+                return false;
+
+        return true;
     }
 
     public static TimeSpan Time(Action action)

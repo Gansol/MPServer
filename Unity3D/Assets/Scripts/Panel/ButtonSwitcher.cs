@@ -44,7 +44,7 @@ public class ButtonSwitcher : MPButton
         _activeBtn = false;
         _other = gameObject;
         leftDist = 25;
-//        teamCountMax = 5;
+        //        teamCountMax = 5;
     }
 
     void Update()
@@ -81,8 +81,8 @@ public class ButtonSwitcher : MPButton
                 {
                     PlayerManager.dictLoadedEquiped[_clone.name] = _clone;
                 }
-              //  if (transform.Find("Image").childCount != 0)
-                    _pressingIcon = gameObject.GetComponentInChildren<UISprite>().gameObject;
+                //  if (transform.Find("Image").childCount != 0)
+                _pressingIcon = gameObject.GetComponentInChildren<UISprite>().gameObject;
             }
             else
             {
@@ -220,7 +220,7 @@ public class ButtonSwitcher : MPButton
 
     void SwitchICON()
     {
-        string imageName = _pressingIcon.name.Remove(_pressingIcon.name.Length - Global.extIconLength);
+        string imageName = _pressingIcon.name.Remove(_pressingIcon.name.Length - 4);
         _other.name = imageName;
         _pressingIcon.transform.parent = _other.transform.Find("Image");
         _pressingIcon.transform.localScale = Vector3.one;

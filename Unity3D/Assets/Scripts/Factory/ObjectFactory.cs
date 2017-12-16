@@ -17,6 +17,10 @@ using UnityEngine;
 public class ObjectFactory : FactoryBase
 {
     GameObject _clone;
+    public void TestMethod()
+    {
+        Debug.Log("ObjectFactory Init!");
+    }
 
     #region -- Instantiate 實體化物件 --
     /// <summary>

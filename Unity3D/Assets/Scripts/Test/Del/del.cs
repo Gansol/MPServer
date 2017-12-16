@@ -20,11 +20,12 @@ public class del : MonoBehaviour
         enabled = false;
     }
 
-    public void Send(ref Dictionary<string, GameObject> f)
+    public void Send(ref Dictionary<string, GameObject> f, Dictionary<string, GameObject> c)
     {
         a = f;
         a["1"].GetComponent<del2>().enabled = false;
         a["1"].SendMessage("Active");
+        c["1"] = null;
         //a["1"].GetComponent<del2>().Active();
     }
 }

@@ -65,16 +65,14 @@ public class BattleManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        Debug.Log("Battle Start");
+        Debug.Log("-------Battle Start-------");
 
         FindHole();
-       // spawnAI = GetComponent<SpawnAI>(); BattleManager 恢復時重新掛上AI
-        
+
         poolManager = GetComponent<PoolManager>();
         missionManager = GetComponent<MissionManager>();
-
         battleHUD = GetComponent<BattleHUD>();
-        spawnAI = new SpawnAI(this);
+        spawnAI = new SpawnAI(this, hole);
         SetSpawnState(new EasyBattleAIState());
         playerAIState = new PlayerAIState(this);
         MPGame.Instance.GetMessageManager().messagePanel = transform.Find("Message(Panel)");
