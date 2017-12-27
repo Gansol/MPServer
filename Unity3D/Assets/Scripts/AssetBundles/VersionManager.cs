@@ -37,12 +37,12 @@ public class VersionManager : MonoBehaviour
 
     void Start() //開始檢查版本
     {
-        Global.nextScene = (int)Global.Scene.MainGame;
+        Global.nextScene = Global.Scene.MainGame;
        // assetLoader = new AssetLoader();
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VersionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
-        Global.prevScene = Application.loadedLevel;
+        Global.prevScene = Application.loadedLevelName;
 
         if (connCheck.ConnStatus)
             StartCoroutine(visionChecker.CheckVision());

@@ -40,7 +40,7 @@ public class PlayerManager : MPPanel
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
     private static string _MiceIconPath = "MiceICON", _ItemIconPath = "ItemICON", _PanelPath = "Panel", _InvItem = "InvItem";
-    private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
+    private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
     public PlayerManager(MPGame MPGame) : base(MPGame) { }
@@ -55,7 +55,7 @@ public class PlayerManager : MPPanel
         _playerEquipInventoryPanel = inventoryArea.transform.parent.parent.parent.gameObject;
         _dictItemData = Global.dictSortedItem;
         _itemType = (int)StoreType.Armor;
-        _bLoadedPanel = _bImgActive = _bInvActive = false;
+        _bLoadedCurrency = _bLoadedPanel = _bImgActive = _bInvActive = false;
         _bPanelFirstLoad = _bFirstLoad = true;
     }
 
@@ -65,6 +65,7 @@ public class PlayerManager : MPPanel
         // 監聽事件
         Global.photonService.LoadItemDataEvent += OnLoadItem;
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
+        Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
     }
 
@@ -72,14 +73,14 @@ public class PlayerManager : MPPanel
     {
 
         // 資料庫資料載入完成時 載入Asset
-        if (_bLoadedPlayerItem && _bLoadPlayerData && _bLoadItem && !_bLoadedPanel)
+        if (_bLoadedPlayerItem && _bLoadPlayerData && _bLoadedCurrency && _bLoadItem && !_bLoadedPanel)
         {
             _bLoadedPanel = true;
             OnLoadPanel();
         }
 
         // Asset載入完成時 載入玩家頭像、實體化裝備圖示
-        if (assetLoader.loadedObj && _LoadedAsset)
+        if (m_MPGame.GetAssetLoader().loadedObj && _LoadedAsset)
         {
             _LoadedAsset = false;
             LoadPlayerAvatorIcon();
@@ -112,7 +113,13 @@ public class PlayerManager : MPPanel
         // 載入 資料庫資料
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
+        Global.photonService.LoadCurrency(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
+    }
+
+    void OnLoadCurrency() {
+
+        _bLoadedCurrency = true;
     }
 
     /// <summary>
@@ -167,7 +174,9 @@ public class PlayerManager : MPPanel
         {
             LoadProperty.ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItem);
             LoadProperty.ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquiped);
-            _dictItemData = LoadProperty.SelectNewData(Global.playerItem, _dictItemData);
+
+            // Where 找不存在的KEY 再轉換為Dictionary
+            _dictItemData = Global.playerItem.Where(kvp => !_dictItemData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
 
@@ -187,7 +196,7 @@ public class PlayerManager : MPPanel
         }
         else
         {
-            assetLoader.loadedObj = _LoadedAsset = true;
+            m_MPGame.GetAssetLoader().loadedObj = _LoadedAsset = true;
         }
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
@@ -219,7 +228,7 @@ public class PlayerManager : MPPanel
     {
         // 如果道具形態正確 取得 該道具形態 的 道具資料
         if (itemType != -1)
-            itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(itemData, itemType);
+            itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, itemType);
 
         // 如果取得資料
         if (itemData.Count != 0)
@@ -499,6 +508,7 @@ public class PlayerManager : MPPanel
         // -event 移除事件監聽 (載入道具資料時、載入玩家資料時、載入玩家道具資料時)
         Global.photonService.LoadItemDataEvent -= OnLoadItem;
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
+        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
     }
 }

@@ -10,14 +10,15 @@ public class SyncLoad : MonoBehaviour
 
 
     void Awake()
-    { 
+    {
+        Global.photonService.LoadSceneEvent += OnLoadScene;
         AssetBundleManager.UnloadUnusedAssets();
         System.GC.Collect();
     }
 
     void Start()
     {
-        assetLoader = MPGame.Instance.AssetLoader();
+        assetLoader = MPGame.Instance.GetAssetLoader();
         LoadAssetCheck();
     }
 
@@ -35,19 +36,19 @@ public class SyncLoad : MonoBehaviour
 
     public void OnLoadScene()       // LoadScene
     {
-        Global.photonService.LoadSceneEvent -= OnLoadScene;
-        Application.LoadLevel((int)Global.Scene.LoadScene);
+        Application.LoadLevel(Global.Scene.LoadScene);
     }
 
     private void LoadAssetCheck()
     {
-        if (Application.loadedLevel == (int)Global.Scene.BundleCheck)
+        if (Application.loadedLevelName == Global.Scene.BundleCheck)
         {
             bLoadAsset = true;
         }
 
-        if (Application.loadedLevel == (int)Global.Scene.MainGame)
+        if (Application.loadedLevelName == Global.Scene.MainGame)
         {
+            assetLoader.init();
             assetLoader.LoadAsset("Panel/", "LiHeiProFont");
             assetLoader.LoadAsset("Panel/", "ComicFont");
             assetLoader.LoadAsset("Panel/", "ComicFontB");
@@ -58,14 +59,15 @@ public class SyncLoad : MonoBehaviour
             assetLoader.LoadAsset("Panel/", "MainBack");
             assetLoader.LoadAsset("Panel/", "ShareObject");
 
-            assetLoader.LoadPrefab("Panel/", "MenuUI");
+            assetLoader.LoadPrefab("Panel/", Global.Scene.MainGameAsset);
             bLoadAsset = true;
         }
 
-        if (Application.loadedLevel == (int)Global.Scene.Battle)
+        if (Application.loadedLevelName == Global.Scene.Battle)
         {
+            assetLoader.init();
             assetLoader.LoadAsset("Panel/", "BattleHUD");
-            assetLoader.LoadPrefab("Panel/", "GameUI");
+            assetLoader.LoadPrefab("Panel/", Global.Scene.BattleAsset);
             bLoadAsset = true;
         }
     }
@@ -76,14 +78,14 @@ public class SyncLoad : MonoBehaviour
 
         switch (Application.loadedLevelName)
         {
-            case "BundleCheck":
-                sceneName = "MainGame";
+            case Global.Scene.BundleCheck:
+                sceneName = Global.Scene.MainGame;
                 break;
-            case "MainGame":
-                sceneName = "MenuUI";
+            case Global.Scene.MainGame:
+                sceneName =  Global.Scene.MainGameAsset;
                 break;
-            case "Battle":
-                sceneName = "GameUI";
+            case  Global.Scene.Battle:
+                sceneName = Global.Scene.BattleAsset;
                 break;
         }
 
@@ -101,10 +103,10 @@ public class SyncLoad : MonoBehaviour
                 Global.dictLoadedScene[sceneName] = _clone;
         }
 
-        if (Global.prevScene == (int)Global.Scene.MainGame)
-            Global.dictLoadedScene["MenuUI"].SetActive(false);
-        if (Global.nextScene == (int)Global.Scene.MainGame)
-            Global.dictLoadedScene["MenuUI"].SetActive(true);
+        if (Global.prevScene == Global.Scene.MainGame)
+            Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(false);
+        if (Global.nextScene == Global.Scene.MainGame)
+            Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(true);
 
 
 
@@ -114,11 +116,14 @@ public class SyncLoad : MonoBehaviour
             _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
         }
 
-        Global.photonService.LoadSceneEvent += OnLoadScene;
-
-        Global.prevScene = Application.loadedLevel;
+        Global.prevScene = Application.loadedLevelName;
 
 
+    }
+
+    void OnDestory()
+    {
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
 
 }

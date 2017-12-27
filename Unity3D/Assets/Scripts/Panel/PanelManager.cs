@@ -40,22 +40,24 @@ public class PanelManager : MPPanel
     }
     #endregion
 
-    public PanelManager(MPGame MPGame) : base(MPGame)
+    public PanelManager(MPGame MPGame)
+        : base(MPGame)
     {
+
     }
 
     void Awake()
     {
-        Debug.Log(m_MPGame);
+        EventMaskSwitch.Init();
         if (dictPanelRefs == null) dictPanelRefs = new Dictionary<string, PanelState>();
 
 
         scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
     }
 
-
     void OnEnable()
     {
+        EventMaskSwitch.Resume();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
@@ -72,17 +74,13 @@ public class PanelManager : MPPanel
 
     void Update()
     {
-        //if (!_loadedPanel)                                          // 除錯訊息
-        //    if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-        //        Debug.Log("訊息：" + assetLoader.ReturnMessage);
-        
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Global.ShowMessage("確定要離開遊戲嗎?", Global.MessageBoxType.YesNo);
+            Global.ShowMessage("確定要離開遊戲嗎?", Global.MessageBoxType.YesNo, 0);
             Global.ExitGame();
         }
 
-        if (assetLoader.loadedObj && _loadedPanel)                 // 載入Panel完成時
+        if (m_MPGame.GetAssetLoader().loadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
 
@@ -198,7 +196,7 @@ public class PanelManager : MPPanel
                 panelState.onOff = !panelState.onOff;
                 _lastPanel = panelState.obj;
 
-                EventMaskSwitch.Switch(Panel[5], false);
+                EventMaskSwitch.Switch(Panel[5]);
                 EventMaskSwitch.lastPanel = Panel[5];
 
                 return _lastPanel;
@@ -230,7 +228,7 @@ public class PanelManager : MPPanel
     }
     #endregion
 
-   
+
 
     //private void OnConnect(bool status)
     //{

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Gansol")]
 [assembly: AssemblyProduct("MicePow")]
-[assembly: AssemblyCopyright("Copyright © Gansol 2015")]
+[assembly: AssemblyCopyright("Copyright © Gansol 2018")]
 [assembly: AssemblyTrademark("Gansol")]
 [assembly: AssemblyCulture("")]
 

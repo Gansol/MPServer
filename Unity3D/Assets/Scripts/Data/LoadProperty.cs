@@ -34,7 +34,13 @@ public static class LoadProperty
     }
     #endregion
 
-    #region LoadPrice
+    #region -- LoadPrice 載入價格 --
+    /// <summary>
+    /// 載入價格
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="parent"></param>
+    /// <param name="itemType"></param>
     public static void LoadPrice(GameObject item, GameObject parent, int itemType)
     {
         int i = 0;
@@ -42,15 +48,15 @@ public static class LoadProperty
         {
             var nestedData = mice.Value as Dictionary<string, object>;
             object value;
-            nestedData.TryGetValue("ItemID", out value);
+            nestedData.TryGetValue(StoreProperty.ItemID.ToString(), out value);
 
             if (item.name == value.ToString())
             {
-                nestedData.TryGetValue("ItemType", out value);
+                nestedData.TryGetValue(StoreProperty.ItemType.ToString(), out value);
                 if (itemType == int.Parse(value.ToString()))
                 {
-                    nestedData.TryGetValue("Price", out value);
-                    parent.transform.Find("Price").GetComponent<UILabel>().text = value.ToString();
+                    nestedData.TryGetValue(StoreProperty.Price.ToString(), out value);
+                    parent.transform.Find(StoreProperty.Price.ToString()).GetComponent<UILabel>().text = value.ToString();
                     break;
                 }
             }
@@ -90,34 +96,6 @@ public static class LoadProperty
                 }
             }
         }
-    }
-    #endregion
-
-    #region -- SelectNewData 獲得伺服器新增資料 --
-    /// <summary>
-    /// 獲得伺服器新增資料，排除重複
-    /// </summary>
-    /// <param name="dicServerData">Server Data</param>
-    /// <param name="dicClinetData">Client Data</param>
-    /// <returns></returns>
-    public static Dictionary<string, object> SelectNewData(Dictionary<string, object> dicServerData, Dictionary<string, object> dicClinetData)
-    {
-        var newObject = new Dictionary<string, object>();           // 新資料
-        //var buffer = new Dictionary<string, object>();              // buffer
-
-        foreach (KeyValuePair<string, object> item in dicServerData)
-        {
-            if (!dicClinetData.ContainsValue(item.Value))           // 如果在Clinet找不到Server資料 = 新資料           
-            {
-                newObject.Add(item.Key, item.Value);
-            }                                                       // 如果在Clinet找不到Server資料 且 如果Clinet和Server Key值不相等
-            else if (dicClinetData.ContainsValue(item.Value) && !dicClinetData.ContainsKey(item.Key))
-            {
-                //buffer = dicServerData;
-                Debug.LogError("SelectNewData 還沒寫好 Error!");
-            }
-        }
-        return newObject;
     }
     #endregion
 }

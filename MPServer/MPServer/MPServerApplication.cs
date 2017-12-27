@@ -45,7 +45,7 @@ namespace MPServer
         // 建立peer連線時 取得Client的Protocol、Peer資料 
         protected override PeerBase CreatePeer(InitRequest initRequest) 
         {
-            return new MPServerPeer(initRequest.Protocol, initRequest.PhotonPeer,this);
+            return new MPServerPeer(initRequest, this);
         }
 
         // 伺服器初始化時

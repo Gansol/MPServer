@@ -36,7 +36,7 @@ public class Lighting : SkillItem
         Debug.Log(skillData.SkillName + " Display");
 
         ObjectFactory objFactory = new ObjectFactory();
-        AssetLoader assetLoader = MPGame.Instance.AssetLoader();
+        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
         List<Transform> holeBuffer = new List<Transform>(); // not rnd hole
         List<Transform> rndHole = new List<Transform>(); // ok  rnd hole 

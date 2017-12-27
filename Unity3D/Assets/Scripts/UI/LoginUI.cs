@@ -90,7 +90,7 @@ public class LoginUI : MonoBehaviour
     // 在Start裡建立好Login的回應事件
     void Start()
     {
-        assetLoader = MPGame.Instance.AssetLoader();
+        assetLoader = MPGame.Instance.GetAssetLoader();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;
@@ -200,7 +200,7 @@ public class LoginUI : MonoBehaviour
 
     public void Login(UILabel email, UIInput password)
     {
-        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChkBtn);
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
         LoginPanel.SetActive(false);
         isLoginBtn = true;
         Global.Hash = Encrypt(password.value);
@@ -213,7 +213,7 @@ public class LoginUI : MonoBehaviour
 
     public void OpenJoinPanel(GameObject myPanel, GameObject joinPanel)
     {
-        EventMaskSwitch.Switch(myPanel, true);
+        EventMaskSwitch.Switch(myPanel/*, true*/);
         myPanel.SetActive(false);
         joinPanel.SetActive(true);
     }
@@ -390,7 +390,7 @@ public class LoginUI : MonoBehaviour
         {
             //  ShowMatchGame();
             LoginPanel.SetActive(false);
-            Global.ShowMessage("登入成功！", Global.MessageBoxType.Default);
+            Global.ShowMessage("登入成功！", Global.MessageBoxType.Yes,0);
             //EventMaskSwitch.PrevToFirst();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
@@ -400,7 +400,7 @@ public class LoginUI : MonoBehaviour
             isLoginBtn = false;
             LoginPanel.SetActive(true);
             LoginMessageBox.gameObject.SetActive(true);
-            Global.ShowMessage(message, Global.MessageBoxType.Default);
+            Global.ShowMessage(message, Global.MessageBoxType.Yes,0);
             LoginMessageBox.color = Color.red;
             LoginMessageBox.text = "X  " + message;
         }
@@ -434,7 +434,7 @@ public class LoginUI : MonoBehaviour
 
         if (!isLoginBtn)
         {
-            Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+            Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
             LoginPanel.SetActive(false);
             Debug.Log("Google Logining...");
             isLoginBtn = true;
@@ -464,7 +464,7 @@ public class LoginUI : MonoBehaviour
                     //if (String.IsNullOrEmpty(email))
                     //    email = "example@example.com";
 
-                    Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+                    Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
                     Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
                 }
                 else
@@ -555,7 +555,7 @@ public class LoginUI : MonoBehaviour
         }
 
         LoginPanel.SetActive(false);
-        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
     }
     #endregion
 
@@ -584,7 +584,7 @@ public class LoginUI : MonoBehaviour
     // 加入會員後 再度取得資料並登入
     void OnGetProfile()
     {
-        Global.ShowMessage("登入中...",Global.MessageBoxType.NonChkBtn);
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
         LoginPanel.SetActive(false);
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)

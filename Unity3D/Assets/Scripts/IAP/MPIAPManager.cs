@@ -23,33 +23,33 @@ public class MPIAPManager : MonoBehaviour
             });
     }
 
-    void OnGUI()
-    {
-        if (GUI.Button(new Rect(0, 0, 100, 100), "purchase"))
-        {
-            IabWrapper.purchase("micepow_00000",10001, "PRODUCT_SKU_AND_USER_ID_AND_DATE",
-                delegate(object[] ret)
-                {
-                    if (false == (bool)ret[0])
-                    {
-                        Debug.Log("purchase cancelled");
-                    }
-                    else
-                    {
-                        string purchaseinfo = (string)ret[1];
-                        string signature = (string)ret[2];
-                        IabWrapper.ConsumeInApp(purchaseinfo, signature,
-                            delegate(object[] ret2)
-                            {
-                                if (false == (bool)ret2[0])
-                                {
-                                    Debug.Log("failed to consume product");
-                                }
-                            });
-                    }
-                });
-        }
-    }
+    //void OnGUI()
+    //{
+    //    if (GUI.Button(new Rect(0, 0, 100, 100), "purchase"))
+    //    {
+    //        IabWrapper.purchase("micepow_00000", 10001, "PRODUCT_SKU_AND_USER_ID_AND_DATE",
+    //            delegate(object[] ret)
+    //            {
+    //                if (false == (bool)ret[0])
+    //                {
+    //                    Debug.Log("purchase cancelled");
+    //                }
+    //                else
+    //                {
+    //                    string purchaseinfo = (string)ret[1];
+    //                    string signature = (string)ret[2];
+    //                    IabWrapper.ConsumeInApp(purchaseinfo, signature,
+    //                        delegate(object[] ret2)
+    //                        {
+    //                            if (false == (bool)ret2[0])
+    //                            {
+    //                                Debug.Log("failed to consume product");
+    //                            }
+    //                        });
+    //                }
+    //            });
+    //    }
+    //}
 
     void OnApplicationQuit()
     {

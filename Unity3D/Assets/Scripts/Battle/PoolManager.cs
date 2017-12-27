@@ -77,7 +77,7 @@ public class PoolManager : MonoBehaviour
     {
         Global.photonService.LoadPlayerItem(Global.Account);
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
-        assetLoader = MPGame.Instance.AssetLoader();
+        assetLoader = MPGame.Instance.GetAssetLoader();
         _lastTime = 0;
         _currentTime = 0;
         clearTime = 10;
@@ -192,8 +192,8 @@ public class PoolManager : MonoBehaviour
 
     void Update()
     {
-        if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log("Message:" + assetLoader.ReturnMessage /*+ "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount*/);
+        //if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log("Message:" + assetLoader.ReturnMessage /*+ "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount*/);
 
         if (assetLoader.loadedObj && !_poolingFlag)
         {
@@ -202,13 +202,13 @@ public class PoolManager : MonoBehaviour
 
             //_dictMiceObject.Add(10003, "Bali");
             InstantiateObject(_dictMiceObject);
-            Debug.Log("Instantiate Mice Completed!");
+           // Debug.Log("Instantiate Mice Completed!");
             InstantiateObject(_dictSpecialObject);
-            Debug.Log("Instantiate SpecialMice Completed!");
+          //  Debug.Log("Instantiate SpecialMice Completed!");
             InstantiateSkillMice(_dictSkillMice);
           //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
             _poolingFlag = true;
-            Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
+          //  Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
 
             Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.Select(x=>(x).ToString()).ToArray());
         }

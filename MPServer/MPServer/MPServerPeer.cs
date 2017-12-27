@@ -29,11 +29,11 @@ using MPCOM;
 
 namespace MPServer
 {
-    public class MPServerPeer : PeerBase
+    public class MPServerPeer : MPClientPeer
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         public Guid peerGuid { get; protected set; }
-        private MPServerApplication _server;
+        
         private bool isCreateRoom;
         // private int roomID;
         //private int primaryID;
@@ -52,15 +52,16 @@ namespace MPServer
         private static readonly int GameTime = 180;
         private static readonly int maxNumPlayer = 2;
         //初始化
-        public MPServerPeer(IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication)
-            : base(rpcProtocol, nativePeer)
+        public MPServerPeer(InitRequest initRequest, MPServerApplication serverApplication)
+            : base(initRequest, serverApplication)
         {
-
+            
+           // IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication
 
             isCreateRoom = false;
             peerGuid = Guid.NewGuid();      // 建立一個Client唯一識別GUID
-            _server = ServerApplication;
-
+         //   _server = ServerApplication;
+           
             _server.Actors.AddConnectedPeer(peerGuid, this);    // 加入連線中的peer列表
 
             battleUI = new BattleUI();
@@ -2075,8 +2076,8 @@ namespace MPServer
 
                                     if (otherActor.Account != account)
                                     {
-                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, nickname } };
-                                        OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.InviteFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "加入好友時，取得對方玩家成功!" }; ;
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MemberParameterCode.Friends, nickname }, { (byte)MemberParameterCode.Account, account } };
+                                        OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.InviteFriend, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = "已成為你的好友囉!" }; ;
                                         otherPeer.SendOperationResponse(response, new SendParameters());
                                     }
                                     else
@@ -2089,7 +2090,7 @@ namespace MPServer
                                 else
                                 {
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
-                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, new Dictionary<byte, object>()) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = "加入好友時，取得玩家資料失敗!" };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, new Dictionary<byte, object>()) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = "玩家不再線上哦~可能輸入了錯誤的名稱~" };
                                     SendOperationResponse(actorResponse, new SendParameters());
                                 }
 
@@ -2176,7 +2177,7 @@ namespace MPServer
 
                         #region RemoveFriend 移除好友 還沒寫好
                         case (byte)PlayerDataOperationCode.RemoveFriend:
-                            {//目前移除好友 只能在玩家線上時移除
+                            {
                                 string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                 string friendAccount = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Friend];
                                 PlayerData otherPlayerData, playerData;
@@ -2184,8 +2185,12 @@ namespace MPServer
                                 Dictionary<string, object> otherActorState = new Dictionary<string, object>();
                                 Actor actor, otherActor, friendActor;
 
+                                Log.Debug("account: " + account);
+                                
+
                                 playerData = otherPlayerData = new PlayerData();
                                 actor = _server.Actors.GetActorFromAccount(account);
+                                Log.Debug("actor: " + actor.Account);
                                 otherActor = _server.Actors.GetActorFromAccount(friendAccount);
                                 playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Friend" }));
 
@@ -2198,16 +2203,18 @@ namespace MPServer
                                     // 移除對方版本
                                     if (otherActor != null)    // 如果對放在線上 直接移除
                                     {
+                                        Log.Debug("otherActor.guid: " + otherActor.guid + "  otherActor.Account: " + otherActor.Account);
                                         MPServerPeer otherPeer = _server.Actors.GetPeerFromGuid(otherActor.guid);
                                         otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.RemoveFriend(otherActor.Account, actor.Account));
 
                                         if (otherPlayerData.ReturnCode == "S440")
                                         {
-                                            otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(account, new string[] { "Friend" }));
+                                            Log.Debug("otherPlayerData.ReturnCode == S440");
+                                            otherPlayerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerData(otherActor.Account, new string[] { "Friend" }));
                                             if (otherPlayerData.ReturnCode == "S436")
                                             {
+                                                Log.Debug("otherPlayerData.ReturnCode == S436   " + otherPlayerData.ReturnMessage + "  Friends: " + otherPlayerData.Friends);
                                                 string[] friends = otherPlayerData.Friends.Split(',').ToArray();
-
                                                 if (!string.IsNullOrEmpty(otherPlayerData.Friends))
                                                 {
                                                     foreach (string player in friends)
@@ -2218,6 +2225,7 @@ namespace MPServer
                                                 }
                                                 else
                                                 {
+                                                    Log.Debug("FUCK");
                                                     otherPlayerData.Friends = "";
                                                 }
                                                 // 取得詳細資料後 互傳給對方自己的資料

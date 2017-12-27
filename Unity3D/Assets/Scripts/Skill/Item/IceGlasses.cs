@@ -52,7 +52,7 @@ public class IceGlasses : SkillItem
     public override void Display()
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = MPGame.Instance.AssetLoader();
+        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
         ObjectFactory objFactory = new ObjectFactory();
 
@@ -62,7 +62,7 @@ public class IceGlasses : SkillItem
         tap = bundle.GetComponent<TapBorad>();
         effects.Add(bundle);
         effects[0].GetComponent<Animator>().Play("Effect1");
-        EventMaskSwitch.Switch(bundle, false);
+        EventMaskSwitch.Switch(bundle/*, false*/);
         m_StartTime = Time.time;
     }
 }

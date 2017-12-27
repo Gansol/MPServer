@@ -21,7 +21,7 @@ using MiniJSON;
 public abstract class MPPanel : MonoBehaviour
 {
     protected static AssetLoader assetLoader;
-    protected MPGame m_MPGame;
+    protected static MPGame m_MPGame;
     public static GameObject _lastEmptyItemGroup;
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
     private GameObject _tmpActor, _clone;
@@ -29,8 +29,7 @@ public abstract class MPPanel : MonoBehaviour
     public MPPanel(MPGame MPGame)
     {
         m_MPGame = MPGame;
-        assetLoader = m_MPGame.AssetLoader();
-        Debug.Log(assetLoader.name);
+        assetLoader = m_MPGame.GetAssetLoader();
     }
 
     #region -- LoadActor 載入老鼠角色 --
@@ -100,7 +99,7 @@ public abstract class MPPanel : MonoBehaviour
     public virtual Dictionary<string, GameObject> InstantiateItemBG(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
         if (itemType != -1)
-            itemData = MPGFactory.GetObjFactory().GetItemInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+            itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, itemType);     // 取得對應道具類別資料
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
@@ -272,12 +271,14 @@ public abstract class MPPanel : MonoBehaviour
     }
     #endregion
 
-    // 復原視窗焦點
+    /// <summary>
+    /// 復原視窗焦點
+    /// </summary>
     protected void ResumeToggleTarget()
     {
         EventMaskSwitch.Resume();
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-        EventMaskSwitch.Switch(gameObject, false);
+        EventMaskSwitch.Switch(gameObject);
         EventMaskSwitch.lastPanel = gameObject;
     }
 

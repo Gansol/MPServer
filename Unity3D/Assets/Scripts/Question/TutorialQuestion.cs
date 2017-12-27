@@ -33,7 +33,7 @@ public class TutorialQuestion : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         EventMaskSwitch.Resume();
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
-        EventMaskSwitch.Switch(gameObject, false);
+        EventMaskSwitch.Switch(gameObject/*, false*/);
         EventMaskSwitch.lastPanel = gameObject;
     }
 }

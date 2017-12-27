@@ -50,7 +50,7 @@ public class BattleHUD : MonoBehaviour
     {
         WaitObject.transform.gameObject.SetActive(true);
         battleManager = GetComponent<BattleManager>();
-        assetLoader = MPGame.Instance.AssetLoader();
+        assetLoader = MPGame.Instance.GetAssetLoader();
         objFactory = new ObjectFactory();
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;

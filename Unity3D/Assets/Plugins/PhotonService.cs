@@ -86,10 +86,6 @@ public class PhotonService : IPhotonPeerListener
     public event UpdateCurrencyHandler UpdateCurrencyEvent;
 
     //委派事件 ShowMessage
-    public delegate void ShowMessageHandler(string message, Global.MessageBoxType messageBoxType);
-    public event ShowMessageHandler ShowMessageEvent;
-
-    //委派事件 ShowMessage
     public delegate void LoadDataHandler();
     public event LoadDataHandler LoadPlayerDataEvent;
     public event LoadDataHandler LoadStoreDataEvent;
@@ -109,8 +105,8 @@ public class PhotonService : IPhotonPeerListener
     public event ActorStateHandler GetOnlineActorStateEvent;
 
     public delegate void UpdateValueHandler(short value);
-     public event UpdateValueHandler UpdateLifeEvent;
-     public event UpdateValueHandler GetLifeEvent;
+    public event UpdateValueHandler UpdateLifeEvent;
+    public event UpdateValueHandler GetLifeEvent;
 
     public class PlayerItemData
     {
@@ -192,7 +188,7 @@ public class PhotonService : IPhotonPeerListener
     void IPhotonPeerListener.DebugReturn(DebugLevel level, string message)
     {
         //Debug.Log("伺服器關閉重啟中！");
-        ShowMessageEvent("伺服器重啟中，等待自動連線！", 0);
+        Global.ShowMessage("伺服器重啟中，等待自動連線！", Global.MessageBoxType.Yes, 0);
         //  throw new NotImplementedException();
     }
 
@@ -205,7 +201,7 @@ public class PhotonService : IPhotonPeerListener
             // 重複登入
             case (byte)LoginOperationCode.ReLogin:
                 ReLoginEvent();
-                ShowMessageEvent("重複登入，請重新登入！", 0);
+                Global.ShowMessage("重複登入，請重新登入！", Global.MessageBoxType.Yes, 0);
                 break;
 
             // 配對成功 傳入 房間ID、對手資料、老鼠資料
@@ -216,7 +212,7 @@ public class PhotonService : IPhotonPeerListener
                 Global.OpponentData.Team = Json.Deserialize((string)eventResponse.Parameters[(byte)MatchGameParameterCode.Team]) as Dictionary<string, object>;
                 Global.OpponentData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
                 Global.OpponentData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
-                Global.nextScene = (int)Global.Scene.Battle;
+                Global.nextScene = Global.Scene.Battle;
                 ExitWaitingRoom();
                 LoadSceneEvent();
                 break;
@@ -237,7 +233,7 @@ public class PhotonService : IPhotonPeerListener
                 break;
             // 被踢出房間了
             case (byte)BattleResponseCode.KickOther:
-                Global.nextScene = (int)Global.Scene.MainGame;
+                Global.nextScene = Global.Scene.MainGame;
                 LoadSceneEvent();
                 Global.isGameStart = false;
                 Global.isMatching = false;
@@ -248,7 +244,7 @@ public class PhotonService : IPhotonPeerListener
             case (byte)BattleResponseCode.Offline:
                 if (Global.isGameStart)
                 {
-                    Global.nextScene = (int)Global.Scene.MainGame;
+                    Global.nextScene = Global.Scene.MainGame;
                     LoadSceneEvent();
                     Global.isGameStart = false;
                     Global.isMatching = false;
@@ -324,7 +320,7 @@ public class PhotonService : IPhotonPeerListener
             case (byte)MatchGameResponseCode.InviteMatchGame:
                 Global.OpponentData.Account = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.OtherAccount];
                 Global.OpponentData.Nickname = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.Nickname];
-                Global.ShowMessage(Global.OpponentData.Nickname + " 邀請對戰", Global.MessageBoxType.YesNo);
+                Global.ShowMessage(Global.OpponentData.Nickname + " 邀請對戰", Global.MessageBoxType.YesNo, 0);
                 InviteMatchGameEvent(Global.OpponentData.Account);
                 break;
 
@@ -389,7 +385,7 @@ public class PhotonService : IPhotonPeerListener
                     //{
                     if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                     {
-                        Debug.Log("login:" + operationResponse.ReturnCode + "   " + operationResponse.DebugMessage);
+//                        Debug.Log("login:" + operationResponse.ReturnCode + "   " + operationResponse.DebugMessage);
                         Global.Ret = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
                         Global.Account = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
                         Global.Nickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
@@ -401,6 +397,7 @@ public class PhotonService : IPhotonPeerListener
                         Global.LoginStatus = true;
 
                         Global.photonService.LoadPlayerData(Global.Account);
+                        Global.photonService.LoadCurrency(Global.Account);
                         Global.photonService.LoadMiceData();
                         Global.photonService.LoadSkillData();
 
@@ -458,7 +455,7 @@ public class PhotonService : IPhotonPeerListener
                     {
                         Global.isGameStart = false;
                         Global.isMatching = false;
-                        Global.nextScene = (int)Global.Scene.MainGame;
+                        Global.nextScene = Global.Scene.MainGame;
                         LoadSceneEvent();
                         Debug.Log("房間資訊：" + operationResponse.DebugMessage.ToString());
                     }
@@ -529,15 +526,10 @@ public class PhotonService : IPhotonPeerListener
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>;
                             Global.dictTeam = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
                             Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
-
-                            string friends = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend];
-                            if (!string.IsNullOrEmpty(friends)) Global.dictFriends = friends.Split(',').ToList();
-                            Global.dictFriends.Sort();
                             Global.PlayerImage = Convert.ToString(operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage]);
-                            Global.photonService.LoadCurrency(Global.Account);      // 載入玩家資料時一起載入貨幣資料
-                            //Debug.Log("!!!!!!!!!!!!!!!!!!!!!!!!!!!Team"+Global.dictTeam.Count);
-                            //Debug.Log("OperationCode:" + operationResponse.OperationCode + "  Message:" + (string)operationResponse.DebugMessage);
 
+                            if (operationResponse.Parameters.ContainsKey((byte)MemberParameterCode.Friends))
+                                FriendsChk((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]);
 
 
                             Global.isPlayerDataLoaded = true;
@@ -564,7 +556,7 @@ public class PhotonService : IPhotonPeerListener
                         {
                             string playerItem = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem];
                             //Global.playerItem = convertUtility.Json2Array(playerItem);
-                            Debug.Log("Server Response : LoadPlayerItem");
+//                            Debug.Log("Server Response : LoadPlayerItem");
 
                             Global.playerItem = Json.Deserialize(playerItem) as Dictionary<string, object>;
                             LoadPlayerItemEvent();
@@ -620,14 +612,11 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
+                            //     Global.dictOnlineFriendsDetail.Clear();
                             if (operationResponse.Parameters.Count > 0)
                             {
                                 string firends = (string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail];
                                 Global.dictOnlineFriendsDetail = Json.Deserialize(firends) as Dictionary<string, object>;
-                            }
-                            else
-                            {
-                                Global.dictOnlineFriendsDetail.Clear();
                             }
                             LoadFriendsDataEvent();
                         }
@@ -655,6 +644,7 @@ public class PhotonService : IPhotonPeerListener
                                 Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             else
                                 Global.dictOnlineFriendsState.Clear();
+
                             GetOnlineActorStateEvent();
                         }
 
@@ -677,13 +667,18 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
+                            string account = (string)operationResponse.Parameters[(byte)MemberParameterCode.Account];
                             string nickname = (string)operationResponse.Parameters[(byte)MemberParameterCode.Friends];
-                            Global.ShowMessage(nickname + " 想成為你的好友!", Global.MessageBoxType.YesNo);
-                            InviteFriendEvent(nickname);
+
+                            if (!Global.dictFriends.Contains(account))
+                            {
+                                Global.ShowMessage(nickname + " 想成為你的好友!", Global.MessageBoxType.YesNo, 0);
+                                InviteFriendEvent(nickname);
+                            }
                         }
                         else
                         {
-                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Default);
+                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Yes, 0);
                         }
                         Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
                     }
@@ -704,12 +699,13 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
-                            Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
-                            Global.dictFriends.Sort();
+                            if (operationResponse.Parameters.ContainsKey((byte)MemberParameterCode.Friends))
+                                FriendsChk((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]);
                             Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             ApplyInviteFriendEvent();
                         }
+
                         Debug.Log("資訊：" + operationResponse.ReturnCode + " " + operationResponse.DebugMessage.ToString());
                     }
                     catch (Exception e)
@@ -729,15 +725,16 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (byte)ErrorCode.Ok)
                         {
-                            Global.dictFriends = ((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]).Split(',').ToList();
-                            Global.dictFriends.Sort();
+                            if (operationResponse.Parameters.ContainsKey((byte)MemberParameterCode.Friends))
+                                FriendsChk((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]);
+
                             Global.dictOnlineFriendsDetail = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsDetail]) as Dictionary<string, object>;
                             Global.dictOnlineFriendsState = Json.Deserialize((string)operationResponse.Parameters[(byte)MemberParameterCode.OnlineFriendsState]) as Dictionary<string, object>;
                             RemoveFriendEvent();
                         }
                         else
                         {
-                            Global.ShowMessage(operationResponse.DebugMessage, 0);
+                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Yes, 0);
                         }
                         Debug.Log("資訊：" + operationResponse.DebugMessage.ToString());
                     }
@@ -782,6 +779,7 @@ public class PhotonService : IPhotonPeerListener
 
             case (byte)CurrencyResponseCode.Loaded: // 取得貨幣資料
                 {
+                    //    Debug.Log("CurrencyResponseCode: " + (byte)CurrencyResponseCode.Loaded);
                     try
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
@@ -828,7 +826,7 @@ public class PhotonService : IPhotonPeerListener
                         Global.dictSkills = Json.Deserialize(skillData) as Dictionary<string, object>;
                         //Global.MiceProperty[] playerItemData = JsonConvert.DeserializeObject<Global.MiceProperty[]>(miceData);
                         Global.isLoadedSkill = true;
-                        Debug.Log("Loaded Skills");
+                        //                        Debug.Log("Loaded Skills");
 
                         //foreach (KeyValuePair<string, object> item in Global.dictSkills)
                         //{
@@ -866,13 +864,20 @@ public class PhotonService : IPhotonPeerListener
 
             case (byte)ItemResponseCode.LoadItem:   // 取得道具屬性資料
                 {
-                    Debug.Log("Server Response : LoadItem");
-                    if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                    //                    Debug.Log("Server Response : LoadItem");
+                    try
                     {
-                        string itemData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
-                        Global.itemProperty = Json.Deserialize(itemData) as Dictionary<string, object>;
-                        Global.isItemLoaded = true;
-                        LoadItemDataEvent();
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            string itemData = (string)operationResponse.Parameters[(byte)ItemParameterCode.ItemData];
+                            Global.itemProperty = Json.Deserialize(itemData) as Dictionary<string, object>;
+                            Global.isItemLoaded = true;
+                            LoadItemDataEvent();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e);
                     }
                 }
                 break;
@@ -1174,11 +1179,11 @@ public class PhotonService : IPhotonPeerListener
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
                             Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>; ;
                             UpdateCurrencyEvent();
-                            ShowMessageEvent("購買完成！", 0);
+                            Global.ShowMessage("購買完成！", Global.MessageBoxType.Yes, 3);
                         }
                         else
                         {
-                            ShowMessageEvent(operationResponse.DebugMessage, 0);
+                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Yes, 0);
                             Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
                         }
                     }
@@ -1212,11 +1217,7 @@ public class PhotonService : IPhotonPeerListener
                         Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
 
-                        Debug.Log("GameOver Score:" + score);
-                        Debug.Log("GameOver ExpReward:" + expReward);
-                        Debug.Log("GameOver SliverReward:" + sliverReward);
-                        Debug.Log("GameOver SliverReward:" + jItemReward);
-                        Debug.Log("RECIVE GameOver !");
+                           Debug.Log("RECIVE GameOver ! :" + "   Score:" + score+"   ExpReward:" + expReward+"   SliverReward:" + sliverReward+"   SliverReward:" + jItemReward);
 
                         GameOverEvent(score, maxScore, maxCombo, expReward, sliverReward, goldReward, jItemReward, evaluate, battleResult);
                     }
@@ -1260,7 +1261,7 @@ public class PhotonService : IPhotonPeerListener
     /// </summary>
     public void Login(string Account, string Password, MemberType memberType)
     {
-        Debug.Log("memberType:" + (byte)memberType);
+//        Debug.Log("memberType:" + (byte)memberType);
         try
         {
             if (Global.photonService.isConnected)
@@ -1940,10 +1941,10 @@ public class PhotonService : IPhotonPeerListener
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID },{ (byte)BattleParameterCode.RoomID, Global.RoomID },{ (byte)BattleParameterCode.Life, life },{ (byte)BattleParameterCode.CustomValue, bSetDefaultLife }};
-         
+
             this.peer.OpCustom((byte)BattleOperationCode.UpdateLife, parameter, true, 0, false); // operationCode is RoomSpeak
         }
-        catch 
+        catch
         {
             throw;
         }
@@ -2075,10 +2076,10 @@ public class PhotonService : IPhotonPeerListener
     /// <param name="itemAmount">使用的道具數量</param>
     public void GameOver(Int16 gameScore, Int16 otherScore, Int16 gameTime, Int16 maxCombo, int killMice, int lostMice, Int16 spawnCount, string jMicesUseCount, string jItemsUseCount, string[] columns)
     {
-        Debug.Log(gameScore + " " + otherScore + " " + gameTime + " " + maxCombo + " " + killMice + " " + lostMice + " " + spawnCount);
+//        Debug.Log(gameScore + " " + otherScore + " " + gameTime + " " + maxCombo + " " + killMice + " " + lostMice + " " + spawnCount);
         try
         {
-            Debug.Log("Send GameOver:" + Global.dictSortedItem);
+         //   Debug.Log("Send GameOver:" + Global.dictSortedItem);
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, Global.Account },{ (byte)LoginParameterCode.PrimaryID, Global.PrimaryID },
             { (byte)BattleParameterCode.Score, gameScore },{ (byte)BattleParameterCode.OtherScore, otherScore },
@@ -2104,16 +2105,15 @@ public class PhotonService : IPhotonPeerListener
     /// <summary>
     /// 購買商品
     /// </summary>
-    public void BuyItem(string account, string[] goods)
+    public void BuyItem(string account, Dictionary<string,string> goods)
     {
-        Debug.Log(goods[0] + " " + goods[1] + " " + goods[2] + " " + goods[3]);
         try
         {
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Json.Serialize(Global.dictMiceAll) },
-            { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[0])},{ (byte)StoreParameterCode.ItemName,goods[1]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[2])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[3])},
-            { (byte)StoreParameterCode.BuyCount,Int16.Parse(goods[4])}};
+            { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[StoreParameterCode.ItemID.ToString()])},{ (byte)StoreParameterCode.ItemName,goods[StoreParameterCode.ItemName.ToString()]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[StoreParameterCode.ItemType.ToString()])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[StoreParameterCode.CurrencyType.ToString()])},
+            { (byte)StoreParameterCode.BuyCount,Int16.Parse(goods[StoreParameterCode.BuyCount.ToString()])}};
             this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
@@ -2193,7 +2193,7 @@ public class PhotonService : IPhotonPeerListener
     {
         try
         {
-            Debug.Log("IN SendRoomMice: " + roomMice.Length);
+//            Debug.Log("IN SendRoomMice: " + roomMice.Length);
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
             this.peer.OpCustom((byte)BattleOperationCode.RoomMice, parameter, true, 0, true); // operationCode is RoomSpeak
@@ -2315,4 +2315,14 @@ public class PhotonService : IPhotonPeerListener
     }
     #endregion
 
+
+
+    private void FriendsChk(string friendString)
+    {
+        string friends = (!string.IsNullOrEmpty(friendString)) ? friendString : "";
+
+        Global.dictFriends.Clear();
+        if (!string.IsNullOrEmpty(friends)) Global.dictFriends = friends.Split(',').ToList();
+        Global.dictFriends.Sort();
+    }
 }

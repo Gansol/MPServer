@@ -35,7 +35,7 @@ public class MPGame {
         m_MessageManager = new MessageManager(this);
         m_AssetLoader = gameLoop.GetComponent<AssetLoader>();
         m_MPPanel = new PanelManager(this);
-        Debug.Log(m_AssetLoader);
+//        Debug.Log(m_AssetLoader);
 
 //        MPFactory m_MPFactory = new MPFactory(this);
     }
@@ -58,7 +58,7 @@ public class MPGame {
     }
 
 
-    public AssetLoader AssetLoader()
+    public AssetLoader GetAssetLoader()
     {
         if (m_AssetLoader == null)
             m_AssetLoader = m_StartCoroutine.GetComponent<AssetLoader>();
