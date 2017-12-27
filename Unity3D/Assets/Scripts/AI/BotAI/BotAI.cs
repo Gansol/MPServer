@@ -10,7 +10,7 @@ public class BotAI
     private float lastAITime, lastBossHitTime, lastSkillTime, skillStartOffset, hitIntervalTime, skillIntervalTime, _lastGameTime;
     private int hitTimes, botLevel;
 
-    private List<int> skillMiceIDs, skillItemIDs;
+    private List<int> _skillMiceIDs, _skillItemIDs;
     //public void init(BattleManager battleManager)
     //{
     //    this.battleManager = battleManager;
@@ -23,37 +23,24 @@ public class BotAI
 
     public BotAI(List<int> skillMiceIDs)
     {
-
+        rnd = new System.Random();
         lastAITime = lastBossHitTime = lastSkillTime = 0;
-        hitIntervalTime = 1;
+        hitIntervalTime = .5f;
         skillIntervalTime = 10;
         skillStartOffset = 10;
         botLevel = 1;
-        hitTimes = 3;
+        hitTimes = 5;//3
 
-        this.skillItemIDs = new List<int>();
+        _skillItemIDs = new List<int>();
 
         foreach (int miceID in skillMiceIDs)
         {
             object value;
-            //Global.miceProperty.TryGetValue(miceID.ToString(), out value);
-
-            //Dictionary<string,object> prop = value as Dictionary<string,object>;
-
             value = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", miceID.ToString());
-            this.skillItemIDs.Add(int.Parse(value.ToString()));
-
+            _skillItemIDs.Add(int.Parse(value.ToString()));
         }
 
-
-        this.skillMiceIDs = skillMiceIDs;
-        this.skillItemIDs = skillItemIDs;
-
-        rnd = new System.Random();
-
-
-
-
+        _skillMiceIDs = skillMiceIDs;
 
         //Global.dictBattleMice;
         // get battle mice
@@ -72,16 +59,18 @@ public class BotAI
     // Update is called once per frame
     public void UpdateAI()
     {
-        if (Global.isGameStart && Global.dictBattleMice.Count > 0 && Time.time > lastAITime)
+        if (Global.isGameStart && Global.dictBattleMice.Count > 0 && Time.fixedTime > lastAITime)
         {
             lastAITime += hitIntervalTime * botLevel;
 
             HitAI();
             SkillAI();
+
+            Debug.Log("Time: " + Time.fixedTime + "  Last AI Time:" + lastAITime);
         }
         if (!Global.isGameStart)
         {
-            _lastGameTime = Time.time;
+            _lastGameTime = Time.fixedTime;
         }
     }
 
@@ -101,26 +90,30 @@ public class BotAI
             int value = rnd.Next(keys.Count);
             if (Global.dictBattleMice.ContainsKey(keys[value]) != null)
             {
-                if (buffer[keys[value]].GetComponent<MiceBossBase>() != null && lastBossHitTime > Time.time)
-                {
-                    lastBossHitTime = hitIntervalTime / 2 + Time.time;
-                }
-                else
-                {
-                    if (buffer[keys[value]].GetComponent<Bali>())
-                    {
-                        if (Random.Range(0, 100 + 1) == 100)
-                        {
-                            buffer[keys[value]].SendMessage("OnHit");
-                            Debug.Log("Hit Bali");
-                        }
+                //if (buffer[keys[value]].GetComponent<MiceBossBase>() != null && lastBossHitTime > Time.fixedTime)
+                //{
+                //    lastBossHitTime = hitIntervalTime / 2 + Time.fixedTime;
+                //}
+                //else
+                //{
+                    //if (buffer[keys[value]].GetComponent<Bali>())
+                    //{
+                    //    if (Random.Range(0, 1000 + 1) == 1000 || Random.Range(0, 1000 + 1) == 87)
+                    //    {
+                    //        buffer[keys[value]].SendMessage("OnHit");
+                    //        Debug.Log("Hit Bali");
+                    //    }
 
-                    }
-                    else
+                    //}
+                    //else
+                    //{
+                    if (!buffer[keys[value]].GetComponent<Bali>())
                     {
                         buffer[keys[value]].SendMessage("OnHit");
+                        Debug.Log("Hit!:" + buffer[keys[value]].name);
                     }
-                }
+                 //   }
+                //}
             }
         }
     }
@@ -133,11 +126,11 @@ public class BotAI
         if (Time.time > _lastGameTime + skillStartOffset)
         {
 
-            if (lastSkillTime % 10 == 0)
+            if (lastSkillTime % 20 == 0)
             {
                 lastSkillTime += skillIntervalTime;
-                id = System.Convert.ToInt16(rnd.Next(0, skillMiceIDs.Count + 1));
-                id = System.Convert.ToInt16(skillMiceIDs[id].ToString());
+                id = System.Convert.ToInt16(rnd.Next(0, _skillMiceIDs.Count + 1));
+                id = System.Convert.ToInt16(_skillMiceIDs[id].ToString());
                 if (Global.miceProperty.ContainsKey(id.ToString()))
                 {
                     prop = Global.miceProperty[id.ToString()] as Dictionary<string, object>;
@@ -153,8 +146,8 @@ public class BotAI
             {
                 lastSkillTime += skillIntervalTime;
 
-                id = System.Convert.ToInt16(rnd.Next(0, skillItemIDs.Count + 1));
-                id = System.Convert.ToInt16(skillItemIDs[id].ToString());
+                id = System.Convert.ToInt16(rnd.Next(0, _skillItemIDs.Count + 1));
+                id = System.Convert.ToInt16(_skillItemIDs[id].ToString());
                 id = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "SkillID", id.ToString()));
 
                 prop = Global.dictSkills[id.ToString()] as Dictionary<string, object>;

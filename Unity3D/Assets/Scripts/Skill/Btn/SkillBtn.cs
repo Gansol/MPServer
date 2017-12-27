@@ -38,7 +38,7 @@ public class SkillBtn : MonoBehaviour
         _skillID = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "SkillID", _itemID.ToString()));
         _skillType = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.dictSkills, "SkillType", _skillID.ToString()));
         _cost = System.Convert.ToByte(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "MiceCost", miceID.ToString()));
-        Debug.Log("ItemID:" + _itemID + "  " + _itemCount);
+        Debug.Log("ItemID:" + _itemID + "  " + _itemCount +"這還沒寫好 進入對戰時 道具不足要顯示黑的");
         //if(energyValue=4)
         sprite = transform.parent.Find("SkillBg").GetChild(_energyValue).GetComponent<UISprite>();
     }
@@ -49,7 +49,7 @@ public class SkillBtn : MonoBehaviour
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
         label.text = _useTimes.ToString() + " / " + _skillTimes.ToString();
 
-        Debug.Log("**************************Item Name*************************:" + transform.GetChild(2).gameObject.name);
+//        Debug.Log("**************************Item Name*************************:" + transform.GetChild(2).gameObject.name);
     }
 
     // Update is called once per frame

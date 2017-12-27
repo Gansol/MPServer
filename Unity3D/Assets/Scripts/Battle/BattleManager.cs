@@ -66,7 +66,7 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         Debug.Log("-------Battle Start-------");
-
+        EventMaskSwitch.Init();
         FindHole();
 
         poolManager = GetComponent<PoolManager>();
@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
         spawnAI = new SpawnAI(this, hole);
         SetSpawnState(new EasyBattleAIState());
         playerAIState = new PlayerAIState(this);
-        MPGame.Instance.GetMessageManager().messagePanel = transform.Find("Message(Panel)");
+      //  MPGame.Instance.GetMessageManager().messagePanel = transform.Find("Message(Panel)");
 
         dictMiceUseCount = new Dictionary<string, Dictionary<string, object>>();
         dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
@@ -124,7 +124,7 @@ public class BattleManager : MonoBehaviour
         {
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-            Debug.Log(short.Parse(key).ToString());
+         //   Debug.Log(short.Parse(key).ToString());
             dictMiceUseCount.Add(key, data);
 
 
@@ -132,7 +132,7 @@ public class BattleManager : MonoBehaviour
             string _itemID = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", key));
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-            Debug.Log(short.Parse(_itemID).ToString());
+         //   Debug.Log(short.Parse(_itemID).ToString());
             dictItemUseCount.Add(_itemID, data);
         }
 
@@ -143,7 +143,7 @@ public class BattleManager : MonoBehaviour
         {
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-            Debug.Log(short.Parse(key).ToString());
+//            Debug.Log(short.Parse(key).ToString());
             dictItemUseCount.Add(key, data);
         }
     }
@@ -230,9 +230,9 @@ public class BattleManager : MonoBehaviour
                 columns.Add("ItemCount");
                 string jMicesUseCount = MiniJSON.Json.Serialize(dictMiceUseCount);
                 string jItemsUseCount = MiniJSON.Json.Serialize(dictItemUseCount);
-                Debug.Log("jMicesUseCount:" + jMicesUseCount + "jItemsUseCount:" + jItemsUseCount + "  _maxCombo:" + _maxCombo);
+
                 Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short)_elapsedGameTime, _maxCombo, _killMice, _lostMice, spawnCount, jMicesUseCount, jItemsUseCount, columns.ToArray());
-                Debug.Log("GameOver Time!" + _elapsedGameTime);
+                Debug.Log("GameOver Time! " + _elapsedGameTime + "    jMicesUseCount:" + jMicesUseCount + "jItemsUseCount:" + jItemsUseCount + "  _maxCombo:" + _maxCombo);
             }
         }
     }

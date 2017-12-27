@@ -34,6 +34,7 @@
         PromotionsTime = 6,
         LimitTime = 7,
         BuyCount = 8,
+        Description =9,
     }
 
     public enum StoreType

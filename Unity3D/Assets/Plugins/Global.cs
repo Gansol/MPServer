@@ -70,7 +70,7 @@ public static class Global
     public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務
 
-    public delegate void ShowMessageHandler(string message, MessageBoxType messageBoxType);
+    public delegate void ShowMessageHandler(string message, string MessageBoxType, int prevMask);
     public static event ShowMessageHandler ShowMessageEvent;
 
     public static readonly string patchFile = "patch.txt"; // 資源版本
@@ -110,8 +110,8 @@ public static class Global
     public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
     public static bool exitingGame = false;         // 是否執行任務
-    public static int prevScene = (int)Scene.LogoScene;  // 上一個場景
-    public static int nextScene = (int)Scene.BundleCheck;  // 要被載入的場景
+    public static string prevScene = Scene.LogoScene;  // 上一個場景
+    public static string nextScene = Scene.BundleCheck;  // 要被載入的場景
     public static int extIconLength = 4;            // 圖片名稱(副檔)長度
     public static int maxConnTimes = 5;                         // 重新連限次數
     public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
@@ -159,7 +159,8 @@ public static class Global
     public static Dictionary<string, object> miceProperty = new Dictionary<string, object>();                   // 老鼠屬性資料 
     public static Dictionary<string, object> itemProperty = new Dictionary<string, object>();                   // 道具屬性資料 
     public static Dictionary<string, object> storeItem = new Dictionary<string, object>();                      // 商店屬性資料 
-    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 商店屬性資料 
+    public static Dictionary<string, object> gashaponItem = new Dictionary<string, object>();                      // 轉蛋屬性資料 
+    public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 玩家道具屬性資料 
     public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
     public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
     public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
@@ -173,16 +174,23 @@ public static class Global
     public delegate void ExitGameHandler();
     public static event ExitGameHandler ExitGameEvent;
 
-    public enum MessageBoxType
+    public class MessageBoxType
     {
-        NonChkBtn = -1,
-        Default,
-        YesNo,
+        public const string NonChk = "MsgBox_NonChk";
+        public const string Yes = "MsgBox_Yes";
+        public const string YesNo = "MsgBox_YesNo";
+        public const string SystemCrash = "MsgBox_Yes";
     }
 
-    public static void ShowMessage(string message, MessageBoxType messageBoxType)
+    /// <summary>
+    /// 顯示訊息視窗
+    /// </summary>
+    /// <param name="message">訊息</param>
+    /// <param name="MessageBoxType">訊息視窗類型</param>
+    /// <param name="prevMask">返回事件遮罩級數</param>
+    public static void ShowMessage(string message, string MessageBoxType, int prevMask)
     {
-        ShowMessageEvent(message, messageBoxType);
+        ShowMessageEvent(message, MessageBoxType, prevMask);
     }
 
     public static void ExitGame()
@@ -219,13 +227,18 @@ public static class Global
         int miceCost { get; set; }
     }
     */
-    public enum Scene : int
+    public class Scene
     {
-        LogoScene = 0,
-        BundleCheck = 1,
-        MainGame = 2,
-        Battle = 3,
-        LoadScene = 4,
+        public const string LogoScene = "LogoScene";
+        public const string BundleCheck = "BundleCheck";
+        public const string MainGame = "MainGame";
+        public const string Battle = "Battle";
+        public const string LoadScene = "LoadScene";
+
+
+
+        public const string MainGameAsset = "MenuUI";
+        public const string BattleAsset = "GameUI";
 
     }
 
@@ -286,7 +299,7 @@ public static class Global
     {
         if (dict.ContainsKey(key1) && dict.ContainsKey(key2))
         {
-            TValue value1 , value2 ;
+            TValue value1, value2;
 
             dict.TryGetValue(key1, out value1);
             dict.TryGetValue(key2, out value2);
@@ -307,7 +320,7 @@ public static class Global
     /// <param name="key2"></param>
     /// <param name="tmpKey">交換用臨時Key</param>
     /// <param name="dict"></param>
-    public static bool SwapDictKey<TKey, TValue>(TKey key1, TKey key2,TKey tmpKey, Dictionary<TKey, TValue> dict)
+    public static bool SwapDictKey<TKey, TValue>(TKey key1, TKey key2, TKey tmpKey, Dictionary<TKey, TValue> dict)
     {
         if (dict.ContainsKey(key1) && dict.ContainsKey(key2))
         {

@@ -132,7 +132,7 @@ public class VersionChecker
     {
         File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.visionListFile, _bVisionFile); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
         Global.ReturnMessage = "遊戲版本檢查完成!";
-        Debug.Log("遊戲版本檢查完成!");
+        Debug.Log("----------------------------------------遊戲版本檢查完成!--------------------------------------");
         yield return new WaitForSeconds(1.0f);
         _visionChk = true;
         Global.isNewlyVision = true;

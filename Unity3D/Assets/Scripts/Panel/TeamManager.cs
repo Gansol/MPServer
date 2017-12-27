@@ -95,7 +95,7 @@ public class TeamManager : MPPanel
         }
 
         // 載入資產完成後 實體化 物件
-        if (assetLoader.loadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
             _bLoadedAsset = !_bLoadedAsset;
             _bLoadedEffect = !_bLoadedEffect;
@@ -117,7 +117,7 @@ public class TeamManager : MPPanel
         }
 
         // 按下圖示按鈕後 載入角色完成時 實體化角色
-        if (assetLoader.loadedObj && _bLoadedActor)
+        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
             assetLoader.init();
@@ -344,14 +344,15 @@ public class TeamManager : MPPanel
             }
             else
             {
-                Dictionary<string, object> newData;
+                Dictionary<string, object> newAssetData;
 
                 LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
                 LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
                 LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
-                newData = LoadProperty.SelectNewData(Global.dictMiceAll, _dictMiceData);
+                // Where 找不存在的KEY 再轉換為Dictionary
+                newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-                dictNotLoadedAsset = GetDontNotLoadAsset(newData);
+                dictNotLoadedAsset = GetDontNotLoadAsset(newAssetData);
 
                 ResumeToggleTarget();
             }

@@ -35,7 +35,7 @@ namespace MPCOM
     [Transaction(TransactionOption.Required)]                   // ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     public class MemberIO : ServicedComponent
     {
-        static string host = "localhost\\SQLEXPRESS";           // 主機位置 IP(本機)\\伺服器名稱
+        static string host = "localhost\\SQLEXPRESS01";           // 主機位置 IP(本機)\\伺服器名稱
         static string id = "Krola";                             // SQL Server帳號
         static string pwd = "1234";                             // SQL Server密碼
         static string database = "MicePowDB";                   // 資料庫名稱

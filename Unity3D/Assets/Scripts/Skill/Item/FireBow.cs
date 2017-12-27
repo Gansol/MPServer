@@ -45,7 +45,7 @@ public class FireBow : SkillItem
     public override void Display()
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = MPGame.Instance.AssetLoader();
+        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
         ObjectFactory objFactory = new ObjectFactory();
         

@@ -162,8 +162,8 @@ public class ObjectFactory : FactoryBase
 
 
 
-    #region -- GetItemInfoFromType 取得道具(類別)資訊  --
-    public Dictionary<string, object> GetItemInfoFromType(Dictionary<string, object> itemData, int type)
+    #region -- GetItemInfoFromType 取得特定(類別)道具詳細資料  --
+    public Dictionary<string, object> GetItemDetailsInfoFromType(Dictionary<string, object> itemData, int type)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
 

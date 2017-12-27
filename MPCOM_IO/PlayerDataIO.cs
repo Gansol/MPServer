@@ -34,7 +34,7 @@ namespace MPCOM
     [Transaction(TransactionOption.RequiresNew)]
     public class PlayerDataIO : ServicedComponent
     {
-        static string host = "localhost\\SQLEXPRESS";               // 主機位置 IP(本機)\\伺服器名稱
+        static string host = "localhost\\SQLEXPRESS01";               // 主機位置 IP(本機)\\伺服器名稱
         static string id = "Krola";                                 // SQL Server帳號
         static string pwd = "1234";                                 // SQL Server密碼
         static string database = "MicePowDB";                       // 資料庫名稱
@@ -302,7 +302,7 @@ namespace MPCOM
 
                     selectString = selectString.TrimEnd(charsToTrim) + String.Format("  FROM Player_PlayerData WITH(NOLOCK) WHERE Account='{0}'", account);
 
-                 //   Log.Debug("selectString:" + selectString);
+                    Log.Debug("PlayerDataIO SelectString:" + selectString);
                     adapter.SelectCommand = new SqlCommand(selectString, sqlConn);
                     adapter.Fill(DS);
 
@@ -324,10 +324,11 @@ namespace MPCOM
                         if (columns.Contains("MiceAll")) playerData.MiceAll = Convert.ToString(DS.Tables[0].Rows[0]["MiceAll"]);
                         if (columns.Contains("Team")) playerData.Team = Convert.ToString(DS.Tables[0].Rows[0]["Team"]);
                         if (columns.Contains("Friend")) playerData.Friends = Convert.ToString(DS.Tables[0].Rows[0]["Friend"]);
+                        if (columns.Contains("Image")) playerData.PlayerImage = Convert.ToString(DS.Tables[0].Rows[0]["Image"]);
                         if (columns.Contains("AccountLevel")) playerData.AccountLevel = Convert.ToByte(DS.Tables[0].Rows[0]["AccountLevel"]);
 
                         playerData.ReturnCode = "S436"; //true
-                        playerData.ReturnMessage = "取得玩家特定資料成功！";
+                        playerData.ReturnMessage = "取得玩家特定資料成功！  " + selectString;
                     }
                     else
                     {

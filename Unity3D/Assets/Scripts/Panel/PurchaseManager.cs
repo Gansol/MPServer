@@ -20,7 +20,7 @@ public class PurchaseManager : MPPanel
     // Update is called once per frame
     void Update()
     {
-        if (assetLoader.loadedObj && _bLoadObj)
+        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadObj)
         {
             _bLoadObj = !_bLoadObj;
          InstantiateItem();

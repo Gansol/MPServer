@@ -14,7 +14,7 @@ public class Question : MonoBehaviour {
     public void OnQusetClick()
     {
         transform.GetChild(0).gameObject.SetActive(true);
-        EventMaskSwitch.Switch(transform.GetChild(0).gameObject, true);
+        EventMaskSwitch.Switch(transform.GetChild(0).gameObject/*, true*/);
     }
 
 

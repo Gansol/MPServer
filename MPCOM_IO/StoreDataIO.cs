@@ -32,7 +32,7 @@ namespace MPCOM
     [Transaction(TransactionOption.RequiresNew)]
     public class StoreDataIO : ServicedComponent
     {
-        static string host = "localhost\\SQLEXPRESS";           // 主機位置 IP(本機)\\伺服器名稱
+        static string host = "localhost\\SQLEXPRESS01";           // 主機位置 IP(本機)\\伺服器名稱
         static string id = "Krola";                             // SQL Server帳號
         static string pwd = "1234";                             // SQL Server密碼
         static string database = "MicePowDB";                   // 資料庫名稱

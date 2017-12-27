@@ -40,7 +40,7 @@ public class SpawnAI
         _battleManager = battleManager;
         poolManager = battleManager.GetComponent<PoolManager>();
         objFactory = MPGFactory.GetObjFactory();
-        objFactory.TestMethod();
+      //  objFactory.TestMethod();
         miceSize = 3.5f;
         _hole = hole;
         Global.photonService.LoadSceneEvent += OnLoadScene;
@@ -197,7 +197,7 @@ public class SpawnAI
         {
             try
             {
-                objFactory.TestMethod();
+               // objFactory.TestMethod();
                 objFactory.InstantiateMice(poolManager, miceID, miceSize, _hole[holeArray[holePos]], impose);
             }
             catch (Exception e)
