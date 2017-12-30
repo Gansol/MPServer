@@ -3,7 +3,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.EnterpriseServices;
-
+using MPProtocol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -39,13 +39,18 @@ namespace MPCOM
         string connectionString = string.Format("Server = {0};Database = {1};User ID = {2};Password = {3};", host, database, id, pwd); //格式化連線字串
 
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();   // LOG
-        
+
         protected override bool CanBePooled()                                       //覆寫 可以被放入集區 
         {
             return true;
         }
 
         #region LoadCurrency 載入貨幣資料
+        /// <summary>
+        /// 載入貨幣資料
+        /// </summary>
+        /// <param name="Account"></param>
+        /// <returns></returns>
         [AutoComplete]                                          //如果方法呼叫正常傳回的話，交易會自動呼叫 SetComplete。如果方法呼叫擲回例外狀況，則交易中止。
         public CurrencyData LoadCurrency(string Account)
         {
@@ -103,136 +108,80 @@ namespace MPCOM
         }
         #endregion
 
-        #region UpdateCurrency 更新遊戲幣資料
-        /// <summary>
-        /// 更新遊戲幣資料
-        /// </summary>
-        /// <param name="account"></param>
-        /// <param name="rice"></param>
-        /// <returns></returns>
-        [AutoComplete]
-        public CurrencyData UpdateCurrency(string account, int rice)  // gold = Int16
-        {
-            CurrencyData currencyData = new CurrencyData();
-            currencyData.ReturnCode = "(IO)S700";
-            currencyData.ReturnMessage = "";
-            DataSet DS = new DataSet();
+        //#region UpdateCurrency 更新遊戲幣資料
+        ///// <summary>
+        ///// 更新遊戲幣資料
+        ///// </summary>
+        ///// <param name="account"></param>
+        ///// <param name="rice"></param>
+        ///// <returns></returns>
+        //[AutoComplete]
+        //public CurrencyData UpdateCurrency(string account, int rice)  // gold = Int16
+        //{
+        //    CurrencyData currencyData = new CurrencyData();
+        //    currencyData.ReturnCode = "(IO)S700";
+        //    currencyData.ReturnMessage = "";
+        //    DataSet DS = new DataSet();
 
-            try
-            {
-                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
-                {
+        //    try
+        //    {
+        //        using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+        //        {
 
-                    SqlCommand sqlCmd = new SqlCommand();
-                    sqlCmd.Connection = sqlConn;
-                    sqlConn.Open();
+        //            SqlCommand sqlCmd = new SqlCommand();
+        //            sqlCmd.Connection = sqlConn;
+        //            sqlConn.Open();
 
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Rice FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
-                    adapter.Fill(DS);
+        //            SqlDataAdapter adapter = new SqlDataAdapter();
+        //            adapter.SelectCommand = new SqlCommand(string.Format("SELECT Rice FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+        //            adapter.Fill(DS);
 
-                    if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
-                    {
-                        string query = @"UPDATE Player_GameCurrency SET Rice=@rice WHERE Account=@account";
-                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
-                        command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@account", account);
-                        command.Parameters.AddWithValue("@rice", rice);
-                        command.ExecuteNonQuery();
+        //            if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
+        //            {
+        //                string query = @"UPDATE Player_GameCurrency SET Rice=@rice WHERE Account=@account";
+        //                SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+        //                command.Parameters.Clear();
+        //                command.Parameters.AddWithValue("@account", account);
+        //                command.Parameters.AddWithValue("@rice", rice);
+        //                command.ExecuteNonQuery();
 
-                        currencyData.ReturnCode = "S703";
-                        currencyData.ReturnMessage = "更新遊戲金幣成功！";
-                    }
-                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
-                    {
-                        currencyData.ReturnCode = "S704";
-                        currencyData.ReturnMessage = "更新遊戲金幣失敗！";
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Debug("(IO)UpdateCrrency failed!" + e.Message + " Track: " + e.StackTrace);
-                currencyData.ReturnCode = "S799";
-                currencyData.ReturnMessage = "更新遊戲金幣未知錯誤！";
-                throw e;
-            }
-            return currencyData;
-        }
-        #endregion
-
-        #region UpdateCurrency 更新金幣資料
-        /// <summary>
-        /// 更新金幣資料
-        /// </summary>
-        /// <param name="account"></param>
-        /// <param name="gold"></param>
-        /// <returns></returns>
-        [AutoComplete]
-        public CurrencyData UpdateCurrency(string account, Int16 gold)  // gold = Int16
-        {
-            CurrencyData currencyData = new CurrencyData();
-            currencyData.ReturnCode = "(IO)S700";
-            currencyData.ReturnMessage = "";
-            DataSet DS = new DataSet();
-
-            try
-            {
-                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
-                {
-
-                    SqlCommand sqlCmd = new SqlCommand();
-                    sqlCmd.Connection = sqlConn;
-                    sqlConn.Open();
-
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Gold FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
-                    adapter.Fill(DS);
-
-                    if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
-                    {
-                        string query = @"UPDATE Player_GameCurrency SET Gold=@gold WHERE Account=@account";
-                        SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
-                        command.Parameters.AddWithValue("@account", account);
-                        command.Parameters.AddWithValue("@gold", gold);
-                        command.ExecuteNonQuery();
-
-                        currencyData.ReturnCode = "S703";
-                        currencyData.ReturnMessage = "更新遊戲金幣成功！";
-                    }
-                    else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
-                    {
-                        currencyData.ReturnCode = "S704";
-                        currencyData.ReturnMessage = "更新遊戲金幣失敗！";
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Debug("(IO)UpdateCrrency failed!" + e.Message + " Track: " + e.StackTrace);
-                currencyData.ReturnCode = "S799";
-                currencyData.ReturnMessage = "更新遊戲金幣未知錯誤！";
-                throw e;
-            }
-            return currencyData;
-        }
-        #endregion
+        //                currencyData.ReturnCode = "S703";
+        //                currencyData.ReturnMessage = "更新遊戲金幣成功！";
+        //            }
+        //            else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+        //            {
+        //                currencyData.ReturnCode = "S704";
+        //                currencyData.ReturnMessage = "更新遊戲金幣失敗！";
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Log.Debug("(IO)UpdateCrrency failed!" + e.Message + " Track: " + e.StackTrace);
+        //        currencyData.ReturnCode = "S799";
+        //        currencyData.ReturnMessage = "更新遊戲金幣未知錯誤！";
+        //        throw e;
+        //    }
+        //    return currencyData;
+        //}
+        //#endregion
 
         #region UpdateCurrency 更新貨幣資料
         /// <summary>
         /// 更新貨幣資料
         /// </summary>
         /// <param name="account"></param>
-        /// <param name="rice"></param>
-        /// <param name="gold"></param>
+        /// <param name="value">貨幣價值</param>
+        /// <param name="currencyType">貨幣類別</param>
         /// <returns></returns>
         [AutoComplete]
-        public CurrencyData UpdateCurrency(string account,int rice, Int16 gold)  // gold = Int16
+        public CurrencyData UpdateCurrency(string account, string value, CurrencyType currencyType)  // gold = Int16
         {
             CurrencyData currencyData = new CurrencyData();
             currencyData.ReturnCode = "(IO)S700";
             currencyData.ReturnMessage = "";
             DataSet DS = new DataSet();
+
 
             try
             {
@@ -244,20 +193,37 @@ namespace MPCOM
                     sqlConn.Open();
 
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Rice,Gold,Bonus FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
                     adapter.Fill(DS);
+
 
                     if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
                     {
-                        string query = @"UPDATE Player_GameCurrency SET Rice=@rice,Gold=@gold WHERE Account=@account";
+                        string currencyQuery = "";
+
+                        if (currencyType == CurrencyType.Rice)
+                            currencyQuery = "Rice";
+                        if (currencyType == CurrencyType.Gold)
+                            currencyQuery = "Gold";
+                        if (currencyType == CurrencyType.Bonus)
+                            currencyQuery = "Bonus";
+
+                        string query = string.Format(@"UPDATE Player_GameCurrency SET {0}=@value WHERE Account=@account", currencyQuery);
+
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.AddWithValue("@account", account);
-                        command.Parameters.AddWithValue("@rice", rice);
-                        command.Parameters.AddWithValue("@gold", gold);
+                        command.Parameters.AddWithValue("@value", value);
                         command.ExecuteNonQuery();
 
+                        if (currencyType == CurrencyType.Rice)
+                            currencyData.ReturnMessage = "更新遊戲幣成功！" + "  currencyType:" + currencyType + "  value:" + value;
+
+                        if (currencyType == CurrencyType.Gold)
+                            currencyData.ReturnMessage = "更新遊戲金幣成功！" + "  currencyType:" + currencyType + "  value:" + value;
+
+                        if (currencyType == CurrencyType.Bonus)
+                            currencyData.ReturnMessage = "更新遊戲紅利成功！" + "  currencyType:" + currencyType + "  value:" + value;
                         currencyData.ReturnCode = "S703";
-                        currencyData.ReturnMessage = "更新遊戲貨幣成功！";
                     }
                     else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
                     {
@@ -276,6 +242,65 @@ namespace MPCOM
             return currencyData;
         }
         #endregion
+
+        //#region UpdateCurrency 更新貨幣資料
+        ///// <summary>
+        ///// 更新貨幣資料
+        ///// </summary>
+        ///// <param name="account"></param>
+        ///// <param name="rice"></param>
+        ///// <param name="gold"></param>
+        ///// <returns></returns>
+        //[AutoComplete]
+        //public CurrencyData UpdateCurrency(string account, int rice, Int16 gold)  // gold = Int16
+        //{
+        //    CurrencyData currencyData = new CurrencyData();
+        //    currencyData.ReturnCode = "(IO)S700";
+        //    currencyData.ReturnMessage = "";
+        //    DataSet DS = new DataSet();
+
+        //    try
+        //    {
+        //        using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+        //        {
+
+        //            SqlCommand sqlCmd = new SqlCommand();
+        //            sqlCmd.Connection = sqlConn;
+        //            sqlConn.Open();
+
+        //            SqlDataAdapter adapter = new SqlDataAdapter();
+        //            adapter.SelectCommand = new SqlCommand(string.Format("SELECT * FROM Player_GameCurrency WHERE (Account='{0}') ", account), sqlConn);
+        //            adapter.Fill(DS);
+
+        //            if (DS.Tables[0].Rows.Count == 1)   // 如果找到玩家資料
+        //            {
+        //                string query = @"UPDATE Player_GameCurrency SET Rice=@rice,Gold=@gold WHERE Account=@account";
+        //                SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
+        //                command.Parameters.AddWithValue("@account", account);
+        //                command.Parameters.AddWithValue("@rice", rice);
+        //                command.Parameters.AddWithValue("@gold", gold);
+        //                command.ExecuteNonQuery();
+
+        //                currencyData.ReturnCode = "S703";
+        //                currencyData.ReturnMessage = "更新遊戲貨幣成功！";
+        //            }
+        //            else if (DS.Tables[0].Rows.Count == 0) // 如果沒有找到玩家資料
+        //            {
+        //                currencyData.ReturnCode = "S704";
+        //                currencyData.ReturnMessage = "更新遊戲金幣失敗！";
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Log.Debug("(IO)UpdateCrrency failed!" + e.Message + " Track: " + e.StackTrace);
+        //        currencyData.ReturnCode = "S799";
+        //        currencyData.ReturnMessage = "更新遊戲金幣未知錯誤！";
+        //        throw e;
+        //    }
+        //    return currencyData;
+        //}
+        //#endregion
 
     }
 }

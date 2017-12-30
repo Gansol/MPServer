@@ -33,7 +33,7 @@ namespace MPServer
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
         public Guid peerGuid { get; protected set; }
-        
+
         private bool isCreateRoom;
         // private int roomID;
         //private int primaryID;
@@ -47,6 +47,7 @@ namespace MPServer
         private PlayerDataUI playerDataUI;
         private SkillUI skillUI;
         private StoreDataUI storeDataUI;
+        private PurchaseUI purchaseUI;
         private ItemUI itemUI;
 
         private static readonly int GameTime = 180;
@@ -55,13 +56,13 @@ namespace MPServer
         public MPServerPeer(InitRequest initRequest, MPServerApplication serverApplication)
             : base(initRequest, serverApplication)
         {
-            
-           // IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication
+
+            // IRpcProtocol rpcProtocol, IPhotonPeer nativePeer, MPServerApplication ServerApplication
 
             isCreateRoom = false;
             peerGuid = Guid.NewGuid();      // 建立一個Client唯一識別GUID
-         //   _server = ServerApplication;
-           
+            //   _server = ServerApplication;
+
             _server.Actors.AddConnectedPeer(peerGuid, this);    // 加入連線中的peer列表
 
             battleUI = new BattleUI();
@@ -71,7 +72,9 @@ namespace MPServer
             skillUI = new SkillUI();
             storeDataUI = new StoreDataUI();
             currencyUI = new CurrencyUI();
+            purchaseUI = new PurchaseUI();
             itemUI = new ItemUI();
+
             if (_server.Actors.GetOnlineActors().Count >= 100)
             {
                 string reasonDetail = "線上玩家數過多";
@@ -146,8 +149,11 @@ namespace MPServer
                 {
                     //Log.Debug("IN >9 :" + operationRequest.OperationCode.ToString());
 
+                    Log.Debug("Server Get Response Code: " + operationRequest.OperationCode);
+
                     switch (operationRequest.OperationCode)
                     {
+
 
                         #region JoinMember 加入會員 (這裡面有IP、email的參數亂打) (含FB首次登入)
 
@@ -1721,6 +1727,80 @@ namespace MPServer
                             break;
                         #endregion
 
+                        #region LoadPurchase 載入法幣道具資料
+                        case (byte)PurchaseOperationCode.Load:
+                            {
+                                Log.Debug("IN LoadPurchase");
+
+                                PurchaseData purchaseData = (PurchaseData)TextUtility.DeserializeFromStream(purchaseUI.LoadPurchase());
+
+                                string purchaseItem = purchaseData.jPurchaseData;
+
+                                if (purchaseData.ReturnCode == "S1101")  // 取得法幣道具成功 回傳玩家資料
+                                {
+                                    Log.Debug("purchaseData.ReturnCode == S1101");
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)PurchaseParameterCode.PurchaseItem, purchaseItem }
+                                    };
+
+                                    OperationResponse response = new OperationResponse((byte)PurchaseResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = purchaseData.ReturnMessage.ToString() };
+                                    SendOperationResponse(response, new SendParameters());
+                                }
+                                else  // 失敗 傳空值+錯誤訊息
+                                {
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = purchaseData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+                            }
+                            break;
+                        #endregion
+
+                        #region ConfirmPurchase 載入法幣道具資料
+                        case (byte)PurchaseOperationCode.Confirm:
+                            {
+                                Log.Debug("IN ConfirmPurchase");
+                                string receiptCipheredPayload = "test"; // Google 購買單號                  測試代碼"test"
+                                string receipt = "test";               // Google 自訂交易代號(自我驗證)   測試代碼"test"
+                                string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                string purchaseID = (string)operationRequest.Parameters[(byte)PurchaseParameterCode.PurchaseID];
+                                string currencyCode = (string)operationRequest.Parameters[(byte)PurchaseParameterCode.CurrencyCode];
+                                string currencyValue = System.Convert.ToString(operationRequest.Parameters[(byte)PurchaseParameterCode.CurrencyValue]);
+                                string description = (string)operationRequest.Parameters[(byte)PurchaseParameterCode.Description];
+
+                                // 測試中沒有以下兩個代碼 所以要判斷
+                                if (operationRequest.Parameters.ContainsKey((byte)PurchaseParameterCode.ReceiptCipheredPayload))
+                                    receiptCipheredPayload = (string)operationRequest.Parameters[(byte)PurchaseParameterCode.ReceiptCipheredPayload];
+                                if (operationRequest.Parameters.ContainsKey((byte)PurchaseParameterCode.Receipt))
+                                    receipt = (string)operationRequest.Parameters[(byte)PurchaseParameterCode.Receipt];
+
+
+
+                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(purchaseUI.ConfirmPurchase(account, purchaseID, currencyCode, currencyValue, receiptCipheredPayload, receipt,description));
+
+
+
+                                if (currencyData.ReturnCode == "S703")  // 取得法幣道具成功 回傳玩家資料
+                                {
+                                    Log.Debug("purchaseData.ReturnCode == S703");
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                       { (byte)CurrencyParameterCode.Rice, currencyData.Rice },  { (byte)CurrencyParameterCode.Gold, currencyData.Gold },  { (byte)CurrencyParameterCode.Bonus, currencyData.Bonus }
+                                    };
+
+                                    OperationResponse response = new OperationResponse((byte)PurchaseResponseCode.Confirmed, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = currencyData.ReturnMessage.ToString() };
+                                    SendOperationResponse(response, new SendParameters());
+                                }
+                                else  // 失敗 傳空值+錯誤訊息
+                                {
+                                    Log.Debug("Confirm Error :" + currencyData.ReturnCode + "  CurrencyData.ReturnMessage: " + currencyData.ReturnMessage);
+                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = currencyData.ReturnMessage.ToString() };
+                                    SendOperationResponse(actorResponse, new SendParameters());
+                                }
+                            }
+                            break;
+                        #endregion
+
                         #region LoadCurrency 載入貨幣資料
                         case (byte)CurrencyOperationCode.Load:
                             {
@@ -2186,7 +2266,7 @@ namespace MPServer
                                 Actor actor, otherActor, friendActor;
 
                                 Log.Debug("account: " + account);
-                                
+
 
                                 playerData = otherPlayerData = new PlayerData();
                                 actor = _server.Actors.GetActorFromAccount(account);
@@ -2689,7 +2769,7 @@ namespace MPServer
                                         }
 
                                         if (battleData.sliverReward != 0)
-                                            currencyUI.UpdateCurrency(account, (byte)CurrencyType.Sliver, battleData.sliverReward);
+                                            currencyUI.UpdateCurrency(account, (byte)CurrencyType.Rice, battleData.sliverReward);
 
                                         if (battleData.goldReward != 0)
                                             currencyUI.UpdateCurrency(account, (byte)CurrencyType.Gold, battleData.goldReward);

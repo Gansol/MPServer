@@ -6,6 +6,7 @@ using MPProtocol;
 using MiniJSON;
 using Gansol;
 using System.Linq;
+
 /*
  * 分數驗證目前有問題 目前只把自己的分數傳給對方並更新，沒有驗證自己的分數(兩個更新分數都是)
  *
@@ -92,6 +93,7 @@ public class PhotonService : IPhotonPeerListener
     public event LoadDataHandler LoadPlayerItemEvent;
     public event LoadDataHandler LoadItemDataEvent;
     public event LoadDataHandler LoadCurrencyEvent;
+    public event LoadDataHandler LoadPurchaseEvent;
     public event LoadDataHandler UpdateMiceEvent;
     public event LoadDataHandler LoadFriendsDataEvent;
     public event LoadDataHandler ApplyInviteFriendEvent;
@@ -385,7 +387,7 @@ public class PhotonService : IPhotonPeerListener
                     //{
                     if (operationResponse.ReturnCode == (short)ErrorCode.Ok)  // if success
                     {
-//                        Debug.Log("login:" + operationResponse.ReturnCode + "   " + operationResponse.DebugMessage);
+                        //                        Debug.Log("login:" + operationResponse.ReturnCode + "   " + operationResponse.DebugMessage);
                         Global.Ret = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Ret]);
                         Global.Account = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Account]);
                         Global.Nickname = Convert.ToString(operationResponse.Parameters[(byte)LoginParameterCode.Nickname]);
@@ -556,7 +558,7 @@ public class PhotonService : IPhotonPeerListener
                         {
                             string playerItem = (string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem];
                             //Global.playerItem = convertUtility.Json2Array(playerItem);
-//                            Debug.Log("Server Response : LoadPlayerItem");
+                            //                            Debug.Log("Server Response : LoadPlayerItem");
 
                             Global.playerItem = Json.Deserialize(playerItem) as Dictionary<string, object>;
                             LoadPlayerItemEvent();
@@ -786,10 +788,33 @@ public class PhotonService : IPhotonPeerListener
                         {
                             Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
-
+                            Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
                             Global.isCurrencyLoaded = true;
 
                             LoadCurrencyEvent();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.Message + e.StackTrace);
+                    }
+                }
+                break;
+
+            #endregion
+
+            #region LoadPurchase 載入法幣資料
+
+            case (byte)PurchaseResponseCode.Loaded: // 取得法幣道具資料
+                {
+                    Debug.Log("PurchaseResponseCode: " + (byte)PurchaseResponseCode.Loaded);
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            string purchaseItem = (string)operationResponse.Parameters[(byte)PurchaseParameterCode.PurchaseItem];
+                            Global.purchaseItem = Json.Deserialize(purchaseItem) as Dictionary<string, object>;
+                            LoadPurchaseEvent();
                         }
                     }
                     catch (Exception e)
@@ -1038,6 +1063,35 @@ public class PhotonService : IPhotonPeerListener
 
             #endregion
 
+            #region PurchaseConfirmed 購買法幣道具完成
+
+            case (byte)PurchaseResponseCode.Confirmed: // 購買道具
+                {
+                    try
+                    {
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
+                            Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
+                            Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
+                            Global.isCurrencyLoaded = true;
+                            Debug.Log("PurchaseResponseCode.Confirmed: Global.Rice:" + Global.Rice + " Global.Gold:" + Global.Gold + " Global.Bonus:" + Global.Bonus);
+                            LoadCurrencyEvent();
+                        }
+                        else
+                        {
+                            Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e);
+                    }
+                }
+                break;
+
+            #endregion
+
             #region Recive Mission 接收任務
 
             case (byte)BattleResponseCode.Mission://取得老鼠資料
@@ -1217,7 +1271,7 @@ public class PhotonService : IPhotonPeerListener
                         Global.Rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
 
 
-                           Debug.Log("RECIVE GameOver ! :" + "   Score:" + score+"   ExpReward:" + expReward+"   SliverReward:" + sliverReward+"   SliverReward:" + jItemReward);
+                        Debug.Log("RECIVE GameOver ! :" + "   Score:" + score + "   ExpReward:" + expReward + "   SliverReward:" + sliverReward + "   SliverReward:" + jItemReward);
 
                         GameOverEvent(score, maxScore, maxCombo, expReward, sliverReward, goldReward, jItemReward, evaluate, battleResult);
                     }
@@ -1261,7 +1315,7 @@ public class PhotonService : IPhotonPeerListener
     /// </summary>
     public void Login(string Account, string Password, MemberType memberType)
     {
-//        Debug.Log("memberType:" + (byte)memberType);
+        //        Debug.Log("memberType:" + (byte)memberType);
         try
         {
             if (Global.photonService.isConnected)
@@ -1799,6 +1853,60 @@ public class PhotonService : IPhotonPeerListener
     }
     #endregion
 
+    #region LoadPurchase 載入法幣商品資料
+    /// <summary>
+    /// 載入貨幣資料
+    /// </summary>
+    public void LoadPurchase()
+    {
+        try
+        {
+            this.peer.OpCustom((byte)PurchaseOperationCode.Load, new Dictionary<byte, object>(), true, 0, true);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region ConfirmPurchase 載入法幣商品資料
+    /// <summary>
+    /// 載入貨幣資料
+    /// </summary>
+    public void ConfirmPurchase(string jProductString)
+    {
+        try
+        {
+            object p = "product";
+            Debug.Log("Ph service:" + jProductString);
+            Dictionary<string, object> pruduct = new Dictionary<string, object>();
+            pruduct = Json.Deserialize(jProductString) as Dictionary<string, object>;
+            pruduct = pruduct["product"] as Dictionary<string, object>;
+            Debug.Log("Ph service pruduct.Count :" + pruduct.Count);
+
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {{ (byte)PlayerDataParameterCode.Account,Global.Account }, { (byte)PurchaseParameterCode.PurchaseID, pruduct["id"] }
+        , { (byte)PurchaseParameterCode.CurrencyCode, pruduct["currencyCode"] }, { (byte)PurchaseParameterCode.CurrencyValue, pruduct["priceValue"] },
+        { (byte)PurchaseParameterCode.Description, pruduct["desc"] }};
+
+            if (pruduct.ContainsKey("receiptCipheredPayload"))
+                parameter.Add((byte)PurchaseParameterCode.ReceiptCipheredPayload, pruduct["receiptCipheredPayload"]);
+            if (pruduct.ContainsKey("receipt"))
+                parameter.Add((byte)PurchaseParameterCode.Receipt, pruduct["receipt"]);
+
+
+            if (pruduct.Count > 3)
+                this.peer.OpCustom((byte)PurchaseOperationCode.Confirm, parameter, true, 0, true);
+            else
+                Debug.Log("FUCK");
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
     #region LoadRice 載入遊戲幣資料
     /// <summary>
     /// 載入遊戲幣資料
@@ -2076,10 +2184,10 @@ public class PhotonService : IPhotonPeerListener
     /// <param name="itemAmount">使用的道具數量</param>
     public void GameOver(Int16 gameScore, Int16 otherScore, Int16 gameTime, Int16 maxCombo, int killMice, int lostMice, Int16 spawnCount, string jMicesUseCount, string jItemsUseCount, string[] columns)
     {
-//        Debug.Log(gameScore + " " + otherScore + " " + gameTime + " " + maxCombo + " " + killMice + " " + lostMice + " " + spawnCount);
+        //        Debug.Log(gameScore + " " + otherScore + " " + gameTime + " " + maxCombo + " " + killMice + " " + lostMice + " " + spawnCount);
         try
         {
-         //   Debug.Log("Send GameOver:" + Global.dictSortedItem);
+            //   Debug.Log("Send GameOver:" + Global.dictSortedItem);
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, Global.Account },{ (byte)LoginParameterCode.PrimaryID, Global.PrimaryID },
             { (byte)BattleParameterCode.Score, gameScore },{ (byte)BattleParameterCode.OtherScore, otherScore },
@@ -2105,7 +2213,7 @@ public class PhotonService : IPhotonPeerListener
     /// <summary>
     /// 購買商品
     /// </summary>
-    public void BuyItem(string account, Dictionary<string,string> goods)
+    public void BuyItem(string account, Dictionary<string, string> goods)
     {
         try
         {
@@ -2193,7 +2301,7 @@ public class PhotonService : IPhotonPeerListener
     {
         try
         {
-//            Debug.Log("IN SendRoomMice: " + roomMice.Length);
+            //            Debug.Log("IN SendRoomMice: " + roomMice.Length);
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID},{ (byte)BattleParameterCode.RoomID, Global.RoomID}, { (byte)BattleParameterCode.MiceID, roomMice}};
             this.peer.OpCustom((byte)BattleOperationCode.RoomMice, parameter, true, 0, true); // operationCode is RoomSpeak

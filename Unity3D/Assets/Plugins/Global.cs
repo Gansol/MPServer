@@ -135,6 +135,7 @@ public static class Global
     public static MemberType MemberType;     // 
     public static int Rice = 0;             // 遊戲幣
     public static Int16 Gold = 0;           // 金幣
+    public static Int16 Bonus = 0;           // 紅利
 
     public static byte Rank = 0;            // 等級
     public static short Exp = 0;             // 經驗
@@ -161,6 +162,7 @@ public static class Global
     public static Dictionary<string, object> storeItem = new Dictionary<string, object>();                      // 商店屬性資料 
     public static Dictionary<string, object> gashaponItem = new Dictionary<string, object>();                      // 轉蛋屬性資料 
     public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 玩家道具屬性資料 
+    public static Dictionary<string, object> purchaseItem = new Dictionary<string, object>();                     //商城道具屬性資料 
     public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
     public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
     public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
@@ -380,6 +382,5 @@ public static class Global
         stopwatch.Stop();
         return stopwatch.Elapsed;
     }
-
 
 }
