@@ -63,7 +63,14 @@ namespace MPCOM
 
         #endregion
 
-        #region UpdateCurrency
+        #region UpdateCurrency 更新貨幣資料
+        /// <summary>
+        /// 更新貨幣資料 目前沒有驗證邏輯
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="currencyType">貨幣種類</param>
+        /// <param name="currency">貨幣價值</param>
+        /// <returns></returns>
         [AutoComplete]
         public CurrencyData UpdateCurrency(string account, byte currencyType, int currency)
         {
@@ -71,56 +78,71 @@ namespace MPCOM
             currencyData.ReturnCode = "(Logic)S700";
             currencyData.ReturnMessage = "";
 
+            // 目前沒有驗證邏輯
             try
             {
-                // to do check
-                int rice = 0;
-                Int16 gold = 0;
-
+                int value = 0;
 
                 CurrencyIO currencyIO = new CurrencyIO();
-
                 currencyData = currencyIO.LoadCurrency(account);
-
 
                 switch (currencyType)
                 {
-                    case (byte)CurrencyType.Sliver:
+                    case (byte)CurrencyType.Rice:
                         {
-                            rice = currencyData.Rice + currency;
-                            
-
-                            if (rice >= 0)
-                            {
-                                currencyData = currencyIO.UpdateCurrency(account, rice);
-                            }
-                            else
-                            {
-                                currencyData.ReturnMessage = "遊戲幣不足！";
-                                currencyData.ReturnCode = "S711";
-                            }
+                            value = currencyData.Rice + currency;
                             break;
                         }
                     case (byte)CurrencyType.Gold:
                         {
-
-                            gold =  Convert.ToInt16((currencyData.Gold + Convert.ToInt16(currency.ToString())).ToString());
-
-                            if (gold >= 0)
-                            {
-                                currencyData = currencyIO.UpdateCurrency(account, gold);
-                            }
-                            else
-                            {
-                                currencyData.ReturnMessage = "金幣不足！";
-                                currencyData.ReturnCode = "S712";
-                            }
+                            value = currencyData.Gold + currency;
+                            break;
+                        }
+                    case (byte)CurrencyType.Bonus:
+                        {
+                            value = currencyData.Rice + currency;
                             break;
                         }
                     default:
                         currencyData.ReturnMessage = "金流資料未知例外情況！";
                         currencyData.ReturnCode = "S799";
                         break;
+                }
+
+
+
+                if (value >= 0)
+                {
+                    currencyData = currencyIO.UpdateCurrency(account, value.ToString(), (CurrencyType)currencyType);
+                }
+                else
+                {
+                    if (currencyType == (byte)CurrencyType.Rice)
+                    {
+                        currencyData.ReturnMessage = "遊戲幣不足！";
+                        currencyData.ReturnCode = "S711";
+                    }
+                    if (currencyType == (byte)CurrencyType.Rice)
+                    {
+                        if (currencyType == (byte)CurrencyType.Gold)
+                            currencyData.ReturnMessage = "金幣不足！";
+                        currencyData.ReturnCode = "S712";
+                    }
+                    if (currencyType == (byte)CurrencyType.Bonus)
+                    {
+                        value = value + currencyData.Gold;
+
+                        // 目前紅利採金幣模式 與金幣共用優先使用紅利 使用者看不到 未來新增紅利再修正
+                        if (value >= 0)
+                        {
+                            currencyData = currencyIO.UpdateCurrency(account, value.ToString(), (CurrencyType)currencyType);
+                        }
+                        else
+                        {
+                            currencyData.ReturnMessage = "金幣不足！";
+                            currencyData.ReturnCode = "S712";
+                        }
+                    }
                 }
             }
             catch

@@ -26,7 +26,7 @@ namespace MPCOM
         public int FreeRice;		                // 遊戲幣21e
         public Int16 Gold;		                // 金幣65536
         public Int16 FreeGold;		                // 金幣65536
-        public Int16 Bouns;                     // 紅利
+        public Int16 Bonus;                     // 紅利
         public byte goldMiceEgg;                // 老鼠蛋數量255
         public byte silverMiceEgg;              // 老鼠蛋數量255
     }

@@ -138,5 +138,20 @@ public class del2 :MonoBehaviour
         string tmpString = TextUtility.SHA512Complier(Gansol.TextUtility.SerializeToStream(data));
         return TextUtility.SHA1Complier(Gansol.TextUtility.SerializeToStream(tmpString));
     }
+
+
+    public void OnInit()
+    {
+        label.text = "Init";
+    }
+
+       public void OnBuySuccess()
+    {
+        label.text = "Buy Success!"+(++i).ToString();
+    }
+
+       public int i = 0;
+
 }
+
 

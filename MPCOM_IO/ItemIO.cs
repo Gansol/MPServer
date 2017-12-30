@@ -101,7 +101,7 @@ namespace MPCOM
                 }
                 else
                 {
-                    itemData.ReturnCode = "602";
+                    itemData.ReturnCode = "S602";
                     itemData.ReturnMessage = "取得道具資料失敗！";
                 }
             }
