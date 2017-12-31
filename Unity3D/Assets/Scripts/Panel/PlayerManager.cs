@@ -154,6 +154,7 @@ public class PlayerManager : MPPanel
     {
         // load asset
         GetMustLoadAsset();
+        EventMaskSwitch.lastPanel = gameObject;
     }
 
     /// <summary>

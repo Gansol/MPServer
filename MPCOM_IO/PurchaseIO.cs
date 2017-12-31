@@ -96,7 +96,10 @@ namespace MPCOM
                                 foreach (DataColumn col in table.Columns)
                                 {
                                     if (j == 0) itemID = table.Rows[i][col].ToString();
-                                    dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
+                                    if (col.ColumnName == "NewArrivalsTime" || col.ColumnName == "PromotionsTime")
+                                        dictData2.Add(col.ColumnName, Convert.ToDateTime(table.Rows[i][col]).ToString("yyyy/MM/dd HH:mm:ss"));
+                                    else
+                                        dictData2.Add(col.ColumnName, table.Rows[i][col].ToString());
                                     j++;
                                 }
                                 dictData.Add(itemID, dictData2);

@@ -788,7 +788,7 @@ public class PhotonService : IPhotonPeerListener
                         {
                             Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
-                            Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
+                           // Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
                             Global.isCurrencyLoaded = true;
 
                             LoadCurrencyEvent();

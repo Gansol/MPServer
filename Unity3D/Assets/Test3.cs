@@ -42,6 +42,14 @@ public class Test3 : MonoBehaviour {
 
         Debug.Log(c["a"]);
 
+
+        int i =-1;
+
+        foreach (var x in b)
+        {
+            if (++i == 0) Debug.Log("XXX");
+        }
+
 	}
 
 	

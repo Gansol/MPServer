@@ -321,7 +321,7 @@ public class MatchManager : MPPanel
 
         _dictMiceData = Global.dictMiceAll;
         _dictTeamData = Global.dictTeam;
-
+        EventMaskSwitch.lastPanel = gameObject;
         OnCostCheck();
     }
     #endregion

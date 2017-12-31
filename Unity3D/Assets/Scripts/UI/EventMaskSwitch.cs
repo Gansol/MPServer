@@ -14,7 +14,8 @@ using System.Collections.Generic;
  *                      負責 所有相機事件遮罩
  *                      
  * ***************************************************************
- *                           ChangeLog           
+ *                           ChangeLog         
+ * 20171225 v1.1.3   修正階層問題    
  * 20171225 v1.1.2   修正階層問題                                                                  
  * ****************************************************************/
 //
@@ -92,6 +93,7 @@ public static class EventMaskSwitch
     public static void PrevToFirst()
     {
         int level = (prevLayerMask.Count / Camera.allCamerasCount);
+        if (lastPanel != null) level = 1;
         Prev(level);
         prevLayerMask.Clear();  // 最後要清除 defaultMask 因為彈出的訊息視窗會回到DefaultMask
     }

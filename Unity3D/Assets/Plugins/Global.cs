@@ -163,6 +163,8 @@ public static class Global
     public static Dictionary<string, object> gashaponItem = new Dictionary<string, object>();                      // 轉蛋屬性資料 
     public static Dictionary<string, object> playerItem = new Dictionary<string, object>();                     // 玩家道具屬性資料 
     public static Dictionary<string, object> purchaseItem = new Dictionary<string, object>();                     //商城道具屬性資料 
+   
+
     public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
     public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
     public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();

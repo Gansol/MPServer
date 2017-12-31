@@ -291,6 +291,7 @@ public class TeamManager : MPPanel
     {
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
+        EventMaskSwitch.lastPanel = gameObject;
     }
 
     void OnLoadPlayerData()

@@ -1811,12 +1811,13 @@ namespace MPServer
 
                                 int rice = currencyData.Rice;
                                 Int16 gold = currencyData.Gold;
+                              //  Int16 bonus = currencyData.Bonus;
 
                                 if (currencyData.ReturnCode == "S701")  // 取得遊戲貨幣成功 回傳玩家資料
                                 {
                                     // Log.Debug("currencyData.ReturnCode == S701");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Rice, rice }, { (byte)CurrencyParameterCode.Gold, gold } 
+                                        { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Rice, rice }, { (byte)CurrencyParameterCode.Gold, gold } /*, { (byte)CurrencyParameterCode.Bonus, bonus } */
                                     };
 
                                     OperationResponse response = new OperationResponse((byte)CurrencyResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = currencyData.ReturnMessage.ToString() };

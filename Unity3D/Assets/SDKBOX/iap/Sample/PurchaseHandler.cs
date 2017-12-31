@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Sdkbox;
 
 public class PurchaseHandler : MonoBehaviour
@@ -64,10 +64,10 @@ public class PurchaseHandler : MonoBehaviour
         GetComponent<PurchaseManager>().OnIABInit(status);
 	}
 
-	public void onSuccess(Product product)
+    public void onSuccess(Product product, string jsonString)
 	{
         Debug.Log("PurchaseHandler.onSuccess: " + product.name + "  BuyID:" + product.receiptCipheredPayload);
-      //  Global.photonService.LoadPurchase.CompletedBuy(product.name);
+      //  Global.photonService.ConfirmPurchase(jsonString);
 	}
 
 	public void onFailure(Product product, string message)
@@ -87,12 +87,22 @@ public class PurchaseHandler : MonoBehaviour
 
 	public void onProductRequestSuccess(Product[] products)
 	{
-        GetComponent<PurchaseManager>().OnProductRequest(products);
+        if (enabled)
+        {
+            Dictionary<string, object> dictProducts = new Dictionary<string, object>();
+            string currencyCode = "";
+            int i = -1;
+            
+            foreach (var p in products)
+            {
+                if (++i == 0) currencyCode = p.currencyCode;
+                dictProducts.Add(p.name, p.price);
+                Debug.Log("Product: " + p.name + " price: " + p.price + " currencyCode" + currencyCode);
+            }
 
-		foreach (var p in products)
-		{
-			Debug.Log("Product: " + p.name + " price: " + p.price);
-		}
+            if (GetComponentInChildren<PurchaseManager>())
+                GetComponentInChildren<PurchaseManager>().OnProductRequest(dictProducts, products, currencyCode);
+        }
 	}
 
 	public void onProductRequestFailure(string message)
