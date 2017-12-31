@@ -76,9 +76,9 @@ namespace MPCOM
 
             Dictionary<string, object> dictPurchaseData, nestedProductData;
             CurrencyType currencyType = CurrencyType.Rice;
-            object value = "", price = "";
+            object value = "", price = "";  // price 道具貨幣值
             bool onSell;
-            int tmpCurrency = 0; // 相加後的錢
+            int tmpCurrency = 0, maxValue = 9999999; // 相加後的錢
 
             PurchaseIO purchaseIO = new PurchaseIO();
             CurrencyIO currencyIO = new CurrencyIO();
@@ -113,13 +113,13 @@ namespace MPCOM
                     switch (currencyType)
                     {
                         case CurrencyType.Rice:
-                            tmpCurrency = currencyData.Rice + int.Parse(price.ToString());
+                            tmpCurrency = (currencyData.Rice + int.Parse(price.ToString())) < maxValue ? currencyData.Rice + int.Parse(price.ToString()) : currencyData.Rice;
                             break;
                         case CurrencyType.Gold:
-                            tmpCurrency = currencyData.Gold + int.Parse(price.ToString());
+                            tmpCurrency = currencyData.Gold + int.Parse(price.ToString()) < maxValue ? currencyData.Gold + int.Parse(price.ToString()) : currencyData.Gold;
                             break;
                         case CurrencyType.Bonus:
-                            tmpCurrency = currencyData.Bonus + int.Parse(price.ToString());
+                            tmpCurrency = currencyData.Bonus + int.Parse(price.ToString()) < maxValue ? currencyData.Bonus + int.Parse(price.ToString()) : currencyData.Bonus;
                             break;
                     }
 
@@ -134,17 +134,16 @@ namespace MPCOM
                         currencyData.ReturnMessage = "紀錄購買法幣商品成功！";
                     }
 
-
                     tmpCurrency = tmpCurrency + int.Parse(nestedProductData["Price"].ToString());
                     currencyData = currencyIO.UpdateCurrency(account, tmpCurrency.ToString(), currencyType);
 
                     if (currencyData.ReturnCode == "S703")
                     {
-                        currencyData.ReturnMessage = currencyData.ReturnMessage + "          value:" + value + "  bool:" + onSell + " dictPurchaseData Count:" + dictPurchaseData.Count + "purchaseData.jPurchaseData:" + purchaseData.jPurchaseData + "  tmpCurrency:" + tmpCurrency + "  price:" + price;
+                        currencyData.ReturnMessage = currencyData.ReturnMessage + "          value:" + value + "  bool:" + onSell + " dictPurchaseData Count:" + dictPurchaseData.Count + "purchaseData.jPurchaseData:" + "  tmpCurrency:" + tmpCurrency + "  price:" + price;
                     }
                     else
                     {
-                        currencyData.ReturnMessage = "LOG成功，加錢失敗" + "purchaseData.ReturnCode:" + purchaseData.ReturnCode + " purchaseData.ReturnMessage: " + purchaseData.ReturnMessage + " currencyData.ReturnMessage: " + currencyData.ReturnMessage + "  value:" + value + "  bool:" + onSell + " dictPurchaseData Count:" + dictPurchaseData.Count + "purchaseData.jPurchaseData:" + purchaseData.jPurchaseData + "  tmpCurrency:" + tmpCurrency + "  price:" + price;
+                        currencyData.ReturnMessage += "  currencyData.ReturnMessage: " + currencyData.ReturnMessage + "  value:" + value + "  bool:" + onSell + " dictPurchaseData Count:" + dictPurchaseData.Count + "  tmpCurrency:" + tmpCurrency + "  price:" + price;
                     }
 
                 }

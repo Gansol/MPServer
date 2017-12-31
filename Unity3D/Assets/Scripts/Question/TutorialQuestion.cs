@@ -17,15 +17,16 @@ public class TutorialQuestion : MonoBehaviour {
 	
 	}
 
-    public void OnClosed(GameObject obj)
+    public  void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
     }
 
-    private void OnLoading()
+    protected  void OnLoading()
     {
         transform.parent.gameObject.SetActive(true);
+        EventMaskSwitch.lastPanel = gameObject;
     }
 
     private IEnumerator Resume()
@@ -36,4 +37,5 @@ public class TutorialQuestion : MonoBehaviour {
         EventMaskSwitch.Switch(gameObject/*, false*/);
         EventMaskSwitch.lastPanel = gameObject;
     }
+
 }
