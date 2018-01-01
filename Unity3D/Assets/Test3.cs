@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using MiniJSON;
+using System.Linq;
 
 public class Test3 : MonoBehaviour {
 
@@ -27,29 +28,15 @@ public class Test3 : MonoBehaviour {
         //value = int.Parse(b);
         //Debug.Log("2-2:" + value);
         object f;
-        Dictionary<string, object> a, b, c, d;
+        Dictionary<string, object> a;
         a = new Dictionary<string, object>();
-        b = new Dictionary<string, object>();
-        a.Add("a", "a");
-        b.Add("b1", a);
-        b.Add("b2", a);
 
+
+
+        List<string> keys = a.Keys.ToList();
+        Debug.Log(keys.Count);
 
        
-        b.TryGetValue("b1", out f);
-
-        c = f as Dictionary<string, object>;
-
-        Debug.Log(c["a"]);
-
-
-        int i =-1;
-
-        foreach (var x in b)
-        {
-            if (++i == 0) Debug.Log("XXX");
-        }
-
 	}
 
 	
