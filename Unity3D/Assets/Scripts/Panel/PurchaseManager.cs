@@ -3,22 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Sdkbox;
-
+/* ***************************************************************
+ * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 負責 負責所有法幣商品交易的 所有處理
+ * 
+ * 
+ * ***************************************************************
+ *                           ChangeLog
+ * 20180101 v1.0.0   完成功能、註解             
+ * ****************************************************************/
 // 可以把PurchaseHandlder寫到這裡
 public class PurchaseManager : MPPanel
 {
     ObjectFactory objFactory;
 
-    private Sdkbox.IAP _iap;
     public int offset = 275;
     public GameObject itemPanel;
 
-    private Sdkbox.Product[] _product;
-    private Dictionary<string, GameObject> _dictitemSlot;
-    private Dictionary<string, object> _dictProductsFitCurrency;
+    private Sdkbox.IAP _iap;                                        // IAP資料
+    private Sdkbox.Product[] _product;                              // 商品資料
+    private Dictionary<string, GameObject> _dictitemSlot;           // 已實體化的商品
+    private Dictionary<string, object> _dictProductsFitCurrency;    // 法幣道具價格
     private bool _bLoadAsset, _bFirstLoad, _bLoadPanel, _bIABInit, _bLoadPurchase, _bLoadProduct, _bLoadCurrency;
-    private string _purchaseName = "Purchase", _currencyCode = "TWD";
-    private int _slotPosY;
+    private string _currencyCode = "TWD";                           // 貨幣代號
+    private int _slotPosY;                                          // 道具位子偏移量
 
     public PurchaseManager(MPGame MPGame) : base(MPGame) { }
 
@@ -26,16 +41,11 @@ public class PurchaseManager : MPPanel
     void Start()
     {
         _iap = FindObjectOfType<Sdkbox.IAP>();
-        if (_iap == null)
-        {
-            Debug.Log("Failed to find IAP instance");
-        }
-
         objFactory = new ObjectFactory();
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
         _bFirstLoad = true;
-        _bLoadProduct = false;
+        _bLoadProduct = true;
 
         _iap.getProducts();
     }
@@ -52,9 +62,10 @@ public class PurchaseManager : MPPanel
     // Update is called once per frame
     void Update()
     {
-        if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log("訊息：" + assetLoader.ReturnMessage);
+        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
+        // 資料載入完成後 載入Panel
         if (_bLoadCurrency && _bLoadPurchase && _bLoadProduct && !_bLoadPanel)
         {
             if (!_bFirstLoad)
@@ -64,7 +75,7 @@ public class PurchaseManager : MPPanel
             OnLoadPanel();
         }
 
-
+        // Panel載入完成後 實體化道具 載入屬性
         if (m_MPGame.GetAssetLoader().loadedObj && _bLoadAsset && _bLoadPanel)
         {
             _bLoadAsset = !_bLoadAsset;
@@ -98,32 +109,51 @@ public class PurchaseManager : MPPanel
     {
         GameObject bundle = m_MPGame.GetAssetLoader().GetAsset("PurchaseItem");
         Transform itemSlot = null;
-        object value, dataTime;
+        object value, promotionsTime;
+        bool reload = false;
 
         var newData = Global.purchaseItem.Where(kvp => !_dictitemSlot.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        List<string> serverPurchasekeys = Global.purchaseItem.Keys.ToList();
 
-
-        if (newData.Count > 0)
+        // 如果有新的道具資料
+        if (newData.Count > 0 && Global.purchaseItem.Count > _dictitemSlot.Count)
         {
-            // ins slot
+            // 實體化道具欄位
             foreach (KeyValuePair<string, object> item in newData)
             {
                 Dictionary<string, object> values = item.Value as Dictionary<string, object>;
                 values.TryGetValue(PurchaseProperty.OnSell, out value);
-                values.TryGetValue(PurchaseProperty.PromotionsTime, out dataTime);
+                values.TryGetValue(PurchaseProperty.PromotionsTime, out promotionsTime);
 
                 // 如果商品在銷售期間內中才實體化
-                if (bool.Parse(value.ToString()) && Convert.ToDateTime(dataTime.ToString()) > System.DateTime.Now)
+                if (bool.Parse(value.ToString()) && Convert.ToDateTime(promotionsTime.ToString()) > System.DateTime.Now)
                 {
                     values.TryGetValue(PurchaseProperty.ItemName, out value);
 
                     itemSlot = objFactory.Instantiate(bundle, itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
-                    UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
+                   // UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
                     Add2Refs(item.Key, itemSlot.gameObject);
                     _slotPosY += offset;
                 }
             }
+            reload = true;
         }
+        else if (Global.purchaseItem.Count < _dictitemSlot.Count)
+        {
+            string lastKey = _dictitemSlot.Keys.Last();
+            _dictitemSlot.Remove(lastKey);
+            reload = true;
+        }
+
+        int i = 0;
+
+        if (reload)
+            foreach (var item in _dictitemSlot)
+            {
+                if (i < serverPurchasekeys.Count)
+                    item.Value.name = serverPurchasekeys[i];
+                i++;
+            }
     }
 
     /// <summary>
@@ -131,71 +161,89 @@ public class PurchaseManager : MPPanel
     /// </summary>
     private void LoadPurchaseProperty()
     {
-        int i = 0;
-        object value, purchaseTime, newArrivalsTime, buyCount, limitCount;
-        bool bSoldOut = true;
+        object bSell,price, promotionsTime, newArrivalsTime, promotionsCount, buyCount, limitCount;
+        List<string> keys = _dictitemSlot.Keys.ToList();
 
         // 載入屬性
         foreach (KeyValuePair<string, object> item in Global.purchaseItem)
         {
             // 如果舊的數量較多
-            if (_dictitemSlot.Count >= Global.purchaseItem.Count)
+            if (keys.Contains(item.Key))
             {
                 Dictionary<string, object> values = item.Value as Dictionary<string, object>;
 
-                values.TryGetValue(PurchaseProperty.OnSell, out value);
+                // 取值
+                values.TryGetValue(PurchaseProperty.OnSell, out bSell);
+                values.TryGetValue(PurchaseProperty.Price, out price);
                 values.TryGetValue(PurchaseProperty.LimitCount, out limitCount);
-                values.TryGetValue(PurchaseProperty.PromotionsTime, out newArrivalsTime);
-                values.TryGetValue(PurchaseProperty.PromotionsTime, out purchaseTime);
+                values.TryGetValue(PurchaseProperty.NewArrivalsTime, out newArrivalsTime);
+                values.TryGetValue(PurchaseProperty.PromotionsTime, out promotionsTime);
                 values.TryGetValue(PurchaseProperty.BuyCount, out buyCount);
+                values.TryGetValue(PurchaseProperty.PromotionsCount, out promotionsCount);
 
-                Debug.Log(Convert.ToDateTime(purchaseTime) + "  Now:" + System.DateTime.Now);
+                // 價格
+                _dictitemSlot[item.Key].transform.Find("Info").transform.Find(PurchaseProperty.Price).GetComponent<UILabel>().text = "x" + price.ToString();
 
+                // 法幣價格
+                //   _dictitemSlot[item.Key].transform.Find("Info").Find(PurchaseProperty.FitCurrency).GetComponent<UILabel>().text = _currencyCode +" "+ _dictProductsFitCurrency[item.Key].ToString();
 
+                // 上市日期 檢查 附值
+                NewArrivalsTime_LabelChk(item.Key, Convert.ToDateTime(newArrivalsTime));
 
-                bSoldOut = (int.Parse(limitCount.ToString()) == -1 || int.Parse(limitCount.ToString()) - int.Parse(buyCount.ToString()) > 0) ? false : true;
+                // 促銷日期 檢查 附值
+                PromotionsTime_LabelChk(item.Key, Convert.ToDateTime(promotionsTime));
 
+                // 促銷數量 檢查 附值
+                PromotionsCount_LabelChk(item.Key, int.Parse(promotionsCount.ToString()));
 
-                // 如果商品在銷售中才載入值 //.ToString("yyyyMMddHHmmss")
-                if (bool.Parse(value.ToString()) && !bSoldOut && Convert.ToDateTime(purchaseTime) > System.DateTime.Now && Convert.ToDateTime(newArrivalsTime) > System.DateTime.Now)
-                {
-                    //促銷時間
-                    _dictitemSlot[item.Key].transform.Find(PurchaseProperty.PromotionsTime).GetComponent<UILabel>().text ="In: ~" Convert.ToDateTime(purchaseTime).ToString("yyyy/MM/dd/ HH:mm:ss");
+                // 限制數量 檢查 附值
+                LimitCount_LabelChk(item.Key, int.Parse(limitCount.ToString()), buyCount.ToString());
 
-                    // 價格
-                    values.TryGetValue(PurchaseProperty.Price, out value);
-                    _dictitemSlot[item.Key].transform.Find(PurchaseProperty.Price).GetComponent<UILabel>().text = "x" + value.ToString();
-
-                    // 促銷數量
-                    values.TryGetValue(PurchaseProperty.PromotionsCount, out value);
-                    PromotionsCount_LabelChk(item.Key, int.Parse(value.ToString()));
-
-                    // 限制數量
-                    LimitCount_LabelChk(item.Key, int.Parse(limitCount.ToString()));
-
-                    i++;
-                }
-                else
-                {
-                    if (Convert.ToDateTime(newArrivalsTime) < System.DateTime.Now)
-                    {
-                        Debug.LogError("趕快寫賣完了!");
-                        // 顯示灰色 賣完了
-                    }
-                    else
-                    {
-                        Debug.LogError("趕快寫即將開賣!");
-                        // 顯示即將開賣
-                    }
-                }
-
-
-                _dictitemSlot[item.Key].transform.Find(PurchaseProperty.FitCurrency).GetComponent<UILabel>().text = _currencyCode +" "+ _dictProductsFitCurrency[item.Key].ToString();
+                
             }
-            else
-            {
-                break;
-            }
+        }
+    }
+
+    /// <summary>
+    /// 促銷時間 改變道具欄位Active狀態
+    /// </summary>
+    /// <param name="key">字典資訊位置</param>
+    /// <param name="promotionsTime">限制時間</param>
+    private void PromotionsTime_LabelChk(string key, DateTime promotionsTime)
+    {
+        if (promotionsTime > DateTime.Now)
+        {
+            _dictitemSlot[key].GetComponent<UIButton>().enabled = true;
+            _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(true);
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsTime).GetComponent<UILabel>().text ="~"+ promotionsTime.ToString("yyyy/MM/dd");
+        }
+        else
+        {
+            _dictitemSlot[key].GetComponent<UIButton>().enabled = false;
+            _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(false);
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsTime).GetComponent<UILabel>().text = "";
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.NewArrivalsTime).GetComponent<UILabel>().text = "overtime";
+        }
+    }
+
+    /// <summary>
+    /// 是否開始販售中 改變道具欄位Active狀態
+    /// </summary>
+    /// <param name="key">字典資訊位置</param>
+    /// <param name="limitCount">限制數量</param>
+    private void NewArrivalsTime_LabelChk(string key, DateTime newArrivalsTime)
+    {
+        if (newArrivalsTime < DateTime.Now)
+        {
+            _dictitemSlot[key].GetComponent<UIButton>().enabled = true;
+            _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(true);
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = newArrivalsTime.ToString("yyyy/MM/dd");
+        }
+        else
+        {
+            _dictitemSlot[key].GetComponent<UIButton>().enabled = false;
+            _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(false);
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Coming Soon..";
         }
     }
 
@@ -206,13 +254,15 @@ public class PurchaseManager : MPPanel
     /// <param name="limitCount">限制數量</param>
     private void PromotionsCount_LabelChk(string key, int promotionsCount)
     {
-        _dictitemSlot[key].transform.Find(PurchaseProperty.PromotionsCount).GetComponent<UILabel>().text = "";
-        _dictitemSlot[key].transform.Find(PurchaseProperty.PromotionsImage).gameObject.SetActive(false);
-
         if (promotionsCount > 0)
         {
-            _dictitemSlot[key].transform.Find(PurchaseProperty.PromotionsCount).GetComponent<UILabel>().text = "+" + promotionsCount.ToString();
-            _dictitemSlot[key].transform.Find(PurchaseProperty.PromotionsImage).gameObject.SetActive(true);
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsCount).GetComponent<UILabel>().text = "+" + promotionsCount.ToString();
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsImage).gameObject.SetActive(true);
+        }
+        else
+        {
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsCount).GetComponent<UILabel>().text = "";
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsImage).gameObject.SetActive(false);
         }
     }
 
@@ -221,14 +271,27 @@ public class PurchaseManager : MPPanel
     /// </summary>
     /// <param name="key">字典資訊位置</param>
     /// <param name="limitCount">限制數量</param>
-    private void LimitCount_LabelChk(string key, int limitCount)
+    private void LimitCount_LabelChk(string key, int limitCount, string buyCount)
     {
-        if (limitCount > 0)
-            _dictitemSlot[key].transform.Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = limitCount.ToString();
-        else if (limitCount == 0)
-            _dictitemSlot[key].transform.Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Sold Out!";
-        else
-            _dictitemSlot[key].transform.Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "";
+        _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "";
+        _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(true);
+
+        // 剩餘購買量 limit -buycount
+        int purcahseRemainingCount = (int.Parse(limitCount.ToString()) > 0) ? int.Parse(limitCount.ToString()) - int.Parse(buyCount.ToString()) : -1;
+
+        bool bSoldOut = (int.Parse(limitCount.ToString()) == -1 || purcahseRemainingCount > 0) ? false : true;
+
+        if (purcahseRemainingCount > 0)
+        {
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Limit:" + buyCount + "/" + limitCount.ToString();
+            UIEventListener.Get(_dictitemSlot[key]).onClick = OnPurchase;
+        }
+        else if (limitCount == 0 || bSoldOut)
+        {
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Sold Out!";
+            _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(false);
+            UIEventListener.Get(_dictitemSlot[key]).onClick = null;
+        }
     }
 
     private void Add2Refs(string id, GameObject go)

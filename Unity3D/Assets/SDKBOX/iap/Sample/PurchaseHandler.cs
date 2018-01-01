@@ -1,7 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Sdkbox;
-
+/* ***************************************************************
+ * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 負責 Google IAB 所有處理
+ * 
+ * 
+ * ***************************************************************
+ *                           ChangeLog                  
+ * ****************************************************************/
 public class PurchaseHandler : MonoBehaviour
 {
 	private Sdkbox.IAP _iap;
