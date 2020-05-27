@@ -22,6 +22,7 @@ namespace MPCOM
         public string ReturnCode;               // 回傳值
         public string ReturnMessage;            // 回傳說明文字<30全形字
 
+        public byte CurrencyType;               // 貨幣型態
         public int Rice;		                // 遊戲幣21e
         public int FreeRice;		                // 遊戲幣21e
         public Int16 Gold;		                // 金幣65536

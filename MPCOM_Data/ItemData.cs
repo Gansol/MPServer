@@ -24,7 +24,7 @@ namespace MPCOM
         public string ReturnMessage;            // 回傳說明文字<30全形字
         public string itemProperty;             // 道具屬性
 
-        public Int16 itemID;
+        public int itemID;
 
     }
 }

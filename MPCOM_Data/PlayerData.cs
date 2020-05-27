@@ -41,8 +41,8 @@ namespace MPCOM
         public string PlayerImage;   // 玩家道具資料
         public byte AccountLevel;
 
-        public Int16 ItemID;
-        public Int16 ItemCount;
+        public int ItemID;
+        public int ItemCount;
         public byte ItemType;
         public string MiceAmount;	// 老鼠數量		＊＊＊類型ＪＳＯＮ＊＊＊＊
         public string SortedItem;		// 所有老鼠		＊＊＊類型ＪＳＯＮ＊＊＊＊ 這是錯的要刪除

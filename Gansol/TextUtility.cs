@@ -432,6 +432,7 @@ namespace Gansol
             return hashString.PadLeft(64, '0');
         }
         #endregion
+
         #region 金錀加密後傳回加密字串
         public string EncryptDerivedKey(String SrcString, String Password, Byte[] Salt)
         {
@@ -683,5 +684,6 @@ namespace Gansol
             return UnSerializeObj;
         }
         #endregion
+
     }
 }

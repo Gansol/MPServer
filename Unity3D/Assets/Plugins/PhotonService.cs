@@ -40,7 +40,7 @@ public class PhotonService : IPhotonPeerListener
     //委派事件 接收技能傷害
     public delegate void ApplySkillHandler(short ID);
     public event ApplySkillHandler ApplySkillMiceEvent;
-    public delegate void ApplySkillItemHandler(short ID);
+    public delegate void ApplySkillItemHandler(int ID);
     public event ApplySkillItemHandler ApplySkillItemEvent;
 
     //委派事件 接收分數、對手分數
@@ -99,6 +99,7 @@ public class PhotonService : IPhotonPeerListener
     public event LoadDataHandler ApplyInviteFriendEvent;
     public event LoadDataHandler RemoveFriendEvent;
 
+
     public delegate void FriendHandler(string value);
     public event FriendHandler InviteFriendEvent;
     public event FriendHandler InviteMatchGameEvent;
@@ -109,6 +110,9 @@ public class PhotonService : IPhotonPeerListener
     public delegate void UpdateValueHandler(short value);
     public event UpdateValueHandler UpdateLifeEvent;
     public event UpdateValueHandler GetLifeEvent;
+
+    public delegate void GetListHandler(List<string> value);
+    public event GetListHandler GetGashaponEvent;
 
     public class PlayerItemData
     {
@@ -263,7 +267,7 @@ public class PhotonService : IPhotonPeerListener
 
             // 接收 技能傷害
             case (byte)BattleResponseCode.ApplySkillItem:
-                short itemID = (short)eventResponse.Parameters[(byte)ItemParameterCode.ItemID];
+                int itemID = (int)eventResponse.Parameters[(byte)ItemParameterCode.ItemID];
                 ApplySkillItemEvent(itemID);
                 Debug.Log("Recive Skill Item!" + (string)eventResponse.Parameters[(byte)BattleResponseCode.DebugMessage]);
                 Debug.Log("OpCode:" + (short)BattleResponseCode.ApplySkillItem);
@@ -788,7 +792,7 @@ public class PhotonService : IPhotonPeerListener
                         {
                             Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
-                           // Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
+                            // Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
                             Global.isCurrencyLoaded = true;
 
                             LoadCurrencyEvent();
@@ -1250,6 +1254,39 @@ public class PhotonService : IPhotonPeerListener
 
             #endregion
 
+            #region BuyGashapon 購買轉蛋道具
+
+            case (byte)StoreResponseCode.BuyGashapon: // 購買轉蛋道具
+                {
+                    try
+                    {
+                        Debug.Log("Gashapon ReturnCode: " + (string)operationResponse.Parameters[(byte)GashaponParameterCode.Ret]);
+                        if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
+                        {
+                            Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
+                            Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
+                            List<string> itemList = (List<string>)TextUtility.DeserializeFromStream((byte[])operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]);
+                            Global.playerItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem]) as Dictionary<string, object>; ;
+                            Global.storeItem = Json.Deserialize((string)operationResponse.Parameters[(byte)StoreParameterCode.StoreData]) as Dictionary<string, object>; ;
+
+                            GetGashaponEvent(itemList);
+                            UpdateCurrencyEvent();
+                            Global.ShowMessage("購買完成！", Global.MessageBoxType.Yes, 3);
+                        }
+                        else
+                        {
+                            Global.ShowMessage(operationResponse.DebugMessage, Global.MessageBoxType.Yes, 0);
+                            Debug.Log("Server DebugMessage: " + operationResponse.DebugMessage);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e);
+                    }
+                }
+                break;
+
+            #endregion
 
             #region  GameOver 接收遊戲結束時資料
             case (byte)BattleResponseCode.GameOver:
@@ -1612,7 +1649,7 @@ public class PhotonService : IPhotonPeerListener
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
     /// </summary>
-    public void SendSkillItem(short itemID, short skillType) //攻擊測試
+    public void SendSkillItem(int itemID, short skillType) //攻擊測試
     {
         Debug.Log("IN Services SendSkillItem:" + itemID);
         try
@@ -1748,7 +1785,7 @@ public class PhotonService : IPhotonPeerListener
     /// </summary>         
     /// <param name="itemID">物品ID</param>
     /// <param name="isEquip">裝備狀態</param>
-    public void UpdatePlayerItem(Int16 itemID, bool isEquip)
+    public void UpdatePlayerItem(int itemID, bool isEquip)
     {
         try
         {
@@ -2220,9 +2257,31 @@ public class PhotonService : IPhotonPeerListener
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, account },{ (byte)PlayerDataParameterCode.MiceAll, Json.Serialize(Global.dictMiceAll) },
-            { (byte)StoreParameterCode.ItemID,Int16.Parse(goods[StoreParameterCode.ItemID.ToString()])},{ (byte)StoreParameterCode.ItemName,goods[StoreParameterCode.ItemName.ToString()]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[StoreParameterCode.ItemType.ToString()])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[StoreParameterCode.CurrencyType.ToString()])},
-            { (byte)StoreParameterCode.BuyCount,Int16.Parse(goods[StoreParameterCode.BuyCount.ToString()])}};
+            { (byte)StoreParameterCode.ItemID,int.Parse(goods[StoreParameterCode.ItemID.ToString()])},{ (byte)StoreParameterCode.ItemName,goods[StoreParameterCode.ItemName.ToString()]},{ (byte)StoreParameterCode.ItemType,byte.Parse(goods[StoreParameterCode.ItemType.ToString()])},{ (byte)StoreParameterCode.CurrencyType,byte.Parse(goods[StoreParameterCode.CurrencyType.ToString()])},
+            { (byte)StoreParameterCode.BuyCount,int.Parse(goods[StoreParameterCode.BuyCount.ToString()])}};
             this.peer.OpCustom((byte)StoreOperationCode.BuyItem, parameter, true, 0, true); // operationCode is RoomSpeak
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    #endregion
+
+    #region BuyGashapon 購買轉蛋商品
+    /// <summary>
+    /// 購買商品
+    /// </summary>
+    public void BuyGashapon(string itemID, string itemType, string series)
+    {
+        try
+        {
+
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+            { (byte)PlayerDataParameterCode.Account, Global.Account },{ (byte)StoreParameterCode.ItemID,itemID },{ (byte)GashaponParameterCode.Series,series },
+            
+           };
+            this.peer.OpCustom((byte)StoreOperationCode.BuyGashapon, parameter, true, 0, true); // operationCode is RoomSpeak
         }
         catch (Exception e)
         {

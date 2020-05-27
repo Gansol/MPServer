@@ -49,6 +49,7 @@ namespace MPServer
         private StoreDataUI storeDataUI;
         private PurchaseUI purchaseUI;
         private ItemUI itemUI;
+        private GashaponUI gashaponUI;
 
         private static readonly int GameTime = 180;
         private static readonly int maxNumPlayer = 2;
@@ -73,6 +74,7 @@ namespace MPServer
             storeDataUI = new StoreDataUI();
             currencyUI = new CurrencyUI();
             purchaseUI = new PurchaseUI();
+            gashaponUI = new GashaponUI(); //實體化 IO (連結資料庫拿資料)
             itemUI = new ItemUI();
 
             if (_server.Actors.GetOnlineActors().Count >= 100)
@@ -310,7 +312,7 @@ namespace MPServer
                                 {
                                     case "S200":
                                         {
-                                            Log.Debug("會員資料內部程式錯誤！");
+                                            Log.Debug("Code:"+ memberData.ReturnCode + "  Message:"+memberData.ReturnMessage +  "  會員資料內部程式錯誤！"  );
                                             break;
                                         }
                                     #region 登入成功
@@ -1221,7 +1223,7 @@ namespace MPServer
 
                                 try
                                 {
-                                    short itemID = (short)operationRequest.Parameters[(byte)ItemParameterCode.ItemID];
+                                    int itemID = (int)operationRequest.Parameters[(byte)ItemParameterCode.ItemID];
                                     short skillType = (short)operationRequest.Parameters[(byte)SkillParameterCode.SkillType];
                                     int roomID = _server.room.GetPlayingRoomFromGuid(peerGuid);
                                     int primaryID = (int)operationRequest.Parameters[(byte)BattleParameterCode.PrimaryID];
@@ -1395,7 +1397,7 @@ namespace MPServer
                                 if (operationRequest.Parameters.Count == 3)
                                 { // 3個參數=更新裝備狀態
                                     bool isEquip = (bool)operationRequest.Parameters[(byte)PlayerDataParameterCode.Equip];
-                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
+                                    int itemID = (int)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
                                     playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerItem(account, itemID, isEquip)); // 更新裝備狀態
                                 }
                                 else// 更新數量
@@ -1776,7 +1778,7 @@ namespace MPServer
 
 
 
-                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(purchaseUI.ConfirmPurchase(account, purchaseID, currencyCode, currencyValue, receiptCipheredPayload, receipt,description));
+                                CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(purchaseUI.ConfirmPurchase(account, purchaseID, currencyCode, currencyValue, receiptCipheredPayload, receipt, description));
 
 
 
@@ -1811,7 +1813,7 @@ namespace MPServer
 
                                 int rice = currencyData.Rice;
                                 Int16 gold = currencyData.Gold;
-                              //  Int16 bonus = currencyData.Bonus;
+                                //  Int16 bonus = currencyData.Bonus;
 
                                 if (currencyData.ReturnCode == "S701")  // 取得遊戲貨幣成功 回傳玩家資料
                                 {
@@ -2839,11 +2841,11 @@ namespace MPServer
                                     // Log.Debug("IN BuyItem");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];
-                                    Int16 itemID = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
+                                    int itemID = (int)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
                                     string itemName = (string)operationRequest.Parameters[(byte)StoreParameterCode.ItemName];
                                     byte itemType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.ItemType];
                                     byte currencyType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.CurrencyType];
-                                    Int16 buyCount = (Int16)operationRequest.Parameters[(byte)StoreParameterCode.BuyCount];
+                                    int buyCount = (int)operationRequest.Parameters[(byte)StoreParameterCode.BuyCount];
 
                                     Log.Debug(string.Format("itemName={0}   itemType={1}   currencyType={2}   buyCount={3}", itemID, itemType, currencyType, buyCount));
                                     StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
@@ -2923,6 +2925,112 @@ namespace MPServer
 
                             }
                             break;
+                        #endregion
+
+                        #region BuyGashapon 購買轉蛋商品
+                        case (byte)StoreOperationCode.BuyGashapon:
+                            {
+                                try
+                                {
+                                    Log.Debug("--------IN BuyGashapon-------");
+                                    string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
+                                    int itemID = (int)operationRequest.Parameters[(byte)StoreParameterCode.ItemID];
+                                    byte itemType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.ItemType];
+                                    byte series = (byte)operationRequest.Parameters[(byte)GashaponParameterCode.Series];
+
+                                    Log.Debug(string.Format("itemID={0}   itemType={1}  Series={2}", itemID, itemType,series));
+
+                                    StoreData storeData;
+                                    CurrencyData currencyData;
+                                    PlayerData playerData;
+                                    GashaponData[] gashaponData;
+
+
+
+
+                                    // 更新商店購買數量
+                                    storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.BuyGashapon(itemID)); //g
+            
+                                    if (storeData.ReturnCode == "S903") // 購買轉蛋商品 商店資料更新成功 ****"－price"****　負的　減少
+                                    {
+                                        // chk currency
+                                        currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, storeData.CurrencyType, -storeData.Price));
+
+                                        // 更新玩家貨幣 成功
+                                        if (currencyData.ReturnCode == "S703") 
+                                        {
+                                            // grenate gashapon
+                                            gashaponData = (GashaponData[])TextUtility.DeserializeFromStream(gashaponUI.BuyGashapon(itemID, itemType,series, storeData.Price)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+
+                                            // 購買轉蛋 成功
+                                            if (gashaponData[0].ReturnCode == "S1205") 
+                                            {
+                                                List<string> itemIist = new List<string>();
+                                                
+                                               itemIist= gashaponData.Select(x => x.ItemID.ToString()).ToList();
+
+                                               string[] itemArray = itemIist.ToArray();
+
+                                                currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
+                                                storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData());
+                                                playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.InsertPlayerItem(account, itemArray));
+
+                                                if (playerData.ReturnCode == "S442") // 新增道具成功
+                                                {
+                                                    playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerItem(account));
+
+                                                    byte[] itemSerialize = TextUtility.SerializeToStream(itemIist);
+
+                                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                                                     { (byte)GashaponParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem, playerData.PlayerItem } , { (byte)PlayerDataParameterCode.SortedItem, itemSerialize } ,
+                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } ,{ (byte)CurrencyParameterCode.Bonus, currencyData.Bonus } 
+                                                                       ,{ (byte)StoreParameterCode.StoreData, storeData.StoreItem }  };
+
+                                                    OperationResponse response = new OperationResponse((byte)GashaponResponseCode.BuyGashapon, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage.ToString() };
+                                                    SendOperationResponse(response, new SendParameters());
+
+                                                }
+                                                else    // 失敗
+                                                {
+                                                    Log.Debug("新增玩家道具失敗: " + playerData.ReturnCode+"  " + playerData.ReturnMessage);
+                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret,playerData.ReturnCode  } };
+                                                    OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                                    SendOperationResponse(actorResponse, new SendParameters());
+                                                }
+
+
+                                                // return currencyData storeData playerItem gashaponItemID
+                                            }
+                                            else    // 失敗
+                                            {
+                                                Log.Debug("購買轉蛋道具失敗: " + gashaponData[0].ReturnCode + "  " + gashaponData[0].ReturnMessage);
+                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret,  gashaponData[0].ReturnCode} };
+                                                OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                                SendOperationResponse(actorResponse, new SendParameters());
+                                            }
+                                        }
+                                        else    // 失敗
+                                        {
+                                            Log.Debug("更新貨幣失敗: " + currencyData.ReturnCode + "  " + currencyData.ReturnMessage);
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret, currencyData.ReturnCode } };
+                                            OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                            SendOperationResponse(actorResponse, new SendParameters());
+                                        }
+                                    }
+                                    else    // 失敗
+                                    {
+                                        Log.Debug("更新商店購買量失敗: " + storeData.ReturnCode + "  " + storeData.ReturnMessage);
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)GashaponParameterCode.Ret, storeData.ReturnCode } };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Debug("例外情況: " + e.Message + "於： " + e.StackTrace);
+                                }
+                                break;
+                            }
                         #endregion
 
                         #region RoomMice 取得雙方房間老鼠資料

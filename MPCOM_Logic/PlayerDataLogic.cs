@@ -5,6 +5,7 @@ using MiniJSON;
 using ExitGames.Logging;
 using MPProtocol;
 using System.Linq;
+using Gansol;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -32,7 +33,8 @@ namespace MPCOM
     [Transaction(TransactionOption.Required)]
     public class PlayerDataLogic : ServicedComponent    // ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
-        PlayerData playerData = new PlayerData();
+        PlayerData playerData;
+        PlayerDataIO playerDataIO;
         Dictionary<string, object> clinetData;
         Dictionary<string, object> serverData;
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
@@ -42,6 +44,12 @@ namespace MPCOM
         protected override bool CanBePooled()
         {
             return true;
+        }
+
+        public PlayerDataLogic()
+        {
+            playerDataIO = new PlayerDataIO();
+            playerData = new PlayerData();
         }
 
         #region LoadPlayerData 載入玩家資料
@@ -56,7 +64,7 @@ namespace MPCOM
             {
                 //to do check 
 
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                //PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.LoadPlayerData(account);
 
             }
@@ -85,7 +93,7 @@ namespace MPCOM
             try
             {
                 //to do check 
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                //PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.LoadPlayerData(account, columns);
             }
             catch
@@ -93,14 +101,14 @@ namespace MPCOM
                 throw;
             }
             return playerData;
-        } 
+        }
         #endregion
 
         #region LoadPlayerItem 載入玩家道具(單筆)資料
         /// <summary>
         /// 載入玩家道具(單筆)資料
         /// </summary>
-        public PlayerData LoadPlayerItem(string account, Int16 itemID)
+        public PlayerData LoadPlayerItem(string account, int itemID)
         {
             playerData.ReturnCode = "(Logic)S400";
             playerData.ReturnMessage = "";
@@ -109,7 +117,7 @@ namespace MPCOM
             {
                 //to do check 
 
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                //PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.LoadPlayerItem(account, itemID);
             }
             catch
@@ -134,7 +142,7 @@ namespace MPCOM
             {
                 //to do check 
 
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                // PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.LoadPlayerItem(account);
             }
             catch
@@ -151,8 +159,8 @@ namespace MPCOM
         [AutoComplete]
         public PlayerData UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend)
         {
-            PlayerData playerData = new PlayerData();
-            PlayerDataIO playerDataIO = new PlayerDataIO();
+            // PlayerData playerData = new PlayerData();
+            // PlayerDataIO playerDataIO = new PlayerDataIO();
             playerData = LoadPlayerData(account);
             playerData.ReturnCode = "(Logic)S400";
             playerData.ReturnMessage = "";
@@ -300,7 +308,7 @@ namespace MPCOM
             playerData.ReturnMessage = "";
 
             //如果驗證成功 寫入玩家資料
-            PlayerDataIO playerDataIO = new PlayerDataIO();
+            // PlayerDataIO playerDataIO = new PlayerDataIO();
             playerData = playerDataIO.LoadPlayerData(account, new List<string> { "Friend" });
 
             if (playerData.ReturnCode == "S436")
@@ -312,7 +320,7 @@ namespace MPCOM
                 //    playerData.ReturnMessage = "不能加自己為好友！";
                 //}
                 //else
-                    if (playerData.Friends.Contains(friend))
+                if (playerData.Friends.Contains(friend))
                 {
                     playerData.ReturnCode = "S439";
                     playerData.ReturnMessage = "已加入好友！";
@@ -336,7 +344,7 @@ namespace MPCOM
             playerData.ReturnMessage = "";
 
             //如果驗證成功 寫入玩家資料
-            PlayerDataIO playerDataIO = new PlayerDataIO();
+            // PlayerDataIO playerDataIO = new PlayerDataIO();
             playerData = playerDataIO.UpdatePlayerData(account, imageName);
 
             return playerData;
@@ -381,14 +389,14 @@ namespace MPCOM
                     }
 
                     //如果驗證成功 寫入玩家資料
-                    PlayerDataIO playerDataIO = new PlayerDataIO();
+                    //PlayerDataIO playerDataIO = new PlayerDataIO();
                     playerData = playerDataIO.UpdatePlayerData(account, miceAll, team);
                 }
 
             }
             catch
             {
-                throw ;
+                throw;
             }
 
             return playerData;
@@ -460,7 +468,7 @@ namespace MPCOM
                     miceAmount = MiniJSON.Json.Serialize(serverData);
 */
                     //如果驗證成功 寫入玩家資料
-                    PlayerDataIO playerDataIO = new PlayerDataIO();
+                    //PlayerDataIO playerDataIO = new PlayerDataIO();
                     playerData = playerDataIO.UpdatePlayerData(account, miceAll);
                 }
 
@@ -531,7 +539,7 @@ namespace MPCOM
                     }
 
                     //如果驗證成功 寫入玩家資料
-                    PlayerDataIO playerDataIO = new PlayerDataIO();
+                    // PlayerDataIO playerDataIO = new PlayerDataIO();
                     playerData = playerDataIO.UpdateGameOver(account, playerData.Rank, playerData.Exp, maxCombo, maxScore, playerData.SumScore, playerData.SumLost, playerData.SumKill, playerData.SumWin, playerData.SumBattle, item);
                 }
 
@@ -548,11 +556,11 @@ namespace MPCOM
         #endregion
 
         #region UpdatePlayerItem 更新玩家(道具)資料
-        public PlayerData UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount)
+        public PlayerData UpdatePlayerItem(string account, int itemID, string itemName, byte itemType, int itemCount)
         {
             try
             {
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                // PlayerDataIO playerDataIO = new PlayerDataIO();
                 PlayerData playerData2 = playerDataIO.LoadPlayerData(account);
 
                 if (itemType == (byte)StoreType.Mice)
@@ -587,7 +595,7 @@ namespace MPCOM
         #region UpdatePlayerItem 更新玩家(多筆道具)資料
         public PlayerData UpdatePlayerItem(string account, string jItemUsage, string[] col)
         {
-            PlayerDataIO playerDataIO = new PlayerDataIO();
+            //PlayerDataIO playerDataIO = new PlayerDataIO();
             playerData = playerDataIO.LoadPlayerItem(account);
 
             var dictClinetData = Json.Deserialize(jItemUsage) as Dictionary<string, object>;
@@ -595,7 +603,7 @@ namespace MPCOM
             List<string> columns = new List<string>(col);
 
             Dictionary<string, Dictionary<string, object>> dictSendData = new Dictionary<string, Dictionary<string, object>>();
-           // Log.Debug("FUCK");
+            // Log.Debug("FUCK");
             //Log.Debug("dictServerItem.Count:" + dictServerItem.Count + "dictClient.Count:" + dictClient.Count);
 
             //object itemProp;
@@ -608,7 +616,7 @@ namespace MPCOM
 
                 foreach (KeyValuePair<string, object> dictNestedServerData in dictServerData)   // 伺服器道具資料 迴圈
                 {
-                  //  Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
+                    //  Log.Debug("dictServerData:" + dictServerData.Count + " dictClinetData:" + dictClinetData.Count);
 
 
                     object itemID; // 道具ID
@@ -620,7 +628,7 @@ namespace MPCOM
                     var dictServerItem = serverItemObejct as Dictionary<string, object>;
 
 
-                //    Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
+                    //    Log.Debug("  dictServerItem Key:" + dictServerItem.Keys + "  dictServerItem value:" + dictServerItem.Values);
 
 
 
@@ -657,8 +665,8 @@ namespace MPCOM
                     //bGetRank = dictClient.TryGetValue(PlayerItem.Rank.ToString(), out clientRank);
                     //bGetExp = dictClient.TryGetValue(PlayerItem.Exp.ToString(), out clientExp);
 
-                  //  Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientUseage: " + clientUseCount);
-                  //  Log.Debug(serverCount + "  " + clientUseCount);
+                    //  Log.Debug("serverCount: " + serverCount + "serverUseage: " + serverUseage + "clientUseage: " + clientUseCount);
+                    //  Log.Debug(serverCount + "  " + clientUseCount);
 
                     int sCount = Convert.ToInt32(serverCount);
                     int sUseage = Convert.ToInt32(serverUseage);
@@ -686,7 +694,7 @@ namespace MPCOM
                             useCount = cUseage + sUseage;
                             dictClient[PlayerItem.ItemCount.ToString()] = itemCount.ToString();
                             dictClient[PlayerItem.UseCount.ToString()] = useCount.ToString();
-                          ///  Log.Debug("ItemCount: " + itemCount + "  UseCount: " + useCount);
+                            ///  Log.Debug("ItemCount: " + itemCount + "  UseCount: " + useCount);
                         }
                         else
                         {
@@ -732,11 +740,11 @@ namespace MPCOM
         #endregion
 
         #region UpdatePlayerItem 更新玩家(道具)裝備狀態
-        public PlayerData UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        public PlayerData UpdatePlayerItem(string account, int itemID, bool isEquip)
         {
             try
             {
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+
                 playerData = playerDataIO.UpdatePlayerItem(account, itemID, isEquip);
 
                 return playerData;
@@ -748,12 +756,102 @@ namespace MPCOM
         }
         #endregion
 
+        #region InsertPlayerItem 新增玩家道具
+        public PlayerData InsertPlayerItem(string account, string[] itemArray)
+        {
+            try
+            {
+                int i = 0;
+                string jString = "";
+
+                Dictionary<string, object> itemData = new Dictionary<string, object>();
+                Dictionary<string, Dictionary<string, object>> sendData = new Dictionary<string, Dictionary<string, object>>();
+                List<string> itemList = itemArray.ToList();
+                playerData = playerDataIO.LoadPlayerItem(account);
+
+                itemData = Json.Deserialize(playerData.PlayerItem) as Dictionary<string, object>;
+
+                // 將相同ID的道具資料加入字典
+                foreach (var item in itemData)
+                {
+                    if (item.Key == itemList[i])
+                    {
+                        Dictionary<string, object> property = item.Value as Dictionary<string, object>;
+
+                        int itemCount = int.Parse(property[PlayerItem.ItemCount.ToString()].ToString());
+                        property[PlayerItem.ItemCount.ToString()] = itemCount + 1;
+                        itemList.Remove(itemList[i]);
+
+                        sendData.Add(item.Key, property);
+                    }
+                    i++;
+                }
+                //account itemID itemCount itemType 
+
+                // 如果已有相同資料 更新道具數量
+                if(sendData.Count>0)
+                    playerData = playerDataIO.UpdatePlayerItem(account, sendData, new List<string> { { PlayerItem.ItemCount.ToString() } });
+
+                // 如果有新的資料 插入新道具資料
+                if (itemList.Count > 0)
+                {
+                    jString = Json.Serialize(GetSroteData(itemList));
+                    playerData = playerDataIO.InsertPlayerItem(account, jString);
+                }
+
+                // 沒有道具 回傳錯誤
+                if (itemList.Count == 0 && sendData.Count == 0)
+                {
+                    playerData.ReturnCode = "S443";
+                    playerData.ReturnMessage = "插入玩家資料失敗，沒有道具資料！";
+                }
+
+
+                return playerData;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        
+        #endregion
+
+        /// <summary>
+        /// 取得對應ID道具資料
+        /// </summary>
+        /// <param name="itemList">道具ID</param>
+        /// <returns></returns>
+        private Dictionary<string, object> GetSroteData(List<string> itemList)
+        {
+            StoreDataIO storeDataIO = new StoreDataIO();
+            StoreData storeData;
+            Dictionary<string, object> dictStoreData = new Dictionary<string, object>();
+            Dictionary<string, object> dictItemData = new Dictionary<string, object>();
+            object values;
+
+            storeData = storeDataIO.LoadStoreData();
+
+            dictStoreData = Json.Deserialize(storeData.StoreItem) as Dictionary<string, object>;
+
+
+
+            foreach (string item in itemList)
+            {
+                dictStoreData.TryGetValue(item, out values);
+                dictItemData.Add(item, values);
+            }
+
+            return dictStoreData;
+        }
+
+
         #region SortPlayerItem 更新玩家(道具排序)資料
         public PlayerData SortPlayerItem(string account, string jString)
         {
             try
             {
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                //PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.SortPlayerItem(account, jString);
 
                 return playerData;
@@ -770,7 +868,7 @@ namespace MPCOM
         #region UpdatePlayerData 更新玩家(Team)資料
 
         [AutoComplete]
-        public PlayerData RemoveFriend(string account,string friend)
+        public PlayerData RemoveFriend(string account, string friend)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(Logic)S400";
@@ -798,7 +896,7 @@ namespace MPCOM
                     }
                     else
                     {
-                       // Log.Debug(friend + "  " + account);
+                        // Log.Debug(friend + "  " + account);
                         playerData.ReturnCode = "S441";
                         playerData.ReturnMessage = "刪除好友失敗，不在好友列表！";
                         return playerData;
@@ -1036,7 +1134,7 @@ namespace MPCOM
             try
             {
                 //如果檢查成功 進行會員資料比對
-                PlayerDataIO playerDataIO = new PlayerDataIO();
+                //PlayerDataIO playerDataIO = new PlayerDataIO();
                 playerData = playerDataIO.LoadFriendsData(accounts);
             }
             catch (Exception e)

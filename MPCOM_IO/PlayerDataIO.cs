@@ -34,7 +34,7 @@ namespace MPCOM
     [Transaction(TransactionOption.RequiresNew)]
     public class PlayerDataIO : ServicedComponent
     {
-        static string host = "localhost\\SQLEXPRESS01";               // 主機位置 IP(本機)\\伺服器名稱
+        static string host = "localhost\\MPSQLSERVER";               // 主機位置 IP(本機)\\伺服器名稱
         static string id = "Krola";                                 // SQL Server帳號
         static string pwd = "1234";                                 // SQL Server密碼
         static string database = "MicePowDB";                       // 資料庫名稱
@@ -204,7 +204,7 @@ namespace MPCOM
         /// </summary>
         /// <returns>PlayerData</returns>
         [AutoComplete]
-        public PlayerData LoadPlayerItem(string account, Int16 itemID)
+        public PlayerData LoadPlayerItem(string account, int itemID)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";             //預設值
@@ -711,7 +711,7 @@ namespace MPCOM
 
         #region UpdatePlayerItem 更新玩家(道具)資料
         [AutoComplete]
-        public PlayerData UpdatePlayerItem(string account, Int16 itemID, byte itemType, Int16 itemCount)
+        public PlayerData UpdatePlayerItem(string account, int itemID, byte itemType, int itemCount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -958,7 +958,7 @@ namespace MPCOM
 
         #region UpdatePlayerItem 更新玩家(道具)裝備狀態
         [AutoComplete]
-        public PlayerData UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        public PlayerData UpdatePlayerItem(string account, int itemID, bool isEquip)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "(IO)S400";
@@ -1005,6 +1005,63 @@ namespace MPCOM
                 throw e;
             }
             return playerData;
+        }
+
+        #endregion
+
+        #region InsertPlayerItem 插入玩家道具資料
+        /// <summary>
+        /// 插入玩家道具資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="jString">要新增的道具jString Dict<str,Dict<str,obj>></param>
+        /// <returns></returns>
+        [AutoComplete]
+        public PlayerData InsertPlayerItem(string account, string jString)
+        {
+            object itemCount,itemType;
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "(IO)S400";
+            playerData.ReturnMessage = "";
+            DataSet DS = new DataSet();
+            try
+            {
+                using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
+                {
+                    Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
+                    string query = @"INSERT INTO Player_PlayerItem(Account,ItemID,ItemCount,ItemType) VALUES(";
+
+
+                    foreach (KeyValuePair<string,object> item in data)
+                    {
+                        Dictionary<string, object> itemProperty = item.Value as Dictionary<string, object>;
+
+                        itemProperty.TryGetValue(PlayerItem.ItemCount.ToString(),out itemCount);
+                        itemProperty.TryGetValue(PlayerItem.ItemType.ToString(),out itemType);
+
+                        query +=account+","+ item.Key + "," + itemCount + "," + itemType + "),(";
+                    }
+
+
+                    query = query.Remove(query.Length - 2, 2);
+
+                    SqlCommand command = new SqlCommand(query, sqlConn);
+                    command.Parameters.Clear();
+                    command.ExecuteNonQuery();
+
+                  playerData=  LoadPlayerItem(account);
+
+                    playerData.ReturnCode = "S442";
+                    playerData.ReturnMessage = "更新玩家道具資料成功！ " + query;
+
+                }
+
+                return playerData;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
         #endregion

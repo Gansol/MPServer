@@ -24,10 +24,11 @@ namespace MPCOM
         public string ReturnMessage;            // 回傳說明文字<30全形字
         public string StoreItem;                 // 商店道具資料
 
-        public Int16 ItemID;                   // 道具ID
+        public int itemID;                   // 道具ID
         public string ItemName;                   // 道具名稱
-        public Int16 BuyCount;                    // 購買數量
+        public int BuyCount;                    // 購買數量
         public byte ItemType;                   // 道具類型
+        public byte CurrencyType;               // 貨幣類型
         public Int16 Price;                   // 道具價格
         public Int16 PromotionsCount;           // 限量
     }

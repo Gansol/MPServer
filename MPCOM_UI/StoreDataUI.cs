@@ -22,10 +22,11 @@ namespace MPCOM
     public interface IStoreDataUI    // 使用介面 可以提供給不同程式語言繼承使用      
     {
         byte[] LoadStoreData();
-        byte[] LoadStoreData(Int16 itemID, byte itemType);
-        byte[] UpdateStoreBuyCount(Int16 itemID, byte itemType, Int16 buyCount);
-        byte[] UpdateStoreLimit(Int16 itemID, byte itemType, int buyCount);
+        byte[] LoadStoreData(int itemID, byte itemType);
+        byte[] UpdateStoreBuyCount(int itemID, byte itemType, int buyCount);
+        byte[] UpdateStoreLimit(int itemID, byte itemType, int buyCount);
 
+        byte[] BuyGashapon(int itemID);
     }
 
     public class StoreDataUI : ServicedComponent, IStoreDataUI
@@ -42,7 +43,7 @@ namespace MPCOM
         /// <param name="itemName"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        public byte[] LoadStoreData(Int16 itemID, byte itemType)
+        public byte[] LoadStoreData(int itemID, byte itemType)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "(UI)S900";
@@ -98,7 +99,7 @@ namespace MPCOM
         /// <param name="itemType">道具類別</param>
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
-        public byte[] UpdateStoreBuyCount(Int16 itemID, byte itemType, Int16 buyCount)
+        public byte[] UpdateStoreBuyCount(int itemID, byte itemType, int buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "S900";
@@ -126,7 +127,7 @@ namespace MPCOM
         /// <param name="itemType">道具類別</param>
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
-        public byte[] UpdateStoreLimit(Int16 itemID, byte itemType, int buyCount)
+        public byte[] UpdateStoreLimit(int itemID, byte itemType, int buyCount)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "S900";
@@ -136,6 +137,34 @@ namespace MPCOM
             {
                 StoreDataLogic storeDataLogic = new StoreDataLogic();
                 storeData = storeDataLogic.UpdateStoreLimit(itemID, itemType, buyCount);
+            }
+            catch (Exception e)
+            {
+                storeData.ReturnCode = "S999";
+                storeData.ReturnMessage = e.Message;
+            }
+            return TextUtility.SerializeToStream(storeData);
+        }
+        #endregion
+
+        #region BuyGashapon 購買轉蛋道具
+        /// <summary>
+        /// 更新道具"限量"數量
+        /// </summary>
+        /// <param name="itemName">道具名稱</param>
+        /// <param name="itemType">道具類別</param>
+        /// <param name="buyCount">購買數量</param>
+        /// <returns></returns>
+        public byte[] BuyGashapon(int itemID)
+        {
+            StoreData storeData = new StoreData();
+            storeData.ReturnCode = "S900";
+            storeData.ReturnMessage = "";
+
+            try
+            {
+                StoreDataLogic storeDataLogic = new StoreDataLogic();
+                storeData = storeDataLogic.BuyGashapon(itemID);
             }
             catch (Exception e)
             {

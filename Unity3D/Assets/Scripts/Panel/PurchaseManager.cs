@@ -330,8 +330,9 @@ public class PurchaseManager : MPPanel
                 m_MPGame.GetAssetLoader().LoadAsset("Panel" + "/", "PanelUI");
                 m_MPGame.GetAssetLoader().LoadPrefab("Panel" + "/", "PurchaseItem");
             }
+            _bLoadAsset = true;
         }
-        _bLoadAsset = true;
+       
     }
 
     private void OnLoadCurrency()

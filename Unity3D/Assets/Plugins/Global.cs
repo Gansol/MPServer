@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static string serverPath = "http://180.218.164.232:58767/MicePowBETA";//Server路徑
+    public static string serverPath = "http://180.218.164.56:58767/MicePowBETA";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
@@ -150,10 +150,12 @@ public static class Global
     public static int bundleVersion = 1;    // 資產版本
     public static int MenuObjetDepth = 10000; // 主選單物件深度
 
+    public static List<string> dictFriends = new List<string>();                                                // 好友列表 List資料
+    public static List<string> GashaponItemList = new List<string>();                                           // 轉到的轉蛋列表 List資料
     public static Dictionary<string, object> dictSortedItem = new Dictionary<string, object>();                 // 全部老鼠 JSON資料;         // 漏掉的老鼠
     public static Dictionary<string, object> dictMiceAll = new Dictionary<string, object>();                    // 全部老鼠 JSON資料
     public static Dictionary<string, object> dictTeam = new Dictionary<string, object>();                       // 隊伍老鼠 JSON資料
-    public static List<string> dictFriends = new List<string>();                                                                        // 好友列表 List資料
+    
     public static Dictionary<string, object> dictOnlineFriendsDetail = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
     public static Dictionary<string, object> dictOnlineFriendsState = new Dictionary<string, object>();          // 好友詳細列表 JSON資料
     public static Dictionary<string, object> dictSkills = new Dictionary<string, object>();                     // 技能列表 JSON資料

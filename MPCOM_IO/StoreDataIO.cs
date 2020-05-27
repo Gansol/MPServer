@@ -32,7 +32,7 @@ namespace MPCOM
     [Transaction(TransactionOption.RequiresNew)]
     public class StoreDataIO : ServicedComponent
     {
-        static string host = "localhost\\SQLEXPRESS01";           // 主機位置 IP(本機)\\伺服器名稱
+        static string host = "localhost\\MPSQLSERVER";           // 主機位置 IP(本機)\\伺服器名稱
         static string id = "Krola";                             // SQL Server帳號
         static string pwd = "1234";                             // SQL Server密碼
         static string database = "MicePowDB";                   // 資料庫名稱
@@ -55,7 +55,7 @@ namespace MPCOM
         /// <param name="itemType"></param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData LoadStoreData(Int16 itemID, byte itemType)
+        public StoreData LoadStoreData(int itemID, byte itemType)
         {
             StoreData storeData = new StoreData();
             storeData.ReturnCode = "S900";
@@ -79,7 +79,7 @@ namespace MPCOM
 
                     // 讀取老鼠資料 寫入DS資料列
                     SqlDataAdapter adapter = new SqlDataAdapter();
-                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Price,PromotionsCount,BuyCount FROM Store_ItemData WHERE (ItemID='{0}') ", itemID), sqlConn);
+                    adapter.SelectCommand = new SqlCommand(string.Format("SELECT Price,PromotionsCount,BuyCount,CurrencyType FROM Store_ItemData WHERE (ItemID='{0}') ", itemID), sqlConn);
                     adapter.Fill(DS);
                 }
                 // 若有讀到則 取得所有資料
@@ -88,6 +88,7 @@ namespace MPCOM
                     storeData.PromotionsCount = Convert.ToInt16(DS.Tables[0].Rows[0]["PromotionsCount"]);
                     storeData.BuyCount = Convert.ToInt16(DS.Tables[0].Rows[0]["BuyCount"]);
                     storeData.Price = Convert.ToInt16(DS.Tables[0].Rows[0]["Price"]);
+                    storeData.Price = Convert.ToInt16(DS.Tables[0].Rows[0]["CurrencyType"]);
 
                     storeData.ReturnCode = "S901"; //true
                     storeData.ReturnMessage = "取得商店資料成功！";
@@ -201,13 +202,13 @@ namespace MPCOM
         /// <param name="buyCount">購買數量</param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData UpdateStoreBuyCount(Int16 itemID, byte itemType, int buyCount)
+        public StoreData UpdateStoreBuyCount(int itemID, byte itemType, int buyCount, Int16 promotionsCount)
         {
             StoreData storeData = default(StoreData);
             storeData.ReturnCode = "(IO)S900";
             storeData.ReturnMessage = "";
             DataSet DS = new DataSet();
-
+            
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(this.connectionString))
@@ -225,11 +226,12 @@ namespace MPCOM
                     //假如資料表中找到資料 更新資料
                     if (DS.Tables[0].Rows.Count == 1)
                     {
-                        string query = @"UPDATE Store_ItemData SET BuyCount=@buyCount WHERE ItemID=@itemID";
+                        string query = @"UPDATE Store_ItemData SET BuyCount=@buyCount,PromotionsCount=@promotionsCount WHERE ItemID=@itemID";
                         SqlCommand command = new SqlCommand(query, sqlCmd.Connection);
                         command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@ItemID", itemID);
+                        command.Parameters.AddWithValue("@itemID", itemID);
                         command.Parameters.AddWithValue("@buyCount", buyCount);
+                        command.Parameters.AddWithValue("@promotionsCount", promotionsCount);
                         command.ExecuteNonQuery();
 
                         storeData.ReturnCode = "S902";
@@ -262,7 +264,7 @@ namespace MPCOM
         /// <param name="limit">限量數</param>
         /// <returns></returns>
         [AutoComplete]
-        public StoreData UpdatedStoreLimit(Int16 itemID, byte itemType, Int16 promotionsCount)
+        public StoreData UpdatedStorePromotionsCount(int itemID, byte itemType, Int16 promotionsCount)
         {
             StoreData storeData = default(StoreData);
             storeData.ReturnCode = "(IO)S900";
