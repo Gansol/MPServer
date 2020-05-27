@@ -27,16 +27,17 @@ namespace MPCOM
         byte[] LoadPlayerData(string account, string[] columns);
 
         byte[] LoadPlayerItem(string account);
-        byte[] LoadPlayerItem(string account, Int16 itemID);
+        byte[] LoadPlayerItem(string account, int itemID);
         byte[] UpdatePlayerData(string account, byte rank, short exp, Int16 maxCombo, int maxScore, int sumScore, int sumLost, int sumKill, string item, string miceAll, string team, string friend);
         byte[] UpdateGameOver(string account, int score, short exp, Int16 maxCombo, int maxScore, int lostMice, int killMice, int battleResult, string item);
         byte[] UpdatePlayerData(string account, string miceAll, string miceName, int amount);
         byte[] UpdatePlayerData(string account, string miceAll, string team);
 
         byte[] UpdatePlayerData(string account, object imageName);
-        byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount);
+        byte[] UpdatePlayerItem(string account, int itemID, string itemName, byte itemType, int itemCount);
         byte[] UpdatePlayerItem(string account, string jItemUsage, string[] columns);
-        byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip);
+        byte[] UpdatePlayerItem(string account, int itemID, bool isEquip);
+        byte[] InsertPlayerItem(string account, string[] itemList);
         byte[] SortPlayerItem(string account, string jString);
 
         byte[] LoadFriendsData(string[] friends);
@@ -128,7 +129,7 @@ namespace MPCOM
         /// <summary>
         /// 載入玩家道具(全部)資料
         /// </summary>
-        public byte[] LoadPlayerItem(string account, Int16 itemID)
+        public byte[] LoadPlayerItem(string account, int itemID)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -318,7 +319,7 @@ namespace MPCOM
         /// <param name="itemType"></param>
         /// <param name="itemCount"></param>
         /// <returns></returns>
-        public byte[] UpdatePlayerItem(string account, Int16 itemID, string itemName, byte itemType, Int16 itemCount)
+        public byte[] UpdatePlayerItem(string account, int itemID, string itemName, byte itemType, int itemCount)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -376,7 +377,7 @@ namespace MPCOM
         /// <param name="itemID"></param>
         /// <param name="isEquip"></param>
         /// <returns></returns>
-        public byte[] UpdatePlayerItem(string account, Int16 itemID, bool isEquip)
+        public byte[] UpdatePlayerItem(string account, int itemID, bool isEquip)
         {
             PlayerData playerData = new PlayerData();
             playerData.ReturnCode = "S400";
@@ -395,6 +396,35 @@ namespace MPCOM
             }
             return TextUtility.SerializeToStream(playerData);
         }
+        #endregion
+
+        #region InsertPlayerItem 插入玩家道具資料
+        /// <summary>
+        /// 插入玩家道具資料
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="itemList">道具ID</param>
+        /// <returns></returns>
+        public byte[] InsertPlayerItem(string account, string[] itemList)
+        {
+            PlayerData playerData = new PlayerData();
+            playerData.ReturnCode = "S400";
+            playerData.ReturnMessage = "";
+
+            try
+            {
+                PlayerDataLogic playerDataLogic = new PlayerDataLogic();
+                playerData = playerDataLogic.InsertPlayerItem(account, itemList);
+            }
+            catch (Exception e)
+            {
+                playerData.ReturnCode = "S499";
+                playerData.ReturnMessage = "(UI)玩家資料未知例外情況！　" + e.Message;
+                throw e;
+            }
+
+            return TextUtility.SerializeToStream(playerData);
+        } 
         #endregion
 
         #region SortPlayerItem 更新玩家(道具)裝備狀態

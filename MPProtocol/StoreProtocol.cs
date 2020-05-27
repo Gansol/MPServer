@@ -4,12 +4,14 @@
     {
         LoadStore = 91,
         BuyItem = 92,
+        BuyGashapon = 99,
     }
 
     public enum StoreResponseCode
     {
         LoadStore = 91,
         BuyItem = 92,
+        BuyGashapon = 99,
     }
 
     public enum StoreParameterCode

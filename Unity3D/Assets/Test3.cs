@@ -1,47 +1,66 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using System.Security.Cryptography;
 using System.Collections.Generic;
-using MiniJSON;
+using Gansol;
 using System.Linq;
 
-public class Test3 : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-        //string a = "90.00005";
-        //string b= "90.60005";
-
-        //int value = 0;
-        //int.TryParse(a, out value);
-        //Debug.Log("1-1:"+value);
-        //int.TryParse(b, out value);
-        //Debug.Log("1-2:" + value);
-
-
-
-        //value = System.Convert.ToInt32(a);
-        //Debug.Log("3-1:" + value);
-        //value = System.Convert.ToInt32(b);
-        //Debug.Log("3-3:" + value);
-
-        //value = int.Parse(a);
-        //Debug.Log("2-1:" + value);
-        //value = int.Parse(b);
-        //Debug.Log("2-2:" + value);
-        object f;
-        Dictionary<string, object> a;
-        a = new Dictionary<string, object>();
+/// <summary>
+/// 使用 RNGCryptoServiceProvider 產生由密碼編譯服務供應者 (CSP) 提供的亂數產生器。
+/// </summary>
+public class Test3 : MonoBehaviour
+{
+    Data[] datas;
+    Data[] datas2;
+    Dictionary<string, object> dict = new Dictionary<string, object>();
+    [Serializable()]
+    public struct Data
+    {
+        public string name;
+        public string id;
+    }
 
 
 
-        List<string> keys = a.Keys.ToList();
-        Debug.Log(keys.Count);
+    public void Start()
+    {
+        datas = new Data[5];
 
+
+        for (int i = 0; i < datas.Length; i++)
+        {
+            datas[i].name = "a" + i.ToString();
+            datas[i].id = "1";
+        }
+
+        datas[3].id = "2";
+        datas[4].id = "2";
        
-	}
 
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        byte[] x = TextUtility.SerializeToStream(datas);
+
+
+        for (int i = 0; i < x.Length; i++)
+        {
+            Debug.Log(x[i]);
+        }
+
+        datas2 = TextUtility.DeserializeFromStream(x) as Data[];
+
+        for (int i = 0; i < datas2.Length; i++)
+        {
+            Debug.Log("datas2:" + datas2[i].id + " " + datas2[i].name);
+        }
+
+        List<string> aaa = new List<string>();
+       aaa =  datas2.Select(c => c.id).ToList();
+
+
+       foreach (string s in aaa)
+       {
+           Debug.Log("list:"+s);
+       }
+
+    }
+
 }

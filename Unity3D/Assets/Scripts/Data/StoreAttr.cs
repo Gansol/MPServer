@@ -7,7 +7,7 @@ public class StoreAttr : AttrBase {
     /// <summary>
     /// 道具ID
     /// </summary>
-    public short itemID;
+    public int itemID;
     /// <summary>
     /// 道具名稱
     /// </summary>

@@ -655,7 +655,7 @@ public class BattleManager : MonoBehaviour
        spawnAI.SpawnByRandom(miceID, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
     }
 
-    void OnApplySkillItem(short itemID)     // 收到技能攻擊 
+    void OnApplySkillItem(int itemID)     // 收到技能攻擊 
     {
         if (!_isReflection || !_isPropected)
         {

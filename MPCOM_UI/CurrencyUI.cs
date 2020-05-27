@@ -61,7 +61,7 @@ namespace MPCOM
         /// </summary>
         /// <param name="account">帳號</param>
         /// <param name="currencyType">道具種類</param>
-        /// <param name="currency">消費總額</param>
+        /// <param name="currency">正負貨幣量( -減少 +增加 )</param>
         /// <returns></returns>
         public byte[] UpdateCurrency(string account, byte currencyType, int currency)
         {

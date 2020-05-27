@@ -4,9 +4,9 @@ using System.Collections;
 public class PhotonConnect : MonoBehaviour
 {
     private InternetChecker internetCheck;
-    public string ServerIP = "180.218.164.232";
-    public int ServerPort = 5055;
-    public string ServerName = "MPServer";
+    private string ServerIP = "180.218.164.56";
+    private int ServerPort = 5055;
+    private string ServerName = "MPServer";
     private static bool firstLogin;
     private bool ConnectStatus = true;
 
@@ -88,7 +88,7 @@ public class PhotonConnect : MonoBehaviour
         }
         else
         {
-            Debug.Log("Connect Fail");
+            Debug.Log("Connect Fail " + ServerIP);
             flag = false;
             ConnectStatus = false;
         }

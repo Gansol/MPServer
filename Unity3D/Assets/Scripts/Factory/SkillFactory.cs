@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MPProtocol;
 using System;
+using Gansol;
 public class SkillFactory : FactoryBase
 {
     static SkillBase skill = null;

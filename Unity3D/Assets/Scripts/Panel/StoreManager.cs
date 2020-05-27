@@ -58,7 +58,7 @@ public class StoreManager : MPPanel
     private string _folderString;                                  // 資料夾名稱
     private int _itemType;                                        // 道具形態
     private bool _bFirstLoad, _bLoadedGashapon, _bLoadedAsset, _bLoadedItem, _bLoadedActor, _bLoadedStoreData, _bLoadedItemData, _bLoadedCurrency, _bLoadedPlayerItem, _bLoadedPanel; // 是否載入轉蛋、是否載入圖片、是否載入角色 等
-    private static GameObject  _lastItemBtn;                   // 暫存分頁、暫存按鈕
+    private static GameObject _lastItemBtn;                   // 暫存分頁、暫存按鈕
     private Dictionary<string, object> _itemData;                   // 道具資料
     private Dictionary<string, GameObject> dictItemRefs;
     #endregion
@@ -74,6 +74,7 @@ public class StoreManager : MPPanel
         ItemPanel,
         ItemInfoBox,
         CheckoutBox,
+        GashaponBox
     }
 
     private void Awake()
@@ -98,7 +99,7 @@ public class StoreManager : MPPanel
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadItemDataEvent += OnLoadItemData;
         Global.photonService.UpdateCurrencyEvent += LoadPlayerInfo;
-
+        Global.photonService.GetGashaponEvent += OnGetGashapon;
     }
 
     private void Update()
@@ -108,14 +109,12 @@ public class StoreManager : MPPanel
 
 
         //// ins fisrt load panelScene : Gashapon
-        //if (assetLoader.loadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
-        //{
-
-        //    //  assetLoader.init();
-        //    //_tmpTab = infoGroupsArea[2];
-        //    //  InstantiateGashapon(infoGroupsArea[2].transform, assetFolder[0]);
-
-        //}
+        if (m_MPGame.GetAssetLoader().loadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
+        {
+            m_MPGame.GetAssetLoader().init();
+            //_tmpTab = infoGroupsArea[2];
+            InstantiateGashapon(infoGroupsArea[(int)ENUM_Area.Tab].transform);
+        }
 
         // 載入Panel完成後 
         if (_bLoadedStoreData && _bLoadedPlayerItem && _bLoadedItemData && _bLoadedCurrency && !_bLoadedPanel)
@@ -123,7 +122,7 @@ public class StoreManager : MPPanel
             _bLoadedPanel = true;
 
             // 顯示 Tab下 第一個商品類別
-            if (!_bFirstLoad) 
+            if (!_bFirstLoad)
                 OnTabClick(infoGroupsArea[(int)ENUM_Area.Tab].transform.GetChild(0).gameObject);
 
             ResumeToggleTarget();
@@ -131,7 +130,7 @@ public class StoreManager : MPPanel
         }
 
         // 載入道具完成後 實體化 道具
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset)                      
+        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset)
         {
             _bLoadedAsset = !_bLoadedAsset;
             InstantiateStoreItem();
@@ -140,7 +139,7 @@ public class StoreManager : MPPanel
         }
 
         // 載入角色完成後 實體化 角色
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedActor)                     
+        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
             _bLoadedActor = InstantiateActor(_lastItemBtn.GetComponentInChildren<UISprite>().name, infoGroupsArea[(int)ENUM_Area.ItemInfoBox].transform.Find(StoreType.Mice.ToString()).GetChild(0).Find("Image"), actorScale);
@@ -153,7 +152,7 @@ public class StoreManager : MPPanel
     private void InstantiateStoreItem()
     {
         // 實體化的商品背景(按鈕)
-        Dictionary<string, GameObject> itemBtnDict= InstantiateItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
+        Dictionary<string, GameObject> itemBtnDict = InstantiateItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
         Transform parent = infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.FindChild(_itemType.ToString());
 
         // 如果有新商品 加入索引 並 加入按鈕事件
@@ -180,6 +179,7 @@ public class StoreManager : MPPanel
     #region -- OnLoadPanel 載入面板 --
     protected override void OnLoading()
     {
+        LoadGashaponAsset();
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
         Global.photonService.LoadCurrency(Global.Account);
@@ -324,7 +324,7 @@ public class StoreManager : MPPanel
         // 關閉上個Panel 顯示Panel 
         itemInfoBox.Find(StoreType.Item.ToString()).gameObject.SetActive(true);
         itemInfoBox.Find(StoreType.Mice.ToString()).gameObject.SetActive(false);
-        
+
         // 載入商品資訊
         LoadProperty.LoadItemProperty(item_Click, itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).gameObject, _itemData, _itemType);
         LoadProperty.LoadPrice(item_Click, itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).gameObject, _itemType);
@@ -368,7 +368,7 @@ public class StoreManager : MPPanel
         object value;
         Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.CheckoutBox].transform;
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
-        
+
         //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
 
         // 基礎購買量
@@ -453,7 +453,7 @@ public class StoreManager : MPPanel
     {
         _itemType = (obj == null) ? (int)StoreType.Mice : int.Parse(obj.name.Remove(0, 3));
         GetMustLoadAsset();
-        infoGroupsArea[(int)ENUM_Area.ItemPanel].SetActive(true); 
+        infoGroupsArea[(int)ENUM_Area.ItemPanel].SetActive(true);
     }
     #endregion
 
@@ -544,7 +544,7 @@ public class StoreManager : MPPanel
     {
         int i = 0;
         itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, _itemType);
-        
+
         // 實體化
         foreach (KeyValuePair<string, object> item in itemData)
         {
@@ -554,13 +554,13 @@ public class StoreManager : MPPanel
             string bundleName = itemName.ToString() + Global.IconSuffix;
 
             // 已載入資產時
-            if (assetLoader.GetAsset(bundleName) != null)                  
+            if (assetLoader.GetAsset(bundleName) != null)
             {
                 GameObject bundle = assetLoader.GetAsset(bundleName);
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
 
                 // 如果沒有ICON 實體化
-                if (imageParent.childCount == 0)   
+                if (imageParent.childCount == 0)
                     MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName.ToString(), new Vector3(0, -30), Vector3.one, new Vector2(140, 140), 400);
             }
             else
@@ -605,54 +605,129 @@ public class StoreManager : MPPanel
         Global.photonService.UpdateCurrencyEvent -= LoadPlayerInfo;
     }
 
+    #region -- LoadGashapon 載入轉蛋物件(亂寫) --
+    private void LoadGashaponAsset()
+    {
+        GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
+        assetLoader.init();
+        assetLoader.LoadAsset(_folderString + "/", _folderString);
+        for (int i = 1; i <= 3; i++)
+            assetLoader.LoadPrefab(_folderString + "/", _folderString + i);
+        _bLoadedGashapon = true;
+    }
+    #endregion
+
+    #region -- InstantiateGashapon 實體化轉蛋物件(亂寫)--
+    /// <summary>
+    /// 實體化載入完成的轉蛋物件，利用資料夾名稱判斷必要實體物件
+    /// </summary>
+    /// <param name="myParent">實體化父系位置</param>
+    /// <param name="folder">資料夾名稱</param>
+    private void InstantiateGashapon(Transform myParent)
+    {
+        GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
+
+        Dictionary<string, object> dictGashaponData = new Dictionary<string, object>();
+        List<string> itemNameList = new List<string>();
+        object itemType, itemName;
+
+        foreach (var item in Global.storeItem)
+        {
+            Dictionary<string, object> values = item.Value as Dictionary<string, object>;
+            values.TryGetValue(StoreProperty.ItemType.ToString(), out itemType);
+            values.TryGetValue(StoreProperty.ItemName.ToString(), out itemName);
+            itemNameList.Add(itemName.ToString());
+            if ((int)itemType == (int)StoreType.Gashapon)
+                dictGashaponData.Add(item.Key, item.Value);
+        }
+
+        int i = 0;
+
+        foreach (KeyValuePair<string, object> gashapon in dictGashaponData)
+        {
+            if (assetLoader.GetAsset(itemNameList[i]) != null)                  // 已載入資產時
+            {
+                GameObject bundle = assetLoader.GetAsset(itemNameList[i]);
+                Transform parent = infoGroupsArea[(int)ENUM_Area.Gashapon].transform.Find("Promotions");
+                MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemNameList[i], new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
+                parent.GetChild(i).name = itemNameList[i];
+            }
+            else
+            {
+                Debug.LogError("Assetbundle reference not set to an instance.");
+            }
+            i++;
+        }
+        _bLoadedGashapon = true;
+    }
+    #endregion
 
 
 
-    //#region -- LoadBuyCountInfo 載入物件價格 --
-    //private void LoadBuyCountInfo(GameObject item, Transform parent)
-    //{
-    //    //parent.GetChild(0).GetChild(1).GetComponent<UILabel>().text = item.GetComponent<Item>().itemProperty[(int)StoreProperty.ItemName];
-    //    //parent.GetChild(0).GetChild(2).GetComponent<UILabel>().text = item.GetComponent<Item>().storeInfo[(int)StoreProperty.Price];
-    //}
-    //#endregion
+    public void OnBuyGashapon(GameObject go)
+    {
+        _lastItemBtn = go;
+        infoGroupsArea[(int)ENUM_Area.GashaponBox].SetActive(true);
+
+        // 初始化視窗資訊
+        GashaponWindowsInit();
+
+        // 因為子物件不能有不同的Layer強制改變
+        infoGroupsArea[(int)ENUM_Area.GashaponBox].layer = LayerMask.NameToLayer("BuyInfo");
+        EventMaskSwitch.Switch(infoGroupsArea[(int)ENUM_Area.GashaponBox]);
+    }
+
+    private void GashaponWindowsInit()
+    {
+        object value;
+        Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.GashaponBox].transform;
+        Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
+
+        //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
+
+        //// 基礎購買量
+        //buyingGoodsData[StoreProperty.BuyCount.ToString()] = "1";
+
+        // 暫存 將購買的商品資訊
+        dictItemProperty.TryGetValue(StoreProperty.ItemID.ToString(), out value);
+        buyingGoodsData[StoreProperty.ItemID.ToString()] = value.ToString();
+
+        dictItemProperty.TryGetValue(StoreProperty.ItemType.ToString(), out value);
+        buyingGoodsData[StoreProperty.ItemType.ToString()] = value.ToString();
+
+        dictItemProperty.TryGetValue(StoreProperty.CurrencyType.ToString(), out value);
+        buyingGoodsData[StoreProperty.CurrencyType.ToString()] = value.ToString();
+
+        dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
+        buyingGoodsData[StoreProperty.ItemName.ToString()] = value.ToString();
+
+        // 顯示圖示
+        //  checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
+        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString()/*.Replace(" ", "") + Global.IconSuffix*/;
+
+        // 顯示商品資訊
+        // checkoutBox.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
+        dictItemProperty.TryGetValue("Price", out value);
+        //  checkoutBox.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = value.ToString(); // price
+        checkoutBox.GetChild(0).FindChild("Price").GetComponent<UILabel>().text = value.ToString(); // price
+    }
+
+    /// <summary>
+    /// 確認購買轉蛋
+    /// </summary>
+    /// <param name="go">Series </param>
+    public void OnConfirmGashapon(GameObject go)
+    {
+        Global.photonService.BuyGashapon(buyingGoodsData[StoreProperty.ItemID.ToString()], buyingGoodsData[StoreProperty.ItemType.ToString()], go.name);
+    }
 
 
-    //#region -- LoadGashapon 載入轉蛋物件(亂寫) --
-    //private void LoadGashaponAsset(string folder)
-    //{
-    //    assetLoader.init();
-    //    assetLoader.LoadAsset(folder + "/", folder);
-    //    for (int i = 1; i <= 3; i++)
-    //        assetLoader.LoadPrefab(folder + "/", folder + i);
-    //    _bLoadedGashapon = true;
-    //}
-    //#endregion
-
-    //#region -- InstantiateGashapon 實體化轉蛋物件(亂寫)--
-    ///// <summary>
-    ///// 實體化載入完成的轉蛋物件，利用資料夾名稱判斷必要實體物件
-    ///// </summary>
-    ///// <param name="myParent">實體化父系位置</param>
-    ///// <param name="folder">資料夾名稱</param>
-    //private void InstantiateGashapon(Transform myParent, string folder)
-    //{
-    //    for (int i = 0; i < 3; i++)
-    //    {
-    //        if (assetLoader.GetAsset(folder + (i + 1).ToString()) != null)                  // 已載入資產時
-    //        {
-    //            GameObject bundle = assetLoader.GetAsset(folder + (i + 1).ToString());
-    //            Transform parent = myParent.GetChild(1).GetChild(i).GetChild(0);
-
-    //            MPGFactory.GetObjFactory().Instantiate(bundle, parent, folder + (i + 1).ToString(), new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
-    //        }
-    //        else
-    //        {
-    //            Debug.LogError("Assetbundle reference not set to an instance.");
-    //        }
-    //    }
-    //    _bLoadedGashapon = true;
-    //}
-    //#endregion
+    private void OnGetGashapon(List<string> itemList)
+    {
+        // show panel
+        // show animation
+        // skip
+    }
 
     //#region -- LoadItemData 載入道具資訊 --
     //private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)

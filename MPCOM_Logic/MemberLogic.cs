@@ -199,6 +199,7 @@ namespace MPCOM
             {
                 throw e;
             }
+
             return memberData;
         }
         #endregion
