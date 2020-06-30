@@ -1,20 +1,21 @@
 ﻿using UnityEngine;
 using System.IO;
 using Gansol;
+using UnityEngine.SceneManagement;
 /* ***************************************************************
- * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
- * -----------            CC BY-NC-SA 4.0            -------------
- * -----------  @Website:  EasyUnity@blogspot.com    -------------
- * -----------  @Email:    GansolTW@gmail.com        -------------
- * -----------  @Author:   Krola.                    -------------
- * ***************************************************************
- *                          Description
- * ***************************************************************
- * 負責 檢查遊戲版本
- * ***************************************************************
- *                           ChangeLog
- * 20160714 v1.0.1  1次重構，版本、資產檢查組件化                                         
- * ****************************************************************/
+* -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+* -----------            CC BY-NC-SA 4.0            -------------
+* -----------  @Website:  EasyUnity@blogspot.com    -------------
+* -----------  @Email:    GansolTW@gmail.com        -------------
+* -----------  @Author:   Krola.                    -------------
+* ***************************************************************
+*                          Description
+* ***************************************************************
+* 負責 檢查遊戲版本
+* ***************************************************************
+*                           ChangeLog
+* 20160714 v1.0.1  1次重構，版本、資產檢查組件化                                         
+* ****************************************************************/
 public class VersionManager : MonoBehaviour
 {
     public GameObject message;
@@ -42,7 +43,7 @@ public class VersionManager : MonoBehaviour
         bundleChecker = gameObject.AddComponent<AssetBundleChecker>();
         visionChecker = new VersionChecker();
         Global.ReturnMessage = "開始檢查遊戲資源. . .";
-        Global.prevScene = Application.loadedLevelName;
+        Global.prevScene = SceneManager.GetActiveScene().name;
 
         if (connCheck.ConnStatus)
             StartCoroutine(visionChecker.CheckVision());
@@ -127,6 +128,7 @@ public class VersionManager : MonoBehaviour
 
         if (Global.isCompleted && bTwiceChk && !bCompleted)
         {
+            
             bCompleted = true;
             if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
             {

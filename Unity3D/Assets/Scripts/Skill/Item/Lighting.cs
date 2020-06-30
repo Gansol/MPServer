@@ -37,7 +37,7 @@ public class Lighting : SkillItem
 
         ObjectFactory objFactory = new ObjectFactory();
         AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
-        GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
+        GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         List<Transform> holeBuffer = new List<Transform>(); // not rnd hole
         List<Transform> rndHole = new List<Transform>(); // ok  rnd hole 
 
@@ -63,7 +63,7 @@ public class Lighting : SkillItem
             // 如果在動上的老鼠已經消失 則不顯示技能
             if (rndHole[i] != null)
             {
-                effects.Add(objFactory.Instantiate(bundle, rndHole[i], skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
+                effects.Add(objFactory.Instantiate(bundle, rndHole[i], "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
                 effects[i].GetComponent<Animator>().Play("Effect1");
             }
         }

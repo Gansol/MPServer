@@ -12,14 +12,14 @@ public class AudioManager : MonoBehaviour
 
     void Awake()
     {
-        audio.volume = audio1Volume;
-        audio.loop = true;
+        GetComponent<AudioSource>().volume = audio1Volume;
+        GetComponent<AudioSource>().loop = true;
     }
 
     void Start()
     {
-        audio.clip = BGSound;
-        audio.Stop();
+        GetComponent<AudioSource>().clip = BGSound;
+        GetComponent<AudioSource>().Stop();
         flag = true;
 //        Debug.Log(audio.name);
 
@@ -54,10 +54,10 @@ public class AudioManager : MonoBehaviour
     {
         FadeIn();
 
-        if (audio.isPlaying == false)
+        if (GetComponent<AudioSource>().isPlaying == false)
         {
-            audio.volume = 0;
-            audio.Play();
+            GetComponent<AudioSource>().volume = 0;
+            GetComponent<AudioSource>().Play();
             Debug.Log("PLAY Sound");
         }
 
@@ -66,9 +66,9 @@ public class AudioManager : MonoBehaviour
     void FadeIn()
     {
 
-        if (audio.volume < maxVolume)
+        if (GetComponent<AudioSource>().volume < maxVolume)
         {
-            audio.volume += 0.1f * Time.deltaTime;
+            GetComponent<AudioSource>().volume += 0.1f * Time.deltaTime;
         }
 
     }
@@ -76,9 +76,9 @@ public class AudioManager : MonoBehaviour
     void FadeOut()
     {
 
-        if (audio.volume > minVolume)
+        if (GetComponent<AudioSource>().volume > minVolume)
             {
-                audio.volume -= 0.1f * Time.deltaTime;
+                GetComponent<AudioSource>().volume -= 0.1f * Time.deltaTime;
             }
 
     }

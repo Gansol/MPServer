@@ -40,7 +40,7 @@ public class MatchManager : MPPanel
     [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
     public Vector3 actorScale;                                                      // 角色縮放
-    public string iconPath = "MiceICON";                                            // 圖片資料夾位置
+    public string iconPath = "miceicon";                                            // 圖片資料夾位置
 
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
@@ -175,7 +175,7 @@ public class MatchManager : MPPanel
                 if (data.TryGetValue(parent.GetChild(i).GetComponentInChildren<UISprite>().name, out miceData))
                 {
                     Dictionary<string, object> miceProp = miceData as Dictionary<string, object>;
-                    parent.parent.FindChild("ItemCount").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
+                    parent.parent.Find("ItemCount").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
                 }
         }
     }
@@ -198,9 +198,9 @@ public class MatchManager : MPPanel
         miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
         miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
-        infoGroupsArea[1].transform.FindChild("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
-        infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
-        infoGroupsArea[1].transform.FindChild("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
+        infoGroupsArea[1].transform.Find("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
+        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
+        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
     }
     #endregion
 
@@ -222,7 +222,7 @@ public class MatchManager : MPPanel
         List<string> keys = loadedBtnRefs.Keys.ToList();
         foreach (KeyValuePair<string, object> item in dictServerData)
         {
-            string bundleName = item.Value.ToString() + Global.IconSuffix;
+            string bundleName = Global.IconSuffix+ item.Value.ToString() ;
 
             if (assetLoader.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
@@ -404,11 +404,11 @@ public class MatchManager : MPPanel
             _miceCost += Convert.ToInt32(value);
         }
 
-        infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+        infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
         ok_btn.SetActive(true);
         if (_miceCost > maxCost)
         {
-            infoGroupsArea[1].transform.FindChild("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
+            infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
             ok_btn.SetActive(false);
             return false;
         }

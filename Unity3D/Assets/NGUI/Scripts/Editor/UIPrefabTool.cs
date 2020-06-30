@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEditor;
 using UnityEngine;
@@ -166,11 +166,15 @@ public class UIPrefabTool : EditorWindow
 #else
 			string path = EditorUtility.SaveFilePanelInProject("Save a prefab",
 				go.name + ".prefab", "prefab", "Save prefab as...", NGUISettings.currentPath);
-#endif	
+#endif
 			if (string.IsNullOrEmpty(path)) return;
 			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
 
+#if UNITY_2018_3_OR_NEWER
+			go = PrefabUtility.SaveAsPrefabAsset(go, path);
+#else
 			go = PrefabUtility.CreatePrefab(path, go);
+#endif
 			if (go == null) return;
 
 			guid = NGUIEditorTools.ObjectToGUID(go);
@@ -219,7 +223,7 @@ public class UIPrefabTool : EditorWindow
 		int index = (int)obj;
 		if (index < mItems.size && index > -1)
 		{
-			Item item = mItems[index];
+			Item item = mItems.buffer[index];
 			DestroyTexture(item);
 			mItems.RemoveAt(index);
 		}
@@ -233,8 +237,8 @@ public class UIPrefabTool : EditorWindow
 	Item FindItem (GameObject go)
 	{
 		for (int i = 0; i < mItems.size; ++i)
-			if (mItems[i].prefab == go)
-				return mItems[i];
+			if (mItems.buffer[i].prefab == go)
+				return mItems.buffer[i];
 		return null;
 	}
 
@@ -254,22 +258,22 @@ public class UIPrefabTool : EditorWindow
 
 		if (mItems.size > 0)
 		{
-			string guid = mItems[0].guid;
+			string guid = mItems.buffer[0].guid;
 			StringBuilder sb = new StringBuilder();
 			sb.Append(guid);
 
 			for (int i = 1; i < mItems.size; ++i)
 			{
-				guid = mItems[i].guid;
+				guid = mItems.buffer[i].guid;
 
 				if (string.IsNullOrEmpty(guid))
 				{
-					Debug.LogWarning("Unable to save " + mItems[i].prefab.name);
+					Debug.LogWarning("Unable to save " + mItems.buffer[i].prefab.name);
 				}
 				else
 				{
 					sb.Append('|');
-					sb.Append(mItems[i].guid);
+					sb.Append(mItems.buffer[i].guid);
 				}
 			}
 			data = sb.ToString();
@@ -326,7 +330,7 @@ public class UIPrefabTool : EditorWindow
 	{
 		for (int i = 0; i < mItems.size; ++i)
 		{
-			Item item = mItems[i];
+			Item item = mItems.buffer[i];
 
 			if (item.prefab == prefab)
 			{
@@ -381,7 +385,7 @@ public class UIPrefabTool : EditorWindow
 	{
 		UISnapshotPoint point = t.GetComponent<UISnapshotPoint>();
 		if (point != null) return point;
-		
+
 		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform c = t.GetChild(i);
@@ -399,25 +403,31 @@ public class UIPrefabTool : EditorWindow
 	{
 		if (item == null || item.prefab == null) return;
 
+		// For some reason Unity 5 doesn't seem to support render textures at edit time while Unity 4 does...
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		if (point == null) point = GetSnapshotPoint(item.prefab.transform);
 
 		if (point != null && point.thumbnail != null)
 		{
-			Debug.Log(2);
 			// Explicitly chosen thumbnail
 			item.tex = point.thumbnail;
 			item.dynamicTex = false;
 			return;
 		}
 		else if (!UnityEditorInternal.InternalEditorUtility.HasPro())
+#endif
 		{
 			// Render textures only work in Unity Pro
 			string path = "Assets/NGUI/Editor/Preview/" + item.prefab.name + ".png";
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			item.tex = File.Exists(path) ? (Texture2D)Resources.LoadAssetAtPath(path, typeof(Texture2D)) : null;
+#else
+			item.tex = File.Exists(path) ? (Texture2D)AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) : null;
+#endif
 			item.dynamicTex = false;
 			return;
 		}
-
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		int dim = (cellSize - 4) * 2;
 
 		// Asset Preview-based approach is unreliable, and most of the time fails to provide a texture.
@@ -427,18 +437,15 @@ public class UIPrefabTool : EditorWindow
 		//if (item.tex != null) return;
 
 		// Let's create a basic scene
-		GameObject root = EditorUtility.CreateGameObjectWithHideFlags(
-				"Preview Root", HideFlags.HideAndDontSave);
-
-		GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags(
-			"Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
+		GameObject root = EditorUtility.CreateGameObjectWithHideFlags("Preview Root", HideFlags.HideAndDontSave);
+		GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags("Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
 
 		// Position it far away so that it doesn't interfere with existing objects
 		root.transform.position = new Vector3(0f, 0f, 10000f);
 		root.layer = item.prefab.layer;
 
 		// Set up the camera
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		Camera cam = camGO.camera;
 		cam.isOrthoGraphic = true;
 #else
@@ -479,6 +486,7 @@ public class UIPrefabTool : EditorWindow
 		// Clean up everything
 		DestroyImmediate(camGO);
 		DestroyImmediate(root);
+#endif
 	}
 
 	/// <summary>
@@ -534,7 +542,7 @@ public class UIPrefabTool : EditorWindow
 
 		// Set the camera's properties
 		cam.cullingMask = mask;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		cam.isOrthoGraphic = true;
 #else
 		cam.orthographic = true;
@@ -579,7 +587,7 @@ public class UIPrefabTool : EditorWindow
 
 		cam.transform.position = pos;
 		cam.transform.rotation = rot;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		cam.isOrthoGraphic = point.isOrthographic;
 #else
 		cam.orthographic = point.isOrthographic;
@@ -606,7 +614,7 @@ public class UIPrefabTool : EditorWindow
 		//   NGUI Snapshot Point 0.1 10 45
 
 		Transform snapshot = FindChild(go.transform, "NGUI Snapshot Point");
-		
+
 		if (snapshot == null)
 		{
 			cam.nearClipPlane = near;
@@ -628,7 +636,7 @@ public class UIPrefabTool : EditorWindow
 			float.TryParse(parts[1], out far);
 			float.TryParse(parts[2], out fov);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			cam.isOrthoGraphic = false;
 #else
 			cam.orthographic = false;
@@ -699,7 +707,7 @@ public class UIPrefabTool : EditorWindow
 		if (mLights != null)
 		{
 			for (int i = 0; i < mLights.size; ++i)
-				mLights[i].enabled = true;
+				mLights.buffer[i].enabled = true;
 			mLights = null;
 		}
 	}
@@ -873,10 +881,10 @@ public class UIPrefabTool : EditorWindow
 			if (dragged != null && indices.size == indexUnderMouse)
 				indices.Add(-1);
 
-			if (mItems[i] != selection)
+			if (mItems.buffer[i] != selection)
 			{
 				if (string.IsNullOrEmpty(searchFilter) ||
-					mItems[i].prefab.name.IndexOf(searchFilter, System.StringComparison.CurrentCultureIgnoreCase) != -1)
+					mItems.buffer[i].prefab.name.IndexOf(searchFilter, System.StringComparison.CurrentCultureIgnoreCase) != -1)
 						indices.Add(i);
 			}
 			++i;
@@ -892,11 +900,11 @@ public class UIPrefabTool : EditorWindow
 
 			if (currentEvent.button == 0 && indexUnderMouse < indices.size)
 			{
-				int index = indices[indexUnderMouse];
+				int index = indices.buffer[indexUnderMouse];
 
 				if (index != -1 && index < mItems.size)
 				{
-					selection = mItems[index];
+					selection = mItems.buffer[index];
 					draggedObject = selection.prefab;
 					dragged = selection.prefab;
 					currentEvent.Use();
@@ -916,8 +924,8 @@ public class UIPrefabTool : EditorWindow
 
 			for (int i = 0; i < indices.size; ++i)
 			{
-				int index = indices[i];
-				Item ent = (index != -1) ? mItems[index] : selection;
+				int index = indices.buffer[i];
+				Item ent = (index != -1) ? mItems.buffer[index] : selection;
 
 				if (ent != null && ent.prefab == null)
 				{

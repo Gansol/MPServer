@@ -78,7 +78,7 @@ public class ObjectPool
             {
                 clone = (GameObject)GameObject.Instantiate(ObjectDeck[item.Key]);   //　等傳老鼠ID名稱近來這要改
                 clone.name = item.Key.ToString();
-                clone.transform.parent = Pool.transform.FindChild(item.Key.ToString()).transform;
+                clone.transform.parent = Pool.transform.Find(item.Key.ToString()).transform;
                 clone.transform.localScale = Vector3.one;
                 clone.transform.gameObject.SetActive(false);    // 新版 子物件隱藏
             }
@@ -99,20 +99,20 @@ public class ObjectPool
 
         objectName = objectID.ToString();
 
-        if (Pool.transform.FindChild(objectName).childCount == 0)
+        if (Pool.transform.Find(objectName).childCount == 0)
         {
             clone = (GameObject)GameObject.Instantiate(ObjectDeck[objectID], Vector3.zero, Quaternion.identity);
             clone.name = objectName;
-            clone.transform.parent = Pool.transform.FindChild(objectName).transform;
+            clone.transform.parent = Pool.transform.Find(objectName).transform;
             clone.transform.localScale = Vector3.one;
             return clone;
         }
 
-        for (int i = 0; i < Pool.transform.FindChild(objectName).childCount; i++)
+        for (int i = 0; i < Pool.transform.Find(objectName).childCount; i++)
         {
             GameObject obj;
 
-            obj = Pool.transform.FindChild(objectName).GetChild(i).gameObject;
+            obj = Pool.transform.Find(objectName).GetChild(i).gameObject;
 
             if (obj.name == objectName && !obj.transform.gameObject.activeSelf)
             {

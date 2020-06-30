@@ -360,7 +360,7 @@ public class SpawnAI
             clone.transform.parent = _hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
             clone.transform.localPosition = new Vector3(0, 0, 0);
-            clone.AddComponent(miceAttr.name + "Boss");
+          //  UnityEngineInternal.APIUpdaterRuntimeServices.AddComponent(clone, "Assets\Scripts\AI\BattleAI\SpawnAI.cs (363,13)", miceAttr.name + "Boss");
 
             // 初始化 MiceBoss數值
 

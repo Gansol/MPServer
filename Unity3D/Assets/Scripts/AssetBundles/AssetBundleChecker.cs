@@ -3,20 +3,21 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Networking;
 /* ***************************************************************
- * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
- * -----------            CC BY-NC-SA 4.0            -------------
- * -----------  @Website:  EasyUnity@blogspot.com    -------------
- * -----------  @Email:    GansolTW@gmail.com        -------------
- * -----------  @Author:   Krola.                    -------------
- * ***************************************************************
- *                          Description
- * ***************************************************************
- * 負責 檢查資產
- * ***************************************************************
- *                           ChangeLog
- * 20160714 v1.0.1  修正部分問題                                       
- * ****************************************************************/
+* -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+* -----------            CC BY-NC-SA 4.0            -------------
+* -----------  @Website:  EasyUnity@blogspot.com    -------------
+* -----------  @Email:    GansolTW@gmail.com        -------------
+* -----------  @Author:   Krola.                    -------------
+* ***************************************************************
+*                          Description
+* ***************************************************************
+* 負責 檢查資產
+* ***************************************************************
+*                           ChangeLog
+* 20160714 v1.0.1  修正部分問題                                       
+* ****************************************************************/
 public class AssetBundleChecker : MonoBehaviour
 {
     #region 欄位
@@ -24,7 +25,7 @@ public class AssetBundleChecker : MonoBehaviour
     AssetBundlesDownloader bundleDownloader;
 
     public int downloadCount;           // 下載數量
-    public bool bundleChk,bFristLoad;              // 資源檢查
+    public bool bundleChk, bFristLoad;              // 資源檢查
     private string localItemListText;   // 本機 檔案列表內容
     private int reConnTimes = 0;
     #endregion
@@ -50,9 +51,9 @@ public class AssetBundleChecker : MonoBehaviour
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
     ReCheckFlag:
-        using (WWW wwwVersionList = new WWW(serverPathFile))
+        using (UnityWebRequest wwwVersionList =  UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
-            yield return wwwVersionList;
+            yield return wwwVersionList.SendWebRequest();
 
             if (wwwVersionList.error != null && reConnTimes < Global.maxConnTimes)
             {
@@ -64,7 +65,7 @@ public class AssetBundleChecker : MonoBehaviour
             }
             if (wwwVersionList.isDone && wwwVersionList.error == null)
             {
-                Global.bundleVersion = System.Convert.ToInt16(wwwVersionList.text);
+                Global.bundleVersion = System.Convert.ToUInt16(wwwVersionList.downloadHandler.text);
                 Debug.Log("遊戲資源版本:" + Global.bundleVersion);
                 reConnTimes = 0;
                 Global.ReturnMessage = "下載資源版本列表完成!";
@@ -84,9 +85,10 @@ public class AssetBundleChecker : MonoBehaviour
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
     ReCheckFlag:
-        using (WWW wwwItemList = new WWW(serverPathFile))
+
+        using (UnityWebRequest wwwItemList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
-            yield return wwwItemList;
+            yield return wwwItemList.SendWebRequest();
 
             if (wwwItemList.error != null && reConnTimes < Global.maxConnTimes)
             {
@@ -100,8 +102,7 @@ public class AssetBundleChecker : MonoBehaviour
             {
                 reConnTimes = 0;
                 Global.ReturnMessage = "檔案列表下載完成!";
-                CompareListFile(wwwItemList.text, localPathFile);
-
+                CompareListFile(wwwItemList.downloadHandler.text, localPathFile);
             }
             else if (reConnTimes >= Global.maxConnTimes)
             {
@@ -203,30 +204,31 @@ public class AssetBundleChecker : MonoBehaviour
             //Debug.Log("Equal= :"+ (hashServerList == hashDelorAdd));
             //HashSet<string> test = new HashSet<string>();
 
-//            string str = "", str2 = "";
-//            foreach (string a in hashServerList)
-//            {
-//               str+=a;
-//            }
-////            Debug.Log(str);
+            //            string str = "", str2 = "";
+            //            foreach (string a in hashServerList)
+            //            {
+            //               str+=a;
+            //            }
+            ////            Debug.Log(str);
 
-//            foreach (string b in hashDelorAdd)
-//            {
-//                str2 += b;
-//            }
-//            Debug.Log(str2);
+            //            foreach (string b in hashDelorAdd)
+            //            {
+            //                str2 += b;
+            //            }
+            //            Debug.Log(str2);
 
             hashServerList.ExceptWith(hashDelorAdd);// hashServerList 新增檔案 = 伺服器檔案 - 已存在檔案
-            
-            
+
+
             //foreach (string a in hashServerList)
             //{
             //    Debug.Log(a);
             //}
             downloadCount = bundleDownloader.fileCount = hashServerList.Count;
-            if (downloadCount > 0) bundleChk = true;
+            if (downloadCount > 0)
+                bundleChk = true;
 
-           // if (bundleDownloader.fileCount > 0) bundleChk = true;
+            // if (bundleDownloader.fileCount > 0) bundleChk = true;
 
             if (hashServerList.Count != 0)
             {
@@ -234,6 +236,7 @@ public class AssetBundleChecker : MonoBehaviour
                 //    bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
 
                 bundleDownloader.DownloadFile(Global.assetBundlesPath, hashServerList.ToList<string>());
+                bundleChk = bundleDownloader.BundleChk;
             }
             else
             {
@@ -245,8 +248,8 @@ public class AssetBundleChecker : MonoBehaviour
         }
         else // 與伺服器檔案相同
         {
-            Global.ReturnMessage = "遊戲資源為最新版本!";
             //Debug.Log("Nothing to update.");
+            Global.ReturnMessage = "遊戲資源為最新版本!";
             Global.isCompleted = true;
         }
     }

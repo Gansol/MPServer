@@ -55,7 +55,7 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
-        assetLoader.LoadPrefab("Panel/", "InvItem");
+        assetLoader.LoadPrefab("panel/", "invitem");
         _beautyEnergy = _beautyFever = 0f;
         //_energy = 0d;
         bLoadPrefab = true;
@@ -92,7 +92,7 @@ public class BattleHUD : MonoBehaviour
             Animator waitAnims = WaitObject.GetComponent("Animator") as Animator;
             AnimatorStateInfo waitState = waitAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (waitState.nameHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
+            if (waitState.fullPathHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
                 if (waitState.normalizedTime > 0.1f) WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
 
@@ -110,9 +110,9 @@ public class BattleHUD : MonoBehaviour
             Animator missionAnims = MissionObject.GetComponent("Animator") as Animator;
             AnimatorStateInfo missionState = missionAnims.GetCurrentAnimatorStateInfo(0);          // 取得目前動畫狀態 (0) = Layer1
 
-            if (missionState.nameHash == Animator.StringToHash("Layer1.FadeIn"))                   // 如果 目前 動化狀態 是 FadeIn
-                if (missionState.normalizedTime > 2.0f) MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-            if (missionState.nameHash == Animator.StringToHash("Layer1.Completed"))                // 如果 目前 動化狀態 是 Completed
+            if (missionState.fullPathHash == Animator.StringToHash("Layer1.FadeIn"))                   // 如果 目前 動化狀態 是 FadeIn
+                if (missionState.fullPathHash > 2.0f) MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+            if (missionState.fullPathHash == Animator.StringToHash("Layer1.Completed"))                // 如果 目前 動化狀態 是 Completed
                 if (missionState.normalizedTime > 2.0f) MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
 
@@ -121,7 +121,7 @@ public class BattleHUD : MonoBehaviour
             Animator scoreAnims = ScorePlusObject.GetComponent("Animator") as Animator;
             AnimatorStateInfo scoreState = scoreAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (scoreState.nameHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
+            if (scoreState.fullPathHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
                 if (scoreState.normalizedTime > 1.0f) ScorePlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
 
@@ -130,7 +130,7 @@ public class BattleHUD : MonoBehaviour
             Animator otherAnims = OtherPlusObject.GetComponent("Animator") as Animator;
             AnimatorStateInfo otherState = otherAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (otherState.nameHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
+            if (otherState.shortNameHash  == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
                 if (otherState.normalizedTime > 1.0f) OtherPlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
         #endregion
@@ -150,13 +150,13 @@ public class BattleHUD : MonoBehaviour
 
                 string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                GameObject bundle = assetLoader.GetAsset(itemName + Global.IconSuffix);
+                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix+ itemName );
                 Debug.Log("Bundle:" + bundle);
                 if (bundle != null)
-                    bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).FindChild("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
+                    bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
 
 
-                rewardPanel.GetChild(i).FindChild("text").GetComponent<UILabel>().text = itemCount;
+                rewardPanel.GetChild(i).Find("text").GetComponent<UILabel>().text = itemCount;
                 i++;
             }
         }
@@ -454,7 +454,7 @@ public class BattleHUD : MonoBehaviour
 
 
         // todo show itemReward goldReward
-        InstantiateItem(_dictItemReward, "InvItem", rewardPanel, new Vector2(400, 0));
+        InstantiateItem(_dictItemReward, "invitem", rewardPanel, new Vector2(400, 0));
         bLoadPrefab = LoadItemICON();
 
         if (result)
@@ -494,13 +494,13 @@ public class BattleHUD : MonoBehaviour
     {
         if (_dictItemReward.Count != 0)
         {
-            assetLoader.LoadAsset("MiceICON/", "MiceICON");
+            assetLoader.LoadAsset("miceicon/", "miceicon");
             // dictItemReward {"10001":{"ItemCount":"0"}}
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                if (assetLoader.GetAsset(itemName + Global.IconSuffix) == null)
-                    assetLoader.LoadPrefab("MiceICON/", itemName + Global.IconSuffix);
+                if (assetLoader.GetAsset(Global.IconSuffix+itemName ) == null)
+                    assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
             }
             return false;
         }

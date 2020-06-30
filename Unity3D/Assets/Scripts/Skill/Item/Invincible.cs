@@ -46,10 +46,10 @@ public class Invincible : SkillItem {
     {
         Debug.Log(skillData.SkillName+" Display: "+skillData.Attr);
         AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
-        GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
+        GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         ObjectFactory objFactory = new ObjectFactory();
 
-        effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName+"Effect", Vector3.zero, Vector3.one, Vector2.one, 1));
+        effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform,"effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Yellow");
 
         BattleManager.SetInvincible(true);  // 錯誤

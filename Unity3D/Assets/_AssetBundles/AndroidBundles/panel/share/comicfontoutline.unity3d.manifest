@@ -1,0 +1,26 @@
+ManifestFileVersion: 0
+CRC: 2189516206
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b3bb457927173c6cd437d0a3ccbe3cae
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2eb4fe45a07866e59f0b1a1f4c8a2968
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1a3c1ecb0cfff2e4d9d70fbd9552f19a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Panel/Share/ComicFontOutline.asset
+- Assets/AssetBundles/Panel/Share/ComicFontOutline.png
+- Assets/AssetBundles/Panel/Share/ComicFontOutline.mat
+Dependencies: []

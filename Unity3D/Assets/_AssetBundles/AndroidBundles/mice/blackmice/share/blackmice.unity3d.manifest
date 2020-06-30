@@ -1,0 +1,26 @@
+ManifestFileVersion: 0
+CRC: 3819837175
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 82f1174924bed8ee5cc629381ed08daa
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2622fcc33b2ee4d452250bd430f8317c
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Mice/BlackMice/Share/BlackMice.asset
+- Assets/AssetBundles/Mice/BlackMice/Share/BlackMice.png
+- Assets/AssetBundles/Mice/BlackMice/Share/BlackMice.mat
+Dependencies: []

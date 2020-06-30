@@ -2,6 +2,8 @@
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.Networking;
+
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -45,10 +47,10 @@ public class VersionChecker
     //        Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
     // Debug.LogError("Eclipse Debug : " + localVisionListFile);
     ReCheckFlag:
-        using (WWW wwwVisionList = new WWW(Global.serverListPath + Global.visionListFile))
+        using (UnityWebRequest wwwVisionList = UnityWebRequest.Get(Global.serverListPath + Global.visionListFile))
         {
 
-            yield return wwwVisionList;
+            yield return wwwVisionList.SendWebRequest();
 
             //Debug.Log("FILE Contain= " + www.text);
 
@@ -72,7 +74,7 @@ public class VersionChecker
             else if (wwwVisionList.isDone && wwwVisionList.error == null)    //開始檢查版本
             {
                 reConnTimes = 0;
-                _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwVisionList.text); // 儲存 下載好的檔案版本
+                _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwVisionList.downloadHandler.text); // 儲存 下載好的檔案版本
 
                 // 如果本機 版本列表檔案 不存在 建立空檔
                 if (!File.Exists(localVisionListFile))
@@ -86,7 +88,7 @@ public class VersionChecker
                 if (string.IsNullOrEmpty(clientVersionText))
                     clientVersionText = Global.defaultVersion;
                 Dictionary<string, object> clientVersion = MiniJSON.Json.Deserialize(clientVersionText) as Dictionary<string, object>;
-                Dictionary<string, object> serverVersion = MiniJSON.Json.Deserialize(wwwVisionList.text) as Dictionary<string, object>;
+                Dictionary<string, object> serverVersion = MiniJSON.Json.Deserialize(wwwVisionList.downloadHandler.text) as Dictionary<string, object>;
                 List<string> clientkeys = new List<string>(clientVersion.Keys);
                 List<string> serverkeys = new List<string>(serverVersion.Keys);
 

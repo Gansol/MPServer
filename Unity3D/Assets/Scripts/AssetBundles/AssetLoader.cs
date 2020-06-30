@@ -1,21 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 /* ***************************************************************
- * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
- * -----------            CC BY-NC-SA 4.0            -------------
- * -----------  @Website:  EasyUnity@blogspot.com    -------------
- * -----------  @Email:    GansolTW@gmail.com        -------------
- * -----------  @Author:   Krola.                    -------------
- * ***************************************************************
- *                          Description
- * ***************************************************************
- * 負責載入資產、取得載入的資產 
- * AssetBundleManager <-- AssetLoader
- * ***************************************************************
- *                           ChangeLog
- * 20160711 v1.0.0  新增載入資產                        
- * ****************************************************************/
+* -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
+* -----------            CC BY-NC-SA 4.0            -------------
+* -----------  @Website:  EasyUnity@blogspot.com    -------------
+* -----------  @Email:    GansolTW@gmail.com        -------------
+* -----------  @Author:   Krola.                    -------------
+* ***************************************************************
+*                          Description
+* ***************************************************************
+* 負責載入資產、取得載入的資產 
+* AssetBundleManager <-- AssetLoader
+* ***************************************************************
+*                           ChangeLog
+* 20160711 v1.0.0  新增載入資產                        
+* ****************************************************************/
 public class AssetLoader : MonoBehaviour
 {
     private int _objCount = 0, _loadedCount = 0;
@@ -23,13 +24,18 @@ public class AssetLoader : MonoBehaviour
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;
     private GameLoop _gameLoop;
+    private string[] dependenciesManifestAssetPath;
+    private AssetBundleManifest manifest;
+    private AssetBundle assetBundle;
+    private string manipath;
 
     public AssetLoader(/*GameLoop gameLoop*/)
     {
+
         init();
-       // _gameLoop = gameLoop;
+        // _gameLoop = gameLoop;
         //Debug.Log( GameObject.Find("GameLoop").name);
-       // Debug.Log(gameLoop.name);
+        // Debug.Log(gameLoop.name);
     }
 
     private void Update()
@@ -38,23 +44,23 @@ public class AssetLoader : MonoBehaviour
 
         if (_objCount != 0)
         {
-            if (AssetBundleManager.loadedObjectCount == _objCount) // 全部沒有載入的情況  如果AB載入完成數量=載入數量
+            if (AssetBundleManager.LoadedObjectCount == _objCount) // 全部沒有載入的情況  如果AB載入完成數量=載入數量
             {
-                AssetBundleManager.loadedObjectCount = _objCount = 0;
+                AssetBundleManager.LoadedObjectCount = _objCount = 0;
                 loadedObj = true;
-                if (AssetBundleManager.isLoadPrefab) AssetBundleManager.init();
+                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
-            else if ((_objCount - _loadedCount) == AssetBundleManager.loadedObjectCount && AssetBundleManager.loadedObjectCount != 0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
+            else if ((_objCount - _loadedCount) == AssetBundleManager.LoadedObjectCount && AssetBundleManager.LoadedObjectCount != 0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
             {
-                AssetBundleManager.loadedObjectCount = _objCount = 0;
+                AssetBundleManager.LoadedObjectCount = _objCount = 0;
                 loadedObj = true;
-                if (AssetBundleManager.isLoadPrefab) AssetBundleManager.init();
+                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
             else if (_objCount == _loadedCount)  // 全部已載入
             {
-                AssetBundleManager.loadedObjectCount = _objCount = 0;
+                AssetBundleManager.LoadedObjectCount = _objCount = 0;
                 loadedObj = true;
-                if (AssetBundleManager.isLoadPrefab) AssetBundleManager.init();
+                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
             //else
             //{
@@ -63,12 +69,47 @@ public class AssetLoader : MonoBehaviour
         }
     }
 
+    public void LoadAssetFormManifest(string folderPath, string manifestAssetName, string assetName)
+    {
+        // 載入Mainfest
+        manipath = Application.persistentDataPath + "/AssetBundles/";
+        if (assetBundle == null )
+        {
+            assetBundle = AssetBundle.LoadFromFile(Path.Combine(manipath, "AndroidBundles"));
+            manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        }
+
+        dependenciesManifestAssetPath = manifest.GetAllDependencies(manifestAssetName);
+
+        AssetBundleManager.init();
+
+        if (!AssetBundleManager.bLoadedAssetbundle(assetName))
+        {
+            // 載入Mainfest 中GameObject Dependencies物件
+            foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
+                StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, dependencyManifestAssetPath, typeof(GameObject)));
+
+            // 載入遊戲物件
+            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
+
+
+        }
+        else
+        {
+            _loadedCount++;
+        }
+        _objCount++;
+
+    }
+
+
     public void LoadAsset(string folderPath, string assetName)
     {
         AssetBundleManager.init();
         try
         {
-            /*_gameLoop.*/StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
+            /*_gameLoop.*/
+            StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
         }
         catch
         {
@@ -82,7 +123,8 @@ public class AssetLoader : MonoBehaviour
         loadedObj = false;
         if (!AssetBundleManager.bLoadedAssetbundle(assetName))
         {
-           /* _gameLoop.*/StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
+            /* _gameLoop.*/
+            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
         }
         else
         {
@@ -98,16 +140,23 @@ public class AssetLoader : MonoBehaviour
     /// <returns>GameObject</returns>
     public GameObject GetAsset(string assetName)
     {
+        AssetBundle ab;
         if (AssetBundleManager.bLoadedAssetbundle(assetName))
-            return AssetBundleManager.getAssetBundle(assetName).mainAsset as GameObject;
+        {
+            ab = AssetBundleManager.getAssetBundle(assetName);
+            return ab.LoadAsset(ab.GetAllAssetNames()[0]) as GameObject;  // 2019新版寫法
+        }
         return null;
     }
+
 
     public void init()
     {
         _objCount = _loadedCount = 0;
         loadedObj = false;
         AssetBundleManager.init();
+
+
     }
 
 

@@ -107,7 +107,7 @@ public class PurchaseManager : MPPanel
     /// </summary>
     private void InstantiateItem()
     {
-        GameObject bundle = m_MPGame.GetAssetLoader().GetAsset("PurchaseItem");
+        GameObject bundle = m_MPGame.GetAssetLoader().GetAsset("purchaseitem");
         Transform itemSlot = null;
         object value, promotionsTime;
         bool reload = false;
@@ -327,8 +327,8 @@ public class PurchaseManager : MPPanel
                 _bFirstLoad = false;
 
                 //  m_MPGame.GetAssetLoader().LoadAsset("Purchase" + "/", "Purchase" + Global.IconSuffix);
-                m_MPGame.GetAssetLoader().LoadAsset("Panel" + "/", "PanelUI");
-                m_MPGame.GetAssetLoader().LoadPrefab("Panel" + "/", "PurchaseItem");
+                m_MPGame.GetAssetLoader().LoadAsset("panel" + "/", "panelui");
+                m_MPGame.GetAssetLoader().LoadPrefab("panel" + "/", "purchaseitem");
             }
             _bLoadAsset = true;
         }

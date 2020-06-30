@@ -13,7 +13,8 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
+
+#if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
 {
@@ -42,12 +43,12 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         /// <param name="callback">Callback when completed.</param>
         /// <param name="silent">If set to <c>true</c> silent.</param>
-        public void Authenticate(Action<bool, string> callback, bool silent)
+        public void Authenticate(bool silent, Action<SignInStatus> callback)
         {
             LogUsage();
             if (callback != null)
             {
-                callback(false, "Not implemented on this platform");
+                callback(SignInStatus.Failed);
             }
         }
 
@@ -74,7 +75,6 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Retrieves an id token, which can be verified server side, if they are logged in.
         /// </summary>
-        /// <param name="idTokenCallback">The callback invoked with the token</param>
         /// <returns>The identifier token.</returns>
         public string GetIdToken()
         {
@@ -98,6 +98,13 @@ namespace GooglePlayGames.BasicApi
         {
             LogUsage();
             return null;
+        }
+
+        public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+            Action<string> callback)
+        {
+            LogUsage();
+            callback(null);
         }
 
         /// <summary>
@@ -173,17 +180,6 @@ namespace GooglePlayGames.BasicApi
             {
                 callback.Invoke(null);
             }
-        }
-
-        /// <summary>
-        /// Returns the achievement corresponding to the passed achievement identifier.
-        /// </summary>
-        /// <returns>The achievement.</returns>
-        /// <param name="achId">Achievement identifier.</param>
-        public Achievement GetAchievement(string achId)
-        {
-            LogUsage();
-            return null;
         }
 
         /// <summary>
@@ -311,8 +307,8 @@ namespace GooglePlayGames.BasicApi
             if (callback != null)
             {
                 callback(new LeaderboardScoreData(
-                        leaderboardId,
-                        ResponseStatus.LicenseCheckFailed));
+                    leaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
             }
         }
 
@@ -335,8 +331,8 @@ namespace GooglePlayGames.BasicApi
             if (callback != null)
             {
                 callback(new LeaderboardScoreData(
-                        token.LeaderboardId,
-                        ResponseStatus.LicenseCheckFailed));
+                    token.LeaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
             }
         }
 
@@ -377,10 +373,32 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>Asks user to give permissions for the given scopes.</summary>
+        /// <param name="scopes">Scope to ask permission for</param>
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback.Invoke(SignInStatus.Failed);
+            }
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.HasPermissions"/>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            LogUsage();
+            return false;
+        }
+
         /// <summary>
         /// Returns a real-time multiplayer client.
         /// </summary>
-        /// <seealso cref="GooglePlayGames.Multiplayer.IRealTimeMultiplayerClient"></seealso>
+        /// <seealso cref="GooglePlayGames.BasicApi.Multiplayer.IRealTimeMultiplayerClient"></seealso>
         /// <returns>The rtmp client.</returns>
         public IRealTimeMultiplayerClient GetRtmpClient()
         {
@@ -413,16 +431,6 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         /// <returns>The events client.</returns>
         public GooglePlayGames.BasicApi.Events.IEventsClient GetEventsClient()
-        {
-            LogUsage();
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the quests client.
-        /// </summary>
-        /// <returns>The quests client.</returns>
-        public GooglePlayGames.BasicApi.Quests.IQuestsClient GetQuestsClient()
         {
             LogUsage();
             return null;
@@ -489,13 +497,14 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Gets the Android API client. Returns null on non-Android players.
+        /// Sets the gravity for popups (Android only).
         /// </summary>
-        /// <returns>The API client.</returns>
-        public IntPtr GetApiClient()
+        /// <remarks>This can only be called after authentication.  It affects
+        /// popups for achievements and other game services elements.</remarks>
+        /// <param name="gravity">Gravity for the popup.</param>
+        public void SetGravityForPopups(Gravity gravity)
         {
             LogUsage();
-            return IntPtr.Zero;
         }
 
         /// <summary>

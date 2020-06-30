@@ -39,7 +39,7 @@ public class PlayerManager : MPPanel
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
-    private static string _MiceIconPath = "MiceICON", _ItemIconPath = "ItemICON", _PanelPath = "Panel", _InvItem = "InvItem";
+    private static string _MiceIconPath = "miceicon", _ItemIconPath = "itemicon", _PanelPath = "panel", _InvItem = "invitem";
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
@@ -201,7 +201,7 @@ public class PlayerManager : MPPanel
         }
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
-            assetLoader.LoadPrefab(_MiceIconPath + "/", item.Value + Global.IconSuffix);
+            assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
         _dictItemData = Global.playerItem;
     }
 
@@ -245,7 +245,7 @@ public class PlayerManager : MPPanel
 
                 nestedData.TryGetValue("ItemID", out itemID);
                 itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-                bundleName = itemName + Global.IconSuffix;
+                bundleName = Global.IconSuffix+ itemName;
 
                 // 已載入資產時
                 if (assetLoader.GetAsset(bundleName) != null)
@@ -317,7 +317,7 @@ public class PlayerManager : MPPanel
 
                 if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                 {
-                    string bundleName = itemName + Global.IconSuffix;
+                    string bundleName = Global.IconSuffix+ itemName ;
                     // 已載入資產時
                     if (assetLoader.GetAsset(bundleName) != null)
                     {
@@ -358,13 +358,13 @@ public class PlayerManager : MPPanel
         Transform parent = playerInfoArea.transform;
         int exp = Clac.ClacExp(Mathf.Min(Global.Rank + 1, 100));
 
-        parent.FindChild("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
-        parent.FindChild("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
-        parent.FindChild("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
+        parent.Find("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
+        parent.Find("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
+        parent.Find("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
         // parent.FindChild("Note").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.FindChild("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + exp.ToString();
-        parent.FindChild("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(exp);
-        parent.FindChild("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
+        parent.Find("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + exp.ToString();
+        parent.Find("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(exp);
+        parent.Find("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
     }
 
     private void LoadPlayerEquip()
@@ -377,13 +377,13 @@ public class PlayerManager : MPPanel
         Transform parent = playerRecordArea.transform;
         float winRate = ((float)Global.SumWin / (float)Global.SumBattle) * 100f;
 
-        parent.FindChild("HighScore").GetComponent<UILabel>().text = Global.MaxScore.ToString();
-        parent.FindChild("Hit").GetComponent<UILabel>().text = Global.SumKill.ToString();
-        parent.FindChild("Win").GetComponent<UILabel>().text = Global.SumWin.ToString();
-        parent.FindChild("Combo").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.FindChild("WinRate").GetComponent<UILabel>().text = winRate.ToString("F2") + " %";
-        parent.FindChild("StrianghtWin").GetComponent<UILabel>().text = Global.SumWin.ToString();
-        parent.FindChild("Lose").GetComponent<UILabel>().text = Global.SumLost.ToString();
+        parent.Find("HighScore").GetComponent<UILabel>().text = Global.MaxScore.ToString();
+        parent.Find("Hit").GetComponent<UILabel>().text = Global.SumKill.ToString();
+        parent.Find("Win").GetComponent<UILabel>().text = Global.SumWin.ToString();
+        parent.Find("Combo").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
+        parent.Find("WinRate").GetComponent<UILabel>().text = winRate.ToString("F2") + " %";
+        parent.Find("StrianghtWin").GetComponent<UILabel>().text = Global.SumWin.ToString();
+        parent.Find("Lose").GetComponent<UILabel>().text = Global.SumLost.ToString();
     }
     #endregion
 
@@ -399,7 +399,7 @@ public class PlayerManager : MPPanel
 
         // 如果 頭像背包為空 實體化按鈕圖示
         if (playerAvatarIconGrid.transform.childCount == 0)
-            InstantiateICON(Global.dictMiceAll, "InvItem", playerAvatarIconGrid.transform, itemOffset, itemCount, row);
+            InstantiateICON(Global.dictMiceAll, "invitem", playerAvatarIconGrid.transform, itemOffset, itemCount, row);
 
         // 開關防止Item按鈕失效
         playerAvatarIconGrid.SetActive(false);
@@ -431,11 +431,11 @@ public class PlayerManager : MPPanel
                     pos = sortItemPos(12, 5, offset, pos, i);
                     bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
-                    string iconName = item.Value + Global.IconSuffix;
+                    string iconName = Global.IconSuffix + item.Value ;
                     if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
                     {
                         GameObject icon = assetLoader.GetAsset(iconName);
-                        bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.FindChild("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                        bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.Find("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
                         bundle.transform.parent.parent.gameObject.tag = "InventoryICON";
                         GameObject.Destroy(bundle.transform.parent.parent.GetComponent<ButtonSwitcher>());
                         GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragScrollView>());

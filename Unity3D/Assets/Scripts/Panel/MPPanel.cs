@@ -109,13 +109,13 @@ public abstract class MPPanel : MonoBehaviour
         else
         {// 已建立道具時
 
-            if (itemPanel.FindChild(itemType.ToString()))       // 如果有對應道具類別
+            if (itemPanel.Find(itemType.ToString()))       // 如果有對應道具類別
             {
                 _lastEmptyItemGroup.SetActive(false);
-                _lastEmptyItemGroup = itemPanel.FindChild(itemType.ToString()).gameObject;
+                _lastEmptyItemGroup = itemPanel.Find(itemType.ToString()).gameObject;
                 _lastEmptyItemGroup.SetActive(true);                                                  // 如果沒有對應道具類別資料 建立道具
             }
-            else if ((_lastEmptyItemGroup != itemPanel.FindChild(itemType.ToString())))
+            else if ((_lastEmptyItemGroup != itemPanel.Find(itemType.ToString())))
             {
 
                 _lastEmptyItemGroup.SetActive(false);
@@ -195,7 +195,7 @@ public abstract class MPPanel : MonoBehaviour
             foreach (KeyValuePair<string, object> item in itemData)
             {
                 if (!string.IsNullOrEmpty(item.Value.ToString()))
-                    assetLoader.LoadPrefab(folder + "/", item.Value.ToString() + Global.IconSuffix);
+                    assetLoader.LoadPrefab(folder + "/", Global.IconSuffix + item.Value.ToString() );
             }
             return true;
         }

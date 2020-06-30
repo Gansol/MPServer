@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static string serverPath = "http://180.218.164.56:58767/MicePowBETA";//Server路徑
+    public static string serverPath = "http://180.218.140.27:58767/MicePowBETA";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
@@ -16,8 +16,6 @@ public static class Global
  "/AndroidList/";//  "/AndroidList/";   
 #elif UNITY_IPHONE
     "/iOSList/";
-#elif UNITY_STANDALONE_WIN
-    "/WebList/";
 #else
  string.Empty;
 #endif
@@ -28,8 +26,6 @@ public static class Global
  "/AndroidBundles/"; // "/AndroidBundles/";
 #elif UNITY_IPHONE
     "/iOSBundles/";
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
-    "/WebBundles/";
 #else
  string.Empty;
 #endif
@@ -127,7 +123,9 @@ public static class Global
     public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
 
-    public static string IconSuffix = "ICON";  // ICON附檔名
+    public static string IconSuffix = "Icon_";  // ICON附檔名
+    public static string PanelPath = "panel/";  // panel路徑
+    public static string PanelUniquePath = "panel/unique/";  // panel路徑
 
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別
@@ -147,7 +145,7 @@ public static class Global
     public static int SumWin = 0;          // 總勝場
     public static int SumBattle = 0;          // 總場次
     public static string gameVersion = "";    // 資產版本
-    public static int bundleVersion = 1;    // 資產版本
+    public static uint bundleVersion = 1;    // 資產版本
     public static int MenuObjetDepth = 10000; // 主選單物件深度
 
     public static List<string> dictFriends = new List<string>();                                                // 好友列表 List資料
@@ -243,8 +241,8 @@ public static class Global
 
 
 
-        public const string MainGameAsset = "MenuUI";
-        public const string BattleAsset = "GameUI";
+        public const string MainGameAsset = "menuui";
+        public const string BattleAsset = "gameui";
 
     }
 

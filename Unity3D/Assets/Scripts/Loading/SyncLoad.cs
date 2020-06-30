@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+
 public class SyncLoad : MonoBehaviour
 {
     AssetLoader assetLoader;
@@ -36,38 +36,41 @@ public class SyncLoad : MonoBehaviour
 
     public void OnLoadScene()       // LoadScene
     {
-        Application.LoadLevel(Global.Scene.LoadScene);
+        SceneManager.LoadScene(Global.Scene.LoadScene);
     }
 
     private void LoadAssetCheck()
     {
-        if (Application.loadedLevelName == Global.Scene.BundleCheck)
+
+        if (SceneManager.GetActiveScene().name == Global.Scene.BundleCheck)
         {
             bLoadAsset = true;
         }
 
-        if (Application.loadedLevelName == Global.Scene.MainGame)
+        if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "LiHeiProFont");
-            assetLoader.LoadAsset("Panel/", "ComicFont");
-            assetLoader.LoadAsset("Panel/", "ComicFontB");
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath+ "menuui.unity3d", "menuui");
 
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadAsset("Panel/", "GameScene");
-            assetLoader.LoadAsset("Panel/", "MainFront");
-            assetLoader.LoadAsset("Panel/", "MainBack");
-            assetLoader.LoadAsset("Panel/", "ShareObject");
+            //assetLoader.LoadAsset("panel/share/", "liheiprofont");
+            //assetLoader.LoadAsset("panel/share/", "comicfont");
+            //assetLoader.LoadAsset("panel/", "comicfontoutline");
 
-            assetLoader.LoadPrefab("Panel/", Global.Scene.MainGameAsset);
+            //assetLoader.LoadAsset("panel/share/", "panelui");
+            //assetLoader.LoadAsset("panel/share/", "gamescene");
+            //assetLoader.LoadAsset("panel/share/", "mainfront");
+            //assetLoader.LoadAsset("panel/share/", "mainback");
+            //assetLoader.LoadAsset("panel/share/", "shareobject");
+
+            //assetLoader.LoadPrefab("panel/", Global.Scene.MainGameAsset);
             bLoadAsset = true;
         }
 
-        if (Application.loadedLevelName == Global.Scene.Battle)
+        if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "BattleHUD");
-            assetLoader.LoadPrefab("Panel/", Global.Scene.BattleAsset);
+            assetLoader.LoadAsset(Global.PanelPath, "battlehud");
+            assetLoader.LoadPrefab(Global.PanelPath, Global.Scene.BattleAsset);
             bLoadAsset = true;
         }
     }
@@ -76,15 +79,15 @@ public class SyncLoad : MonoBehaviour
     {
         string sceneName = "";
 
-        switch (Application.loadedLevelName)
+        switch (SceneManager.GetActiveScene().name)
         {
             case Global.Scene.BundleCheck:
                 sceneName = Global.Scene.MainGame;
                 break;
             case Global.Scene.MainGame:
-                sceneName =  Global.Scene.MainGameAsset;
+                sceneName = Global.Scene.MainGameAsset;
                 break;
-            case  Global.Scene.Battle:
+            case Global.Scene.Battle:
                 sceneName = Global.Scene.BattleAsset;
                 break;
         }
@@ -92,10 +95,11 @@ public class SyncLoad : MonoBehaviour
         if (Global.dictLoadedScene.ContainsKey(sceneName))
             Global.dictLoadedScene.TryGetValue(sceneName, out _clone);
 
-        if (AssetBundleManager.bLoadedAssetbundle(sceneName) && _clone == null)
+        if (AssetBundleManager.bLoadedAssetbundle(Global.PanelUniquePath+ sceneName +Global.ext) && _clone == null)
         {
+            string assetName = Global.PanelUniquePath + sceneName + Global.ext;
 
-            _clone = Instantiate(assetLoader.GetAsset(sceneName)) as GameObject;
+            _clone = Instantiate(assetLoader.GetAsset(assetName)) as GameObject;
             _clone.name = sceneName;
             if (!Global.dictLoadedScene.ContainsKey(sceneName))
                 Global.dictLoadedScene.Add(_clone.name, _clone);
@@ -110,13 +114,13 @@ public class SyncLoad : MonoBehaviour
 
 
 
-        if (Application.loadedLevelName != "BundleCheck")
+        if (SceneManager.GetActiveScene().name != "BundleCheck")
         {
-            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = false;
-            _clone.transform.FindChild("HUDCamera").GetComponent<Camera>().enabled = true;
+            _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
+            _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
         }
 
-        Global.prevScene = Application.loadedLevelName;
+        Global.prevScene = SceneManager.GetActiveScene().name;
 
 
     }

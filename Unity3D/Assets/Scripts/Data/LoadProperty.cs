@@ -25,7 +25,7 @@ public static class LoadProperty
                 int i = 0;
                 foreach (KeyValuePair<string, object> property in nestedData)
                 {
-                    Transform infoField = parent.transform.FindChild(property.Key);
+                    Transform infoField = parent.transform.Find(property.Key);
                     if (infoField != null) infoField.GetComponent<UILabel>().text = property.Value.ToString();
                     i++;
                 }
