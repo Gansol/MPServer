@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 3309176414
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1ab14d5cd93b1110d03363dbd91a8e73
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8a54f921be9e95a99076cbb9c276b333
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Creature/Share/Bali.png
+- Assets/AssetBundles/Creature/Share/Bali.mat
+- Assets/AssetBundles/Creature/Share/Bali.asset
+Dependencies: []

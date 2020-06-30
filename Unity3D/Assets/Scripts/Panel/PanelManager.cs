@@ -114,7 +114,7 @@ public class PanelManager : MPPanel
         }
 
 
-        GameObject bundle = assetLoader.GetAsset(_panelName);
+        GameObject bundle = assetLoader.GetAsset(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
         panelState.obj = MPGFactory.GetObjFactory().Instantiate(bundle, Panel[_panelNo].transform, _panelName, Vector3.zero, Vector3.one, Vector3.zero, -1);
         panelState.obj = panelState.obj.transform.parent.gameObject;
         panelState.obj.layer = Panel[_panelNo].layer;
@@ -143,8 +143,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadPrefab("Panel/", _panelName);
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath + _panelName.ToLower() + Global.ext, _panelName.ToLower());
             _loadedPanel = true;
         }
         else
@@ -163,8 +162,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
             assetLoader.init();
-            assetLoader.LoadAsset("Panel/", "PanelUI");
-            assetLoader.LoadPrefab("Panel/", _panelName);
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath + _panelName.ToLower() + Global.ext, _panelName);
             _loadedPanel = true;
         }
         else

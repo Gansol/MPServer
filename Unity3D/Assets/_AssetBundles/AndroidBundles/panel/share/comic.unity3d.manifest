@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 3599118258
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: edc93d046748e86a0179af673077b7f0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 44912aa95bf28c03affddc6817be15fe
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Panel/Share/Comic.ttf
+Dependencies: []

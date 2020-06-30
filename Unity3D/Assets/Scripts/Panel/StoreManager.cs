@@ -153,7 +153,7 @@ public class StoreManager : MPPanel
     {
         // 實體化的商品背景(按鈕)
         Dictionary<string, GameObject> itemBtnDict = InstantiateItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
-        Transform parent = infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.FindChild(_itemType.ToString());
+        Transform parent = infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString());
 
         // 如果有新商品 加入索引 並 加入按鈕事件
         if (itemBtnDict != null)
@@ -333,7 +333,7 @@ public class StoreManager : MPPanel
 
         // 載入商品資訊
         dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + Global.IconSuffix;
+        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix+ value.ToString().Replace(" ", "") ;
         dictItemProperty.TryGetValue(StoreProperty.Description.ToString(), out value);
         itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
 
@@ -389,13 +389,13 @@ public class StoreManager : MPPanel
 
         // 顯示圖示
         checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
-        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = value.ToString().Replace(" ", "") + Global.IconSuffix;
+        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "") ;
 
         // 顯示商品資訊
-        checkoutBox.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
+        checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = "1";  // count = 1
         dictItemProperty.TryGetValue("Price", out value);
-        checkoutBox.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = value.ToString(); // price
-        checkoutBox.GetChild(0).FindChild("Price").GetComponent<UILabel>().text = value.ToString(); // price
+        checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text = value.ToString(); // price
+        checkoutBox.GetChild(0).Find("Price").GetComponent<UILabel>().text = value.ToString(); // price
     }
 
     /// <summary>
@@ -405,14 +405,14 @@ public class StoreManager : MPPanel
     public void OnQuantity(GameObject obj)
     {
         Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.CheckoutBox].transform;
-        int price = int.Parse(checkoutBox.GetChild(0).FindChild("Price").GetComponent<UILabel>().text);
-        int sum = int.Parse(checkoutBox.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text);
-        int count = int.Parse(checkoutBox.GetChild(0).FindChild("Count").GetComponent<UILabel>().text);
+        int price = int.Parse(checkoutBox.GetChild(0).Find("Price").GetComponent<UILabel>().text);
+        int sum = int.Parse(checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text);
+        int count = int.Parse(checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text);
 
         count += (obj.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
-        buyingGoodsData[StoreProperty.BuyCount.ToString()] = checkoutBox.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = count.ToString();
-        checkoutBox.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = (price * count).ToString();
+        buyingGoodsData[StoreProperty.BuyCount.ToString()] = checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = count.ToString();
+        checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text = (price * count).ToString();
     }
 
     /// <summary>
@@ -475,7 +475,7 @@ public class StoreManager : MPPanel
         {
             assetLoader.init();
             assetLoader.LoadAsset(_folderString + "/", _folderString);
-            assetLoader.LoadPrefab("Panel/", "Item");   // 道具Slot
+            assetLoader.LoadPrefab("panel/", "Item");   // 道具Slot
             _bLoadedAsset = LoadIconObject(GetItemNameData(itemDetailData), _folderString);
         }
         else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
@@ -504,7 +504,7 @@ public class StoreManager : MPPanel
         {
             diceItemProperty = Global.storeItem[item.Key] as Dictionary<string, object>;
             diceItemProperty.TryGetValue("Price", out price);
-            dictItemRefs[item.Key].transform.FindChild("Price").GetComponent<UILabel>().text = price.ToString();
+            dictItemRefs[item.Key].transform.Find("Price").GetComponent<UILabel>().text = price.ToString();
         }
     }
     #endregion
@@ -551,7 +551,7 @@ public class StoreManager : MPPanel
             object itemName;
             var nestedData = item.Value as Dictionary<string, object>;
             nestedData.TryGetValue(StoreProperty.ItemName.ToString(), out itemName);
-            string bundleName = itemName.ToString() + Global.IconSuffix;
+            string bundleName = Global.IconSuffix+ itemName.ToString() ;
 
             // 已載入資產時
             if (assetLoader.GetAsset(bundleName) != null)
@@ -709,7 +709,7 @@ public class StoreManager : MPPanel
         // checkoutBox.GetChild(0).FindChild("Count").GetComponent<UILabel>().text = "1";  // count = 1
         dictItemProperty.TryGetValue("Price", out value);
         //  checkoutBox.GetChild(0).FindChild("Sum").GetComponent<UILabel>().text = value.ToString(); // price
-        checkoutBox.GetChild(0).FindChild("Price").GetComponent<UILabel>().text = value.ToString(); // price
+        checkoutBox.GetChild(0).Find("Price").GetComponent<UILabel>().text = value.ToString(); // price
     }
 
     /// <summary>

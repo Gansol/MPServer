@@ -1,0 +1,33 @@
+ManifestFileVersion: 0
+CRC: 2532645758
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 0898cb96d78d7c9d114bc5dc4ee98521
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 48366753b50165ede4c82e8b8e34a350
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 61
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Mice/NinjaMice/Unique/NinjaMice.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/ninjamice/share/ninjamice.unity3d

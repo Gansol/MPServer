@@ -12,14 +12,14 @@ public class Coll : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));
+        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("icon_eggmice"));
         //AssetBundleManager.dictAssetBundleRefs.Remove("EggMiceICON");
-        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("EggMiceICON"));
+        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("icon_eggmice"));
         //System.GC.Collect();
         //Resources.UnloadUnusedAssets();
         AssetLoader loader = MPGame.Instance.GetAssetLoader();
 
-        Instantiate(loader.GetAsset("EggMiceICON"));
+        Instantiate(loader.GetAsset("icon_eggmice"));
     }
 
 

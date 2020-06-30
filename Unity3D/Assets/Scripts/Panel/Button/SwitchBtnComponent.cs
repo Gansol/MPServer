@@ -60,7 +60,7 @@ public class SwitchBtnComponent
                 key = loadedGameObjectKeys[i];
                 if (item.Key.ToString() != key.ToString()) // child out 
                 {
-                    loadedBtnRefsBuffer[key].transform.GetChild(0).GetComponent<UISprite>().spriteName = item.Value.ToString() + Global.IconSuffix;
+                    loadedBtnRefsBuffer[key].transform.GetChild(0).GetComponent<UISprite>().spriteName = Global.IconSuffix+ item.Value.ToString();
                     loadedBtnRefs[key].transform.GetChild(0).name = item.Key;
                     loadedBtnRefsBuffer[key].SendMessage("EnableBtn");
                     Global.RenameKey(loadedBtnRefs, key, "x" + i);

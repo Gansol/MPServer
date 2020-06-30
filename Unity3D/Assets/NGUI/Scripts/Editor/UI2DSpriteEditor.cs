@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using UnityEditor;
@@ -31,7 +31,8 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 	{
 		GUI.changed = false;
 		SerializedProperty sp = NGUIEditorTools.DrawProperty("2D Sprite", serializedObject, "mSprite");
-		
+
+#if !UNITY_4_3
 		if (GUI.changed)
 		{
 			UnityEngine.Sprite sprite = sp.objectReferenceValue as Sprite;
@@ -42,7 +43,7 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 				border.vector4Value = sprite.border;
 			}
 		}
-
+#endif
 		NGUISettings.sprite2D = sp.objectReferenceValue as Sprite;
 
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");

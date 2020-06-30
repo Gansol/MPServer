@@ -156,11 +156,11 @@ public class PoolManager : MonoBehaviour
         try
         {
             // 載入 道具資產
-            assetLoader.LoadAsset("ItemICON" + "/", "ItemICON");
+            assetLoader.LoadAsset("itemicon" + "/share/", "itemicon");
 
             foreach (KeyValuePair<int, string> item in _dictSkillObject)
             {
-                assetLoader.LoadPrefab("ItemICON" + "/", item.Value + Global.IconSuffix);
+                assetLoader.LoadPrefab("itemicon" + "/unique/", Global.IconSuffix +  item.Value);
             }
         }
         catch
@@ -174,14 +174,14 @@ public class PoolManager : MonoBehaviour
         // 載入 特效資產
         try
         {
-            assetLoader.LoadAsset("Effects" + "/", "Effects");
+            assetLoader.LoadAsset("Effects" + "/share/", "Effects");
 
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
             {
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
                 string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
-                assetLoader.LoadPrefab("Effects" + "/", itemName + "Effect");
+                assetLoader.LoadPrefab("Effects" + "/unique/", "effect_"+itemName);
             }
         }
         catch
@@ -276,7 +276,7 @@ public class PoolManager : MonoBehaviour
 
                 // instantiate Item btn
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + Global.IconSuffix;
+                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", Global.IconSuffix+ itemID.ToString()).ToString();
 
 
                 if (assetLoader.GetAsset(itemName) != null)
@@ -328,11 +328,11 @@ public class PoolManager : MonoBehaviour
         //Debug.Log("_dictObject.Count:" + _dictObject.Count);
         //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
 
-        if (!ObjectPool.transform.FindChild(objectID))
+        if (!ObjectPool.transform.Find(objectID))
         {
             Debug.Log("Pooling can't find :" + objectID);
         }
-        else if (ObjectPool.transform.FindChild(objectID).childCount == 0)
+        else if (ObjectPool.transform.Find(objectID).childCount == 0)
         {
             string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
             GameObject bundle = assetLoader.GetAsset(bundleName);
@@ -343,9 +343,9 @@ public class PoolManager : MonoBehaviour
         {
 
 
-            for (int i = 0; i < ObjectPool.transform.FindChild(objectID).childCount; i++)
+            for (int i = 0; i < ObjectPool.transform.Find(objectID).childCount; i++)
             {
-                GameObject clone = ObjectPool.transform.FindChild(objectID).GetChild(i).gameObject;
+                GameObject clone = ObjectPool.transform.Find(objectID).GetChild(i).gameObject;
                 MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
                 MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
                 if (mice.enabled == false) mice.enabled = true;
@@ -372,7 +372,7 @@ public class PoolManager : MonoBehaviour
 
     void Instantiate(string objectID, GameObject bundle)
     {
-        Transform objGroup = ObjectPool.transform.FindChild(objectID);
+        Transform objGroup = ObjectPool.transform.Find(objectID);
 
         // 建立空GameObject群組
         if (objGroup == null)

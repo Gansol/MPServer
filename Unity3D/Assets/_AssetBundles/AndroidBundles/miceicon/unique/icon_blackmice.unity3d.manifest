@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 2532819764
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: eeda86c82a25ceb75473a617a490d314
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0a3bd6d2803c128e4e6cc1d021910d84
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/MiceICON/Unique/Icon_BlackMice.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d

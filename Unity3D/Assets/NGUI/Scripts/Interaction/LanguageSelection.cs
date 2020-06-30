@@ -1,10 +1,9 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// Turns the popup list it's attached to into a language selection list.
@@ -15,14 +14,18 @@ using System.Collections.Generic;
 public class LanguageSelection : MonoBehaviour
 {
 	UIPopupList mList;
+	bool mStarted = false;
 
-	void Awake ()
+	void Awake () { mList = GetComponent<UIPopupList>(); }
+
+	void Start ()
 	{
-		mList = GetComponent<UIPopupList>();
+		mStarted = true;
 		Refresh();
+		EventDelegate.Add(mList.onChange, delegate() { Localization.language = UIPopupList.current.value; });
 	}
 
-	void Start () { EventDelegate.Add(mList.onChange, delegate() { Localization.language = UIPopupList.current.value; }); }
+	void OnEnable () { if (mStarted) Refresh(); }
 
 	/// <summary>
 	/// Immediately refresh the list of known languages.
@@ -32,7 +35,7 @@ public class LanguageSelection : MonoBehaviour
 	{
 		if (mList != null && Localization.knownLanguages != null)
 		{
-			mList.items.Clear();
+			mList.Clear();
 
 			for (int i = 0, imax = Localization.knownLanguages.Length; i < imax; ++i)
 				mList.items.Add(Localization.knownLanguages[i]);
@@ -40,4 +43,6 @@ public class LanguageSelection : MonoBehaviour
 			mList.value = Localization.language;
 		}
 	}
+
+	void OnLocalize () { Refresh(); } 
 }

@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using UnityEditor;
@@ -17,7 +17,7 @@ public class UIWidgetInspector : UIRectEditor
 {
 	static public new UIWidgetInspector instance;
 
-	public enum Action
+	[DoNotObfuscateNGUI] public enum Action
 	{
 		None,
 		Move,
@@ -116,7 +116,7 @@ public class UIWidgetInspector : UIRectEditor
 
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
 #else
 		Rect rect = new Rect(screenPoint.x - 5f, screenPoint.y - 9f, 14f, 14f);
@@ -173,7 +173,7 @@ public class UIWidgetInspector : UIRectEditor
 		for (int i = 0; i < worldPoints.Length; ++i)
 		{
 			float distance = GetScreenDistance(worldPoints[i], mousePos);
-			
+
 			if (distance < min)
 			{
 				index = i;
@@ -336,7 +336,7 @@ public class UIWidgetInspector : UIRectEditor
 		}
 		else
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Camera cam = anchor.target.camera;
 #else
 			Camera cam = anchor.target.GetComponent<Camera>();
@@ -375,7 +375,7 @@ public class UIWidgetInspector : UIRectEditor
 		if (Event.current.GetTypeForControl(id) == EventType.Repaint)
 		{
 			Vector2 screenPoint = HandleUtility.WorldToGUIPoint(theirPos);
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
 #else
 			Rect rect = new Rect(screenPoint.x - 5f, screenPoint.y - 9f, 14f, 14f);
@@ -386,7 +386,7 @@ public class UIWidgetInspector : UIRectEditor
 			Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
 
 			Handles.BeginGUI();
-				
+
 			mYellowDot.Draw(rect, GUIContent.none, id);
 
 			Vector3 diff = v1 - v0;
@@ -446,7 +446,7 @@ public class UIWidgetInspector : UIRectEditor
 
 		Action actionUnderMouse = mAction;
 		Vector3[] handles = GetHandles(mWidget.worldCorners);
-		
+
 		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
 		NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
 		NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
@@ -479,7 +479,7 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[7] = canResize;	// bottom
 
 		UILabel lbl = mWidget as UILabel;
-		
+
 		if (lbl != null)
 		{
 			if (lbl.overflowMethod == UILabel.Overflow.ResizeFreely)
@@ -511,16 +511,16 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
-		
-		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
-		
+
+		var pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
+
 		switch (type)
 		{
 			case EventType.Repaint:
 			{
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
 				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-				
+
 				if ((v2 - v0).magnitude > 60f)
 				{
 					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
@@ -896,7 +896,7 @@ public class UIWidgetInspector : UIRectEditor
 			GUILayout.Space(3f);
 		}
 
-		PrefabType type = PrefabUtility.GetPrefabType(w.gameObject);
+		var isPrefab = NGUIEditorTools.IsPrefab(w.gameObject) && !NGUIEditorTools.IsPrefabInstance(w.gameObject);
 
 		if (NGUIEditorTools.DrawHeader("Widget"))
 		{
@@ -904,8 +904,8 @@ public class UIWidgetInspector : UIRectEditor
 			if (NGUISettings.minimalisticLook) NGUIEditorTools.SetLabelWidth(70f);
 
 			DrawPivot(so, w);
-			DrawDepth(so, w, type == PrefabType.Prefab);
-			DrawDimensions(so, w, type == PrefabType.Prefab);
+			DrawDepth(so, w, isPrefab);
+			DrawDimensions(so, w, isPrefab);
 			if (NGUISettings.minimalisticLook) NGUIEditorTools.SetLabelWidth(70f);
 
 			SerializedProperty ratio = so.FindProperty("aspectRatio");
@@ -1032,8 +1032,6 @@ public class UIWidgetInspector : UIRectEditor
 
 	static void DrawDepth (SerializedObject so, UIWidget w, bool isPrefab)
 	{
-		if (isPrefab) return;
-
 		GUILayout.Space(2f);
 		GUILayout.BeginHorizontal();
 		{
@@ -1063,13 +1061,13 @@ public class UIWidgetInspector : UIRectEditor
 
 		int matchingDepths = 1;
 
-		UIPanel p = w.panel;
+		var p = w.panel;
 
 		if (p != null)
 		{
 			for (int i = 0, imax = p.widgets.Count; i < imax; ++i)
 			{
-				UIWidget pw = p.widgets[i];
+				var pw = p.widgets[i];
 				if (pw != w && pw.depth == w.depth)
 					++matchingDepths;
 			}

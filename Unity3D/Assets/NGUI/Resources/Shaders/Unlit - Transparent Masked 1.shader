@@ -15,6 +15,7 @@ Shader "Hidden/Unlit/Transparent Masked 1"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 		
 		Pass
@@ -59,7 +60,7 @@ Shader "Hidden/Unlit/Transparent Masked 1"
 
 			v2f vert (appdata_t v)
 			{
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
 				o.texcoord1 = v.texcoord1;
@@ -91,6 +92,7 @@ Shader "Hidden/Unlit/Transparent Masked 1"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 		
 		Pass

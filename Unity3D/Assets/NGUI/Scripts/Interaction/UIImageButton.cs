@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 
@@ -23,7 +23,7 @@ public class UIImageButton : MonoBehaviour
 	{
 		get
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Collider col = collider;
 #else
 			Collider col = gameObject.GetComponent<Collider>();
@@ -32,7 +32,7 @@ public class UIImageButton : MonoBehaviour
 		}
 		set
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Collider col = collider;
 #else
 			Collider col = gameObject.GetComponent<Collider>();
@@ -87,7 +87,14 @@ public class UIImageButton : MonoBehaviour
 
 	void SetSprite (string sprite)
 	{
-		if (target.atlas == null || target.atlas.GetSprite(sprite) == null) return;
+		if (string.IsNullOrEmpty(sprite)) return;
+
+		var atlas = target.atlas;
+		if (atlas == null) return;
+
+		var atl = atlas as INGUIAtlas;
+		if (atl == null || atl.GetSprite(sprite) == null) return;
+
 		target.spriteName = sprite;
 		if (pixelSnap) target.MakePixelPerfect();
 	}

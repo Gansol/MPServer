@@ -1,0 +1,31 @@
+ManifestFileVersion: 0
+CRC: 447886040
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b8ec6e086167d5b9a7f23b714ddd914b
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Skill/CandyMice.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/candymice/share/candymice.unity3d

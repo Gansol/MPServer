@@ -1,0 +1,51 @@
+ManifestFileVersion: 0
+CRC: 687370581
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 027991a29db8dab54b145b1c3dd31781
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: aa9875a461cbbae85139ea5121e0c3b4
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d81807633ea807d4c8e3fff7e10c6000, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: eb53a74ab3dcf1a4cae7b65c8f197a61, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1a3c1ecb0cfff2e4d9d70fbd9552f19a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Panel/Unique/Store.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/gashapon/share/gashapon.unity3d
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comicfont.unity3d
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

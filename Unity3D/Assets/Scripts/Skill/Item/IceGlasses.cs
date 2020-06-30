@@ -53,10 +53,10 @@ public class IceGlasses : SkillItem
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
         AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
-        GameObject bundle = assetLoader.GetAsset(skillData.SkillName + "Effect");
+        GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         ObjectFactory objFactory = new ObjectFactory();
 
-        bundle = objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, skillData.SkillName + "Effect", Vector3.zero, Vector3.one, Vector2.one, 1);
+        bundle = objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1);
         attr = skillData.Attr + Random.Range(0, skillData.AttrDice);
         bundle.AddComponent<TapBorad>().SetTimes(attr);
         tap = bundle.GetComponent<TapBorad>();

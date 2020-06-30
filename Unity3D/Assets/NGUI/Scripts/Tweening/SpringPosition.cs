@@ -1,10 +1,9 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// Spring-like motion -- the farther away the object is from the target, the stronger the pull.
@@ -135,12 +134,7 @@ public class SpringPosition : MonoBehaviour
 		sp.target = pos;
 		sp.strength = strength;
 		sp.onFinished = null;
-
-		if (!sp.enabled)
-		{
-			sp.mThreshold = 0f;
-			sp.enabled = true;
-		}
+		if (!sp.enabled) sp.enabled = true;
 		return sp;
 	}
 }

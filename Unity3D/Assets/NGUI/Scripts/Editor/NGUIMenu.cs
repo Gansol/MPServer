@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using UnityEditor;
@@ -95,9 +95,8 @@ static public class NGUIMenu
 		return (Selection.activeTransform != null);
 	}
 
-#endregion
+	#endregion
 #region Create
-
 	[MenuItem("NGUI/Create/Sprite &#s", false, 6)]
 	static public void AddSprite ()
 	{
@@ -157,6 +156,56 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Create/", false, 6)]
 	static void AddBreaker123 () {}
 
+	[MenuItem("NGUI/Create/Font", false, 6)]
+	static void AddFont ()
+	{
+		var path = EditorUtility.SaveFilePanelInProject("Save As", "New Font.asset", "asset", "Save font as...", NGUISettings.currentPath);
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+
+			var fontName = path.Replace(".asset", "");
+			fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+			var asset = ScriptableObject.CreateInstance<NGUIFont>();
+			asset.name = fontName;
+
+			AssetDatabase.CreateAsset(asset, path);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+			asset = AssetDatabase.LoadAssetAtPath<NGUIFont>(path);
+			NGUISettings.ambigiousFont = asset;
+			Selection.activeObject = asset;
+		}
+	}
+
+	[MenuItem("NGUI/Create/Atlas", false, 6)]
+	static void AddAtlas ()
+	{
+		var path = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+
+			var fontName = path.Replace(".asset", "");
+			fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+			var asset = ScriptableObject.CreateInstance<NGUIAtlas>();
+			asset.name = fontName;
+
+			AssetDatabase.CreateAsset(asset, path);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+			asset = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
+			NGUISettings.atlas = asset;
+			Selection.activeObject = asset;
+		}
+	}
+
 	[MenuItem("NGUI/Create/Anchor (Legacy)", false, 6)]
 	static void AddAnchor2 () { Add<UIAnchor>(); }
 
@@ -201,7 +250,7 @@ static public class NGUIMenu
 	{
 		if (UIRoot.list.Count == 0 || UICamera.list.size == 0) return true;
 		foreach (UICamera c in UICamera.list)
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (NGUITools.GetActive(c) && c.camera.isOrthoGraphic)
 #else
 			if (NGUITools.GetActive(c) && c.GetComponent<Camera>().orthographic)
@@ -220,7 +269,7 @@ static public class NGUIMenu
 	{
 		if (UIRoot.list.Count == 0 || UICamera.list.size == 0) return true;
 		foreach (UICamera c in UICamera.list)
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (NGUITools.GetActive(c) && !c.camera.isOrthoGraphic)
 #else
 			if (NGUITools.GetActive(c) && !c.GetComponent<Camera>().orthographic)
@@ -565,7 +614,7 @@ static public class NGUIMenu
 	static public void SwitchTo2D ()
 	{
 		BoxCollider[] colliders = NGUITools.FindActive<BoxCollider>();
-		
+
 		for (int i = 0; i < colliders.Length; ++i)
 		{
 			BoxCollider c = colliders[i];
@@ -584,7 +633,7 @@ static public class NGUIMenu
 
 			BoxCollider2D bc = go.AddComponent<BoxCollider2D>();
 			bc.size = size;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			bc.center = center;
 #else
 			bc.offset = center;
@@ -593,10 +642,10 @@ static public class NGUIMenu
 			NGUITools.SetDirty(go);
 
 			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
-			
+
 			if (p != null)
 			{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				if (p.rigidbody != null) NGUITools.Destroy(p.rigidbody);
 #else
 				if (p.GetComponent<Rigidbody>() != null) NGUITools.Destroy(p.GetComponent<Rigidbody>());
@@ -628,7 +677,7 @@ static public class NGUIMenu
 
 			cam.eventType = UICamera.EventType.UI_3D;
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Vector3 center = c.center;
 #else
 			Vector3 center = c.offset;
@@ -647,13 +696,13 @@ static public class NGUIMenu
 			NGUITools.SetDirty(go);
 
 			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
-			
+
 			if (p != null)
 			{
 				if (p.GetComponent<Rigidbody2D>() != null)
 					NGUITools.Destroy(p.GetComponent<Rigidbody2D>());
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				if (p.rigidbody == null)
 #else
 				if (p.GetComponent<Rigidbody>() == null)
@@ -670,7 +719,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Extras/Align Scene View to UI", false, 10)]
 	static public void AlignSVToUI ()
 	{
-		GameObject go = Selection.activeGameObject ?? UICamera.list[0].gameObject;
+		var go = Selection.activeGameObject != null ? Selection.activeGameObject : UICamera.list.buffer[0].gameObject;
 		Camera cam = NGUITools.FindCameraForLayer(go.layer);
 		SceneView sv = SceneView.lastActiveSceneView;
 		Camera svc = sv.camera;
@@ -688,19 +737,19 @@ static public class NGUIMenu
 	{
 		if (SceneView.lastActiveSceneView == null) return false;
 		if (UICamera.list.size == 0) return false;
-		
-		GameObject go = Selection.activeGameObject ?? UICamera.list[0].gameObject;
+
+		var go = Selection.activeGameObject != null ? Selection.activeGameObject : UICamera.list.buffer[0].gameObject;
 		if (go == null) return false;
-		
+
 		Camera cam = NGUITools.FindCameraForLayer(go.layer);
 		if (cam == null || !cam.orthographic) return false;
 		return true;
 	}
 
-	[MenuItem("GameObject/Align View To Selected UI", false, 999)]
+	[MenuItem("GameObject/Align View To Selected UI &f", false, 999)]
 	static public void AlignSVWithSelectedUI () { AlignSVToUI(); }
 
-	[MenuItem("GameObject/Align View To Selected UI", true, 999)]
+	[MenuItem("GameObject/Align View To Selected UI &f", true, 999)]
 	static public bool AlignSVWithSelectedUICheck ()
 	{
 		GameObject go = Selection.activeGameObject;
@@ -711,10 +760,7 @@ static public class NGUIMenu
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0", false, 11)]
 	static public void Normalize () { NGUITools.NormalizeDepths(); }
-	
-	[MenuItem("NGUI/", false, 11)]
-	static void Breaker () { }
 
-	[MenuItem("NGUI/Help", false, 12)]
+	[MenuItem("NGUI/Help", false, 120)]
 	static public void Help () { NGUIHelp.Show(); }
 }

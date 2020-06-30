@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
+using UnityEngine.Networking;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -24,6 +25,8 @@ public class AssetBundlesDownloader : MonoBehaviour
     public int fileCount { get; set; }
     public bool fileDownloaded { get { return _fileDownloaded; } }
 
+    public bool BundleChk { get { return _bundleChk; } private set { _bundleChk = value; } }
+    private bool _bundleChk = true;
     private int _reConnTimes;
     private bool _fileDownloaded = false;
     #endregion
@@ -42,9 +45,9 @@ public class AssetBundlesDownloader : MonoBehaviour
     {
         // www -> storage dict list -> download file
         Global.ReturnMessage = "下載遊戲資源列表...";
-        using (WWW wwwDownloadList = new WWW(Global.serverListPath + pathFile))
+        using (UnityWebRequest wwwDownloadList =  UnityWebRequest.Get(Global.serverListPath + pathFile))
         {//下載伺服器List檔案
-            yield return wwwDownloadList;
+            yield return wwwDownloadList.SendWebRequest();
 
             if (wwwDownloadList.error != null && _reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
             {
@@ -58,14 +61,14 @@ public class AssetBundlesDownloader : MonoBehaviour
             }
             else if (wwwDownloadList.isDone)
             {
-                Dictionary<string, object> dictDownloadFile = Json.Deserialize(wwwDownloadList.text) as Dictionary<string, object>;
+                Dictionary<string, object> dictDownloadFile = Json.Deserialize(wwwDownloadList.downloadHandler.text) as Dictionary<string, object>;
 
                 _reConnTimes = 0;
                 fileCount = dictDownloadFile.Count;
 
                 //等待下載 下載列表中 全部資源
                 List<string> assets = new List<string>(dictDownloadFile.Keys);
-                StartCoroutine(_DownloadFile(Global.assetBundlesPath, assets));
+                StartCoroutine(sub_DownloadFile(Global.assetBundlesPath, assets));
 
             }
             else    // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
@@ -110,7 +113,7 @@ public class AssetBundlesDownloader : MonoBehaviour
         fileCount = assets.Count;
         // lost files name -> download all files
         foreach (string asset in assets) //下載全部遺失的檔案
-            StartCoroutine(_DownloadFile(Global.assetBundlesPath, assets));
+            StartCoroutine(sub_DownloadFile(Global.assetBundlesPath, assets));
 
         yield return assets;
     }
@@ -124,10 +127,10 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// <param name="assets">資產名稱</param>
     public void DownloadFile(string path, List<string> assets)
     {
-        StartCoroutine(_DownloadFile(path, assets));
+        StartCoroutine(sub_DownloadFile(path, assets));
     }
 
-    private IEnumerator _DownloadFile(string path, List<string> assets)
+    private IEnumerator sub_DownloadFile(string path, List<string> assets)
     {
         foreach (string filePath in assets)
         {
@@ -136,10 +139,10 @@ public class AssetBundlesDownloader : MonoBehaviour
                 string[] folder = filePath.Split('/');
                 Global.ReturnMessage = "開始下載資源... " + folder[1];
                 //Debug.Log("Start Downloading... " + assets);
-                using (WWW wwwAssetBundles = new WWW(path + filePath))
+                using (UnityWebRequest wwwAssetBundles =UnityWebRequest.Get(path + filePath))
                 {
                     ; //下載物件
-                    yield return wwwAssetBundles; //等待下載完成，並回傳值
+                    yield return wwwAssetBundles.SendWebRequest(); //等待下載完成，並回傳值
 
                     if (wwwAssetBundles.error != null && _reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
                     {
@@ -159,7 +162,7 @@ public class AssetBundlesDownloader : MonoBehaviour
 
                         System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/AssetBundles/"); //建立 檔案目錄
 
-                        byte[] file = wwwAssetBundles.bytes; //轉換為二進位物件
+                        byte[] file = wwwAssetBundles.downloadHandler.data; //轉換為二進位物件
 
                         string folderPath = Application.persistentDataPath + "/AssetBundles/" + folder[0];
                         if (!Directory.Exists(folderPath))
@@ -188,9 +191,9 @@ public class AssetBundlesDownloader : MonoBehaviour
     #region -- ReplaceItemList --
     private IEnumerator ReplaceItemList() //取代 檔案列表
     {
-        using (WWW wwwItemList = new WWW(Global.serverListPath + Global.itemListFile))
+        using (UnityWebRequest wwwItemList =  UnityWebRequest.Get(Global.serverListPath + Global.itemListFile))
         {
-            yield return wwwItemList;
+            yield return wwwItemList.SendWebRequest();
 
             if (wwwItemList.error != null && _reConnTimes < Global.maxConnTimes)  // 如果出現網路錯誤，重新連線下載，並提示重連次數
             {
@@ -202,7 +205,7 @@ public class AssetBundlesDownloader : MonoBehaviour
             else if (wwwItemList.isDone)//開始檢查 檔案列表
             {
                 _reConnTimes = 0;
-                File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.itemListFile, System.Text.Encoding.UTF8.GetBytes(wwwItemList.text)); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
+                File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.itemListFile, System.Text.Encoding.UTF8.GetBytes(wwwItemList.downloadHandler.text)); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
                 wwwItemList.Dispose();
                 Global.isCompleted = true;
             }
@@ -219,7 +222,10 @@ public class AssetBundlesDownloader : MonoBehaviour
     void ChkDownloadedCount()    // 檢查下載是否完成
     {
         if (fileCount == 0)
+        {
             StartCoroutine(ReplaceItemList());
+            _bundleChk = false;
+        }
     }
     #endregion
 

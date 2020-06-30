@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2019 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using System.Collections;
@@ -14,7 +14,7 @@ using System.Collections;
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
 public class UIDragObject : MonoBehaviour
 {
-	public enum DragEffect
+	[DoNotObfuscateNGUI] public enum DragEffect
 	{
 		None,
 		Momentum,
@@ -102,6 +102,8 @@ public class UIDragObject : MonoBehaviour
 			UIWidget w = target.GetComponent<UIWidget>();
 			if (w != null) contentRect = w;
 		}
+
+		mTargetPos = (target != null) ? target.position : Vector3.zero;
 	}
 
 	void OnDisable () { mStarted = false; }
@@ -131,10 +133,7 @@ public class UIDragObject : MonoBehaviour
 			mBounds = new Bounds(corners[0], Vector3.zero);
 			for (int i = 1; i < 4; ++i) mBounds.Encapsulate(corners[i]);
 		}
-		else
-		{
-			mBounds = NGUIMath.CalculateRelativeWidgetBounds(panelRegion.cachedTransform, target);
-		}
+		else mBounds = NGUIMath.CalculateRelativeWidgetBounds(panelRegion.cachedTransform, target);
 	}
 
 	/// <summary>
@@ -143,6 +142,12 @@ public class UIDragObject : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
+		if (UICamera.currentTouchID == -2 || UICamera.currentTouchID == -3) return;
+
+		// Unity's physics seems to break when timescale is not quite zero. Raycasts start to fail completely.
+		float ts = Time.timeScale;
+		if (ts < 0.01f && ts != 0f) return;
+
 		if (enabled && NGUITools.GetActive(gameObject) && target != null)
 		{
 			if (pressed)
@@ -241,12 +246,38 @@ public class UIDragObject : MonoBehaviour
 		if (panelRegion != null)
 		{
 			mTargetPos += worldDelta;
-			target.position = mTargetPos;
+			Transform parent = target.parent;
+			Rigidbody rb = target.GetComponent<Rigidbody>();
 
-			Vector3 after = target.localPosition;
-			after.x = Mathf.Round(after.x);
-			after.y = Mathf.Round(after.y);
-			target.localPosition = after;
+			if (parent != null)
+			{
+				Vector3 after = parent.worldToLocalMatrix.MultiplyPoint3x4(mTargetPos);
+				after.x = Mathf.Round(after.x);
+				after.y = Mathf.Round(after.y);
+
+				if (rb != null)
+				{
+					// With a lot of colliders under the rigidbody, moving the transform causes some crazy overhead.
+					// Moving the rigidbody is much cheaper, but it does seem to have a side effect of causing
+					// widgets to detect movement relative to the panel, when in fact they should not be moving.
+					// This is why it's best to keep the panel as 'static' if at all possible.
+					// NOTE: Immediate constraints will also fail with a rigidbody because transform doesn't get updated.
+					// It is strongly not advisable to have a rigidbody in this case.
+					after = parent.localToWorldMatrix.MultiplyPoint3x4(after);
+					rb.position = after;
+#if UNITY_EDITOR
+					if (restrictWithinPanel && dragEffect != DragEffect.MomentumAndSpring)
+						Debug.LogWarning("Constraining doesn't work properly when there is a rigidbody present because rigidbodies move in FixedUpdate, not Update.\n" +
+							"Please remove it, or use the MomentumAndSpring type drag effect.", rb);
+#endif
+				}
+				else target.localPosition = after;
+			}
+			else if (rb != null)
+			{
+				rb.position = mTargetPos;
+			}
+			else target.position = mTargetPos;
 
 			UIScrollView ds = panelRegion.GetComponent<UIScrollView>();
 			if (ds != null) ds.UpdateScrollbars(true);

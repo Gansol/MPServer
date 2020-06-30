@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 1121895205
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b9269c70e644acbe409f13b39ce0f626
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 6cd780319471c3f4302504aa5bc8b971
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 61
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Effects/Unique/effect_iceglasses.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

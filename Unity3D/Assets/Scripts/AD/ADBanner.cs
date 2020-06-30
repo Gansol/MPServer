@@ -2,7 +2,7 @@
 using GoogleMobileAds.Api;
 using UnityEngine;
 
-public class AdBanner : MonoBehaviour
+public class ADBanner : MonoBehaviour
 {
 
     public enum BannerSize
@@ -15,7 +15,7 @@ public class AdBanner : MonoBehaviour
         SMART_BANNER
     }
 
-    public static AdBanner ins;
+    public static ADBanner ins;
 
     public string unitId;
     public BannerSize size = BannerSize.BANNER;

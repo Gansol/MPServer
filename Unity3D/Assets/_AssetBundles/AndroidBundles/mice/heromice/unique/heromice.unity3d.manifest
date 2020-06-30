@@ -1,0 +1,35 @@
+ManifestFileVersion: 0
+CRC: 4220077620
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d679519df3df7a1aa991b30b99d5465a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1ca2501bcd9b0cb5e47a0260d991d4e0
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 61
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: cda887b69f4e1084c99ac17566595d25, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Mice/HeroMice/Unique/HeroMice.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/heromice/share/heromice.unity3d

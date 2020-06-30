@@ -97,8 +97,8 @@ public class LoginUI : MonoBehaviour
         Global.photonService.ReLoginEvent += OnReLogin;
         Global.photonService.GetProfileEvent += OnGetProfile;
         // Global.photonService.ExitWaitingEvent += ShowMatchGame;
-        PlayGamesPlatform.DebugLogEnabled = true;
-        PlayGamesPlatform.Activate();
+        // PlayGamesPlatform.DebugLogEnabled = true;//20200527
+        // PlayGamesPlatform.Activate();//20200527
 
         passwordChk = confirmPasswordChk = nicknameChk = emailChk = equalPassword = -1;
 
@@ -419,7 +419,7 @@ public class LoginUI : MonoBehaviour
                 // to do
                 break;
             case (byte)MemberType.Google:
-                ((PlayGamesPlatform)Social.Active).SignOut();
+                //((PlayGamesPlatform)Social.Active).SignOut();
                 break;
             case (byte)MemberType.Facebook:
                 break;
@@ -428,137 +428,138 @@ public class LoginUI : MonoBehaviour
         }
     }
 
-    #region GoogleLogin
-    public void GoogleLogin()
-    {
+    //20200527
+    //#region GoogleLogin
+    //public void GoogleLogin()
+    //{
 
-        if (!isLoginBtn)
-        {
-            Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
-            LoginPanel.SetActive(false);
-            Debug.Log("Google Logining...");
-            isLoginBtn = true;
-            if (!Social.localUser.authenticated)
-                PlayGamesPlatform.Activate();
-            Social.localUser.Authenticate((bool success) =>
-            {
-                if (success)
-                {
-                    Debug.Log("You've successfully logged in" + Social.localUser.id);
-                    if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
-
-
-                    Global.MemberType = MemberType.Google;
-                    Debug.Log(Global.Account);
+    //    if (!isLoginBtn)
+    //    {
+    //        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
+    //        LoginPanel.SetActive(false);
+    //        Debug.Log("Google Logining...");
+    //        isLoginBtn = true;
+    //        if (!Social.localUser.authenticated)
+    //            PlayGamesPlatform.Activate();
+    //        Social.localUser.Authenticate((bool success) =>
+    //        {
+    //            if (success)
+    //            {
+    //                Debug.Log("You've successfully logged in" + Social.localUser.id);
+    //                if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
 
-                    // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
-                    Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
-                    Global.Hash = Encrypt(Global.Account);
-                    Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
+    //                Global.MemberType = MemberType.Google;
+    //                Debug.Log(Global.Account);
 
-                    //string email = ((PlayGamesLocalUser)Social.localUser).Email;
-                    bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
-                    int age = (underage) ? 88 : 6;
 
-                    //if (String.IsNullOrEmpty(email))
-                    //    email = "example@example.com";
+    //                // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
+    //                Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
+    //                Global.Hash = Encrypt(Global.Account);
+    //                Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
 
-                    Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
-                    Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
-                }
-                else
-                {
-                    Debug.Log("Login failed for some reason");
-                }
-            });
-        }
-    }
-    #endregion
+    //                //string email = ((PlayGamesLocalUser)Social.localUser).Email;
+    //                bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
+    //                int age = (underage) ? 88 : 6;
 
-    #region  FBLogin
-    public void FaceBookLogin()
-    {
-        FB.Init(SetInit, OnHideUnity);
-    }
+    //                //if (String.IsNullOrEmpty(email))
+    //                //    email = "example@example.com";
 
-    void SetInit()
-    {
-        Debug.Log("FB init done.");
-        if (FB.IsLoggedIn)
-        {
-            Debug.Log("login");
-            FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
-        }
-        else
-        {
-            FBLogin();
-        }
-    }
+    //                Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
+    //                Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("Login failed for some reason");
+    //            }
+    //        });
+    //    }
+    //}
+    //#endregion
 
-    void OnHideUnity(bool isGameShow)
-    {
-        if (!isGameShow)
-        {
+    //#region  FBLogin
+    //public void FaceBookLogin()
+    //{
+    //    FB.Init(SetInit, OnHideUnity);
+    //}
 
-        }
-    }
-    void FBLogin()
-    {
-        FB.Login("email", AuthCallback);
-    }
+    //void SetInit()
+    //{
+    //    Debug.Log("FB init done.");
+    //    if (FB.IsLoggedIn)
+    //    {
+    //        Debug.Log("login");
+    //        FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
+    //    }
+    //    else
+    //    {
+    //        FBLogin();
+    //    }
+    //}
 
-    void AuthCallback(FBResult result)
-    {
-        if (FB.IsLoggedIn)
-        {
-            Debug.Log("FB Login work");
-            FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
-        }
-        else
-        {
-            Debug.Log("FB don't work!");
-        }
-    }
+    //void OnHideUnity(bool isGameShow)
+    //{
+    //    if (!isGameShow)
+    //    {
 
-    // 普通登入時使用
-    // FB Login
-    void GetFBProfiler(FBResult result)
-    {
+    //    }
+    //}
+    //void FBLogin()
+    //{
+    //    FB.Login("email", AuthCallback);
+    //}
 
-        if (result.Error != null)
-        {
-            Debug.Log("Get FB profiler error!");
-            FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
-            return;
-        }
-        //Global.MemberType = MemberType.Facebook;
-        //if (!Global.photonService.ServerConnected) 
-        //    gameObject.GetComponent<PhotonConnect>().ConnectToServer();
+    //void AuthCallback(FBResult result)
+    //{
+    //    if (FB.IsLoggedIn)
+    //    {
+    //        Debug.Log("FB Login work");
+    //        FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("FB don't work!");
+    //    }
+    //}
 
-        FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
-        Debug.Log(FBProfiler["id"].ToString());
-        Debug.Log(FBProfiler["name"].ToString());
-        Debug.Log(FBProfiler["email"].ToString());
-        Debug.Log(FBProfiler["gender"].ToString());
-        Debug.Log(FBProfiler["birthday"].ToString());
+    //// 普通登入時使用
+    //// FB Login
+    //void GetFBProfiler(FBResult result)
+    //{
 
-        string[] tmp = FBProfiler["email"].ToString().Split('@');
-        Global.Account = tmp[0];
-        Global.Hash = Encrypt(Global.Account);
-        Global.MemberType = MemberType.Facebook;
-        Global.photonService.Login(Global.Account, Global.Hash, MemberType.Facebook); // 登入
+    //    if (result.Error != null)
+    //    {
+    //        Debug.Log("Get FB profiler error!");
+    //        FB.API("/me?fields=id,name,gender,email,birthday", Facebook.HttpMethod.GET, GetFBProfiler);
+    //        return;
+    //    }
+    //    //Global.MemberType = MemberType.Facebook;
+    //    //if (!Global.photonService.ServerConnected) 
+    //    //    gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
-        foreach (var item in FBProfiler)
-        {
-            Debug.Log("KEY:" + item.Key.ToString() + "Value:" + item.Value.ToString());
-        }
+    //    FBProfiler = Json.Deserialize(result.Text) as Dictionary<string, object>;
+    //    Debug.Log(FBProfiler["id"].ToString());
+    //    Debug.Log(FBProfiler["name"].ToString());
+    //    Debug.Log(FBProfiler["email"].ToString());
+    //    Debug.Log(FBProfiler["gender"].ToString());
+    //    Debug.Log(FBProfiler["birthday"].ToString());
 
-        LoginPanel.SetActive(false);
-        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
-    }
-    #endregion
+    //    string[] tmp = FBProfiler["email"].ToString().Split('@');
+    //    Global.Account = tmp[0];
+    //    Global.Hash = Encrypt(Global.Account);
+    //    Global.MemberType = MemberType.Facebook;
+    //    Global.photonService.Login(Global.Account, Global.Hash, MemberType.Facebook); // 登入
 
+    //    foreach (var item in FBProfiler)
+    //    {
+    //        Debug.Log("KEY:" + item.Key.ToString() + "Value:" + item.Value.ToString());
+    //    }
+
+    //    LoginPanel.SetActive(false);
+    //    Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
+    //}
+    //#endregion
+    //20200527
 
     void OnExitMainGame()
     {

@@ -132,7 +132,7 @@ public class FriendManager : MPPanel
                 _clientFriendsList = Global.dictFriends;
                 assetLoader.LoadAsset(iconPath + "/", iconPath);
                 _bLoadedIcon = LoadIconObject(dictMice, iconPath);
-                assetLoader.LoadPrefab("Panel/", slotItemName);
+                assetLoader.LoadPrefab("panel/", slotItemName);
                 _bFirstLoad = false;
             }
         }

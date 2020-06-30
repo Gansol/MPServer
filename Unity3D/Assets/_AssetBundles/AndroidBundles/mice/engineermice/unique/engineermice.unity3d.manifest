@@ -1,0 +1,33 @@
+ManifestFileVersion: 0
+CRC: 2267880402
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 02ab9327ebad84266969f30fdd617b45
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 48366753b50165ede4c82e8b8e34a350
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 61
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Mice/EngineerMice/Unique/EngineerMice.prefab
+Dependencies:
+- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/engineermice/share/engineermice.unity3d

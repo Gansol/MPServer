@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 1511858285
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 409d06d2b5e485777eec2c93f940591f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5b556a04d9a2953eeebc21320c76aba9
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1a3c1ecb0cfff2e4d9d70fbd9552f19a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/Panel/Share/ComicFont.asset
+- Assets/AssetBundles/Panel/Share/ComicFont.mat
+- Assets/AssetBundles/Panel/Share/ComicFont.png
+Dependencies: []

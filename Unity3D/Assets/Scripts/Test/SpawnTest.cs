@@ -8,10 +8,10 @@ public class SpawnTest : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        hole = new GameObject[transform.FindChild("Hole").childCount];
-        for (int i = 0; i < transform.FindChild("Hole").childCount; i++)
+        hole = new GameObject[transform.Find("Hole").childCount];
+        for (int i = 0; i < transform.Find("Hole").childCount; i++)
         {
-            hole[i] = transform.FindChild("Hole").GetChild(i).gameObject;
+            hole[i] = transform.Find("Hole").GetChild(i).gameObject;
             hole[i].GetComponent<UILabel>().text = i.ToString();
         }
 	}

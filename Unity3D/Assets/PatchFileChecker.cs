@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using Gansol;
 using System.Web;
+using UnityEngine.Networking;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -46,9 +47,9 @@ public class PatchFileChecker
         txtUtil = new TextUtility();
     ReCheckFlag:
         string patch = txtUtil.DecryptBase64String(Global.serverPath);
-        using (WWW wwwPatcher = new WWW(patch + Global.patchFile))
+        using (UnityWebRequest wwwPatcher =  UnityWebRequest.Get(patch + Global.patchFile))
         {
-            yield return wwwPatcher;
+            yield return wwwPatcher.SendWebRequest();
 
             if (reConnTimes >= Global.maxConnTimes)        // 如果出現網路錯誤，停止檢測版本，並提示網路錯誤
             {
@@ -69,12 +70,12 @@ public class PatchFileChecker
             {
                 reConnTimes = 0;
 
-                _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwPatcher.text); // 儲存 下載好的檔案版本
+                _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwPatcher.downloadHandler.text); // 儲存 下載好的檔案版本
 
                 string ss = System.Text.Encoding.UTF8.GetString(_bVisionFile);
-                string path = wwwPatcher.text.Replace("\n","");
-                path = wwwPatcher.text.Replace("\\", "");
-                path = wwwPatcher.text.Replace("/", "");
+                string path = wwwPatcher.downloadHandler.text.Replace("\n","");
+                path = wwwPatcher.downloadHandler.text.Replace("\\", "");
+                path = wwwPatcher.downloadHandler.text.Replace("/", "");
                 Debug.Log(path);
                 Global.serverPath = txtUtil.DecryptBase64String("aHR0cDovLzE4MC4yMTguMTY0LjIzMjo1ODc2Ny9NaWNlUG93QkVUQQ==");
                 _patcherChk = true;
