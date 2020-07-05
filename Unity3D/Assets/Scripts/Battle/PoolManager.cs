@@ -123,10 +123,14 @@ public class PoolManager : MonoBehaviour
         {
             // 載入 老鼠資產
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
-                assetLoader.LoadAsset(item.Value + "/", item.Value);
+                assetLoader.LoadAssetFormManifest(Global.PanelPath + "mice/" + item.Value + "/unique/" + item.Value + Global.ext);
 
-            foreach (KeyValuePair<int, string> item in _dictMiceObject)
-                assetLoader.LoadPrefab(item.Value + "/", item.Value);
+  
+            //foreach (KeyValuePair<int, string> item in _dictMiceObject)
+            //    assetLoader.LoadAsset(item.Value + "/", item.Value);
+
+            //foreach (KeyValuePair<int, string> item in _dictMiceObject)
+            //    assetLoader.LoadPrefab(item.Value + "/", item.Value);
         }
         catch
         {
@@ -140,10 +144,14 @@ public class PoolManager : MonoBehaviour
         {
             // 載入 特殊老鼠
             foreach (KeyValuePair<int, string> item in _dictSpecialObject)
-                assetLoader.LoadAsset(item.Value + "/", item.Value);
+                assetLoader.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
+          // assetLoader.LoadAsset(item.Value + "/", item.Value);
 
-            foreach (KeyValuePair<int, string> item in _dictSpecialObject)
-                assetLoader.LoadPrefab(item.Value + "/", item.Value);
+            //foreach (KeyValuePair<int, string> item in _dictSpecialObject)
+            //    assetLoader.LoadAsset(item.Value + "/", item.Value);
+
+            //foreach (KeyValuePair<int, string> item in _dictSpecialObject)
+            //    assetLoader.LoadPrefab(item.Value + "/", item.Value);
         }
         catch
         {
@@ -156,12 +164,11 @@ public class PoolManager : MonoBehaviour
         try
         {
             // 載入 道具資產
-            assetLoader.LoadAsset("itemicon" + "/share/", "itemicon");
+            //assetLoader.LoadAsset("itemicon" + "/share/", "itemicon");
 
             foreach (KeyValuePair<int, string> item in _dictSkillObject)
-            {
-                assetLoader.LoadPrefab("itemicon" + "/unique/", Global.IconSuffix +  item.Value);
-            }
+                assetLoader.LoadAssetFormManifest(Global.ItemIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
+            //assetLoader.LoadPrefab("itemicon" + "/unique/", Global.IconSuffix + item.Value);
         }
         catch
         {
@@ -174,14 +181,16 @@ public class PoolManager : MonoBehaviour
         // 載入 特效資產
         try
         {
-            assetLoader.LoadAsset("Effects" + "/share/", "Effects");
+          //  assetLoader.LoadAsset("Effects" + "/share/", "Effects");
 
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
             {
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
                 string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
-                assetLoader.LoadPrefab("Effects" + "/unique/", "effect_"+itemName);
+                assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + item.Value + Global.ext);
+
+              //  assetLoader.LoadPrefab("Effects" + "/unique/", "effect_" + itemName);
             }
         }
         catch
@@ -202,15 +211,15 @@ public class PoolManager : MonoBehaviour
 
             //_dictMiceObject.Add(10003, "Bali");
             InstantiateObject(_dictMiceObject);
-           // Debug.Log("Instantiate Mice Completed!");
+            // Debug.Log("Instantiate Mice Completed!");
             InstantiateObject(_dictSpecialObject);
-          //  Debug.Log("Instantiate SpecialMice Completed!");
+            //  Debug.Log("Instantiate SpecialMice Completed!");
             InstantiateSkillMice(_dictSkillMice);
-          //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
+            //  Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.ToList().Select(s => Convert.ToString(s)).ToList());
             _poolingFlag = true;
-          //  Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
+            //  Debug.Log("Pooling Mice Completed ! " + _poolingFlag);
 
-            Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.Select(x=>(x).ToString()).ToArray());
+            Global.photonService.SendRoomMice(Global.RoomID, _dictMiceObject.Keys.Select(x => (x).ToString()).ToArray());
         }
 
         _currentTime = Time.time;
@@ -276,7 +285,7 @@ public class PoolManager : MonoBehaviour
 
                 // instantiate Item btn
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", Global.IconSuffix+ itemID.ToString()).ToString();
+                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", Global.IconSuffix + itemID.ToString()).ToString();
 
 
                 if (assetLoader.GetAsset(itemName) != null)
@@ -446,7 +455,7 @@ public class PoolManager : MonoBehaviour
         }
 
         if (!_dictMiceObject.ContainsKey(10001))
-            _dictMiceObject.Add(10001, "EggMice");
+            _dictMiceObject.Add(10001, "eggmice");
         //  Debug.Log(_dictObject);
         _mergeFlag = true;
         Debug.Log("Merge Mice Completed ! " + _mergeFlag);

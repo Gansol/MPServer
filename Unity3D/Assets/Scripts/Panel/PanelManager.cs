@@ -143,7 +143,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
             assetLoader.init();
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath + _panelName.ToLower() + Global.ext, _panelName.ToLower());
+            assetLoader.LoadAssetFormManifest( Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
             _loadedPanel = true;
         }
         else
@@ -162,7 +162,7 @@ public class PanelManager : MPPanel
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
             assetLoader.init();
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath + _panelName.ToLower() + Global.ext, _panelName);
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
             _loadedPanel = true;
         }
         else

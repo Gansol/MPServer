@@ -327,8 +327,9 @@ public class PurchaseManager : MPPanel
                 _bFirstLoad = false;
 
                 //  m_MPGame.GetAssetLoader().LoadAsset("Purchase" + "/", "Purchase" + Global.IconSuffix);
-                m_MPGame.GetAssetLoader().LoadAsset("panel" + "/", "panelui");
-                m_MPGame.GetAssetLoader().LoadPrefab("panel" + "/", "purchaseitem");
+                //m_MPGame.GetAssetLoader().LoadAsset("panel" + "/", "panelui");
+                //m_MPGame.GetAssetLoader().LoadPrefab("panel" + "/", "purchaseitem");
+                m_MPGame.GetAssetLoader().LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
             }
             _bLoadAsset = true;
         }

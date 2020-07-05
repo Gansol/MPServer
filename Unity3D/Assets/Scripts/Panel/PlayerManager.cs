@@ -39,7 +39,7 @@ public class PlayerManager : MPPanel
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
-    private static string _MiceIconPath = "miceicon", _ItemIconPath = "itemicon", _PanelPath = "panel", _InvItem = "invitem";
+    private static string   _InvItem = "invitem";
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
@@ -167,7 +167,7 @@ public class PlayerManager : MPPanel
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
-            assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
+           // assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -189,11 +189,12 @@ public class PlayerManager : MPPanel
         {
             assetLoader.init();
             //assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
-            assetLoader.LoadAsset(_ItemIconPath + "/", _ItemIconPath);
-            assetLoader.LoadPrefab(_PanelPath + "/", _InvItem);
+
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _InvItem + Global.ext);
+            //assetLoader.LoadPrefab(_PanelPath + "/", _InvItem); // old loadprefeb
 
             //_LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
-            _LoadedAsset = LoadIconObject(dictNotLoadedAsset, _ItemIconPath);
+            _LoadedAsset = LoadIconObject(dictNotLoadedAsset, Global.ItemIconUniquePath);
         }
         else
         {
@@ -201,7 +202,8 @@ public class PlayerManager : MPPanel
         }
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
-            assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
+            assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
+      //  assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
         _dictItemData = Global.playerItem;
     }
 

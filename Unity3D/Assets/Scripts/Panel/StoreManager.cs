@@ -81,8 +81,8 @@ public class StoreManager : MPPanel
     {
         _bFirstLoad = true;
         dictItemRefs = new Dictionary<string, GameObject>();
-        buyingGoodsData = new Dictionary<string, string> { 
-        { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" }, 
+        buyingGoodsData = new Dictionary<string, string> {
+        { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" },
         { StoreParameterCode.ItemType.ToString(), "" }, { StoreParameterCode.CurrencyType.ToString(), "" }, { StoreParameterCode.BuyCount.ToString(), "" } };
 
         _itemType = (int)StoreType.Mice;
@@ -333,7 +333,7 @@ public class StoreManager : MPPanel
 
         // 載入商品資訊
         dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix+ value.ToString().Replace(" ", "") ;
+        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
         dictItemProperty.TryGetValue(StoreProperty.Description.ToString(), out value);
         itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
 
@@ -389,7 +389,7 @@ public class StoreManager : MPPanel
 
         // 顯示圖示
         checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
-        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "") ;
+        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
 
         // 顯示商品資訊
         checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = "1";  // count = 1
@@ -474,8 +474,9 @@ public class StoreManager : MPPanel
         if (!assetLoader.GetAsset(_folderString))
         {
             assetLoader.init();
-            assetLoader.LoadAsset(_folderString + "/", _folderString);
-            assetLoader.LoadPrefab("panel/", "Item");   // 道具Slot
+            //  assetLoader.LoadAsset(_folderString + "/", _folderString);
+            //    assetLoader.LoadPrefab("panel/", "Item");   // 道具Slot
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.ItemAssetName + Global.ext);  // 道具Slot
             _bLoadedAsset = LoadIconObject(GetItemNameData(itemDetailData), _folderString);
         }
         else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
@@ -551,7 +552,7 @@ public class StoreManager : MPPanel
             object itemName;
             var nestedData = item.Value as Dictionary<string, object>;
             nestedData.TryGetValue(StoreProperty.ItemName.ToString(), out itemName);
-            string bundleName = Global.IconSuffix+ itemName.ToString() ;
+            string bundleName = Global.IconSuffix + itemName.ToString();
 
             // 已載入資產時
             if (assetLoader.GetAsset(bundleName) != null)
@@ -610,9 +611,8 @@ public class StoreManager : MPPanel
     {
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
         assetLoader.init();
-        assetLoader.LoadAsset(_folderString + "/", _folderString);
         for (int i = 1; i <= 3; i++)
-            assetLoader.LoadPrefab(_folderString + "/", _folderString + i);
+            assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
         _bLoadedGashapon = true;
     }
     #endregion

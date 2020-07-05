@@ -62,8 +62,9 @@ public abstract class MPPanel : MonoBehaviour
         else
         {
             assetLoader.init();
-            assetLoader.LoadAsset(assetName + "/", assetName);
-            assetLoader.LoadPrefab(assetName + "/", assetName);
+            assetLoader.LoadAssetFormManifest(Global.MicePath + assetName + "/unique/" + assetName + Global.ext);
+            //assetLoader.LoadAsset(assetName + "/", assetName);
+            //assetLoader.LoadPrefab(assetName + "/", assetName);
             return true;
         }
     }
@@ -189,13 +190,14 @@ public abstract class MPPanel : MonoBehaviour
     /// <param name="folder">資料夾名稱(不含/)</param>
     /// <param name="bKeyOrValue">0=keyName;1=valueName</param>
     public bool LoadIconObject(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
-    {
+    { // 新版loadasset會出錯位置
         if (itemData != null)
         {
             foreach (KeyValuePair<string, object> item in itemData)
             {
                 if (!string.IsNullOrEmpty(item.Value.ToString()))
-                    assetLoader.LoadPrefab(folder + "/", Global.IconSuffix + item.Value.ToString() );
+                    assetLoader.LoadAssetFormManifest(folder + Global.IconSuffix + item.Value + Global.ext);
+                //assetLoader.LoadPrefab(folder + "/", Global.IconSuffix + item.Value.ToString() );
             }
             return true;
         }

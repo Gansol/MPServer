@@ -124,8 +124,16 @@ public static class Global
     public static string Nickname = "";     // 暱稱
 
     public static string IconSuffix = "Icon_";  // ICON附檔名
+    public static string EffectSuffix = "effect_";  // ICON附檔名
     public static string PanelPath = "panel/";  // panel路徑
     public static string PanelUniquePath = "panel/unique/";  // panel路徑
+    public static string MicePath = "mice/";  // mice路徑
+    public static string MiceIconUniquePath = "miceicon/unique/";  // miceicon路徑
+    public static string ItemIconUniquePath = "itemicon/unique/";  // itemicon路徑
+    public static string EffectsUniquePath = "effects/unique/";  // effects路徑
+    public static string InvItemAssetName = "invitem";
+    public static string ItemAssetName = "item";
+    public static string PurchaseItemAssetName = "purchaseitem"; 
 
     public static int RoomID = -1;          // 房間ID
     public static byte Sex = 0;              // 性別

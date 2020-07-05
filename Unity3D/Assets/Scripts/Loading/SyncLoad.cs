@@ -50,7 +50,7 @@ public class SyncLoad : MonoBehaviour
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
             assetLoader.init();
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath, Global.PanelUniquePath+ "menuui.unity3d", "menuui");
+            assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ "menuui"+Global.ext);
 
             //assetLoader.LoadAsset("panel/share/", "liheiprofont");
             //assetLoader.LoadAsset("panel/share/", "comicfont");
@@ -69,8 +69,9 @@ public class SyncLoad : MonoBehaviour
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
             assetLoader.init();
-            assetLoader.LoadAsset(Global.PanelPath, "battlehud");
-            assetLoader.LoadPrefab(Global.PanelPath, Global.Scene.BattleAsset);
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
+            //assetLoader.LoadAsset(Global.PanelPath, "battlehud");
+            //assetLoader.LoadPrefab(Global.PanelPath, Global.Scene.BattleAsset);
             bLoadAsset = true;
         }
     }
