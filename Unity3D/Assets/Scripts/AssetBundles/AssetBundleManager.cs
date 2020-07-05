@@ -85,48 +85,49 @@ public static class AssetBundleManager
         public AssetBundle assetBundle = null;
     }
 
-    public static IEnumerator LoadAtlas(string folder, string assetName, System.Type type)
+    public static IEnumerator LoadAtlas(string manifestPathName, System.Type type)
     {
-        assetName = assetName.Replace(" ", "");
+
         AssetBundleRef abRef;
-        string assetPath = assetName;
         bool chkAtlas;
-        chkAtlas = dictAssetBundleRefs.TryGetValue(assetName, out abRef);
+        string assetFullPath = @"file:///" + Application.persistentDataPath + "/AssetBundles/" + manifestPathName;
+
+        chkAtlas = dictAssetBundleRefs.TryGetValue(manifestPathName, out abRef);
 
         if (!chkAtlas)
         {
-            if (!bLoadedAssetbundle(assetName))
+            if (!bLoadedAssetbundle(manifestPathName))
             {
                 _isStartLoadAsset = true;
                 while (!Caching.ready)
                     yield return null;
                 //Debug.Log("LoadAtlas Path:" + Application.persistentDataPath + "/AssetBundles/" + fileName + Global.ext);
-                using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle("file:///" + Application.persistentDataPath + "/AssetBundles/" + assetPath))
+                using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(assetFullPath))
                 {
                     yield return www.SendWebRequest();
 
-                    _ReturnMessage = "正再載入資源... ( " + assetPath + Global.ext + " )";
+                    _ReturnMessage = "正再載入資源... ( " + manifestPathName + Global.ext + " )";
                     if (www.isNetworkError || www.isHttpError)
                     {
                         _Ret = "C002";
-                        _ReturnMessage = "載入資源失敗！ : \n" + assetPath + "\n";
+                        _ReturnMessage = "載入資源失敗！ : \n" + manifestPathName + "\n";
                         Debug.Log(_ReturnMessage);
                         //foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
                         //{
                         //    Debug.LogError("AB DICT: " + item.Key.ToString());
                         //}
 
-                        Debug.LogError("assetName:" + assetName + "   assetPath:" + assetPath + "   bGetAsset: " + bLoadedAssetbundle(assetName));
+                        Debug.LogError("assetName:" + manifestPathName + "   assetPath:" + assetFullPath + "   bGetAsset: " + bLoadedAssetbundle(manifestPathName));
                         throw new Exception(www.error);
                     }
                     else if (www.isDone)
                     {
 
                         _Ret = "C001";
-                        _ReturnMessage = "載入資源完成" + assetPath;
+                        _ReturnMessage = "載入資源完成" + manifestPathName;
                         abRef = new AssetBundleRef();
                         abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
-                        dictAssetBundleRefs.Add(assetName, abRef);
+                        dictAssetBundleRefs.Add(manifestPathName, abRef);
                         //AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
                         if (type == typeof(GameObject)) _isLoadPrefab = true;
                         // www.Dispose(); 如果發現網路吃很大要補回修改新方法
@@ -146,12 +147,12 @@ public static class AssetBundleManager
     }
 
 
-    public static IEnumerator LoadGameObject(string folder, string assetName, System.Type type)   // 載入遊戲物件
+    public static IEnumerator LoadGameObject(string manifestPathName, System.Type type)   // 載入遊戲物件
     {
-        assetName = assetName.Replace(" ", "");
+        string assetFullPath = @"file:///" + Application.persistentDataPath + "/AssetBundles/" + manifestPathName;
         AssetBundleRef abRef;
-        string maniAssetNamePath = folder + assetName + Global.ext;
-        if (!bLoadedAssetbundle(maniAssetNamePath))
+
+        if (!bLoadedAssetbundle(manifestPathName))
         {
             while (_isLoadPrefab == false)
                 yield return null;
@@ -161,28 +162,28 @@ public static class AssetBundleManager
             _isStartLoadAsset = true;
             //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
 
-            using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle("file:///" + Application.persistentDataPath + "/AssetBundles/" + maniAssetNamePath))
+            using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(assetFullPath))
             {
                 _progress = (int)www.uploadProgress * 100;
                 yield return www.SendWebRequest();
                 Debug.Log(_progress);
-                _ReturnMessage = "正再載入遊戲物件... ( " + maniAssetNamePath  + " )";
+                _ReturnMessage = "正再載入遊戲物件... ( " + manifestPathName + " )";
                 //Debug.Log("( 2 ) :" + assetName);
                 if (www.isNetworkError || www.isHttpError)
                 {
                     _Ret = "C002";
-                    _ReturnMessage = "載入遊戲物件失敗！ :" + " assetName:" + assetName + "\n assetPath:" + maniAssetNamePath + "\n" + www.error;
+                    _ReturnMessage = "載入遊戲物件失敗！ :" + " assetName:" + manifestPathName + "\n assetPath:" + assetFullPath + "\n" + www.error;
                     Debug.Log("( 3 ) :" + _ReturnMessage);
                     throw new Exception(www.error);
                 }
                 else if (www.isDone)
                 {
                     _Ret = "C001";
-                    _ReturnMessage = "載入遊戲物件完成" + "( " + maniAssetNamePath + " )";
+                    _ReturnMessage = "載入遊戲物件完成" + "( " + manifestPathName + " )";
                     abRef = new AssetBundleRef();
                     abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
-                    dictAssetBundleRefs.Add(maniAssetNamePath, abRef);
-                    _request = abRef.assetBundle.LoadAssetAsync(assetName, type);
+                    dictAssetBundleRefs.Add(manifestPathName, abRef);
+                    _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
                     _isLoadObject = true;
 
                     www.Dispose();
@@ -264,6 +265,30 @@ public static class AssetBundleManager
             abRef.assetBundle = null;
             dictAssetBundleRefs.Remove(fileName);
         }
+    }
+
+    /// <summary>
+    /// Split Path and Name 分開assetbundle和Path(沒用到可以刪除)
+    /// string[0]=Path
+    /// string[1]=assetName
+    /// </summary>
+    /// <param name="manifestAssetName"></param>
+    /// <returns></returns>
+    private static string[] SplitPathName(string manifestAssetName)
+    {
+        manifestAssetName = manifestAssetName.Replace(" ","");
+        string[] path = manifestAssetName.Split(new char[] { '/' });
+        string assetName = path[path.Length - 1];
+        string folderPath = "";
+        string[] assetPathName =new string[2];
+
+        for (int i = 0; i < path.Length - 1; i++)
+        {
+            folderPath += path[i] + "/";
+        }
+        assetPathName[0] = folderPath;
+        assetPathName[1] = assetName;
+        return assetPathName;
     }
 
     public static void UnloadUnusedAssets()

@@ -6,11 +6,11 @@ public class EffectsFactory : FactoryBase
 
     private AssetLoader assetLoader;
 
-    public void LoadEffects(string bundleName)
-    {
-        assetLoader.LoadAsset("Effects/", "Effects");
-        assetLoader.LoadPrefab("Effects/", bundleName);
-    }
+    //public void LoadEffects(string bundleName)
+    //{
+    //    assetLoader.LoadAsset("Effects/", "Effects");
+    //    assetLoader.LoadPrefab("Effects/", bundleName);
+    //}
 
     public GameObject GetEffects(string bundleName)
     {

@@ -10,8 +10,8 @@ public class dem : MonoBehaviour
     void Start()
     {
         loader = MPGame.Instance.GetAssetLoader();
-        loader.LoadAsset("miceicon/", "miceicon");
-        loader.LoadPrefab("miceicon/", "icon_Eggmice");
+        //loader.LoadAsset("miceicon/", "miceicon");
+        //loader.LoadPrefab("miceicon/", "icon_Eggmice");
 
         Debug.Log("coll pos:" + coll.transform.position);
         Debug.Log("coll2 pos:" + coll2.transform.position);

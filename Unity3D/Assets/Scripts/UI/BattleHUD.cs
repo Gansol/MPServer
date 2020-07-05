@@ -55,7 +55,8 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
-        assetLoader.LoadPrefab("panel/", "invitem");
+        assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
+        // assetLoader.LoadPrefab("panel/", "invitem");
         _beautyEnergy = _beautyFever = 0f;
         //_energy = 0d;
         bLoadPrefab = true;
@@ -494,13 +495,14 @@ public class BattleHUD : MonoBehaviour
     {
         if (_dictItemReward.Count != 0)
         {
-            assetLoader.LoadAsset("miceicon/", "miceicon");
+          //  assetLoader.LoadAsset("miceicon/", "miceicon");
             // dictItemReward {"10001":{"ItemCount":"0"}}
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                if (assetLoader.GetAsset(Global.IconSuffix+itemName ) == null)
-                    assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
+                if (assetLoader.GetAsset(Global.IconSuffix + itemName) == null)
+                    assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
+                  //  assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
             }
             return false;
         }

@@ -130,9 +130,10 @@ public class FriendManager : MPPanel
                     dictMice.Add(item.Key, itemName);
                 }
                 _clientFriendsList = Global.dictFriends;
-                assetLoader.LoadAsset(iconPath + "/", iconPath);
+                //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 _bLoadedIcon = LoadIconObject(dictMice, iconPath);
-                assetLoader.LoadPrefab("panel/", slotItemName);
+                assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);
+              //  assetLoader.LoadPrefab("panel/", slotItemName);
                 _bFirstLoad = false;
             }
         }

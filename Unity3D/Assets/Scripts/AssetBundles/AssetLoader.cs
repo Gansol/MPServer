@@ -69,11 +69,12 @@ public class AssetLoader : MonoBehaviour
         }
     }
 
-    public void LoadAssetFormManifest(string folderPath, string manifestAssetName, string assetName)
+    public void LoadAssetFormManifest(string manifestAssetName)
     {
+
         // 載入Mainfest
         manipath = Application.persistentDataPath + "/AssetBundles/";
-        if (assetBundle == null )
+        if (assetBundle == null)
         {
             assetBundle = AssetBundle.LoadFromFile(Path.Combine(manipath, "AndroidBundles"));
             manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
@@ -83,33 +84,31 @@ public class AssetLoader : MonoBehaviour
 
         AssetBundleManager.init();
 
-        if (!AssetBundleManager.bLoadedAssetbundle(assetName))
+        if (!AssetBundleManager.bLoadedAssetbundle(manifestAssetName))
         {
             // 載入Mainfest 中GameObject Dependencies物件
             foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
-                StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, dependencyManifestAssetPath, typeof(GameObject)));
+                LoadAsset(dependencyManifestAssetPath);
 
             // 載入遊戲物件
-            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
-
-
+            LoadPrefab(manifestAssetName);
         }
         else
         {
             _loadedCount++;
         }
         _objCount++;
-
+        Debug.Log("fuck");
     }
 
 
-    public void LoadAsset(string folderPath, string assetName)
+    private void LoadAsset(string manifestAssetName)
     {
         AssetBundleManager.init();
         try
         {
             /*_gameLoop.*/
-            StartCoroutine(AssetBundleManager.LoadAtlas(folderPath, assetName, typeof(GameObject)));
+            StartCoroutine(AssetBundleManager.LoadAtlas(manifestAssetName, typeof(GameObject)));
         }
         catch
         {
@@ -118,19 +117,19 @@ public class AssetLoader : MonoBehaviour
 
     }
 
-    public void LoadPrefab(string folderPath, string assetName)    // 載入遊戲物件
+    private  void LoadPrefab(string manifestAssetName)    // 載入遊戲物件
     {
         loadedObj = false;
-        if (!AssetBundleManager.bLoadedAssetbundle(assetName))
-        {
+        //if (!AssetBundleManager.bLoadedAssetbundle(manifestAssetName))
+        //{
             /* _gameLoop.*/
-            StartCoroutine(AssetBundleManager.LoadGameObject(folderPath, assetName, typeof(GameObject)));
-        }
-        else
-        {
-            _loadedCount++;
-        }
-        _objCount++;
+            StartCoroutine(AssetBundleManager.LoadGameObject(manifestAssetName, typeof(GameObject)));
+        //}
+        //else
+        //{
+        //    _loadedCount++;
+        //}
+        //_objCount++;
     }
 
     /// <summary>

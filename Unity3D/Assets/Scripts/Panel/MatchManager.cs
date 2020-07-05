@@ -358,7 +358,7 @@ public class MatchManager : MPPanel
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
                 assetLoader.init();
-                assetLoader.LoadAsset(iconPath + "/", iconPath);
+                //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedAsset = LoadIconObject(dictNotLoadedAsset, iconPath);
             }                                   // 已載入物件 實體化
