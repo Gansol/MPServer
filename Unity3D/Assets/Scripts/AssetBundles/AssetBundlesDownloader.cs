@@ -22,13 +22,14 @@ using UnityEngine.Networking;
 public class AssetBundlesDownloader : MonoBehaviour
 {
     #region 欄位
-    public int fileCount { get; set; }
+    private int fileCount { get; set; }
     public bool fileDownloaded { get { return _fileDownloaded; } }
 
     public bool BundleChk { get { return _bundleChk; } private set { _bundleChk = value; } }
     private bool _bundleChk = true;
     private int _reConnTimes;
     private bool _fileDownloaded = false;
+    private bool bModify;
     #endregion
 
     #region -- DownloadListFile --
@@ -45,7 +46,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     {
         // www -> storage dict list -> download file
         Global.ReturnMessage = "下載遊戲資源列表...";
-        using (UnityWebRequest wwwDownloadList =  UnityWebRequest.Get(Global.serverListPath + pathFile))
+        using (UnityWebRequest wwwDownloadList = UnityWebRequest.Get(Global.serverListPath + pathFile))
         {//下載伺服器List檔案
             yield return wwwDownloadList.SendWebRequest();
 
@@ -123,23 +124,27 @@ public class AssetBundlesDownloader : MonoBehaviour
     /// <summary>
     /// 下載檔案
     /// </summary>
-    /// <param name="path">下載路徑</param>
+    /// <param name="serverPath">伺服器下載路徑</param>
     /// <param name="assets">資產名稱</param>
-    public void DownloadFile(string path, List<string> assets)
+    public void DownloadFile(string serverPath, List<string> assets)
     {
-        StartCoroutine(sub_DownloadFile(path, assets));
+        StartCoroutine(sub_DownloadFile(serverPath, assets));
     }
 
-    private IEnumerator sub_DownloadFile(string path, List<string> assets)
+    private IEnumerator sub_DownloadFile(string serverPath, List<string> assets)
     {
+        fileCount = assets.Count;
         foreach (string filePath in assets)
         {
-            if (!(File.Exists(Application.persistentDataPath + "/AssetBundles/" + filePath)))  //如果檔案不存在資料夾 開始下載
+            string clientFilePath = Application.persistentDataPath + "/AssetBundles/" + filePath;
+
+            if (!File.Exists(clientFilePath) || bModify)  //如果檔案不存在資料夾 開始下載
             {
-                string[] folder = filePath.Split('/');
-                Global.ReturnMessage = "開始下載資源... " + folder[1];
+                bModify = false;
+                Debug.Log("正在下載 " + clientFilePath);
+                Global.ReturnMessage = "開始下載資源... " + filePath;
                 //Debug.Log("Start Downloading... " + assets);
-                using (UnityWebRequest wwwAssetBundles =UnityWebRequest.Get(path + filePath))
+                using (UnityWebRequest wwwAssetBundles = UnityWebRequest.Get(serverPath + filePath))
                 {
                     ; //下載物件
                     yield return wwwAssetBundles.SendWebRequest(); //等待下載完成，並回傳值
@@ -148,7 +153,7 @@ public class AssetBundlesDownloader : MonoBehaviour
                     {
                         _reConnTimes++;
                         yield return new WaitForSeconds(1.0f);
-                        DownloadFile(path, assets); // ＊＊＊＊這可能會出錯＊＊＊＊＊
+                        DownloadFile(serverPath, assets); // ＊＊＊＊這可能會出錯＊＊＊＊＊
                         Global.ReturnMessage = "Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")";
                         //Debug.Log("Download (" + assets + ") File Error !   " + wwwAssetBundles.error + "\n Wait for one second. Reconnecting to download(" + _reConnTimes + ")");
                     }
@@ -163,11 +168,14 @@ public class AssetBundlesDownloader : MonoBehaviour
                         System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/AssetBundles/"); //建立 檔案目錄
 
                         byte[] file = wwwAssetBundles.downloadHandler.data; //轉換為二進位物件
+                        string directoryPath = clientFilePath.Replace(Path.GetFileName(clientFilePath), "");
 
-                        string folderPath = Application.persistentDataPath + "/AssetBundles/" + folder[0];
-                        if (!Directory.Exists(folderPath))
-                            Directory.CreateDirectory(folderPath);
-                        File.WriteAllBytes(Application.persistentDataPath + "/AssetBundles/" + filePath, file); //寫入 檔案 WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
+
+                        if (!Directory.Exists(directoryPath))
+                            Directory.CreateDirectory(directoryPath);
+
+                        // string directory = filePath.Replace(Path.GetFileName(filePath), "");
+                        File.WriteAllBytes(clientFilePath, file); //寫入 檔案 WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
 
                         ChkDownloadedCount();
                     }
@@ -179,7 +187,7 @@ public class AssetBundlesDownloader : MonoBehaviour
                 }
 
             }
-            else if (File.Exists(Application.persistentDataPath + "/AssetBundles/" + filePath) && !Global.isCompleted) //全部下載完成 取代檔案列表
+            else if (File.Exists(clientFilePath) && !Global.isCompleted) //全部下載完成 取代檔案列表
             {
                 fileCount--;
                 ChkDownloadedCount();
@@ -191,7 +199,7 @@ public class AssetBundlesDownloader : MonoBehaviour
     #region -- ReplaceItemList --
     private IEnumerator ReplaceItemList() //取代 檔案列表
     {
-        using (UnityWebRequest wwwItemList =  UnityWebRequest.Get(Global.serverListPath + Global.itemListFile))
+        using (UnityWebRequest wwwItemList = UnityWebRequest.Get(Global.serverListPath + Global.itemListFile))
         {
             yield return wwwItemList.SendWebRequest();
 
@@ -217,6 +225,14 @@ public class AssetBundlesDownloader : MonoBehaviour
         }
     }
     #endregion
+
+    /// <summary>
+    /// 檔案修改時 開啟下載檔案功能
+    /// </summary>
+    public void ModifyFile()
+    {
+        _bundleChk = bModify = true;
+    }
 
     #region -- ChkDownloadedCount --
     void ChkDownloadedCount()    // 檢查下載是否完成

@@ -56,6 +56,17 @@ public class AssetBundlesCreator : EditorWindow
     public static string sourcePath = Application.dataPath + "/Assetbundles";
     static readonly string AssetBundlesOutputPath = "Assets/_Assetbundles";
 
+    public static string manifestName =
+#if UNITY_ANDROID
+ "AndroidBundles";
+#elif UNITY_IPHONE  || UNITY_IOS
+    "iOSBundles";
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    "STANDALONE_WIN";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    "STANDALONE_OSX";
+#endif
+
     public static string perfabFolder =
 #if UNITY_ANDROID
  "/AssetBundles/";
@@ -361,16 +372,24 @@ public class AssetBundlesCreator : EditorWindow
                     // 第三層資料夾
                     foreach (string path in paths)
                     {
-                        HashComplier(path, dictBundles);
+                        HashComplier(path, dictBundles, fileExtension);
                     }
-                    HashComplier(folder, dictBundles);
+                    HashComplier(folder, dictBundles, fileExtension);
                 }
-                HashComplier(folders, dictBundles);
+                HashComplier(folders, dictBundles, fileExtension);
             }
+            List<string> pathFiles = new List<string>();
+           // string[] manifestFile1 = Directory.GetFiles(Application.dataPath + exportFolder, manifestName);
+            //string[] manifestFile2 = Directory.GetFiles(Application.dataPath + exportFolder, manifestName + ".manifest");
+
+              
+            HashComplier(Application.dataPath + exportFolder, dictBundles, ".");
+            HashComplier(Application.dataPath + exportFolder, dictBundles, ".manifest");
+
             CreateFile(Json.Serialize(dictBundles), bundleFolderPath, "BundleHash.json"); //建立 新 檔案列表
 
             if (_bPublish)
-            {
+            { 
                 if (_bFullPackage)
                     CreateFile(Json.Serialize(dictBundles), publishHashFolder, "FullPackageList.json"); //建立 新 檔案列表
 
@@ -384,21 +403,23 @@ public class AssetBundlesCreator : EditorWindow
         Debug.Log("*****Bundle Hash Completed!*****" + "  Path:" + bundleFolderPath);
     }
 
-    private static Dictionary<string, object> HashComplier(string folders, Dictionary<string, object> dictBundles)
+    private static Dictionary<string, object> HashComplier(string folders, Dictionary<string, object> dictBundles, string fileExtension)
     {
-        string[] pathFiles;
+        List<string> pathFiles;
         byte[] bytesFile;
         uint crc;
 
-        pathFiles = Directory.GetFiles(folders, "*" + fileExtension); //取得 本機資料夾 全部檔案
+        pathFiles = Directory.GetFiles(folders, "*" + fileExtension).ToList(); //取得 本機資料夾 全部檔案
+
+
 
         foreach (string file in pathFiles) // 尋遍所有資料夾下 檔案路徑
         {
             string path = file.Replace(@"\", "/");
-            int pathLength = (Application.dataPath + exportFolder).Length ;
+            int pathLength = (Application.dataPath + exportFolder).Length;
             path = path.Remove(0, pathLength);
             Debug.Log(path);
-             
+
             switch (_hashIndex)
             {
                 case 0: // SHA1

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2790925761
+CRC: 619805066
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 03d4a943eb05dddc13b894b840bf804f
+    Hash: 8f70f4bc68cde5124a27cd93157e317e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -28,6 +28,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/MagicMice/Unique/MagicMice.prefab
+- Assets/AssetBundles/mice/magicmice/unique/magicmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/magicmice/share/magicmice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/magicmice/share/atlas_magicmice.unity3d

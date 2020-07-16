@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3850105781
+CRC: 1844150284
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 51a5392b068a4fb1642a9a3709c38bb1
+    Hash: bbf17844ede3b1ea1b7af475f2af077b
   TypeTreeHash:
     serializedVersion: 2
     Hash: 5d2e305d0061bd54b59415286d23bc7c
@@ -28,8 +28,8 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/ItemICON/Share/ItemIcon.prefab
-- Assets/AssetBundles/ItemICON/Share/ItemIcon.png
-- Assets/AssetBundles/ItemICON/Share/ItemIcon.mat
-- Assets/AssetBundles/ItemICON/Share/ItemIcon.asset
+- Assets/AssetBundles/itemicon/share/itemicon.prefab
+- Assets/AssetBundles/itemicon/share/itemicon.png
+- Assets/AssetBundles/itemicon/share/itemicon.mat
+- Assets/AssetBundles/itemicon/share/itemicon.asset
 Dependencies: []

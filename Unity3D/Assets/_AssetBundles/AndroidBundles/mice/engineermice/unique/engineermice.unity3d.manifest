@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2267880402
+CRC: 1758524185
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 02ab9327ebad84266969f30fdd617b45
+    Hash: ec0984f2b6e930d0e9a21b776fce6a1c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -28,6 +28,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/EngineerMice/Unique/EngineerMice.prefab
+- Assets/AssetBundles/mice/engineermice/unique/engineermice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/engineermice/share/engineermice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/engineermice/share/atlas_engineermice.unity3d

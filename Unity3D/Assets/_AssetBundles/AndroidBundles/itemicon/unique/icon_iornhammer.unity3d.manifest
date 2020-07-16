@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 3624189952
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d50ef4c2b3ef145ad604fc8ac64e2596
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: cd4081c94633e7c3c8d496dd039c2374
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/itemicon/unique/icon_iornhammer.prefab
+Dependencies:
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d

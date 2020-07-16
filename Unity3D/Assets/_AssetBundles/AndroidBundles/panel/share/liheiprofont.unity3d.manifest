@@ -22,7 +22,7 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/LiHeiProFont.asset
-- Assets/AssetBundles/Panel/Share/LiHeiProFont.mat
-- Assets/AssetBundles/Panel/Share/LiHeiProFont.png
+- Assets/AssetBundles/panel/share/LiHeiProFont.asset
+- Assets/AssetBundles/panel/share/LiHeiProFont.mat
+- Assets/AssetBundles/panel/share/LiHeiProFont.png
 Dependencies: []

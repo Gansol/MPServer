@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2532645758
+CRC: 2751593595
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0898cb96d78d7c9d114bc5dc4ee98521
+    Hash: 3b37f1c3bb4eace5023a2d18c6d27f59
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -28,6 +28,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/NinjaMice/Unique/NinjaMice.prefab
+- Assets/AssetBundles/mice/ninjamice/unique/ninjamice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/ninjamice/share/ninjamice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/ninjamice/share/atlas_ninjamice.unity3d

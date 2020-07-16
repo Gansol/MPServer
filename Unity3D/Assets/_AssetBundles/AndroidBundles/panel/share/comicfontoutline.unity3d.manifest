@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/ComicFontOutline.asset
-- Assets/AssetBundles/Panel/Share/ComicFontOutline.png
-- Assets/AssetBundles/Panel/Share/ComicFontOutline.mat
+- Assets/AssetBundles/panel/share/ComicFontOutline.asset
+- Assets/AssetBundles/panel/share/ComicFontOutline.png
+- Assets/AssetBundles/panel/share/ComicFontOutline.mat
 Dependencies: []

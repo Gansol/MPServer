@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/BattleHUD.png
-- Assets/AssetBundles/Panel/Share/BattleHUD.asset
-- Assets/AssetBundles/Panel/Share/BattleHUD.mat
+- Assets/AssetBundles/panel/share/BattleHUD.png
+- Assets/AssetBundles/panel/share/BattleHUD.asset
+- Assets/AssetBundles/panel/share/BattleHUD.mat
 Dependencies: []

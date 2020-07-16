@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4220077620
+CRC: 3981613113
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d679519df3df7a1aa991b30b99d5465a
+    Hash: 29b61697f05a724b6043415d9e2f0806
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1ca2501bcd9b0cb5e47a0260d991d4e0
@@ -30,6 +30,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/HeroMice/Unique/HeroMice.prefab
+- Assets/AssetBundles/mice/heromice/unique/heromice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/heromice/share/heromice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/heromice/share/atlas_heromice.unity3d

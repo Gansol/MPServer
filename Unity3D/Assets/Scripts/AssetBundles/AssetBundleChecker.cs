@@ -16,7 +16,8 @@ using UnityEngine.Networking;
 * 負責 檢查資產
 * ***************************************************************
 *                           ChangeLog
-* 20160714 v1.0.1  修正部分問題                                       
+* 20160714 v1.0.1  修正部分問題      
+* 20200717 v1.1.0  修正無法辨認檔案差異
 * ****************************************************************/
 public class AssetBundleChecker : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class AssetBundleChecker : MonoBehaviour
     public bool bundleChk, bFristLoad;              // 資源檢查
     private string localItemListText;   // 本機 檔案列表內容
     private int reConnTimes = 0;
+
     #endregion
 
     void Start()
@@ -51,7 +53,7 @@ public class AssetBundleChecker : MonoBehaviour
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
     ReCheckFlag:
-        using (UnityWebRequest wwwVersionList =  UnityWebRequest.Get(serverPathFile))
+        using (UnityWebRequest wwwVersionList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
             yield return wwwVersionList.SendWebRequest();
 
@@ -146,13 +148,16 @@ public class AssetBundleChecker : MonoBehaviour
     private void CompareListFile(string wwwText, string localPathFile)
     {
         //把JSON文字解析 後 存入字典檔 等待比較
-        Dictionary<string, object> dictJsonServerList = MiniJSON.Json.Deserialize(wwwText) as Dictionary<string, object>;
-        Dictionary<string, object> dictJsonLocalList = MiniJSON.Json.Deserialize(OpenListFile(localPathFile)) as Dictionary<string, object>;
+        Dictionary<string, object> dictServerFileList = MiniJSON.Json.Deserialize(wwwText) as Dictionary<string, object>;
+        Dictionary<string, object> dictLocalFileList = MiniJSON.Json.Deserialize(OpenListFile(localPathFile)) as Dictionary<string, object>;
+        Dictionary<string, object> dictServerCompareList = new Dictionary<string, object>(dictServerFileList);
+        Dictionary<string, object> dictLocalCompareList = new Dictionary<string, object>(dictLocalFileList);
 
-        //比較用 
+        //比較用 HashSet
         HashSet<string> hashServerList = new HashSet<string>();
         HashSet<string> hashLocalList = new HashSet<string>();
-        HashSet<string> hashDelorAdd = new HashSet<string>();
+        HashSet<string> hashModifyItem = new HashSet<string>();
+        HashSet<string> hashNewServerItem, hashDelItem, hashTmpItem;
 
 
         if (localItemListText == "{}" || localItemListText == "") //本機檔案 被砍光光了 下載全部檔案
@@ -160,82 +165,64 @@ public class AssetBundleChecker : MonoBehaviour
             bFristLoad = true;
             bundleDownloader.DownloadListFile(Global.fullPackageFile);
         }
-        else if ((localItemListText != wwwText))  // 如果 檔案不同 就儲存 進 HashSet 比對資料
+        else if (localItemListText != wwwText)  // 如果 檔案不同 就儲存 進 HashSet 比對資料
         {
-            //Debug.Log("AssetBundles Not Equals");
-            #region 刪除多的檔案
-            foreach (KeyValuePair<string, object> localItem in dictJsonLocalList) //比對 本機 與 伺服器 全部資料
+            foreach (KeyValuePair<string, object> serverItem in dictServerFileList)
+                hashServerList.Add(serverItem.Key);
+
+            foreach (KeyValuePair<string, object> localItem in dictLocalFileList)
+                hashLocalList.Add(localItem.Key);
+
+
+            // 使用HashSet 排除Server相同檔案 找出 新增檔案 並存入HashSet       Server files - local files = new file
+            hashTmpItem = new HashSet<string>(hashServerList);
+            hashTmpItem.ExceptWith(hashLocalList);
+            hashNewServerItem = new HashSet<string>(hashTmpItem);
+            //Debug.Log(hashNewServerItem.Count);
+
+            // 使用HashSet 排除Server相同檔案 找出 多餘檔案 並存入HashSet 刪除      local files -  Server files = del file
+            hashLocalList.ExceptWith(hashServerList);
+            hashDelItem = hashLocalList;    // 方便辨認刪除物件 無意義HashSet
+            //Debug.Log(hashDelItem.Count);
+
+
+            // 取得沒有新檔案的伺服器檔案列表 (用來比較與本機檔案差異)  ServerFiles - NewFiles = no NewFile ServerFile
+            foreach (KeyValuePair<string, object> serverItem in dictServerFileList)
             {
-                foreach (KeyValuePair<string, object> serverItem in dictJsonServerList)
-                {
-                    hashServerList.Add(serverItem.Key); //把 伺服器 檔案列表存入HashSet等待比較
-                    if (localItem.Value.ToString() == serverItem.Value.ToString()) //如果發現相同檔案 (Value值是 SHA1)
-                    {
-                        hashDelorAdd.Add(localItem.Key.ToString()); //把本機資料 存入HashSet中比較 不必刪除 localItem.Key (Key值 是 檔案名稱)
-                        break;
-                    }
-                }
-                hashLocalList.Add(localItem.Key); //把 本機 檔案列表存入HashSet等待比較
-            }
-            hashLocalList.ExceptWith(hashDelorAdd); // (hashLocalList)要刪除的檔案 = 本機檔案 - 要保存的檔案(無變動檔案)
-            //Debug.Log(hashLocalList.Count);
-            bundleDownloader.DeleteFile(hashLocalList); //刪除檔案  //目前狀態 檔案已刪除 LocalList還是舊的
-
-            hashLocalList.Clear(); //清除 本機資料列表(要刪除的檔案，不能再比對，要重新再讀一次本機資料)
-            hashDelorAdd.Clear(); //清除 保留檔案列表
-            createJSON.AssetBundlesJSON();//重新建立 本機 檔案列表
-            #endregion
-
-            #region 新增檔案
-            dictJsonLocalList = MiniJSON.Json.Deserialize(File.ReadAllText(localPathFile)) as Dictionary<string, object>; //存入本機檔案列表至 dictJsonLocalList
-
-            foreach (KeyValuePair<string, object> localItem in dictJsonLocalList) //比較 本機檔案 與 伺服器檔案 新增項目
-            {
-                foreach (KeyValuePair<string, object> serverItem in dictJsonServerList)
-                {
-                    if (localItem.Value.ToString() == serverItem.Value.ToString())  // 如果 本機檔案 = 伺服器檔案 -->檔案存在
-                    {
-                        hashDelorAdd.Add(localItem.Key.ToString()); //存入 已存在檔案
-                        break;
-                    }
-                }
+                if (hashNewServerItem.Contains(serverItem.Key))
+                    dictServerCompareList.Remove(serverItem.Key);
             }
 
-            //Debug.Log("Equal= :"+ (hashServerList == hashDelorAdd));
-            //HashSet<string> test = new HashSet<string>();
+            //Debug.Log("dictServerCompareList.Count :" + dictServerCompareList.Count);
 
-            //            string str = "", str2 = "";
-            //            foreach (string a in hashServerList)
-            //            {
-            //               str+=a;
-            //            }
-            ////            Debug.Log(str);
-
-            //            foreach (string b in hashDelorAdd)
-            //            {
-            //                str2 += b;
-            //            }
-            //            Debug.Log(str2);
-
-            hashServerList.ExceptWith(hashDelorAdd);// hashServerList 新增檔案 = 伺服器檔案 - 已存在檔案
-
-
-            //foreach (string a in hashServerList)
-            //{
-            //    Debug.Log(a);
-            //}
-            downloadCount = bundleDownloader.fileCount = hashServerList.Count;
-            if (downloadCount > 0)
-                bundleChk = true;
-
-            // if (bundleDownloader.fileCount > 0) bundleChk = true;
-
-            if (hashServerList.Count != 0)
+            // 取得沒有舊檔案的本機檔案列表 (用來比較與伺服器檔案差異)  ServerFiles - NewFiles = no NewFile ServerFile
+            foreach (KeyValuePair<string, object> localItem in dictLocalFileList)
             {
-                //foreach (string item in hashServerList) // 下載檔案
-                //    bundleDownloader.DownloadFile(Global.assetBundlesPath, item);
+                if (hashDelItem.Contains(localItem.Key))
+                    dictLocalCompareList.Remove(localItem.Key);
+            }
 
-                bundleDownloader.DownloadFile(Global.assetBundlesPath, hashServerList.ToList<string>());
+            //Debug.Log("dictServerCompareList.Count :" + dictServerCompareList.Count);
+
+            // 檢查相同的檔案是否被修改 
+            foreach (KeyValuePair<string, object> item in dictServerCompareList)
+            {
+                dictLocalCompareList.TryGetValue(item.Key, out object value);
+
+                if (item.Value.ToString() != value.ToString())
+                    hashModifyItem.Add(item.Key);
+            }
+
+            hashNewServerItem.UnionWith(hashModifyItem);    // 合併HashSet 新增檔案 與 差異檔案 
+            bundleDownloader.DeleteFile(hashDelItem);   // 刪除檔案
+
+            //   Debug.Log(hashNewServerItem.Count);
+
+            // 如果有 新增檔案
+            if (hashNewServerItem.Count > 0)
+            {
+                bundleDownloader.ModifyFile();
+                bundleDownloader.DownloadFile(Global.assetBundlesPath, hashNewServerItem.ToList<string>());
                 bundleChk = bundleDownloader.BundleChk;
             }
             else
@@ -243,8 +230,6 @@ public class AssetBundleChecker : MonoBehaviour
                 Global.ReturnMessage = "遊戲資源為最新版本!";
                 Global.isCompleted = true;
             }
-            #endregion
-
         }
         else // 與伺服器檔案相同
         {

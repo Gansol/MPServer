@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1702882327
+CRC: 2497934255
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2e7cde0a08a87e411b139e78306ba709
+    Hash: 925bfd9ad5a2f33073bb454d072493c7
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -28,6 +28,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/EggMice/Unique/EggMice.prefab
+- Assets/AssetBundles/mice/eggmice/unique/eggmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/eggmice/share/eggmice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/eggmice/share/atlas_eggmice.unity3d

@@ -116,7 +116,7 @@ public static class AssetBundleManager
                         //{
                         //    Debug.LogError("AB DICT: " + item.Key.ToString());
                         //}
-
+                        
                         Debug.LogError("assetName:" + manifestPathName + "   assetPath:" + assetFullPath + "   bGetAsset: " + bLoadedAssetbundle(manifestPathName));
                         throw new Exception(www.error);
                     }
@@ -125,9 +125,11 @@ public static class AssetBundleManager
 
                         _Ret = "C001";
                         _ReturnMessage = "載入資源完成" + manifestPathName;
+                        Debug.Log(_ReturnMessage);
                         abRef = new AssetBundleRef();
                         abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
-                        dictAssetBundleRefs.Add(manifestPathName, abRef);
+                        if (!dictAssetBundleRefs.ContainsKey(manifestPathName))
+                            dictAssetBundleRefs.Add(manifestPathName, abRef);
                         //AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
                         if (type == typeof(GameObject)) _isLoadPrefab = true;
                         // www.Dispose(); 如果發現網路吃很大要補回修改新方法
@@ -180,9 +182,11 @@ public static class AssetBundleManager
                 {
                     _Ret = "C001";
                     _ReturnMessage = "載入遊戲物件完成" + "( " + manifestPathName + " )";
+                    Debug.Log(_ReturnMessage);
                     abRef = new AssetBundleRef();
                     abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
-                    dictAssetBundleRefs.Add(manifestPathName, abRef);
+                    if (!dictAssetBundleRefs.ContainsKey(manifestPathName))
+                        dictAssetBundleRefs.Add(manifestPathName, abRef);
                     _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
                     _isLoadObject = true;
 
@@ -276,11 +280,11 @@ public static class AssetBundleManager
     /// <returns></returns>
     private static string[] SplitPathName(string manifestAssetName)
     {
-        manifestAssetName = manifestAssetName.Replace(" ","");
+        manifestAssetName = manifestAssetName.Replace(" ", "");
         string[] path = manifestAssetName.Split(new char[] { '/' });
         string assetName = path[path.Length - 1];
         string folderPath = "";
-        string[] assetPathName =new string[2];
+        string[] assetPathName = new string[2];
 
         for (int i = 0; i < path.Length - 1; i++)
         {

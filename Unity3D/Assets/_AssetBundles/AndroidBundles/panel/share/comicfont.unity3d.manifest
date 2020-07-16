@@ -22,7 +22,7 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/ComicFont.asset
-- Assets/AssetBundles/Panel/Share/ComicFont.mat
-- Assets/AssetBundles/Panel/Share/ComicFont.png
+- Assets/AssetBundles/panel/share/ComicFont.asset
+- Assets/AssetBundles/panel/share/ComicFont.mat
+- Assets/AssetBundles/panel/share/ComicFont.png
 Dependencies: []

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2244799766
+CRC: 1830005346
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ecb89242b2e35ea630ebbf74009b164c
+    Hash: ef30f0e1a3b093bd4dbb24623827a39a
   TypeTreeHash:
     serializedVersion: 2
     Hash: 292aed745896ec01fd76d562108ea287
@@ -30,6 +30,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Mice/CandyMice/Unique/CandyMice.prefab
+- Assets/AssetBundles/mice/candymice/unique/candymice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/mice/candymice/share/candymice.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/candymice/share/atlas_candymice.unity3d
