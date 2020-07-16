@@ -28,7 +28,7 @@ public class AssetLoader : MonoBehaviour
     private AssetBundleManifest manifest;
     private AssetBundle assetBundle;
     private string manipath;
-
+    private List<string> atlasNamePath;
     public AssetLoader(/*GameLoop gameLoop*/)
     {
 
@@ -71,7 +71,6 @@ public class AssetLoader : MonoBehaviour
 
     public void LoadAssetFormManifest(string manifestAssetName)
     {
-
         // 載入Mainfest
         manipath = Application.persistentDataPath + "/AssetBundles/";
         if (assetBundle == null)
@@ -88,7 +87,13 @@ public class AssetLoader : MonoBehaviour
         {
             // 載入Mainfest 中GameObject Dependencies物件
             foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
-                LoadAsset(dependencyManifestAssetPath);
+            {
+                if (!atlasNamePath.Contains(dependencyManifestAssetPath))
+                {
+                    atlasNamePath.Add(dependencyManifestAssetPath);
+                    LoadAsset(dependencyManifestAssetPath);
+                }
+            }
 
             // 載入遊戲物件
             LoadPrefab(manifestAssetName);
@@ -98,7 +103,7 @@ public class AssetLoader : MonoBehaviour
             _loadedCount++;
         }
         _objCount++;
-        Debug.Log("fuck");
+        Debug.Log("_objCount:"+ _objCount);
     }
 
 
@@ -151,6 +156,7 @@ public class AssetLoader : MonoBehaviour
 
     public void init()
     {
+        atlasNamePath = new List<string>();
         _objCount = _loadedCount = 0;
         loadedObj = false;
         AssetBundleManager.init();

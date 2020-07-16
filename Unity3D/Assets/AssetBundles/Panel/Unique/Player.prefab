@@ -9525,7 +9525,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
+  mAtlas: {fileID: 11400000, guid: 9fa90fde179d63a46a4e0399dacea693, type: 2}
   mSpriteName: EggMiceICON
   mFixedAspect: 0
   mFillCenter: 1

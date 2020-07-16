@@ -32,7 +32,7 @@ ClassTypes:
 - Class: 128
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Unique/PurchaseItem.prefab
+- Assets/AssetBundles/panel/unique/PurchaseItem.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

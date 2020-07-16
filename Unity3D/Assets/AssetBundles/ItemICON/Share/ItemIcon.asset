@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
-  m_Name: ItemIcon
+  m_Name: itemicon
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: ac35c65a8121291478c186da699cb9fb, type: 2}
   mSprites:

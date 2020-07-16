@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4191868824
+CRC: 3142152020
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f7fff770868dae97d17a01b4049e7cbd
+    Hash: 09abd377bdd14d583eb89827c0cc0310
   TypeTreeHash:
     serializedVersion: 2
     Hash: cd4081c94633e7c3c8d496dd039c2374
@@ -20,6 +20,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/ItemICON/Unique/Icon_Snow.prefab
+- Assets/AssetBundles/itemicon/unique/icon_snow.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d

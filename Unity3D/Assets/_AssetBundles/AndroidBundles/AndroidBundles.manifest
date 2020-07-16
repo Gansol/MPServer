@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 2826684171
+CRC: 3768399436
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -102,11 +102,11 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
     Info_26:
-      Name: itemicon/unique/icon_iiornhammer.unity3d
+      Name: itemicon/unique/icon_invincible.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
     Info_27:
-      Name: itemicon/unique/icon_invincible.unity3d
+      Name: itemicon/unique/icon_iornhammer.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
     Info_28:
@@ -138,68 +138,68 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
     Info_35:
-      Name: mice/blackmice/share/blackmice.unity3d
+      Name: mice/blackmice/share/atlas_blackmice.unity3d
       Dependencies: {}
     Info_36:
       Name: mice/blackmice/unique/blackmice.unity3d
       Dependencies:
-        Dependency_0: mice/blackmice/share/blackmice.unity3d
+        Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
     Info_37:
-      Name: mice/candymice/share/candymice.unity3d
+      Name: mice/candymice/share/atlas_candymice.unity3d
       Dependencies: {}
     Info_38:
       Name: mice/candymice/unique/candymice.unity3d
       Dependencies:
-        Dependency_0: mice/candymice/share/candymice.unity3d
+        Dependency_0: mice/candymice/share/atlas_candymice.unity3d
     Info_39:
-      Name: mice/eggmice/share/eggmice.unity3d
+      Name: mice/eggmice/share/atlas_eggmice.unity3d
       Dependencies: {}
     Info_40:
       Name: mice/eggmice/unique/eggmice.unity3d
       Dependencies:
-        Dependency_0: mice/eggmice/share/eggmice.unity3d
+        Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
     Info_41:
-      Name: mice/engineermice/share/engineermice.unity3d
+      Name: mice/engineermice/share/atlas_engineermice.unity3d
       Dependencies: {}
     Info_42:
       Name: mice/engineermice/unique/engineermice.unity3d
       Dependencies:
-        Dependency_0: mice/engineermice/share/engineermice.unity3d
+        Dependency_0: mice/engineermice/share/atlas_engineermice.unity3d
     Info_43:
-      Name: mice/heromice/share/heromice.unity3d
+      Name: mice/heromice/share/atlas_heromice.unity3d
       Dependencies: {}
     Info_44:
       Name: mice/heromice/unique/heromice.unity3d
       Dependencies:
-        Dependency_0: mice/heromice/share/heromice.unity3d
+        Dependency_0: mice/heromice/share/atlas_heromice.unity3d
     Info_45:
-      Name: mice/magicmice/share/magicmice.unity3d
+      Name: mice/magicmice/share/atlas_magicmice.unity3d
       Dependencies: {}
     Info_46:
       Name: mice/magicmice/unique/magicmice.unity3d
       Dependencies:
-        Dependency_0: mice/magicmice/share/magicmice.unity3d
+        Dependency_0: mice/magicmice/share/atlas_magicmice.unity3d
     Info_47:
-      Name: mice/ninjamice/share/ninjamice.unity3d
+      Name: mice/ninjamice/share/atlas_ninjamice.unity3d
       Dependencies: {}
     Info_48:
       Name: mice/ninjamice/unique/ninjamice.unity3d
       Dependencies:
-        Dependency_0: mice/ninjamice/share/ninjamice.unity3d
+        Dependency_0: mice/ninjamice/share/atlas_ninjamice.unity3d
     Info_49:
-      Name: mice/rabbitmice/share/rabbitmice.unity3d
+      Name: mice/rabbitmice/share/atlas_rabbitmice.unity3d
       Dependencies: {}
     Info_50:
       Name: mice/rabbitmice/unique/rabbitmice.unity3d
       Dependencies:
-        Dependency_0: mice/rabbitmice/share/rabbitmice.unity3d
+        Dependency_0: mice/rabbitmice/share/atlas_rabbitmice.unity3d
     Info_51:
-      Name: mice/thiefmice/share/thiefmice.unity3d
+      Name: mice/thiefmice/share/atlas_thiefmice.unity3d
       Dependencies: {}
     Info_52:
       Name: mice/thiefmice/unique/thiefmice.unity3d
       Dependencies:
-        Dependency_0: mice/thiefmice/share/thiefmice.unity3d
+        Dependency_0: mice/thiefmice/share/atlas_thiefmice.unity3d
     Info_53:
       Name: miceicon/share/miceicon.unity3d
       Dependencies: {}
@@ -323,8 +323,9 @@ AssetBundleManifest:
     Info_82:
       Name: panel/unique/player.unity3d
       Dependencies:
-        Dependency_0: panel/share/comic.unity3d
-        Dependency_1: panel/share/panelui.unity3d
+        Dependency_0: miceicon/share/miceicon.unity3d
+        Dependency_1: panel/share/comic.unity3d
+        Dependency_2: panel/share/panelui.unity3d
     Info_83:
       Name: panel/unique/purchase.unity3d
       Dependencies:
@@ -356,20 +357,20 @@ AssetBundleManifest:
     Info_88:
       Name: skill/blackmice.unity3d
       Dependencies:
-        Dependency_0: mice/blackmice/share/blackmice.unity3d
+        Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
     Info_89:
       Name: skill/candymice.unity3d
       Dependencies:
-        Dependency_0: mice/candymice/share/candymice.unity3d
+        Dependency_0: mice/candymice/share/atlas_candymice.unity3d
     Info_90:
       Name: skill/eggmice.unity3d
       Dependencies:
-        Dependency_0: mice/eggmice/share/eggmice.unity3d
+        Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
     Info_91:
       Name: skill/ninjamice.unity3d
       Dependencies:
-        Dependency_0: mice/ninjamice/share/ninjamice.unity3d
+        Dependency_0: mice/ninjamice/share/atlas_ninjamice.unity3d
     Info_92:
       Name: skill/rabbitmice.unity3d
       Dependencies:
-        Dependency_0: mice/rabbitmice/share/rabbitmice.unity3d
+        Dependency_0: mice/rabbitmice/share/atlas_rabbitmice.unity3d

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1056136352
+CRC: 2588823996
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f655a6fc5d63f444c7767b8ac8471066
+    Hash: 0a7615958b14c652063a1ce89c2cb4bc
   TypeTreeHash:
     serializedVersion: 2
     Hash: cd4081c94633e7c3c8d496dd039c2374
@@ -20,6 +20,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/ItemICON/Unique/Icon_GoldHammer.prefab
+- Assets/AssetBundles/itemicon/unique/icon_goldhammer.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d

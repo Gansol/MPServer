@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3450223955
+CRC: 642134943
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d5cc56e4caf971bfd1c6e58d9ffe63b7
+    Hash: f6928b39cc1ab3ec55d8afc635158df0
   TypeTreeHash:
     serializedVersion: 2
     Hash: cd4081c94633e7c3c8d496dd039c2374
@@ -20,6 +20,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/ItemICON/Unique/Icon_Invincible.prefab
+- Assets/AssetBundles/itemicon/unique/icon_invincible.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d

@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/GameScene.mat
-- Assets/AssetBundles/Panel/Share/GameScene.asset
-- Assets/AssetBundles/Panel/Share/GameScene.png
+- Assets/AssetBundles/panel/share/GameScene.mat
+- Assets/AssetBundles/panel/share/GameScene.asset
+- Assets/AssetBundles/panel/share/GameScene.png
 Dependencies: []

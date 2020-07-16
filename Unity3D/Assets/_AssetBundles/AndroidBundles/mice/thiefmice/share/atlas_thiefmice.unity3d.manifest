@@ -1,0 +1,26 @@
+ManifestFileVersion: 0
+CRC: 2772560393
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 284584394eaadaa0fb02666985e85d47
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2622fcc33b2ee4d452250bd430f8317c
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.asset
+- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.png
+- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.mat
+Dependencies: []

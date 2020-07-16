@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/MainFront.asset
-- Assets/AssetBundles/Panel/Share/MainFront.png
-- Assets/AssetBundles/Panel/Share/MainFront.mat
+- Assets/AssetBundles/panel/share/MainFront.asset
+- Assets/AssetBundles/panel/share/MainFront.png
+- Assets/AssetBundles/panel/share/MainFront.mat
 Dependencies: []

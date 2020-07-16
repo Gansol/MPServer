@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/MiceICON/Share/MiceIcon.mat
-- Assets/AssetBundles/MiceICON/Share/MiceIcon.asset
-- Assets/AssetBundles/MiceICON/Share/MiceIcon.png
+- Assets/AssetBundles/miceicon/share/MiceIcon.mat
+- Assets/AssetBundles/miceicon/share/MiceIcon.asset
+- Assets/AssetBundles/miceicon/share/MiceIcon.png
 Dependencies: []

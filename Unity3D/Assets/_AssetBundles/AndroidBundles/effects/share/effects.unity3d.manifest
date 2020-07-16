@@ -28,8 +28,8 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Effects/Share/effects.asset
-- Assets/AssetBundles/Effects/Share/effects.mat
-- Assets/AssetBundles/Effects/Share/effects.png
-- Assets/AssetBundles/Effects/Share/effects.prefab
+- Assets/AssetBundles/effects/share/effects.asset
+- Assets/AssetBundles/effects/share/effects.mat
+- Assets/AssetBundles/effects/share/effects.png
+- Assets/AssetBundles/effects/share/effects.prefab
 Dependencies: []

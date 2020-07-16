@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Bali
+  m_Name: bali
   m_Shader: {fileID: 4800000, guid: ed5591596df551e4c8f4b05ce88a7a07, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4

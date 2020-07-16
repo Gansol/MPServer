@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3309176414
+CRC: 878605461
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1ab14d5cd93b1110d03363dbd91a8e73
+    Hash: a87ed5912c9f19682b0fd649ad16ac2e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 8a54f921be9e95a99076cbb9c276b333
@@ -22,7 +22,7 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Creature/Share/Bali.png
-- Assets/AssetBundles/Creature/Share/Bali.mat
-- Assets/AssetBundles/Creature/Share/Bali.asset
+- Assets/AssetBundles/creature/share/bali.png
+- Assets/AssetBundles/creature/share/bali.mat
+- Assets/AssetBundles/creature/share/bali.asset
 Dependencies: []

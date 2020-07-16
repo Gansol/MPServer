@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
-  m_Name: Much
+  m_Name: much
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: a9e73631fbefa48459d0d3d0d07e9885, type: 2}
   mSprites:

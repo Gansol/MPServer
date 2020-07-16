@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2123285187
+CRC: 1600420381
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 211045e09614e2a9bb88176eef2e938a
+    Hash: c5e55d45d1e21150347c441a65c6f07f
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -20,6 +20,6 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/MiceICON/Unique/Icon_RabbitMice.prefab
+- Assets/AssetBundles/miceicon/unique/icon_rabbitmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d

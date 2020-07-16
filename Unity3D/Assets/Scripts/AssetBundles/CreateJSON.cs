@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using MiniJSON;
+using System.Linq;
 
 //目前只比較bytes差別，本檔案沒有判斷檔案關開等例外情況
 public class CreateJSON
@@ -19,7 +20,6 @@ public class CreateJSON
         //bundleHash = gameObject.AddComponent<AssetBundlesHash>();
         Dictionary<string, object> dictBundles = new Dictionary<string, object>();
 
-        string hash;
         string itemListURL = Application.persistentDataPath + "/List/";
         string pathURL = Application.persistentDataPath + "/AssetBundles/";
 
@@ -29,23 +29,57 @@ public class CreateJSON
         if (!System.IO.Directory.Exists(pathURL))
             System.IO.Directory.CreateDirectory(pathURL);
 
-        string[] folders = Directory.GetDirectories(pathURL);
+        string[] rootFolders = Directory.GetDirectories(pathURL);
 
-        foreach (string folder in folders)
+        foreach (string folders in rootFolders)
         {
-            pathFiles = Directory.GetFiles(folder); //取得 本機資料夾 全部檔案
-            foreach (string path in pathFiles) // 尋遍所有資料夾下 檔案路徑
+            string[] innerFolders = Directory.GetDirectories(folders); //取得 本機資料夾 全部檔案
+            foreach (string folder in innerFolders) // 尋遍所有資料夾下 檔案路徑
             {
-                string folderName = Path.GetFileName(Path.GetDirectoryName(path));
-                bytesFile = File.ReadAllBytes(path); //讀取檔案bytes
-                hash = AssetBundlesHash.SHA1Complier(bytesFile);//Hash bytes
-                dictBundles.Add(folderName + "/" + Path.GetFileName(path), hash);//把hash過的值存入字典檔
+                string[] paths = Directory.GetDirectories(folder);
+
+                foreach (string path in paths) // 尋遍所有資料夾下 檔案路徑
+                {
+                    HashComplier(path, dictBundles,"*");
+                }
+                HashComplier(folder, dictBundles, "*");
             }
+            HashComplier(folders, dictBundles, "*");
         }
 
+        //HashComplier(pathURL, dictBundles, ".");
+        //HashComplier(pathURL, dictBundles, ".manifest");
+        HashComplier(pathURL, dictBundles, "*");
+        Debug.Log(Json.Serialize(dictBundles));
         CreateFile(Json.Serialize(dictBundles), itemListURL, Global.itemListFile); //建立 新 檔案列表
     }
 
+    private void HashComplier(string path, Dictionary<string, object> dictBundles,string ext)
+    {
+        //Debug.Log("Path:" + path);
+        string hash;
+        List<string> pathFiles = new List<string>();
+
+
+
+
+        pathFiles = Directory.GetFiles(path, "*" + ext).ToList(); //取得 本機資料夾 全部檔案
+
+        foreach (string file in pathFiles)
+        {
+            // Debug.Log("File:" + file);
+            bytesFile = File.ReadAllBytes(file); //讀取檔案bytes
+            hash = AssetBundlesHash.SHA1Complier(bytesFile);//Hash bytes
+
+            string filePath = file.Replace(@"\\", "/");
+            filePath = file.Replace(@"\", "/");
+
+            int pathLength = (Application.persistentDataPath + "/AssetBundles/").Length;
+            filePath = filePath.Remove(0, pathLength);
+
+            dictBundles.Add(filePath, hash);//把hash過的值存入字典檔
+        }
+    }
 
     protected void CreateFile(string contant, string path, string fileName) //建立檔案
     {

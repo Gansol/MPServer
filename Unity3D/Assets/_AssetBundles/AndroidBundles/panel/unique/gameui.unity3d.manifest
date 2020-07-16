@@ -112,12 +112,12 @@ ClassTypes:
 - Class: 224
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Unique/GameUI.prefab
+- Assets/AssetBundles/panel/unique/GameUI.prefab
 Dependencies:
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/battlehud.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comicfont.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/comicfontoutline.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/gamescene.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
-- D:/Administartor/Desktop/MPServer/Assets/_Assetbundles/AndroidBundles/panel/share/shareobject.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/battlehud.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comicfont.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comicfontoutline.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/gamescene.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/shareobject.unity3d

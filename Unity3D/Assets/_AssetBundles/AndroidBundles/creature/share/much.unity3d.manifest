@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 825764652
+CRC: 135233942
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5b7b5167399abbf19592884edc0770ea
+    Hash: 4d83969d8f4562da26ad5b6f2f3963b2
   TypeTreeHash:
     serializedVersion: 2
     Hash: 8a54f921be9e95a99076cbb9c276b333
@@ -22,7 +22,7 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Creature/Share/Much.mat
-- Assets/AssetBundles/Creature/Share/Much.asset
-- Assets/AssetBundles/Creature/Share/Much.png
+- Assets/AssetBundles/creature/share/much.mat
+- Assets/AssetBundles/creature/share/much.asset
+- Assets/AssetBundles/creature/share/much.png
 Dependencies: []

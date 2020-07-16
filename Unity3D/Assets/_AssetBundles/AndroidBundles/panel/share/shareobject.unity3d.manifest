@@ -20,7 +20,7 @@ ClassTypes:
 - Class: 115
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/Panel/Share/ShareObject.png
-- Assets/AssetBundles/Panel/Share/ShareObject.mat
-- Assets/AssetBundles/Panel/Share/ShareObject.asset
+- Assets/AssetBundles/panel/share/ShareObject.png
+- Assets/AssetBundles/panel/share/ShareObject.mat
+- Assets/AssetBundles/panel/share/ShareObject.asset
 Dependencies: []
