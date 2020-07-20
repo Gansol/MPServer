@@ -8598,7 +8598,6 @@ MonoBehaviour:
   ok_btn: {fileID: 171334}
   delayBetween2Clicks: 0.3
   actorScale: {x: 0, y: 0, z: 0}
-  iconPath: MiceICON
 --- !u!1 &192610
 GameObject:
   m_ObjectHideFlags: 0

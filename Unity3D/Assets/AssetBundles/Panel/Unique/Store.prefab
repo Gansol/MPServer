@@ -9802,15 +9802,15 @@ MonoBehaviour:
   - {fileID: 121932}
   assetFolder:
   - 
-  - MiceICON
-  - ItemICON
-  - ItemICON
+  - miceicon/unique/
+  - itemicon/unique/
+  - itemicon/unique/
   - 
   - 
   - 
   - 
   - 
-  - Gashapon
+  - gashapon/unique/
   itemOffset: {x: 295, y: -350}
   tablePageCount: 9
   tableRowCount: 3
@@ -12758,7 +12758,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &468648
 Transform:
   m_ObjectHideFlags: 0
@@ -12815,7 +12815,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3002
+  startingRenderQueue: 3004
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 4

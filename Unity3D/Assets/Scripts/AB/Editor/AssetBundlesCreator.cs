@@ -93,16 +93,16 @@ public class AssetBundlesCreator : EditorWindow
 
     public static string publishFolder =
 #if UNITY_ANDROID
- "C:/inetpub/wwwroot/MicePow/AndroidBundles/";
-#elif UNITY_IPHONE  || UNITY_IOS
-    "C:/inetpub/wwwroot/MicePow/iOSBundles/";
+ "E:/MicePowBETA/AndroidBundles/";
+#elif UNITY_IPHONE || UNITY_IOS
+    "E:/MicePowBETA/iOSBundles/";
 #endif
 
     public static string publishHashFolder =
 #if UNITY_ANDROID
- "C:/inetpub/wwwroot/MicePow/AndroidList/";
+ "E:/MicePowBETA/AndroidList/";
 #elif UNITY_IPHONE  || UNITY_IOS
-    "C:/inetpub/wwwroot/MicePow/iOSList/";
+    "E:/MicePowBETA/iOSList/";
 #endif
 
     static string fileExtension = ".unity3d";
@@ -113,12 +113,12 @@ public class AssetBundlesCreator : EditorWindow
     //static Dictionary<string, object> files = new Dictionary<string, object>();
     static List<string> ext = new List<string> { };
     static string[] hashType = new string[] { "SHA1", "MD5", "CRC" };
+     
+    Rect baseWindowRect = new Rect(10, 10, 450, 10);
+    //Rect buildWindowRect = new Rect(10, 300, 450, 50);
+    Rect hashWindowsRect = new Rect(10, 200, 450, 50);
 
-    Rect baseWindowRect = new Rect(10, 10, 450, 50);
-    // Rect buildWindowRect = new Rect(10, 300, 450, 50);
-    Rect hashWindowsRect = new Rect(10, 100, 450, 50);
-
-    static bool _uncompressed, _dependent, _otherPlatform, _bPublish, _bFullPackage,
+    static bool _uncompressed, _dependent, _otherPlatform, _bPublish, _bFullPackage, _bPublishAssetBundle,
                 _bPrefab, _bMat, _bPng, _bJpge, _bMp3, _bWav, _bOgg, _bAnim, _bController;
     static int _hashIndex;
     static string _hash;
@@ -141,17 +141,17 @@ public class AssetBundlesCreator : EditorWindow
         hashWindowsRect = GUILayout.Window(2, hashWindowsRect, BuildHashWondow, "AssetBundle Hash");
         EndWindows();
     }
-
+     
 
 
     private void BaseWondow(int unusedWindowID) // 基礎選項視窗物件
     {
         // unusedWindowID = 視窗ID
-        //perfabFolder = EditorGUILayout.TextField("AssetBundles folder: ", perfabFolder);
-        //exportFolder = EditorGUILayout.TextField("Export folder: ", exportFolder);
-        //publishFolder = EditorGUILayout.TextField("Publish folder: ", publishFolder);
-        //publishHashFolder = EditorGUILayout.TextField("Publish hash folder: ", publishHashFolder);
-        //fileExtension = EditorGUILayout.TextField("Bundle file ext: ", fileExtension);
+        perfabFolder = EditorGUILayout.TextField("AssetBundles folder: ", perfabFolder);
+        exportFolder = EditorGUILayout.TextField("Export folder: ", exportFolder);
+        publishFolder = EditorGUILayout.TextField("Publish folder: ", publishFolder);
+        publishHashFolder = EditorGUILayout.TextField("Publish hash folder: ", publishHashFolder);
+        fileExtension = EditorGUILayout.TextField("Bundle file ext: ", fileExtension);
         //EditorGUILayout.LabelField("Bundle Type");
         //GUILayout.BeginHorizontal();
         //_bPrefab = GUILayout.Toggle(_bPrefab, "*.prefab"); // CheckBox 核取欄位
@@ -188,6 +188,7 @@ public class AssetBundlesCreator : EditorWindow
         GUILayout.BeginHorizontal();
         _bPublish = GUILayout.Toggle(_bPublish, "Publish Hash"); // CheckBox 核取欄位
         _bFullPackage = GUILayout.Toggle(_bFullPackage, "Publish Full Hash"); // CheckBox 核取欄位
+        _bPublishAssetBundle= GUILayout.Toggle(_bPublishAssetBundle, "Publish Assetbundles"); // CheckBox 核取欄位
         GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Build AssetBundle Hash"))
@@ -196,7 +197,7 @@ public class AssetBundlesCreator : EditorWindow
         }
         if (GUILayout.Button("Build AssetBundle"))
         {
-            BuildAssetBundle();
+            BuildAssetBundle(); 
         }
     }
 
@@ -207,13 +208,22 @@ public class AssetBundlesCreator : EditorWindow
         Pack(sourcePath);
 
         string outputPath = Path.Combine(AssetBundlesOutputPath, Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget));
+
         if (!Directory.Exists(outputPath))
-        {
             Directory.CreateDirectory(outputPath);
-        }
 
         //根據目前平台打包
         BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension, EditorUserBuildSettings.activeBuildTarget);
+
+        if (_bPublishAssetBundle)
+        {
+            if (!Directory.Exists(publishFolder))
+                Directory.CreateDirectory(publishFolder);
+             
+            BuildPipeline.BuildAssetBundles(publishFolder, BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension, EditorUserBuildSettings.activeBuildTarget);
+        }
+            
+
 
         AssetDatabase.Refresh();
 

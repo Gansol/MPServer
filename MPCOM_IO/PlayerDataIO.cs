@@ -542,6 +542,12 @@ namespace MPCOM
         #endregion UpdatePlayerData
 
         #region UpdatePlayerData 更新玩家(圖片)資料
+        /// <summary>
+        /// UpdatePlayerData 更新玩家(圖片)資料
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="imageName"></param>
+        /// <returns></returns>
         [AutoComplete]
         public PlayerData UpdatePlayerData(string account, object imageName)
         {

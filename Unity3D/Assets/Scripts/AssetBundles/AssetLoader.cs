@@ -61,6 +61,12 @@ public class AssetLoader : MonoBehaviour
                 AssetBundleManager.LoadedObjectCount = _objCount = 0;
                 loadedObj = true;
                 if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+            }else if (AssetBundleManager.LoadedObjectCount == 0 && _objCount ==0 && _loadedCount > 0) // BUG味道
+            {
+                Debug.Log("YESSSSSSSSSS");
+                AssetBundleManager.LoadedObjectCount = _objCount  = _loadedCount  = 0;
+                loadedObj = true;
+                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
             //else
             //{
@@ -71,8 +77,9 @@ public class AssetLoader : MonoBehaviour
 
     public void LoadAssetFormManifest(string manifestAssetName)
     {
-        // 載入Mainfest
-        manipath = Application.persistentDataPath + "/AssetBundles/";
+           // 載入Mainfest
+           manipath = Application.persistentDataPath + "/AssetBundles/";
+        manifestAssetName = manifestAssetName.ToLower();
         if (assetBundle == null)
         {
             assetBundle = AssetBundle.LoadFromFile(Path.Combine(manipath, "AndroidBundles"));
@@ -97,13 +104,15 @@ public class AssetLoader : MonoBehaviour
 
             // 載入遊戲物件
             LoadPrefab(manifestAssetName);
+            _objCount++;
+            Debug.Log("_objCount:" + _objCount);
         }
         else
         {
             _loadedCount++;
+            Debug.Log("_loadedCount:" + _loadedCount);
         }
-        _objCount++;
-        Debug.Log("_objCount:"+ _objCount);
+
     }
 
 
@@ -113,7 +122,7 @@ public class AssetLoader : MonoBehaviour
         try
         {
             /*_gameLoop.*/
-            StartCoroutine(AssetBundleManager.LoadAtlas(manifestAssetName, typeof(GameObject)));
+            StartCoroutine(AssetBundleManager.LoadAtlas(manifestAssetName.ToLower(), typeof(GameObject)));
         }
         catch
         {
@@ -128,7 +137,7 @@ public class AssetLoader : MonoBehaviour
         //if (!AssetBundleManager.bLoadedAssetbundle(manifestAssetName))
         //{
             /* _gameLoop.*/
-            StartCoroutine(AssetBundleManager.LoadGameObject(manifestAssetName, typeof(GameObject)));
+            StartCoroutine(AssetBundleManager.LoadGameObject(manifestAssetName.ToLower(), typeof(GameObject)));
         //}
         //else
         //{
@@ -145,6 +154,7 @@ public class AssetLoader : MonoBehaviour
     public GameObject GetAsset(string assetName)
     {
         AssetBundle ab;
+        assetName = AssetBundleManager.GetAssetBundleNamePath(assetName.ToLower());
         if (AssetBundleManager.bLoadedAssetbundle(assetName))
         {
             ab = AssetBundleManager.getAssetBundle(assetName);

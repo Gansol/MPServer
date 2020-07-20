@@ -40,6 +40,11 @@ public class AssetBundleChecker : MonoBehaviour
         bundleChk = false;
     }
 
+    //private void Update()
+    //{
+    //    bundleChk = bundleDownloader.BundleChk;
+    //}
+
     #region -- CompareAssetBundles --
     public void StartCheck() //開始檢查檔案
     {

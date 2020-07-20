@@ -250,8 +250,6 @@ public class PoolManager : MonoBehaviour
             if (bundle != null)
                 Instantiate(item.Key.ToString(), bundle);
         }
-
-
     }
 
     void InstantiateSkillMice(Dictionary<string, object> objectData)

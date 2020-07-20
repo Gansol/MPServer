@@ -11,11 +11,11 @@ public class ChangeICON : MonoBehaviour {
 
     void OnEnable()
     {
-        UIEventListener.Get(gameObject).onClick += OnClick;
+        UIEventListener.Get(gameObject).onClick += OnClickN;
         
     }
 
-    public void OnClick(GameObject obj)
+    public void OnClickN(GameObject obj)
     {
         PlayerManager.playerImage.spriteName = imageName;
         Global.photonService.UpdatePlayerData(imageName);
@@ -23,6 +23,6 @@ public class ChangeICON : MonoBehaviour {
 
     void OnDisable()
     {
-        UIEventListener.Get(gameObject).onClick -= OnClick;
+        UIEventListener.Get(gameObject).onClick -= OnClickN;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 using UnityEngine.Networking;
+using System.IO;
 /* ***************************************************************
 * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
 * -----------            CC BY-NC-SA 4.0            -------------
@@ -58,11 +59,15 @@ public static class AssetBundleManager
     //};
 
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
+    private static Dictionary<string, string> dictAssetBundleNameRefs;
 
     static AssetBundleManager()
     {
         if (dictAssetBundleRefs == null)
+        {
             dictAssetBundleRefs = new Dictionary<string, AssetBundleRef>();
+            dictAssetBundleNameRefs = new Dictionary<string, string>();
+        }
     }
 
     public static void init()
@@ -87,7 +92,7 @@ public static class AssetBundleManager
 
     public static IEnumerator LoadAtlas(string manifestPathName, System.Type type)
     {
-
+        manifestPathName = manifestPathName.ToLower();
         AssetBundleRef abRef;
         bool chkAtlas;
         string assetFullPath = @"file:///" + Application.persistentDataPath + "/AssetBundles/" + manifestPathName;
@@ -116,7 +121,7 @@ public static class AssetBundleManager
                         //{
                         //    Debug.LogError("AB DICT: " + item.Key.ToString());
                         //}
-                        
+
                         Debug.LogError("assetName:" + manifestPathName + "   assetPath:" + assetFullPath + "   bGetAsset: " + bLoadedAssetbundle(manifestPathName));
                         throw new Exception(www.error);
                     }
@@ -129,7 +134,12 @@ public static class AssetBundleManager
                         abRef = new AssetBundleRef();
                         abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
                         if (!dictAssetBundleRefs.ContainsKey(manifestPathName))
+                        {
+                            string bundleName = Path.GetFileName(manifestPathName).Replace(Global.ext, "");
                             dictAssetBundleRefs.Add(manifestPathName, abRef);
+                            dictAssetBundleNameRefs.Add(bundleName.ToLower(), manifestPathName);
+
+                        }
                         //AssetBundleRequest request = abRef.assetBundle.LoadAsync(fileName, type);
                         if (type == typeof(GameObject)) _isLoadPrefab = true;
                         // www.Dispose(); 如果發現網路吃很大要補回修改新方法
@@ -186,20 +196,27 @@ public static class AssetBundleManager
                     abRef = new AssetBundleRef();
                     abRef.assetBundle = DownloadHandlerAssetBundle.GetContent(www);
                     if (!dictAssetBundleRefs.ContainsKey(manifestPathName))
+                    {
+                        string bundleName = Path.GetFileName(manifestPathName).Replace(Global.ext, "");
                         dictAssetBundleRefs.Add(manifestPathName, abRef);
-                    _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
-                    _isLoadObject = true;
+                        dictAssetBundleNameRefs.Add(bundleName.ToLower(), manifestPathName);
 
+                        _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
+                        Debug.Log("_loadedObjectCount:" + _loadedObjectCount);
+                    }
+                  //  _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
                     www.Dispose();
                     //Debug.Log("( 4 ) :" + assetName);
-                }
-                else // 已經載入了 不須載入
-                {
-                    _isLoadObject = true;
+
                 }
             }
         }
-        _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
+        //else // 已經載入了 不須載入
+        //{
+        //    Debug.Log("FUCK!");
+        //    _isLoadObject = true;
+        //}
+        
     }
 
     /// <summary>
@@ -210,14 +227,23 @@ public static class AssetBundleManager
     public static bool bLoadedAssetbundle(string assetName)
     {
         assetName = assetName.Replace(" ", "");
+
         if (!string.IsNullOrEmpty(assetName))
         {
-            AssetBundleRef abRef;
-            return dictAssetBundleRefs.TryGetValue(assetName, out abRef) ? true : false;
+            return dictAssetBundleRefs.TryGetValue(assetName, out AssetBundleRef abRef) ? true : false;
         }
-
         return false;
     }
+
+    public static string GetAssetBundleNamePath(string assetName)
+    {
+        if (!string.IsNullOrEmpty(assetName))
+        {
+            return dictAssetBundleNameRefs.TryGetValue(assetName, out assetName) ? assetName : "";
+        }
+        return "";
+    }
+
 
     /// <summary>
     /// 取得已載入AssetBundle
