@@ -39,7 +39,7 @@ public class PlayerManager : MPPanel
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
-    private static string   _InvItem = "invitem";
+    private static string _InvItem = "invitem";
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
@@ -110,6 +110,9 @@ public class PlayerManager : MPPanel
     /// </summary>
     protected override void OnLoading()
     {
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
+
         // 載入 資料庫資料
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
@@ -117,7 +120,8 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
-    void OnLoadCurrency() {
+    void OnLoadCurrency()
+    {
 
         _bLoadedCurrency = true;
     }
@@ -167,7 +171,7 @@ public class PlayerManager : MPPanel
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
-           // assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
+            // assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -194,16 +198,19 @@ public class PlayerManager : MPPanel
             //assetLoader.LoadPrefab(_PanelPath + "/", _InvItem); // old loadprefeb
 
             //_LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
-            _LoadedAsset = LoadIconObject(dictNotLoadedAsset, Global.ItemIconUniquePath);
+            _LoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.ItemIconUniquePath);
         }
         else
         {
+            assetLoader.init();
             m_MPGame.GetAssetLoader().loadedObj = _LoadedAsset = true;
         }
 
+       
+
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
             assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
-      //  assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
+        //  assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
         _dictItemData = Global.playerItem;
     }
 
@@ -247,7 +254,8 @@ public class PlayerManager : MPPanel
 
                 nestedData.TryGetValue("ItemID", out itemID);
                 itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-                bundleName = Global.IconSuffix+ itemName;
+                bundleName = Global.IconSuffix + itemName;
+                //bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
 
                 // 已載入資產時
                 if (assetLoader.GetAsset(bundleName) != null)
@@ -260,8 +268,8 @@ public class PlayerManager : MPPanel
                     {
                         imageParent.parent.name = itemID.ToString();
                         imageParent.parent.tag = "Inventory";
-                        GameObject _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
-                        _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
+                        GameObject _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
+                       // _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
 
                         object value;
                         nestedData.TryGetValue("ItemType", out value);
@@ -274,10 +282,10 @@ public class PlayerManager : MPPanel
                         // 如果已經裝備道具 顯示 已裝備狀態
                         nestedData.TryGetValue("IsEquip", out value);
 
-                        if (System.Convert.ToBoolean(value))
-                        {
-                            imageParent.parent.SendMessage("DisableBtn"); // imageParent.parent = button
-                        }
+                        //if (System.Convert.ToBoolean(value))
+                        //{
+                        //    imageParent.parent.SendMessage("DisableBtn"); // imageParent.parent = button
+                        //}
                     }
                 }
                 i++;
@@ -319,9 +327,11 @@ public class PlayerManager : MPPanel
 
                 if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                 {
-                    string bundleName = Global.IconSuffix+ itemName ;
+                    string bundleName = Global.IconSuffix + itemName;
+                  //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
+
                     // 已載入資產時
-                    if (assetLoader.GetAsset(bundleName) != null)
+                    if (!string.IsNullOrEmpty(bundleName) && assetLoader.GetAsset(bundleName) != null)
                     {
                         // 如果沒有ICON才實體化
                         if (imageParent.childCount == 0)
@@ -339,6 +349,10 @@ public class PlayerManager : MPPanel
 
                             i++;
                         }
+                    }
+                    else
+                    {
+                        Debug.LogError("Can't get assetbundle or assetbundle name is null.");
                     }
                 }
             }
@@ -424,6 +438,8 @@ public class PlayerManager : MPPanel
             Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
 
             int i = 0;
+         //  itemName = AssetBundleManager.GetAssetBundleNamePath(itemName);
+
             foreach (KeyValuePair<string, object> item in itemData)
             {
                 if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
@@ -433,7 +449,8 @@ public class PlayerManager : MPPanel
                     pos = sortItemPos(12, 5, offset, pos, i);
                     bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
-                    string iconName = Global.IconSuffix + item.Value ;
+                    string iconName = Global.IconSuffix + item.Value;
+                    //string iconName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + item.Value);
                     if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
                     {
                         GameObject icon = assetLoader.GetAsset(iconName);

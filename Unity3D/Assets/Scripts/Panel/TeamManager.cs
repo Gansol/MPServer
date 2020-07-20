@@ -38,7 +38,6 @@ public class TeamManager : MPPanel
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
     [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
-    public string iconPath = "miceicon";                                            // 圖片資料夾位置
     public Vector3 actorScale;                                                      // 角色縮放
     public GameObject startShowActor;                                               // 起始顯示老鼠
 
@@ -289,6 +288,9 @@ public class TeamManager : MPPanel
     #region -- OnLoadPanel 載入面板--
     protected override void OnLoading()
     {
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
+
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
         EventMaskSwitch.lastPanel = gameObject;
@@ -363,7 +365,7 @@ public class TeamManager : MPPanel
                 assetLoader.init();
                 //assetLoader.LoadAsset(iconPath + "/", "miceicon");
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-                _bLoadedAsset = LoadIconObject(dictNotLoadedAsset, iconPath);
+                _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
             }                                   // 已載入物件 實體化
             else
             {

@@ -36,7 +36,8 @@ public class StoreManager : MPPanel
     /// <summary>
     /// 資產資料夾名稱
     /// </summary>
-    public string[] assetFolder;
+   public string[] assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
+
     /// <summary>
     /// 偏移量
     /// </summary>
@@ -179,6 +180,9 @@ public class StoreManager : MPPanel
     #region -- OnLoadPanel 載入面板 --
     protected override void OnLoading()
     {
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
+
         LoadGashaponAsset();
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
@@ -477,11 +481,11 @@ public class StoreManager : MPPanel
             //  assetLoader.LoadAsset(_folderString + "/", _folderString);
             //    assetLoader.LoadPrefab("panel/", "Item");   // 道具Slot
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.ItemAssetName + Global.ext);  // 道具Slot
-            _bLoadedAsset = LoadIconObject(GetItemNameData(itemDetailData), _folderString);
+            _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
         }
         else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
         {
-            _bLoadedAsset = LoadIconObject(GetItemNameData(itemDetailData), _folderString);
+            _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
         }
     }
 
@@ -612,7 +616,8 @@ public class StoreManager : MPPanel
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
         assetLoader.init();
         for (int i = 1; i <= 3; i++)
-            assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
+            assetLoader.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
+    //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
         _bLoadedGashapon = true;
     }
     #endregion

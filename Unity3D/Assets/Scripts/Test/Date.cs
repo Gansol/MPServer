@@ -12,25 +12,19 @@ public class Date : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int startYear;
-        int endYear = thisYear + count;
+        int startYear, endYear = thisYear + count, x = -1, y = -2; ;
 
-        DateTime dtThisYear, dtYear;
-        int dtOldDays, dtThisDays, x = -1, y = -2;
-
-        for (startYear = (thisYear - count); startYear < endYear; startYear++)
+        for (startYear = thisYear - count; startYear < endYear; startYear++)
         {
-            dtThisYear = new DateTime(thisYear, 1, 1);
-            dtYear = new DateTime(startYear, 1, 1);
+            DateTime dtThisYear = new DateTime(thisYear, 1, 1);
+            DateTime dtYear = new DateTime(startYear, 1, 1);
 
             if (dtYear.DayOfWeek == dtThisYear.DayOfWeek) x = startYear;
 
-
-            dtOldDays = System.DateTime.DaysInMonth(startYear, 2);
-            dtThisDays = System.DateTime.DaysInMonth(thisYear, 2);
+            int dtOldDays = System.DateTime.DaysInMonth(startYear, 2);
+            int dtThisDays = System.DateTime.DaysInMonth(thisYear, 2);
 
             if (dtOldDays == dtThisDays) y = startYear;
-
 
             if (x == y)
             {

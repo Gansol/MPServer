@@ -24,7 +24,7 @@ public class FriendManager : MPPanel
     /// <summary>
     /// 圖片位子、slot名稱
     /// </summary>
-    public string iconPath, slotItemName;
+    public string  slotItemName;
     /// <summary>
     /// 道具Panel
     /// </summary>               
@@ -104,6 +104,8 @@ public class FriendManager : MPPanel
         Global.photonService.GetOnlineActorState(Global.dictFriends.ToArray());
         if (_bFirstLoad)
             Global.photonService.LoadMiceData();
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
     }
 
     protected override void OnLoadPanel()
@@ -131,7 +133,7 @@ public class FriendManager : MPPanel
                 }
                 _clientFriendsList = Global.dictFriends;
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
-                _bLoadedIcon = LoadIconObject(dictMice, iconPath);
+                _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
                 assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);
               //  assetLoader.LoadPrefab("panel/", slotItemName);
                 _bFirstLoad = false;

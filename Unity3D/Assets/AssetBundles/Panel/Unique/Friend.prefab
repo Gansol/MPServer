@@ -335,7 +335,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 894967cd8c44830419c77afaec779618, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iconPath: miceicon
   slotItemName: frienditem
   itemPanel: {fileID: 408574}
   offset: {x: 0, y: -150}

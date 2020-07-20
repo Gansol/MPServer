@@ -11236,7 +11236,6 @@ MonoBehaviour:
   - {fileID: 107816}
   - {fileID: 107818}
   delayBetween2Clicks: 0.3
-  iconPath: MiceICON
   actorScale: {x: 0.8, y: 0.8, z: 1}
   startShowActor: {fileID: 163972}
 --- !u!1 &171516

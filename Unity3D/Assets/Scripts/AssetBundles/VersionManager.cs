@@ -129,7 +129,7 @@ public class VersionManager : MonoBehaviour
         if (Global.isCompleted && bTwiceChk && !bCompleted)
         {
             
-            bCompleted = true;
+           bCompleted = true;
             if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
             {
                 if (Global.connStatus) 

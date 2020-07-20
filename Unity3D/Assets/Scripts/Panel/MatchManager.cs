@@ -40,7 +40,6 @@ public class MatchManager : MPPanel
     [Range(0.2f, 0.4f)]
     public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
     public Vector3 actorScale;                                                      // 角色縮放
-    public string iconPath = "miceicon";                                            // 圖片資料夾位置
 
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
@@ -360,7 +359,7 @@ public class MatchManager : MPPanel
                 assetLoader.init();
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-                _bLoadedAsset = LoadIconObject(dictNotLoadedAsset, iconPath);
+                _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
             }                                   // 已載入物件 實體化
             else
             {
@@ -536,11 +535,15 @@ public class MatchManager : MPPanel
 
     void OnDisable()
     {
+        //if (Global.isMatching)
+        //    Global.photonService.ExitWaitingRoom();
+
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ExitWaitingEvent -= OnExitWaiting;
 
+        Panel[0].SetActive(true);
         Panel[1].SetActive(false);
         Panel[1].transform.parent.parent.gameObject.SetActive(false);
     }

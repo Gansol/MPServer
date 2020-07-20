@@ -261,7 +261,7 @@ namespace MPCOM
 
         #region UpdatePlayerData 更新玩家(TeamUpdate時)資料
         /// <summary>
-        /// 更新 玩家(TeamUpdate時)資料
+        /// 更新 玩家(TeamUpdate時)資料 UpdatePlayerData 更新玩家(圖片)資料
         /// </summary>
         public byte[] UpdatePlayerData(string account, object imageName)
         {

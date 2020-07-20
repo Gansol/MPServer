@@ -308,6 +308,9 @@ public class PurchaseManager : MPPanel
 
     protected override void OnLoading()
     {
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
+
         Global.photonService.LoadCurrency(Global.Account);
         Global.photonService.LoadPurchase();
     }

@@ -77,9 +77,20 @@ public abstract class MPPanel : MonoBehaviour
 
         if (bundle != null)                  // 已載入資產時
         {
-            if (!GetLoadedActor(bundle.name))
-                _clone = MPGFactory.GetObjFactory().InstantiateActor(bundle, parent.transform, actorName, scale, 500); // 老鼠Depth是手動輸入的!! 錯誤
-            SetLoadedActor(_clone);
+            if (!IsLoadedActor(bundle.name))
+            {
+                SetLoadedActor(MPGFactory.GetObjFactory().InstantiateActor(bundle, parent.transform, actorName, scale, 500)); // 老鼠Depth是手動輸入的!! 錯誤
+            }
+            else
+            {
+                bundle.name = actorName;
+                SetLoadedActor(bundle);
+            }
+            
+            //else
+            //    _clone = GetLoadedActor(bundle.name);
+
+
             return false;
         }
         else
@@ -101,6 +112,8 @@ public abstract class MPPanel : MonoBehaviour
     {
         if (itemType != -1)
             itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+
+        //   itemName = AssetBundleManager.GetAssetBundleNamePath(itemName);
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
@@ -189,7 +202,7 @@ public abstract class MPPanel : MonoBehaviour
     /// <param name="itemData">物件陣列</param>
     /// <param name="folder">資料夾名稱(不含/)</param>
     /// <param name="bKeyOrValue">0=keyName;1=valueName</param>
-    public bool LoadIconObject(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
+    public bool LoadIconObjects(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
     { // 新版loadasset會出錯位置
         if (itemData != null)
         {
@@ -286,16 +299,40 @@ public abstract class MPPanel : MonoBehaviour
 
     public void SetLoadedActor(GameObject actor)
     {
-        if (!_dictActor.ContainsKey(actor.name))    // FUCK   del MonoBehaviour name> actor.name
-            _dictActor.Add(actor.name, actor);
-
         if (_tmpActor != null)
             _tmpActor.SetActive(false);
 
-        _tmpActor = actor;
+        if (!_dictActor.ContainsKey(actor.name))
+        {
+            _dictActor.Add(actor.name, actor);
+            _tmpActor = actor;
+        }
+        else if (_dictActor.ContainsKey(actor.name))
+        {
+            _dictActor.TryGetValue(actor.name, out _tmpActor);
+        }
+        else
+        {
+            Debug.LogError("Can't find Actor!");
+        }
+
+
+        _tmpActor.SetActive(true);
+
+
+    }
+    public GameObject GetLoadedActor(string actorName)
+    {
+        if (_dictActor.ContainsKey(actorName))
+        {
+            _dictActor.TryGetValue(actorName, out GameObject actor);
+            return actor;
+        }
+        Debug.LogError("Can't Get Actor!");
+        return null;
     }
 
-    public bool GetLoadedActor(string actorName)
+    public bool IsLoadedActor(string actorName)
     {
         if (_dictActor.ContainsKey(actorName))
             return true;

@@ -98,7 +98,8 @@ public class SyncLoad : MonoBehaviour
 
         if (AssetBundleManager.bLoadedAssetbundle(Global.PanelUniquePath+ sceneName +Global.ext) && _clone == null)
         {
-            string assetName = Global.PanelUniquePath + sceneName + Global.ext;
+           // string assetName = Global.PanelUniquePath + sceneName + Global.ext;
+            string assetName =  sceneName;
 
             _clone = Instantiate(assetLoader.GetAsset(assetName)) as GameObject;
             _clone.name = sceneName;
