@@ -76,7 +76,7 @@ public class PurchaseManager : MPPanel
         }
 
         // Panel載入完成後 實體化道具 載入屬性
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadAsset && _bLoadPanel)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadAsset && _bLoadPanel)
         {
             _bLoadAsset = !_bLoadAsset;
             InstantiateItem();
@@ -107,7 +107,7 @@ public class PurchaseManager : MPPanel
     /// </summary>
     private void InstantiateItem()
     {
-        GameObject bundle = m_MPGame.GetAssetLoader().GetAsset("purchaseitem");
+        GameObject bundle = m_MPGame.GetAssetLoader().GetAsset(Global.PurchaseItemAssetName);
         Transform itemSlot = null;
         object value, promotionsTime;
         bool reload = false;
@@ -328,10 +328,6 @@ public class PurchaseManager : MPPanel
             if (_bFirstLoad)
             {
                 _bFirstLoad = false;
-
-                //  m_MPGame.GetAssetLoader().LoadAsset("Purchase" + "/", "Purchase" + Global.IconSuffix);
-                //m_MPGame.GetAssetLoader().LoadAsset("panel" + "/", "panelui");
-                //m_MPGame.GetAssetLoader().LoadPrefab("panel" + "/", "purchaseitem");
                 m_MPGame.GetAssetLoader().LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
             }
             _bLoadAsset = true;

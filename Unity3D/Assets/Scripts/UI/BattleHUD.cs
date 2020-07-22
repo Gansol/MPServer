@@ -77,11 +77,11 @@ public class BattleHUD : MonoBehaviour
 
     void Update()
     {
-        if (assetLoader.loadedObj && !bLoadPrefab)
+        if (assetLoader.bLoadedObj && !bLoadPrefab)
         {
             bLoadPrefab = true;
             ShowItemReward();
-            assetLoader.init();
+            
         }
 
         #region 動畫類判斷 DisActive

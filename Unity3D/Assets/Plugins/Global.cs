@@ -132,7 +132,7 @@ public static class Global
     public static string ItemIconUniquePath = "itemicon/unique/";  // itemicon路徑
     public static string EffectsUniquePath = "effects/unique/";  // effects路徑
     public static string InvItemAssetName = "invitem";
-    public static string ItemAssetName = "item";
+    public static string StoreItemAssetName = "item";
     public static string PurchaseItemAssetName = "purchaseitem"; 
 
     public static int RoomID = -1;          // 房間ID

@@ -202,7 +202,7 @@ public static class AssetBundleManager
                         dictAssetBundleNameRefs.Add(bundleName.ToLower(), manifestPathName);
 
                         _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
-                        Debug.Log("_loadedObjectCount:" + _loadedObjectCount);
+                        Debug.Log("(AB)_loadedObjectCount:" + _loadedObjectCount);
                     }
                   //  _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
                     www.Dispose();
@@ -211,12 +211,11 @@ public static class AssetBundleManager
                 }
             }
         }
-        //else // 已經載入了 不須載入
-        //{
-        //    Debug.Log("FUCK!");
-        //    _isLoadObject = true;
-        //}
-        
+        else // 已經載入了 不須載入
+        {
+            Debug.Log("(AB_Already)_loadedObjectCount:" + _loadedObjectCount);
+        }
+
     }
 
     /// <summary>

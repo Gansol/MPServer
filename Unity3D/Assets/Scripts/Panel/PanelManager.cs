@@ -80,7 +80,7 @@ public class PanelManager : MPPanel
             Global.ExitGame();
         }
 
-        if (m_MPGame.GetAssetLoader().loadedObj && _loadedPanel)                 // 載入Panel完成時
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
 
@@ -144,7 +144,7 @@ public class PanelManager : MPPanel
 
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
-            assetLoader.init();
+            
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
             _loadedPanel = true;
         }
@@ -163,7 +163,7 @@ public class PanelManager : MPPanel
 
         if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
         {
-            assetLoader.init();
+            
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
             _loadedPanel = true;
         }

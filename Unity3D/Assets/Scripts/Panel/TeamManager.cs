@@ -94,7 +94,7 @@ public class TeamManager : MPPanel
         }
 
         // 載入資產完成後 實體化 物件
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
             _bLoadedAsset = !_bLoadedAsset;
             _bLoadedEffect = !_bLoadedEffect;
@@ -116,10 +116,10 @@ public class TeamManager : MPPanel
         }
 
         // 按下圖示按鈕後 載入角色完成時 實體化角色
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedActor)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
-            assetLoader.init();
+            
             string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - Global.extIconLength);
             InstantiateActor(bundleName, _actorParent.transform, actorScale);
         }
@@ -204,7 +204,7 @@ public class TeamManager : MPPanel
     #endregion
 
 
-    #region -- InstantiateIcon 實體化老鼠物件--
+    #region -- InstantiateIcon 實體化老鼠圖示物件--
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
     /// </summary>
@@ -362,7 +362,7 @@ public class TeamManager : MPPanel
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
-                assetLoader.init();
+                
                 //assetLoader.LoadAsset(iconPath + "/", "miceicon");
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);

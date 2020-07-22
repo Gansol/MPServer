@@ -61,7 +61,7 @@ public abstract class MPPanel : MonoBehaviour
         }
         else
         {
-            assetLoader.init();
+            
             assetLoader.LoadAssetFormManifest(Global.MicePath + assetName + "/unique/" + assetName + Global.ext);
             //assetLoader.LoadAsset(assetName + "/", assetName);
             //assetLoader.LoadPrefab(assetName + "/", assetName);
@@ -203,7 +203,8 @@ public abstract class MPPanel : MonoBehaviour
     /// <param name="folder">資料夾名稱(不含/)</param>
     /// <param name="bKeyOrValue">0=keyName;1=valueName</param>
     public bool LoadIconObjects(Dictionary<string, object> itemData, string folder)    // 載入遊戲物件
-    { // 新版loadasset會出錯位置
+    { 
+
         if (itemData != null)
         {
             foreach (KeyValuePair<string, object> item in itemData)
@@ -295,6 +296,7 @@ public abstract class MPPanel : MonoBehaviour
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
         EventMaskSwitch.Switch(gameObject);
         EventMaskSwitch.lastPanel = gameObject;
+        assetLoader.init();
     }
 
     public void SetLoadedActor(GameObject actor)

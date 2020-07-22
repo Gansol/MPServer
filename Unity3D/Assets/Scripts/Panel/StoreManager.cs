@@ -16,6 +16,7 @@ using MPProtocol;
  * ***************************************************************
  * 負責 商店 所有處理
  * 現在會錯誤是正常的 因為還沒有Gashpon 暫時會少載入一下ICON
+ * 目前載入第一個Tab是Mice，如果要第一個載入Gashapon需要換到第一個  infoGroupsArea
  * 部分程式碼 在MPPanel
  * ***************************************************************
  *                           ChangeLog
@@ -36,7 +37,7 @@ public class StoreManager : MPPanel
     /// <summary>
     /// 資產資料夾名稱
     /// </summary>
-   public string[] assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
+    public string[] assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
 
     /// <summary>
     /// 偏移量
@@ -86,7 +87,7 @@ public class StoreManager : MPPanel
         { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" },
         { StoreParameterCode.ItemType.ToString(), "" }, { StoreParameterCode.CurrencyType.ToString(), "" }, { StoreParameterCode.BuyCount.ToString(), "" } };
 
-        _itemType = (int)StoreType.Mice;
+        _itemType = (int)StoreType.Gashapon;
         tablePageCount = 9;
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
@@ -110,10 +111,9 @@ public class StoreManager : MPPanel
 
 
         //// ins fisrt load panelScene : Gashapon
-        if (m_MPGame.GetAssetLoader().loadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
+        if (m_MPGame.GetAssetLoader().bLoadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
         {
-            m_MPGame.GetAssetLoader().init();
-            //_tmpTab = infoGroupsArea[2];
+            Debug.Log("Gashapon!!!!!");
             InstantiateGashapon(infoGroupsArea[(int)ENUM_Area.Tab].transform);
         }
 
@@ -131,7 +131,7 @@ public class StoreManager : MPPanel
         }
 
         // 載入道具完成後 實體化 道具
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset)
         {
             _bLoadedAsset = !_bLoadedAsset;
             InstantiateStoreItem();
@@ -140,7 +140,7 @@ public class StoreManager : MPPanel
         }
 
         // 載入角色完成後 實體化 角色
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedActor)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
             _bLoadedActor = InstantiateActor(_lastItemBtn.GetComponentInChildren<UISprite>().name, infoGroupsArea[(int)ENUM_Area.ItemInfoBox].transform.Find(StoreType.Mice.ToString()).GetChild(0).Find("Image"), actorScale);
@@ -477,10 +477,10 @@ public class StoreManager : MPPanel
         // 載入資產
         if (!assetLoader.GetAsset(_folderString))
         {
-            assetLoader.init();
+
             //  assetLoader.LoadAsset(_folderString + "/", _folderString);
             //    assetLoader.LoadPrefab("panel/", "Item");   // 道具Slot
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.ItemAssetName + Global.ext);  // 道具Slot
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.StoreItemAssetName + Global.ext);  // 道具Slot
             _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
         }
         else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
@@ -614,11 +614,11 @@ public class StoreManager : MPPanel
     private void LoadGashaponAsset()
     {
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
-        assetLoader.init();
+
         for (int i = 1; i <= 3; i++)
             assetLoader.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
-    //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
-        _bLoadedGashapon = true;
+        //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
+        _bLoadedGashapon = false; // 來用暫時停掉方便測試  並需要配合修改起始TAB頁面 
     }
     #endregion
 
@@ -630,10 +630,13 @@ public class StoreManager : MPPanel
     /// <param name="folder">資料夾名稱</param>
     private void InstantiateGashapon(Transform myParent)
     {
+        _bLoadedGashapon = true;
+
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
 
         Dictionary<string, object> dictGashaponData = new Dictionary<string, object>();
         List<string> itemNameList = new List<string>();
+        List<string> gashaponNameList = new List<string>();
         object itemType, itemName;
 
         foreach (var item in Global.storeItem)
@@ -642,20 +645,23 @@ public class StoreManager : MPPanel
             values.TryGetValue(StoreProperty.ItemType.ToString(), out itemType);
             values.TryGetValue(StoreProperty.ItemName.ToString(), out itemName);
             itemNameList.Add(itemName.ToString());
-            if ((int)itemType == (int)StoreType.Gashapon)
+            if (int.Parse(itemType.ToString()) == (int)StoreType.Gashapon)
+            {
+                gashaponNameList.Add(itemName.ToString());
                 dictGashaponData.Add(item.Key, item.Value);
+            }
         }
 
         int i = 0;
 
         foreach (KeyValuePair<string, object> gashapon in dictGashaponData)
         {
-            if (assetLoader.GetAsset(itemNameList[i]) != null)                  // 已載入資產時
+            if (assetLoader.GetAsset(gashaponNameList[i]) != null)                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(itemNameList[i]);
+                GameObject bundle = assetLoader.GetAsset(gashaponNameList[i]);
                 Transform parent = infoGroupsArea[(int)ENUM_Area.Gashapon].transform.Find("Promotions");
-                MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemNameList[i], new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
-                parent.GetChild(i).name = itemNameList[i];
+                MPGFactory.GetObjFactory().Instantiate(bundle, parent, gashaponNameList[i], new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
+                parent.GetChild(i).name = gashaponNameList[i];
             }
             else
             {
@@ -663,7 +669,7 @@ public class StoreManager : MPPanel
             }
             i++;
         }
-        _bLoadedGashapon = true;
+
     }
     #endregion
 

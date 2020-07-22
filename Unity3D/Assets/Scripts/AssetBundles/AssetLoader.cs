@@ -20,7 +20,8 @@ using System.IO;
 public class AssetLoader : MonoBehaviour
 {
     private int _objCount = 0, _loadedCount = 0;
-    public bool loadedObj;
+    public bool bLoadedObj;
+    private bool bPreLoad;
     public string ReturnMessage { get { return _returnMessage; } }
     private string _returnMessage;
     private GameLoop _gameLoop;
@@ -44,41 +45,66 @@ public class AssetLoader : MonoBehaviour
 
         if (_objCount != 0)
         {
-            if (AssetBundleManager.LoadedObjectCount == _objCount) // 全部沒有載入的情況  如果AB載入完成數量=載入數量
+            //if (AssetBundleManager.LoadedObjectCount == _objCount) // 全部沒有載入的情況  如果AB載入完成數量=載入數量
+            //{
+            //    AssetBundleManager.LoadedObjectCount = _objCount = 0;
+            //    loadedObj = true;
+            //    if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+            //}
+            //else 
+            //if ((_objCount - _loadedCount) == AssetBundleManager.LoadedObjectCount && AssetBundleManager.LoadedObjectCount != 0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
+            //{
+            //    AssetBundleManager.LoadedObjectCount = _objCount = 0;
+            //    loadedObj = true;
+            //    if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+            //}
+            //else if (_objCount == _loadedCount)  // 全部已載入
+            //{
+            //    AssetBundleManager.LoadedObjectCount = _objCount = 0;
+            //    loadedObj = true;
+            //    if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+            //}
+            //else 
+            if (AssetBundleManager.LoadedObjectCount == _objCount) // BUG味道
             {
-                AssetBundleManager.LoadedObjectCount = _objCount = 0;
-                loadedObj = true;
+                Debug.Log("(1)AssetBundleManager.LoadedObjectCount == _objCount");
+                init();
+                bLoadedObj = true;
                 if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
-            else if ((_objCount - _loadedCount) == AssetBundleManager.LoadedObjectCount && AssetBundleManager.LoadedObjectCount != 0) // 部分AB已載入的情況  載入數量-已載入數量 = AB載入完成數量
+            else if (AssetBundleManager.LoadedObjectCount == (_objCount - _loadedCount)) // BUG味道
             {
-                AssetBundleManager.LoadedObjectCount = _objCount = 0;
-                loadedObj = true;
+                Debug.Log("(2)AssetBundleManager.LoadedObjectCount == _loadedCount");
+                init();
+                bLoadedObj = true;
                 if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
-            else if (_objCount == _loadedCount)  // 全部已載入
+
+            if(bPreLoad && _objCount ==0 && _loadedCount > 0)
             {
-                AssetBundleManager.LoadedObjectCount = _objCount = 0;
-                loadedObj = true;
-                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
-            }else if (AssetBundleManager.LoadedObjectCount == 0 && _objCount ==0 && _loadedCount > 0) // BUG味道
-            {
-                Debug.Log("YESSSSSSSSSS");
-                AssetBundleManager.LoadedObjectCount = _objCount  = _loadedCount  = 0;
-                loadedObj = true;
-                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+                Debug.Log("(2)AssetBundleManager.LoadedObjectCount == _loadedCount");
+                init();
+                bLoadedObj = true;
             }
+
             //else
             //{
             //    Debug.Log("(Else) _objCount:" + _objCount + " AssetBundleManager.loadedObjectCount:" + AssetBundleManager.loadedObjectCount + "  _loadedCount:" + _loadedCount);
             //}
         }
+        else if (AssetBundleManager.LoadedObjectCount == 0 && _loadedCount > 0)
+        {
+            Debug.Log("(3)AssetBundleManager.LoadedObjectCount == 0 && _loadedCount > 0");
+            init();
+            bLoadedObj = true;
+            if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+        }
     }
 
     public void LoadAssetFormManifest(string manifestAssetName)
     {
-           // 載入Mainfest
-           manipath = Application.persistentDataPath + "/AssetBundles/";
+        // 載入Mainfest
+        manipath = Application.persistentDataPath + "/AssetBundles/";
         manifestAssetName = manifestAssetName.ToLower();
         if (assetBundle == null)
         {
@@ -112,7 +138,7 @@ public class AssetLoader : MonoBehaviour
             _loadedCount++;
             Debug.Log("_loadedCount:" + _loadedCount);
         }
-
+        bPreLoad = true;
     }
 
 
@@ -131,13 +157,13 @@ public class AssetLoader : MonoBehaviour
 
     }
 
-    private  void LoadPrefab(string manifestAssetName)    // 載入遊戲物件
+    private void LoadPrefab(string manifestAssetName)    // 載入遊戲物件
     {
-        loadedObj = false;
+        bLoadedObj = false;
         //if (!AssetBundleManager.bLoadedAssetbundle(manifestAssetName))
         //{
-            /* _gameLoop.*/
-            StartCoroutine(AssetBundleManager.LoadGameObject(manifestAssetName.ToLower(), typeof(GameObject)));
+        /* _gameLoop.*/
+        StartCoroutine(AssetBundleManager.LoadGameObject(manifestAssetName.ToLower(), typeof(GameObject)));
         //}
         //else
         //{
@@ -166,9 +192,10 @@ public class AssetLoader : MonoBehaviour
 
     public void init()
     {
+        Debug.Log("---------------Call me again!----------------");
         atlasNamePath = new List<string>();
         _objCount = _loadedCount = 0;
-        loadedObj = false;
+        bLoadedObj = bPreLoad = false;
         AssetBundleManager.init();
 
 
