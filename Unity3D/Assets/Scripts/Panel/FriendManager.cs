@@ -73,7 +73,7 @@ public class FriendManager : MPPanel
         }
 
         // Asset載入完成時 實體化道具
-        if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
             _bLoadedIcon = !_bLoadedIcon;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;

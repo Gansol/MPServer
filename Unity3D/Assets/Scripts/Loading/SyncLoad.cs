@@ -4,10 +4,8 @@ using UnityEngine.SceneManagement;
 public class SyncLoad : MonoBehaviour
 {
     AssetLoader assetLoader;
-
     private bool bLoadAsset;
     private GameObject _clone;
-
 
     void Awake()
     {
@@ -27,7 +25,7 @@ public class SyncLoad : MonoBehaviour
         //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (assetLoader.loadedObj && bLoadAsset)
+        if (assetLoader.bLoadedObj && bLoadAsset)
         {
             InstantiateScene();
             bLoadAsset = !bLoadAsset;
@@ -49,7 +47,7 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-            assetLoader.init();
+            
             assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ "menuui"+Global.ext);
 
             //assetLoader.LoadAsset("panel/share/", "liheiprofont");
@@ -68,8 +66,7 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
-            assetLoader.init();
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
+           assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
             //assetLoader.LoadAsset(Global.PanelPath, "battlehud");
             //assetLoader.LoadPrefab(Global.PanelPath, Global.Scene.BattleAsset);
             bLoadAsset = true;

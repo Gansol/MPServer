@@ -107,7 +107,7 @@ public class PoolManager : MonoBehaviour
 
     void Start()
     {
-        assetLoader.init();
+        
         LoadMiceAsset();
         LoadSpecialAsset();
         LoadItemAsset();
@@ -204,7 +204,7 @@ public class PoolManager : MonoBehaviour
         //if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("Message:" + assetLoader.ReturnMessage /*+ "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount*/);
 
-        if (assetLoader.loadedObj && !_poolingFlag)
+        if (assetLoader.bLoadedObj && !_poolingFlag)
         {
             _dictSkillMice = Global.dictTeam;
 

@@ -80,7 +80,7 @@ public class PlayerManager : MPPanel
         }
 
         // Asset載入完成時 載入玩家頭像、實體化裝備圖示
-        if (m_MPGame.GetAssetLoader().loadedObj && _LoadedAsset)
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _LoadedAsset)
         {
             _LoadedAsset = false;
             LoadPlayerAvatorIcon();
@@ -191,7 +191,7 @@ public class PlayerManager : MPPanel
         // 如果 有未載入物件 載入AB
         if (dictNotLoadedAsset.Count != 0)
         {
-            assetLoader.init();
+            
             //assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
 
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _InvItem + Global.ext);
@@ -202,8 +202,8 @@ public class PlayerManager : MPPanel
         }
         else
         {
-            assetLoader.init();
-            m_MPGame.GetAssetLoader().loadedObj = _LoadedAsset = true;
+            
+            m_MPGame.GetAssetLoader().bLoadedObj = _LoadedAsset = true;
         }
 
        

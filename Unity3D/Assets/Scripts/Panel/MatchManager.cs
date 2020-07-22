@@ -113,7 +113,7 @@ public class MatchManager : MPPanel
             }
 
             // 載入資產完成後 實體化 物件
-            if (m_MPGame.GetAssetLoader().loadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
             {
                 _bLoadedAsset = !_bLoadedAsset;
                 _bLoadedEffect = !_bLoadedEffect;
@@ -138,7 +138,7 @@ public class MatchManager : MPPanel
             //if (assetLoader.loadedObj && _bLoadedActor)
             //{
             //    _bLoadedActor = !_bLoadedActor;
-            //    assetLoader.init();
+            //    
             //    string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - Global.extIconLength);
             //    InstantiateActor(bundleName, _actorParent.transform, actorScale);
             //}
@@ -356,7 +356,7 @@ public class MatchManager : MPPanel
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
-                assetLoader.init();
+                
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
