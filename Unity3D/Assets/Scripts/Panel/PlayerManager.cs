@@ -40,7 +40,7 @@ public class PlayerManager : MPPanel
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
     private static string _InvItem = "invitem";
-    private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
+    private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bUpdatePlayerImage, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
 
 
     public PlayerManager(MPGame MPGame) : base(MPGame) { }
@@ -67,6 +67,7 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
+        Global.photonService.UpdatePlayerImageEvent += OnUpdatePlayerImage;
     }
 
     void Update()
@@ -102,6 +103,12 @@ public class PlayerManager : MPPanel
             ResumeToggleTarget();
         }
 
+        //// 資料庫資料載入完成時 載入Asset
+        //if (_bUpdatePlayerImage)
+        //{
+        //    _bUpdatePlayerImage = false;
+        //    LoadPlayerAvatorIcon();
+        //}
 
     }
 
@@ -140,6 +147,14 @@ public class PlayerManager : MPPanel
     void OnLoadPlayerData()
     {
         _bLoadPlayerData = true;
+    }
+
+    /// <summary>
+    /// 載入資料庫 玩家資料完成時
+    /// </summary>
+    void OnUpdatePlayerImage()
+    {
+        _bUpdatePlayerImage = true;
     }
 
     /// <summary>
@@ -219,6 +234,7 @@ public class PlayerManager : MPPanel
     /// </summary>
     private void LoadPlayerAvatorIcon()
     {
+        Debug.Log(Global.PlayerImage);
         Transform imageParent = playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
         imageParent.GetComponent<UISprite>().spriteName = Global.PlayerImage;
         playerImage = imageParent.GetComponent<UISprite>();
@@ -530,5 +546,6 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
         Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+        Global.photonService.UpdatePlayerImageEvent -= OnUpdatePlayerImage;
     }
 }

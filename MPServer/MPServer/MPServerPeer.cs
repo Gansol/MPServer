@@ -199,7 +199,7 @@ namespace MPServer
                                                 Log.Debug("Facebook加入線上玩家成功 Code:" + memberData.ReturnCode + "Message:" + memberData.ReturnMessage);
                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                     { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, memberData.PrimaryID }, { (byte)LoginParameterCode.Account, account },
-                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType } 
+                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType }
                                                                     };
 
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
@@ -231,8 +231,8 @@ namespace MPServer
 
                                                 // 回傳給登入者 通知重複登入
                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object>{
-                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, 
-                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberData.MemberType } 
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" },
+                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberData.MemberType }
                                                 };
 
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
@@ -312,7 +312,7 @@ namespace MPServer
                                 {
                                     case "S200":
                                         {
-                                            Log.Debug("Code:"+ memberData.ReturnCode + "  Message:"+memberData.ReturnMessage +  "  會員資料內部程式錯誤！"  );
+                                            Log.Debug("Code:" + memberData.ReturnCode + "  Message:" + memberData.ReturnMessage + "  會員資料內部程式錯誤！");
                                             break;
                                         }
                                     #region 登入成功
@@ -331,7 +331,7 @@ namespace MPServer
                                                 Log.Debug("加入線上會員資料成功 Code = S301");
                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                     { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, memberData.PrimaryID }, { (byte)LoginParameterCode.Account, account },
-                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType,memberData.MemberType } 
+                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType,memberData.MemberType }
                                                 };
 
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
@@ -363,8 +363,8 @@ namespace MPServer
 
                                                 // 回傳給登入者 通知重複登入
                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object>{
-                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" }, 
-                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberData.MemberType } 
+                                                    { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, 0 }, { (byte)LoginParameterCode.Account, "" },
+                                                    { (byte)LoginParameterCode.Nickname, "" }, { (byte)LoginParameterCode.Age, 0 }, { (byte)LoginParameterCode.Sex, 0 } , { (byte)LoginParameterCode.MemberType, memberData.MemberType }
                                                 };
 
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = actorReturn.DebugMessage.ToString() };
@@ -423,7 +423,7 @@ namespace MPServer
 
                                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                     { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, memberData.PrimaryID }, { (byte)LoginParameterCode.Account, memberData.Account },
-                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType } 
+                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType }
                                                                     };
 
                                                             OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
@@ -468,7 +468,7 @@ namespace MPServer
                                                             Log.Debug("Google加入線上玩家成功 Code:" + memberData.ReturnCode + "Message:" + memberData.ReturnMessage);
                                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                     { (byte)LoginParameterCode.Ret, actorReturn.ReturnCode }, { (byte)LoginParameterCode.PrimaryID, memberData.PrimaryID }, { (byte)LoginParameterCode.Account, memberData.Account },
-                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType } 
+                                                                    { (byte)LoginParameterCode.Nickname, memberData.Nickname }, { (byte)LoginParameterCode.Age, memberData.Age }, { (byte)LoginParameterCode.Sex, memberData.Sex } , { (byte)LoginParameterCode.MemberType, memberData.MemberType }
                                                                     };
 
                                                             OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = memberData.ReturnMessage.ToString() };
@@ -528,7 +528,7 @@ namespace MPServer
                                             SendOperationResponse(response, new SendParameters());
                                             break;
                                         }
-                                    #endregion
+                                        #endregion
                                 }
 
 
@@ -1305,16 +1305,36 @@ namespace MPServer
                         #region UpdatePlayerData 更新玩家資料
                         case (byte)PlayerDataOperationCode.UpdatePlayer:
                             {
-                                Log.Debug("IN UpdatePlayerData");
+                                Log.Debug("IN UpdatePlayer");
 
                                 if (operationRequest.Parameters.ContainsKey((byte)PlayerDataParameterCode.PlayerImage))
                                 {
+                                    Log.Debug("IN UpdatePlayerImage");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
-                                    string imageName = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
-                                    playerDataUI.UpdatePlayerData(account, imageName);
+                                    object imageName = (object)operationRequest.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
+                                    PlayerData playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.UpdatePlayerData(account, imageName));
+
+                                    if (playerData.ReturnCode == "S430") //取得玩家資料成功 回傳玩家資料
+                                    {
+                                        Log.Debug(playerData.ReturnCode + " :" + playerData.ReturnMessage);
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> {
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerImage,imageName }
+                                    };
+
+                                        OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedPlayer, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
+                                    else// 失敗 傳空值+錯誤訊息
+                                    {
+                                        Log.Debug(playerData.ReturnCode + " :" + playerData.ReturnMessage);
+                                        Dictionary<byte, object> parameter = new Dictionary<byte, object> { };
+                                        OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = playerData.ReturnMessage.ToString() };
+                                        SendOperationResponse(actorResponse, new SendParameters());
+                                    }
                                 }
                                 else
                                 {
+                                    Log.Debug("IN UpdatePlayerData");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     byte rank = (byte)operationRequest.Parameters[(byte)PlayerDataParameterCode.Rank];
                                     short exp = (byte)operationRequest.Parameters[(byte)PlayerDataParameterCode.Exp];
@@ -1335,10 +1355,10 @@ namespace MPServer
                                     if (playerData.ReturnCode == "S403")//取得玩家資料成功 回傳玩家資料
                                     {
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp }, 
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp },
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
-                                        { (byte)PlayerDataParameterCode.MiceAll, miceAll } , { (byte)PlayerDataParameterCode.Team, team } , 
-                                        { (byte)PlayerDataParameterCode.Friend, friend } 
+                                        { (byte)PlayerDataParameterCode.MiceAll, miceAll } , { (byte)PlayerDataParameterCode.Team, team } ,
+                                        { (byte)PlayerDataParameterCode.Friend, friend }
                                     };
 
                                         OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedPlayer, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
@@ -1415,7 +1435,7 @@ namespace MPServer
                                     playerData = (PlayerData)TextUtility.DeserializeFromStream(playerDataUI.LoadPlayerItem(account)); // 更新道具數量
 
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                            { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem, playerData.PlayerItem }, 
+                                            { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem, playerData.PlayerItem },
                                          };
 
                                     OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.UpdatedItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
@@ -1454,7 +1474,7 @@ namespace MPServer
                                     {
                                         // Log.Debug("playerData.ReturnCode == S401");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                            { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.SortedItem, playerData.SortedItem }, 
+                                            { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.SortedItem, playerData.SortedItem },
                                          };
 
                                         OperationResponse actorResponse = new OperationResponse((byte)PlayerDataResponseCode.SortedItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage };
@@ -1579,7 +1599,7 @@ namespace MPServer
                                             //回傳給原玩家
                                             //Log.Debug("battleData.ReturnCode == S501");
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } , { (byte)BattleParameterCode.Energy, Convert.ToInt16(battleData.energy)} 
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.Score, battleData.score } , { (byte)BattleParameterCode.Energy, Convert.ToInt16(battleData.energy)}
                                     };
 
 
@@ -1709,7 +1729,7 @@ namespace MPServer
                                 {
                                     //  Log.Debug("playerData.ReturnCode == S401");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp }, 
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.Rank, rank }, { (byte)PlayerDataParameterCode.Exp, exp },
                                         { (byte)PlayerDataParameterCode.MaxCombo, maxCombo }, { (byte)PlayerDataParameterCode.MaxScore, maxScore }, { (byte)PlayerDataParameterCode.SumScore, sumScore } ,
                                         { (byte)PlayerDataParameterCode.SumLost, playerData.SumBattle - playerData.SumWin } ,{ (byte)PlayerDataParameterCode.SumKill, sumKill },{ (byte)PlayerDataParameterCode.SumWin, sumWin },
                                         { (byte)PlayerDataParameterCode.SumBattle, sumBattle },{ (byte)PlayerDataParameterCode.SortedItem, item } ,{ (byte)PlayerDataParameterCode.MiceAll, miceAll } ,
@@ -1882,7 +1902,7 @@ namespace MPServer
                                 {
                                     //  Log.Debug("currencyData.ReturnCode == S705");
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Gold, gold } 
+                                        { (byte)CurrencyParameterCode.Ret, currencyData.ReturnCode }, { (byte)CurrencyParameterCode.Gold, gold }
                                     };
 
                                     OperationResponse response = new OperationResponse((byte)CurrencyResponseCode.Loaded, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = currencyData.ReturnMessage.ToString() };
@@ -1915,7 +1935,7 @@ namespace MPServer
                                     {
                                         Log.Debug("miceData.ReturnCode == S801");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty } 
+                                        { (byte)MiceParameterCode.Ret, miceData.ReturnCode }, { (byte)MiceParameterCode.MiceData,miceData.miceProperty }
                                     };
 
                                         OperationResponse response = new OperationResponse((byte)MiceResponseCode.LoadMice, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = miceData.ReturnMessage.ToString() };
@@ -1950,7 +1970,7 @@ namespace MPServer
                                     {
                                         //  Log.Debug("skillData.ReturnCode == S1001");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)MiceParameterCode.Ret, skillData.ReturnCode }, { (byte)MiceParameterCode.MiceData,skillData.skillProperty } 
+                                        { (byte)MiceParameterCode.Ret, skillData.ReturnCode }, { (byte)MiceParameterCode.MiceData,skillData.skillProperty }
                                     };
 
                                         OperationResponse response = new OperationResponse((byte)SkillResponseCode.LoadSkill, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = skillData.ReturnMessage.ToString() };
@@ -1985,7 +2005,7 @@ namespace MPServer
                                     {
                                         //    Log.Debug("LoadStore.ReturnCode == S901");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)StoreParameterCode.Ret, storeData.ReturnCode }, { (byte)StoreParameterCode.StoreData,storeData.StoreItem } 
+                                        { (byte)StoreParameterCode.Ret, storeData.ReturnCode }, { (byte)StoreParameterCode.StoreData,storeData.StoreItem }
                                     };
 
                                         OperationResponse response = new OperationResponse((byte)StoreResponseCode.LoadStore, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage };
@@ -2020,7 +2040,7 @@ namespace MPServer
                                     {
                                         Log.Debug("LoadItem.ReturnCode == S601");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)ItemParameterCode.Ret, itemData.ReturnCode }, { (byte)ItemParameterCode.ItemData,itemData.itemProperty } 
+                                        { (byte)ItemParameterCode.Ret, itemData.ReturnCode }, { (byte)ItemParameterCode.ItemData,itemData.itemProperty }
                                     };
 
                                         OperationResponse response = new OperationResponse((byte)ItemResponseCode.LoadItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = itemData.ReturnMessage.ToString() };
@@ -2058,7 +2078,7 @@ namespace MPServer
                                     {
                                         Log.Debug("LoadPlayerItem.ReturnCode == S425");
                                         Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem,playerData.PlayerItem } 
+                                        { (byte)PlayerDataParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem,playerData.PlayerItem }
                                             };
 
                                         OperationResponse response = new OperationResponse((byte)PlayerDataResponseCode.LoadedItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = playerData.ReturnMessage.ToString() };
@@ -2557,7 +2577,7 @@ namespace MPServer
                                         {
 
                                             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.MissionReward, missionReward } 
+                                        { (byte)BattleParameterCode.Ret, battleData.ReturnCode }, { (byte)BattleParameterCode.MissionReward, missionReward }
                                     };
 
                                             OperationResponse response = new OperationResponse((byte)BattleResponseCode.MissionCompleted, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = battleData.ReturnMessage.ToString() };
@@ -2878,7 +2898,7 @@ namespace MPServer
 
                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                      { (byte)MiceParameterCode.Ret, storeData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,
-                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } 
+                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice }
                                                                         };
 
                                                     OperationResponse response = new OperationResponse((byte)StoreOperationCode.BuyItem, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage.ToString() };
@@ -2938,7 +2958,7 @@ namespace MPServer
                                     byte itemType = (byte)operationRequest.Parameters[(byte)StoreParameterCode.ItemType];
                                     byte series = (byte)operationRequest.Parameters[(byte)GashaponParameterCode.Series];
 
-                                    Log.Debug(string.Format("itemID={0}   itemType={1}  Series={2}", itemID, itemType,series));
+                                    Log.Debug(string.Format("itemID={0}   itemType={1}  Series={2}", itemID, itemType, series));
 
                                     StoreData storeData;
                                     CurrencyData currencyData;
@@ -2950,26 +2970,26 @@ namespace MPServer
 
                                     // 更新商店購買數量
                                     storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.BuyGashapon(itemID)); //g
-            
+
                                     if (storeData.ReturnCode == "S903") // 購買轉蛋商品 商店資料更新成功 ****"－price"****　負的　減少
                                     {
                                         // chk currency
                                         currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, storeData.CurrencyType, -storeData.Price));
 
                                         // 更新玩家貨幣 成功
-                                        if (currencyData.ReturnCode == "S703") 
+                                        if (currencyData.ReturnCode == "S703")
                                         {
                                             // grenate gashapon
-                                            gashaponData = (GashaponData[])TextUtility.DeserializeFromStream(gashaponUI.BuyGashapon(itemID, itemType,series, storeData.Price)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
+                                            gashaponData = (GashaponData[])TextUtility.DeserializeFromStream(gashaponUI.BuyGashapon(itemID, itemType, series, storeData.Price)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
 
                                             // 購買轉蛋 成功
-                                            if (gashaponData[0].ReturnCode == "S1205") 
+                                            if (gashaponData[0].ReturnCode == "S1205")
                                             {
                                                 List<string> itemIist = new List<string>();
-                                                
-                                               itemIist= gashaponData.Select(x => x.ItemID.ToString()).ToList();
 
-                                               string[] itemArray = itemIist.ToArray();
+                                                itemIist = gashaponData.Select(x => x.ItemID.ToString()).ToList();
+
+                                                string[] itemArray = itemIist.ToArray();
 
                                                 currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
                                                 storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData());
@@ -2983,7 +3003,7 @@ namespace MPServer
 
                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                      { (byte)GashaponParameterCode.Ret, playerData.ReturnCode }, { (byte)PlayerDataParameterCode.PlayerItem, playerData.PlayerItem } , { (byte)PlayerDataParameterCode.SortedItem, itemSerialize } ,
-                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } ,{ (byte)CurrencyParameterCode.Bonus, currencyData.Bonus } 
+                                                                     { (byte)CurrencyParameterCode.Gold, currencyData.Gold } ,{ (byte)CurrencyParameterCode.Rice, currencyData.Rice } ,{ (byte)CurrencyParameterCode.Bonus, currencyData.Bonus }
                                                                        ,{ (byte)StoreParameterCode.StoreData, storeData.StoreItem }  };
 
                                                     OperationResponse response = new OperationResponse((byte)GashaponResponseCode.BuyGashapon, parameter) { ReturnCode = (short)ErrorCode.Ok, DebugMessage = storeData.ReturnMessage.ToString() };
@@ -2992,8 +3012,8 @@ namespace MPServer
                                                 }
                                                 else    // 失敗
                                                 {
-                                                    Log.Debug("新增玩家道具失敗: " + playerData.ReturnCode+"  " + playerData.ReturnMessage);
-                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret,playerData.ReturnCode  } };
+                                                    Log.Debug("新增玩家道具失敗: " + playerData.ReturnCode + "  " + playerData.ReturnMessage);
+                                                    Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)GashaponParameterCode.Ret, playerData.ReturnCode } };
                                                     OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
                                                     SendOperationResponse(actorResponse, new SendParameters());
                                                 }
@@ -3004,7 +3024,7 @@ namespace MPServer
                                             else    // 失敗
                                             {
                                                 Log.Debug("購買轉蛋道具失敗: " + gashaponData[0].ReturnCode + "  " + gashaponData[0].ReturnMessage);
-                                                 Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret,  gashaponData[0].ReturnCode} };
+                                                Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)GashaponParameterCode.Ret, gashaponData[0].ReturnCode } };
                                                 OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
                                                 SendOperationResponse(actorResponse, new SendParameters());
                                             }
@@ -3012,7 +3032,7 @@ namespace MPServer
                                         else    // 失敗
                                         {
                                             Log.Debug("更新貨幣失敗: " + currencyData.ReturnCode + "  " + currencyData.ReturnMessage);
-                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> {{(byte)GashaponParameterCode.Ret, currencyData.ReturnCode } };
+                                            Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)GashaponParameterCode.Ret, currencyData.ReturnCode } };
                                             OperationResponse actorResponse = new OperationResponse(operationRequest.OperationCode, parameter) { ReturnCode = (short)ErrorCode.InvalidParameter, DebugMessage = storeData.ReturnMessage.ToString() };
                                             SendOperationResponse(actorResponse, new SendParameters());
                                         }
@@ -3052,7 +3072,7 @@ namespace MPServer
                                 }
                                 break;
                             }
-                        #endregion
+                            #endregion
                     }
                 }
             }

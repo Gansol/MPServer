@@ -85,6 +85,7 @@ public class PhotonService : IPhotonPeerListener
     //委派事件 UpdateCurrency
     public delegate void UpdateCurrencyHandler();
     public event UpdateCurrencyHandler UpdateCurrencyEvent;
+    public event LoadDataHandler UpdatePlayerImageEvent;
 
     //委派事件 ShowMessage
     public delegate void LoadDataHandler();
@@ -95,6 +96,7 @@ public class PhotonService : IPhotonPeerListener
     public event LoadDataHandler LoadCurrencyEvent;
     public event LoadDataHandler LoadPurchaseEvent;
     public event LoadDataHandler UpdateMiceEvent;
+
     public event LoadDataHandler LoadFriendsDataEvent;
     public event LoadDataHandler ApplyInviteFriendEvent;
     public event LoadDataHandler RemoveFriendEvent;
@@ -534,8 +536,8 @@ public class PhotonService : IPhotonPeerListener
                             Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
                             Global.PlayerImage = Convert.ToString(operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage]);
 
-                            if (operationResponse.Parameters.ContainsKey((byte)MemberParameterCode.Friends))
-                                FriendsChk((string)operationResponse.Parameters[(byte)MemberParameterCode.Friends]);
+                            if (operationResponse.Parameters.ContainsKey((byte)PlayerDataParameterCode.Friend))
+                                FriendsChk((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend]);
 
 
                             Global.isPlayerDataLoaded = true;
@@ -1007,6 +1009,33 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
+                            if (operationResponse.Parameters.Count == 2)
+                            {
+                                Global.PlayerImage = operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage].ToString();
+                                UpdatePlayerImageEvent();
+                                Debug.Log("Updated PlayerImage Data ");
+                            }
+                            else
+                            {
+                                Debug.Log("Updated PlayerImage FUCK !!!! ");
+                            }
+
+                        }
+                        else
+                        {
+                            byte rank = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Rank];
+                            short exp = (byte)operationResponse.Parameters[(byte)PlayerDataParameterCode.Exp];
+                            Int16 maxCombo = (Int16)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxCombo];
+                            int maxScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.MaxScore];
+                            int sumScore = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumScore];
+                            int sumLost = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumLost];
+                            int sumKill = (int)operationResponse.Parameters[(byte)PlayerDataParameterCode.SumKill];
+
+                            Global.dictSortedItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]) as Dictionary<string, object>;
+                            Global.dictMiceAll = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.MiceAll]) as Dictionary<string, object>;
+                            Global.dictTeam = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Team]) as Dictionary<string, object>;
+                            Global.dictFriends = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.Friend]) as List<string>;
+
                             Debug.Log("Updated Player Data.");
                         }
                     }
@@ -1357,7 +1386,7 @@ public class PhotonService : IPhotonPeerListener
         {
             if (Global.photonService.isConnected)
             {
-                Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+                Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                              { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.MemberType, memberType }
                         };
 
@@ -1382,7 +1411,7 @@ public class PhotonService : IPhotonPeerListener
     {
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                            { (byte)MemberParameterCode.Account,Global.Account },  { (byte)MemberParameterCode.Custom,jString }
                         };
 
@@ -1404,7 +1433,7 @@ public class PhotonService : IPhotonPeerListener
         Debug.Log("memberType:" + (byte)memberType);
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                              { (byte)LoginParameterCode.Account,Account },   { (byte)LoginParameterCode.Password, Password },   { (byte)LoginParameterCode.Nickname, name }
                              ,{ (byte)MemberParameterCode.Email, email },{ (byte)MemberParameterCode.Age, age },{ (byte)LoginParameterCode.MemberType, memberType }
                         };
@@ -1432,9 +1461,9 @@ public class PhotonService : IPhotonPeerListener
             char[] splitText = { '@' };
             string[] Account = Email.Split(splitText);
 
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                            { (byte)MemberParameterCode.Email,Email },  { (byte)MemberParameterCode.Account,Account[0] },   { (byte)MemberParameterCode.Password, Password }  ,{ (byte)MemberParameterCode.Nickname, Nickname }  ,
-                             { (byte)MemberParameterCode.Age, age }  ,{ (byte)MemberParameterCode.Sex, sex }  , { (byte)MemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)MemberParameterCode.IP, IP}, { (byte)MemberParameterCode.MemberType, memberType }  
+                             { (byte)MemberParameterCode.Age, age }  ,{ (byte)MemberParameterCode.Sex, sex }  , { (byte)MemberParameterCode.JoinDate, DateTime.Now.ToString()}, { (byte)MemberParameterCode.IP, IP}, { (byte)MemberParameterCode.MemberType, memberType }
                         };
 
             this.peer.OpCustom((byte)MemberOperationCode.JoinMember, parameter, true, 0, true); // operationCode is 21
@@ -1477,7 +1506,7 @@ public class PhotonService : IPhotonPeerListener
         try
         {
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
-                 {(byte)BattleParameterCode.RoomID,Global.RoomID},{(byte)BattleParameterCode.PrimaryID,Global.PrimaryID} 
+                 {(byte)BattleParameterCode.RoomID,Global.RoomID},{(byte)BattleParameterCode.PrimaryID,Global.PrimaryID}
             };
 
             this.peer.OpCustom((byte)BattleOperationCode.CheckStatus, parameter, true, 0, true);
@@ -2062,7 +2091,7 @@ public class PhotonService : IPhotonPeerListener
     {
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID }, { (byte)BattleParameterCode.RoomID, Global.RoomID },
             { (byte)BattleParameterCode.MiceID, miceID },{ (byte)BattleParameterCode.Combo, combo }, { (byte)BattleParameterCode.Time, time }
             };
@@ -2084,7 +2113,7 @@ public class PhotonService : IPhotonPeerListener
     {
         try
         {
-            Dictionary<byte, object> parameter = new Dictionary<byte, object> { 
+            Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)BattleParameterCode.PrimaryID, Global.PrimaryID },{ (byte)BattleParameterCode.RoomID, Global.RoomID },{ (byte)BattleParameterCode.Life, life },{ (byte)BattleParameterCode.CustomValue, bSetDefaultLife }};
 
             this.peer.OpCustom((byte)BattleOperationCode.UpdateLife, parameter, true, 0, false); // operationCode is RoomSpeak
@@ -2279,7 +2308,7 @@ public class PhotonService : IPhotonPeerListener
 
             Dictionary<byte, object> parameter = new Dictionary<byte, object> {
             { (byte)PlayerDataParameterCode.Account, Global.Account },{ (byte)StoreParameterCode.ItemID,itemID },{ (byte)GashaponParameterCode.Series,series },
-            
+
            };
             this.peer.OpCustom((byte)StoreOperationCode.BuyGashapon, parameter, true, 0, true); // operationCode is RoomSpeak
         }
@@ -2486,6 +2515,7 @@ public class PhotonService : IPhotonPeerListener
 
     private void FriendsChk(string friendString)
     {
+        Debug.Log(friendString);
         string friends = (!string.IsNullOrEmpty(friendString)) ? friendString : "";
 
         Global.dictFriends.Clear();
