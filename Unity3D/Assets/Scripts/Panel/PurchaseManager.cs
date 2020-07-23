@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Sdkbox;
+//using Sdkbox;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
  * -----------            CC BY-NC-SA 4.0            -------------
@@ -27,8 +27,8 @@ public class PurchaseManager : MPPanel
     public int offset = 275;
     public GameObject itemPanel;
 
-    private Sdkbox.IAP _iap;                                        // IAP資料
-    private Sdkbox.Product[] _product;                              // 商品資料
+    //private Sdkbox.IAP _iap;                                        // IAP資料
+    //private Sdkbox.Product[] _product;                              // 商品資料
     private Dictionary<string, GameObject> _dictitemSlot;           // 已實體化的商品
     private Dictionary<string, object> _dictProductsFitCurrency;    // 法幣道具價格
     private bool _bLoadAsset, _bFirstLoad, _bLoadPanel, _bIABInit, _bLoadPurchase, _bLoadProduct, _bLoadCurrency;
@@ -40,14 +40,14 @@ public class PurchaseManager : MPPanel
     // Use this for initialization
     void Start()
     {
-        _iap = FindObjectOfType<Sdkbox.IAP>();
+        //_iap = FindObjectOfType<Sdkbox.IAP>();
         objFactory = new ObjectFactory();
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
         _bFirstLoad = true;
         _bLoadProduct = true;
 
-        _iap.getProducts();
+        //_iap.getProducts();
     }
 
     void OnEnable()
@@ -131,7 +131,7 @@ public class PurchaseManager : MPPanel
                     values.TryGetValue(PurchaseProperty.ItemName, out value);
 
                     itemSlot = objFactory.Instantiate(bundle, itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
-                   // UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
+                    //UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
                     Add2Refs(item.Key, itemSlot.gameObject);
                     _slotPosY += offset;
                 }
@@ -303,7 +303,7 @@ public class PurchaseManager : MPPanel
 
     private void OnPurchase(GameObject go)
     {
-        GetComponentInParent<PurchaseHandler>().Purchase(go.name);
+        //GetComponentInParent<PurchaseHandler>().Purchase(go.name);
     }
 
     protected override void OnLoading()
@@ -345,14 +345,14 @@ public class PurchaseManager : MPPanel
         _bLoadPurchase = true;
     }
 
-    public void OnProductRequest(Dictionary<string, object> dictProducts, Product[] product, string currencyCode)
-    {
-        _dictProductsFitCurrency = dictProducts;
-        _product = product;
-        _bLoadProduct = true;
-        _currencyCode = currencyCode;
-        Debug.Log("Manager OnProductRequest");
-    }
+    //public void OnProductRequest(Dictionary<string, object> dictProducts, Product[] product, string currencyCode)
+    //{
+    //    _dictProductsFitCurrency = dictProducts;
+    //    _product = product;
+    //    _bLoadProduct = true;
+    //    _currencyCode = currencyCode;
+    //    Debug.Log("Manager OnProductRequest");
+    //}
 
 
 
