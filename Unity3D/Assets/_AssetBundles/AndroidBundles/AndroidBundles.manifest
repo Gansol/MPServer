@@ -1,177 +1,177 @@
 ManifestFileVersion: 0
-CRC: 2295191463
+CRC: 3808600104
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: creature/share/bali.unity3d
+      Name: creature/share/atlas_bali.unity3d
       Dependencies: {}
     Info_1:
-      Name: creature/share/much.unity3d
+      Name: creature/share/atlas_heromice.unity3d
       Dependencies: {}
     Info_2:
+      Name: creature/share/atlas_much.unity3d
+      Dependencies: {}
+    Info_3:
       Name: creature/unique/bali.unity3d
       Dependencies:
-        Dependency_0: creature/share/bali.unity3d
-    Info_3:
+        Dependency_0: creature/share/atlas_bali.unity3d
+    Info_4:
+      Name: creature/unique/heromice.unity3d
+      Dependencies:
+        Dependency_0: creature/share/atlas_heromice.unity3d
+    Info_5:
       Name: creature/unique/much.unity3d
       Dependencies:
-        Dependency_0: creature/share/much.unity3d
-    Info_4:
+        Dependency_0: creature/share/atlas_much.unity3d
+    Info_6:
       Name: effects/share/effects.unity3d
       Dependencies: {}
-    Info_5:
+    Info_7:
       Name: effects/unique/effect_energyplus.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_6:
+    Info_8:
       Name: effects/unique/effect_fevertime.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_7:
+    Info_9:
       Name: effects/unique/effect_firebow.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_8:
+    Info_10:
       Name: effects/unique/effect_iceglasses.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_9:
+    Info_11:
       Name: effects/unique/effect_invincible.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_10:
+    Info_12:
       Name: effects/unique/effect_landfire.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_11:
+    Info_13:
       Name: effects/unique/effect_lighting.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_12:
+    Info_14:
       Name: effects/unique/effect_rattrap.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_13:
+    Info_15:
       Name: effects/unique/effect_reflection.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_14:
+    Info_16:
       Name: effects/unique/effect_scoreplus.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_15:
+    Info_17:
       Name: effects/unique/effect_snow.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_16:
+    Info_18:
       Name: effects/unique/effect_taco.unity3d
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
-    Info_17:
+    Info_19:
       Name: gashapon/share/gashapon.unity3d
       Dependencies: {}
-    Info_18:
+    Info_20:
       Name: gashapon/unique/gashapon1.unity3d
       Dependencies:
         Dependency_0: gashapon/share/gashapon.unity3d
-    Info_19:
+    Info_21:
       Name: gashapon/unique/gashapon2.unity3d
       Dependencies:
         Dependency_0: gashapon/share/gashapon.unity3d
-    Info_20:
+    Info_22:
       Name: gashapon/unique/gashapon3.unity3d
       Dependencies:
         Dependency_0: gashapon/share/gashapon.unity3d
-    Info_21:
+    Info_23:
       Name: itemicon/share/itemicon.unity3d
       Dependencies: {}
-    Info_22:
+    Info_24:
       Name: itemicon/unique/icon_energyplus.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_23:
+    Info_25:
       Name: itemicon/unique/icon_firebow.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_24:
+    Info_26:
       Name: itemicon/unique/icon_goldhammer.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_25:
+    Info_27:
       Name: itemicon/unique/icon_iceglasses.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_26:
+    Info_28:
       Name: itemicon/unique/icon_invincible.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_27:
+    Info_29:
       Name: itemicon/unique/icon_iornhammer.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_28:
+    Info_30:
       Name: itemicon/unique/icon_lighting.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_29:
+    Info_31:
       Name: itemicon/unique/icon_rattrap.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_30:
+    Info_32:
       Name: itemicon/unique/icon_reflection.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_31:
+    Info_33:
       Name: itemicon/unique/icon_scoreplus.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_32:
+    Info_34:
       Name: itemicon/unique/icon_snow.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_33:
+    Info_35:
       Name: itemicon/unique/icon_taco.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_34:
+    Info_36:
       Name: itemicon/unique/icon_woodhammer.unity3d
       Dependencies:
         Dependency_0: itemicon/share/itemicon.unity3d
-    Info_35:
+    Info_37:
       Name: mice/blackmice/share/atlas_blackmice.unity3d
       Dependencies: {}
-    Info_36:
+    Info_38:
       Name: mice/blackmice/unique/blackmice.unity3d
       Dependencies:
         Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
-    Info_37:
+    Info_39:
       Name: mice/candymice/share/atlas_candymice.unity3d
       Dependencies: {}
-    Info_38:
+    Info_40:
       Name: mice/candymice/unique/candymice.unity3d
       Dependencies:
         Dependency_0: mice/candymice/share/atlas_candymice.unity3d
-    Info_39:
+    Info_41:
       Name: mice/eggmice/share/atlas_eggmice.unity3d
       Dependencies: {}
-    Info_40:
+    Info_42:
       Name: mice/eggmice/unique/eggmice.unity3d
       Dependencies:
         Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
-    Info_41:
+    Info_43:
       Name: mice/engineermice/share/atlas_engineermice.unity3d
       Dependencies: {}
-    Info_42:
+    Info_44:
       Name: mice/engineermice/unique/engineermice.unity3d
       Dependencies:
         Dependency_0: mice/engineermice/share/atlas_engineermice.unity3d
-    Info_43:
-      Name: mice/heromice/share/atlas_heromice.unity3d
-      Dependencies: {}
-    Info_44:
-      Name: mice/heromice/unique/heromice.unity3d
-      Dependencies:
-        Dependency_0: mice/heromice/share/atlas_heromice.unity3d
     Info_45:
       Name: mice/magicmice/share/atlas_magicmice.unity3d
       Dependencies: {}
@@ -290,13 +290,14 @@ AssetBundleManifest:
     Info_77:
       Name: panel/unique/gameui.unity3d
       Dependencies:
-        Dependency_0: panel/share/battlehud.unity3d
-        Dependency_1: panel/share/comic.unity3d
-        Dependency_2: panel/share/comicfont.unity3d
-        Dependency_3: panel/share/comicfontoutline.unity3d
-        Dependency_4: panel/share/gamescene.unity3d
-        Dependency_5: panel/share/panelui.unity3d
-        Dependency_6: panel/share/shareobject.unity3d
+        Dependency_0: miceicon/share/miceicon.unity3d
+        Dependency_1: panel/share/battlehud.unity3d
+        Dependency_2: panel/share/comic.unity3d
+        Dependency_3: panel/share/comicfont.unity3d
+        Dependency_4: panel/share/comicfontoutline.unity3d
+        Dependency_5: panel/share/gamescene.unity3d
+        Dependency_6: panel/share/panelui.unity3d
+        Dependency_7: panel/share/shareobject.unity3d
     Info_78:
       Name: panel/unique/invitem.unity3d
       Dependencies:

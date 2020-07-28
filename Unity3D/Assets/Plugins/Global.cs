@@ -128,6 +128,7 @@ public static class Global
     public static string PanelPath = "panel/";  // panel路徑
     public static string PanelUniquePath = "panel/unique/";  // panel路徑
     public static string MicePath = "mice/";  // mice路徑
+    public static string CreaturePath = "creature/unique/";  // mice路徑
     public static string MiceIconUniquePath = "miceicon/unique/";  // miceicon路徑
     public static string ItemIconUniquePath = "itemicon/unique/";  // itemicon路徑
     public static string EffectsUniquePath = "effects/unique/";  // effects路徑

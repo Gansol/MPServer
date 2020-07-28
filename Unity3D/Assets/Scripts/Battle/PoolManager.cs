@@ -123,7 +123,7 @@ public class PoolManager : MonoBehaviour
         {
             // 載入 老鼠資產
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
-                assetLoader.LoadAssetFormManifest(Global.PanelPath + "mice/" + item.Value + "/unique/" + item.Value + Global.ext);
+                assetLoader.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
 
   
             //foreach (KeyValuePair<int, string> item in _dictMiceObject)
@@ -144,7 +144,7 @@ public class PoolManager : MonoBehaviour
         {
             // 載入 特殊老鼠
             foreach (KeyValuePair<int, string> item in _dictSpecialObject)
-                assetLoader.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
+                assetLoader.LoadAssetFormManifest(Global.CreaturePath + item.Value + Global.ext);
           // assetLoader.LoadAsset(item.Value + "/", item.Value);
 
             //foreach (KeyValuePair<int, string> item in _dictSpecialObject)
@@ -187,8 +187,9 @@ public class PoolManager : MonoBehaviour
             {
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
                 string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-
-                assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + item.Value + Global.ext);
+                Debug.Log("Item Name:  " + item.Value);
+                if(item.Key!=10001)
+                    assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + item.Value + Global.ext);
 
               //  assetLoader.LoadPrefab("Effects" + "/unique/", "effect_" + itemName);
             }
@@ -261,6 +262,7 @@ public class PoolManager : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in objectData)
         {
+
             GameObject bundle = assetLoader.GetAsset(item.Value.ToString());
             if (bundle != null)
             {
@@ -438,20 +440,31 @@ public class PoolManager : MonoBehaviour
 
     public void MergeMice()
     {
-        Dictionary<string, object> dictMyMice = Global.dictTeam;
-        Dictionary<string, object> dictOtherMice = Global.OpponentData.Team;
+        Dictionary<string, object> dictMyMice = new Dictionary<string, object>( Global.dictTeam);
+        Dictionary<string, object> dictOtherMice = new Dictionary<string, object>(Global.OpponentData.Team);
+        int miceID = -1 ;
+
+
+
+        foreach (KeyValuePair<string,object> item in dictMyMice)
+        {
+            if (dictOtherMice.ContainsKey(item.Key))
+                dictOtherMice.Remove(item.Key);
+        }
+
+        dictMyMice = dictMyMice.Concat(dictOtherMice).ToDictionary(x => x.Key, x => x.Value); ;
 
         foreach (KeyValuePair<string, object> item in dictMyMice)
         {
-            _dictMiceObject.Add(MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
+            miceID = MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString());
+            if (!_dictMiceObject.ContainsKey(miceID) && miceID != -1)
+            {
+                _dictMiceObject.Add(miceID, item.Value.ToString());
+                Debug.Log("Mice ID:" + miceID);
+            }
         }
-
-        foreach (KeyValuePair<string, object> item in dictOtherMice)
-        {
-            if (!dictMyMice.ContainsValue(item.Value))
-                _dictMiceObject.Add(MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString()), item.Value.ToString());
-        }
-
+        
+        // 亂寫 FUCK
         if (!_dictMiceObject.ContainsKey(10001))
             _dictMiceObject.Add(10001, "eggmice");
         //  Debug.Log(_dictObject);

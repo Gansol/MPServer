@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 579617909
+CRC: 2632740189
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 36b19674a66e46ce0f4cea25171c326e
+    Hash: 6dc06d1fc577f7bcb3cf6633af03e22a
   TypeTreeHash:
     serializedVersion: 2
     Hash: c3be3e76305a1a5970dbd6682a431bbe
@@ -32,4 +32,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/creature/unique/bali.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/bali.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/atlas_bali.unity3d

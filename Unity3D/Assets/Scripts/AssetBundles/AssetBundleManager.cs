@@ -199,12 +199,13 @@ public static class AssetBundleManager
                     {
                         string bundleName = Path.GetFileName(manifestPathName).Replace(Global.ext, "");
                         dictAssetBundleRefs.Add(manifestPathName, abRef);
-                        dictAssetBundleNameRefs.Add(bundleName.ToLower(), manifestPathName);
+                        //if (!dictAssetBundleNameRefs.ContainsKey(bundleName))
+                            dictAssetBundleNameRefs.Add(bundleName.ToLower(), manifestPathName);
 
                         _loadedObjectCount++;// 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
                         Debug.Log("(AB)_loadedObjectCount:" + _loadedObjectCount);
                     }
-                  //  _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
+                    //  _request = abRef.assetBundle.LoadAssetAsync(manifestPathName, type);
                     www.Dispose();
                     //Debug.Log("( 4 ) :" + assetName);
 

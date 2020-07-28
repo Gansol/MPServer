@@ -683,7 +683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c64599985f4b25e4d83b68b774f453b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadedObj: 1
+  bLoadedObj: 0
 --- !u!1 &1498867302
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,7 +892,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3005
+  startingRenderQueue: 3000
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0

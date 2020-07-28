@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2786622346
+CRC: 3657946435
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2c02a5c91af4b1ee651df56ac35abd26
+    Hash: d319339279b1031f14f6c2aaf19f6b83
   TypeTreeHash:
     serializedVersion: 2
     Hash: 7b2c1eb1bfcf0f7066539eea46a88228
@@ -32,4 +32,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/creature/unique/much.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/much.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/atlas_much.unity3d

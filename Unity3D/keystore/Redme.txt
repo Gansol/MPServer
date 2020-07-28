@@ -1,0 +1,3 @@
+If debug.keystore missing
+
+copy to users/yourUserName/.android

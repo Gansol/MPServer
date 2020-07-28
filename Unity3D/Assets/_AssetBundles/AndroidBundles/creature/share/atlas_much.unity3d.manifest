@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 3925162183
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 84152905e13b7b5b37007e1adc6c7e27
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8a54f921be9e95a99076cbb9c276b333
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/creature/share/atlas_much.mat
+- Assets/AssetBundles/creature/share/atlas_much.asset
+- Assets/AssetBundles/creature/share/atlas_much.png
+Dependencies: []
