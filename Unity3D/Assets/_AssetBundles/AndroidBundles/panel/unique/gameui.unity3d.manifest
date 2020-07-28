@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3818298301
+CRC: 3018439293
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3638ec05726480aad2ecefb0d9f7f619
+    Hash: bb491e4d1a9283763fe89bfa440c94cd
   TypeTreeHash:
     serializedVersion: 2
     Hash: 99e44b4038360529876c8a650d53f6aa
@@ -114,6 +114,7 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/panel/unique/GameUI.prefab
 Dependencies:
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/battlehud.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comicfont.unity3d

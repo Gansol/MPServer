@@ -8478,149 +8478,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 128920}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72bca37534f434d808a1afbb191303e8, type: 3}
+  m_Script: {fileID: 11500000, guid: 2199b7539bd9af4429cf208f532579e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iOSProducts:
-  - name: coin_package
-    id: com.cocos2dx.plugintest2
-    consumable: 1
-  androidKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgWeiYWDdYS5bXOGAKhXVoS2SK7D8c8Iuvl0Qn0yuIFwmVIE+J44+VO8NNwd8ma+wYdLO7Cx8QanI27ad3tUrf14a70qOWgzqdNKp/lh0s6FEg6fo4/o9c2ZYZOz4vq1zccFh7Y3jFSdu1uSkZqEL/caxihvJIOgbHr3yrAQe17KV3EMfXoWdpC7nBqS34I0NnAAM0OGWmJRNvtUQ08PMtfaPzkv0G3mQREsXOXMsVZdAee5HeGtCq9O4DwzAAjMrLm7T5Cs7wQ/EKcFxAoEq9Fp8RUezznebAi6zLroy9i94i1r4lYt+HHtYzySuHsRaAgOmHCPTDAkLIIy20Tlg1wIDAQAB
-  androidProducts:
-  - name: micepow_00000
-    id: micepow_00000
-    consumable: 1
-  - name: micepow_00001
-    id: micepow_00001
-    consumable: 1
-  - name: micepow_00002
-    id: micepow_00002
-    consumable: 1
-  - name: micepow_00003
-    id: micepow_00003
-    consumable: 1
-  - name: micepow_00004
-    id: micepow_00004
-    consumable: 1
-  - name: micepow_00005
-    id: micepow_00005
-    consumable: 1
-  - name: micepow_00006
-    id: micepow_00006
-    consumable: 1
-  callbacks:
-    onInitialized:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onInitialized
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onSuccess:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 11428920}
-          m_MethodName: onSuccess
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onFailure:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onFailure
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onCanceled:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onCanceled
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onRestored:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onRestored
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onProductRequestSuccess:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 11428920}
-          m_MethodName: onProductRequestSuccess
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onProductRequestFailure:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onProductRequestFailure
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    onRestoreComplete:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: onRestoreComplete
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!1 &131498
 GameObject:
   m_ObjectHideFlags: 0
@@ -16549,7 +16409,7 @@ MonoBehaviour:
   minimumHeight: 320
   maximumHeight: 1536
   fitWidth: 0
-  fitHeight: 0
+  fitHeight: 1
   adjustByDPI: 0
   shrinkPortraitUI: 0
 --- !u!114 &11446386
@@ -21129,11 +20989,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 167506}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d00adbd2a5cd640a19945185e8be208c, type: 3}
+  m_Script: {fileID: 11500000, guid: ff540e9439994bc46868ac4edca0d21d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  offset: 0
+  itemPanel: {fileID: 0}
 --- !u!1 &167508
 GameObject:
   m_ObjectHideFlags: 0

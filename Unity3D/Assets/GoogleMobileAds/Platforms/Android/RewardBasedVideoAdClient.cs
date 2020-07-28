@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_ANDROID
-
 using System;
 using UnityEngine;
 
@@ -33,9 +31,9 @@ namespace GoogleMobileAds.Android
         public event EventHandler<EventArgs> OnAdClosed = delegate { };
         public event EventHandler<Reward> OnAdRewarded = delegate { };
         public event EventHandler<EventArgs> OnAdLeavingApplication = delegate { };
+        public event EventHandler<EventArgs> OnAdCompleted = delegate { };
 
-        public RewardBasedVideoAdClient()
-            : base(Utils.UnityRewardBasedVideoAdListenerClassName)
+        public RewardBasedVideoAdClient() : base(Utils.UnityRewardBasedVideoAdListenerClassName)
         {
             AndroidJavaClass playerClass = new AndroidJavaClass(Utils.UnityActivityClassName);
             AndroidJavaObject activity =
@@ -66,9 +64,20 @@ namespace GoogleMobileAds.Android
             androidRewardBasedVideo.Call("show");
         }
 
+        public void SetUserId(string userId)
+        {
+            androidRewardBasedVideo.Call("setUserId", userId);
+        }
+
         public void DestroyRewardBasedVideoAd()
         {
             androidRewardBasedVideo.Call("destroy");
+        }
+
+        // Returns the mediation adapter class name.
+        public string MediationAdapterClassName()
+        {
+            return this.androidRewardBasedVideo.Call<string>("getMediationAdapterClassName");
         }
 
         #endregion
@@ -140,8 +149,14 @@ namespace GoogleMobileAds.Android
             }
         }
 
+        void onAdCompleted()
+        {
+            if (this.OnAdCompleted != null)
+            {
+                this.OnAdCompleted(this, EventArgs.Empty);
+            }
+        }
+
         #endregion
     }
 }
-
-#endif

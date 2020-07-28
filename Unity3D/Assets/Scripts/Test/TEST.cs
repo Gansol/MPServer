@@ -11,27 +11,65 @@ public class TEST : MonoBehaviour
 
     private void Start()
     {
-        HashSet<string> a = new HashSet<string>();
-        HashSet<string> b = new HashSet<string>();
+        Dictionary<string, object> dictMyMice = new Dictionary<string, object>();
+        Dictionary<string, object> dictOtherMice = new Dictionary<string, object>();
+        Dictionary<string, object> mergeMice;
 
 
-        a.Add("a");
-        b.Add("a");
-        b.Add("c");
-        a.UnionWith(b);
+        dictMyMice.Add("a", "a");
+        dictMyMice.Add("b", "b");
+        dictMyMice.Add("f", "f");
 
+        dictOtherMice.Add("a", "a");
+        dictOtherMice.Add("b", "b");
+        dictOtherMice.Add("d", "d");
+        dictOtherMice.Add("e", "e");
 
-        Dictionary<string, object> c = new Dictionary<string, object>();
-        Dictionary<string, object> d = new Dictionary<string, object>();
+        mergeMice = new Dictionary<string, object>(dictMyMice);
 
+        foreach (KeyValuePair<string, object> item in mergeMice)
+        {
+            if (dictOtherMice.ContainsKey(item.Key))
+                dictOtherMice.Remove(item.Key);
+        }
 
-        c.Add("a", a);
-        d.Add("a", a);
+        dictMyMice =  dictMyMice.Concat(dictOtherMice).ToDictionary(x => x.Key, x => x.Value); ;
 
-        
-        Debug.Log(a.Count);
-        Debug.Log(c==d);
+        foreach (KeyValuePair<string, object> item in dictMyMice)
+        {
+            Debug.Log(item.Key);
+        }
+        Debug.Log("---------------------------------");
+        foreach (KeyValuePair<string, object> item in dictOtherMice)
+        {
+            Debug.Log(item.Key);
+        }
+        Debug.Log("---------------------------------");
     }
+
+    //private void Start()
+    //{
+    //    HashSet<string> a = new HashSet<string>();
+    //    HashSet<string> b = new HashSet<string>();
+
+
+    //    a.Add("a");
+    //    b.Add("a");
+    //    b.Add("c");
+    //    a.UnionWith(b);
+
+
+    //    Dictionary<string, object> c = new Dictionary<string, object>();
+    //    Dictionary<string, object> d = new Dictionary<string, object>();
+
+
+    //    c.Add("a", a);
+    //    d.Add("a", a);
+
+
+    //    Debug.Log(a.Count);
+    //    Debug.Log(c==d);
+    //}
 
     //private void Start()
     //{

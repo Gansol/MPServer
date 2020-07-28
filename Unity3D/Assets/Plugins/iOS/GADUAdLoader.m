@@ -15,14 +15,15 @@
 - (instancetype)initWithAdLoaderClientReference:(GADUTypeAdLoaderClientRef *)adLoaderClient
                                        adUnitID:(NSString *)adUnitID
                                     templateIDs:(NSArray *)templateIDs
-                                        adTypes:(NSArray *)adTypes {
+                                        adTypes:(NSArray *)adTypes
+                                        options:(NSArray *)options {
   self = [super init];
   if (self) {
     _adLoaderClient = adLoaderClient;
     _adLoader = [[GADAdLoader alloc] initWithAdUnitID:adUnitID
                                    rootViewController:[GADUPluginUtil unityGLViewController]
                                               adTypes:adTypes
-                                              options:nil];
+                                              options:options];
     _adLoader.delegate = self;
     _templateIDs = [NSArray arrayWithArray:templateIDs];
     _adTypes = [NSArray arrayWithArray:adTypes];
@@ -45,7 +46,7 @@
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(GADRequestError *)error {
   if (self.adFailedCallback) {
     NSString *errorMsg = [NSString
-        stringWithFormat:@"Failed to receive ad with error: %@", [error localizedFailureReason]];
+        stringWithFormat:@"Failed to receive ad with error: %@", [error localizedDescription]];
     self.adFailedCallback(self.adLoaderClient,
                           [errorMsg cStringUsingEncoding:NSUTF8StringEncoding]);
   }
@@ -57,7 +58,7 @@
     GADUObjectCache *cache = [GADUObjectCache sharedInstance];
     GADUNativeCustomTemplateAd *internalNativeAd =
         [[GADUNativeCustomTemplateAd alloc] initWithAd:nativeCustomTemplateAd];
-    [cache.references setObject:internalNativeAd forKey:[internalNativeAd gadu_referenceKey]];
+    cache[internalNativeAd.gadu_referenceKey] = internalNativeAd;
     self.customTemplateAdReceivedCallback(
         self.adLoaderClient, (__bridge GADUTypeNativeCustomTemplateAdRef)internalNativeAd,
         [nativeCustomTemplateAd.templateID cStringUsingEncoding:NSUTF8StringEncoding]);
