@@ -20,7 +20,7 @@ using UnityEngine.Networking;
  *                           ChangeLog
  * 20160714 v1.0.1  修正部分問題                                       
  * ****************************************************************/
-public class PatchFileChecker
+public class PatchFileChecker : MonoBehaviour
 {
     //    AssetBundlesHash bundleHash; //hash文件用
     private byte[] _bVisionFile; //暫存 伺服器版本列表
@@ -45,9 +45,9 @@ public class PatchFileChecker
         //        Debug.Log("Eclipse Debug : " + localListPath + Directory.Exists(localListPath));
         // Debug.LogError("Eclipse Debug : " + localVisionListFile);
         txtUtil = new TextUtility();
-    ReCheckFlag:
+         ReCheckFlag:
         string patch = txtUtil.DecryptBase64String(Global.serverPath);
-        using (UnityWebRequest wwwPatcher =  UnityWebRequest.Get(patch + Global.patchFile))
+        using (UnityWebRequest wwwPatcher = UnityWebRequest.Get(patch + Global.patchFile))
         {
             yield return wwwPatcher.SendWebRequest();
 
@@ -65,6 +65,7 @@ public class PatchFileChecker
                 //   wwwVisionList.Dispose();
                 yield return new WaitForSeconds(1.0f);
                 goto ReCheckFlag;
+             //   StartCoroutine(GetPatcher());
             }
             else if (wwwPatcher.isDone && wwwPatcher.error == null)    //開始檢查版本
             {
@@ -73,7 +74,7 @@ public class PatchFileChecker
                 _bVisionFile = System.Text.Encoding.UTF8.GetBytes(wwwPatcher.downloadHandler.text); // 儲存 下載好的檔案版本
 
                 string ss = System.Text.Encoding.UTF8.GetString(_bVisionFile);
-                string path = wwwPatcher.downloadHandler.text.Replace("\n","");
+                string path = wwwPatcher.downloadHandler.text.Replace("\n", "");
                 path = wwwPatcher.downloadHandler.text.Replace("\\", "");
                 path = wwwPatcher.downloadHandler.text.Replace("/", "");
                 Debug.Log(path);

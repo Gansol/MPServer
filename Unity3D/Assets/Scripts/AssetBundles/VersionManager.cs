@@ -33,7 +33,6 @@ public class VersionManager : MonoBehaviour
     void Awake()
     {
         connCheck = gameObject.AddComponent<InternetChecker>();
-        CreateJSON c = new CreateJSON();
     }
 
     void Start() //開始檢查版本
@@ -67,7 +66,7 @@ public class VersionManager : MonoBehaviour
         if (!connCheck.ConnStatus)
         {
             message.SetActive(true);
-            message.GetComponentInChildren<UILabel>().text = "請檢查網路連線狀態!";
+            message.GetComponentInChildren<UILabel>().text = "檢查網路連線狀態中...";
         }
         else if (!Global.isCompleted && connCheck.ConnStatus)
         {
@@ -142,6 +141,7 @@ public class VersionManager : MonoBehaviour
                 flag = !flag;
                 message.SetActive(true);
                 message.GetComponentInChildren<UILabel>().text = "更新完畢 請重新啟動遊戲！";
+                Caching.ClearCache();
             }
         }
     }

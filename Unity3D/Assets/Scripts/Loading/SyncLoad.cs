@@ -39,7 +39,6 @@ public class SyncLoad : MonoBehaviour
 
     private void LoadAssetCheck()
     {
-
         if (SceneManager.GetActiveScene().name == Global.Scene.BundleCheck)
         {
             bLoadAsset = true;
@@ -47,28 +46,13 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-            
             assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ "menuui"+Global.ext);
-
-            //assetLoader.LoadAsset("panel/share/", "liheiprofont");
-            //assetLoader.LoadAsset("panel/share/", "comicfont");
-            //assetLoader.LoadAsset("panel/", "comicfontoutline");
-
-            //assetLoader.LoadAsset("panel/share/", "panelui");
-            //assetLoader.LoadAsset("panel/share/", "gamescene");
-            //assetLoader.LoadAsset("panel/share/", "mainfront");
-            //assetLoader.LoadAsset("panel/share/", "mainback");
-            //assetLoader.LoadAsset("panel/share/", "shareobject");
-
-            //assetLoader.LoadPrefab("panel/", Global.Scene.MainGameAsset);
             bLoadAsset = true;
         }
 
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
-            //assetLoader.LoadAsset(Global.PanelPath, "battlehud");
-            //assetLoader.LoadPrefab(Global.PanelPath, Global.Scene.BattleAsset);
             bLoadAsset = true;
         }
     }

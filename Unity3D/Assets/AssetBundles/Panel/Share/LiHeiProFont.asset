@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3c1ecb0cfff2e4d9d70fbd9552f19a, type: 3}
   m_Name: LiHeiProFont
   m_EditorClassIdentifier: 
-  mMat: {fileID: 0}
+  mMat: {fileID: 2100000, guid: 30f01ad50ad9ff245bc47c1f92f6eec4, type: 2}
   mUVRect:
     serializedVersion: 2
     x: 0

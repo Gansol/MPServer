@@ -81,45 +81,62 @@ public class BattleHUD : MonoBehaviour
         {
             bLoadPrefab = true;
             ShowItemReward();
-            
+
         }
 
         #region 動畫類判斷 DisActive
         if (WaitObject.activeSelf)
         {
+            Debug.Log("Waiting ....................");
             if (Global.isGameStart)
-                WaitObject.GetComponent<Animator>().Play("Wait");
+                WaitObject.GetComponent<Animator>().Play("Layer1.Wait");
 
             Animator waitAnims = WaitObject.GetComponent("Animator") as Animator;
             AnimatorStateInfo waitState = waitAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
             if (waitState.fullPathHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
-                if (waitState.normalizedTime > 0.1f) WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                if (waitState.normalizedTime > 0.1f)
+                {
+                    WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                    StartObject.SetActive(true);
+                }
+
         }
 
-        //if (StartObject.activeSelf)
-        //{
-        //    Animator startAnims = StartObject.GetComponent("Animator") as Animator;
-        //    AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+        if (StartObject.activeSelf && !WaitObject.activeSelf && Global.isGameStart)
+        {
+            Debug.Log("Start 321................");
+            Animator startAnims = StartObject.GetComponent<Animator>();
+            AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-        //    if (startState.nameHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
-        //        if (startState.normalizedTime > 1) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-        //}
+            if (startState.fullPathHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
+                if (startState.normalizedTime > 1) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+        }
 
         if (MissionObject.activeSelf)
         {
-            Animator missionAnims = MissionObject.GetComponent("Animator") as Animator;
+            Animator missionAnims = MissionObject.GetComponent<Animator>();
             AnimatorStateInfo missionState = missionAnims.GetCurrentAnimatorStateInfo(0);          // 取得目前動畫狀態 (0) = Layer1
 
             if (missionState.fullPathHash == Animator.StringToHash("Layer1.FadeIn"))                   // 如果 目前 動化狀態 是 FadeIn
-                if (missionState.fullPathHash > 2.0f) MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                if (missionState.normalizedTime > 2.0f)
+                {
+                    MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                    Debug.Log(" --------------FadeIn MissionObject.SetActive(false)------------");
+
+                }
+
             if (missionState.fullPathHash == Animator.StringToHash("Layer1.Completed"))                // 如果 目前 動化狀態 是 Completed
-                if (missionState.normalizedTime > 2.0f) MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                if (missionState.normalizedTime > 2.0f)
+                {
+                    MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                    Debug.Log(" --------------Completed MissionObject.SetActive(false)------------");
+                }
         }
 
         if (ScorePlusObject.activeSelf)
         {
-            Animator scoreAnims = ScorePlusObject.GetComponent("Animator") as Animator;
+            Animator scoreAnims = ScorePlusObject.GetComponent<Animator>();
             AnimatorStateInfo scoreState = scoreAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
             if (scoreState.fullPathHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
@@ -128,10 +145,10 @@ public class BattleHUD : MonoBehaviour
 
         if (OtherPlusObject.activeSelf)
         {
-            Animator otherAnims = OtherPlusObject.GetComponent("Animator") as Animator;
+            Animator otherAnims = OtherPlusObject.GetComponent<Animator>();
             AnimatorStateInfo otherState = otherAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (otherState.shortNameHash  == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
+            if (otherState.shortNameHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
                 if (otherState.normalizedTime > 1.0f) OtherPlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
         #endregion
@@ -151,7 +168,7 @@ public class BattleHUD : MonoBehaviour
 
                 string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix+ itemName );
+                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
                 Debug.Log("Bundle:" + bundle);
                 if (bundle != null)
                     bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
@@ -261,9 +278,9 @@ public class BattleHUD : MonoBehaviour
         // 0.137255   // green -35
         // 0.6471     // blue -165
         if (toColor == Color.red)
-            bar.GetComponent<UISprite>().color = new Color(Mathf.Max(color.r + ((1 - defaultColor.r) * (1 - bar.value)), 1),Mathf.Min( color.g - (defaultColor.g * (1 - bar.value)),0), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)),0));
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Max(color.r + ((1 - defaultColor.r) * (1 - bar.value)), 1), Mathf.Min(color.g - (defaultColor.g * (1 - bar.value)), 0), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
         if (toColor == Color.green)
-            bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)),0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)),1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)),0));
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)), 0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)), 1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
         //  color = new Color(1 - bar.value, color.g - color.g * (1 - bar.value), Math.Max(color.b - color.b * (1 - bar.value), 0));
     }
 
@@ -323,7 +340,7 @@ public class BattleHUD : MonoBehaviour
                 break;
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission";
-        MissionObject.GetComponent<Animator>().Play("FadeIn");
+        MissionObject.GetComponent<Animator>().Play("Layer1.FadeIn");
     }
 
     public void MissionCompletedMsg(Mission mission, float missionReward)
@@ -340,7 +357,7 @@ public class BattleHUD : MonoBehaviour
             {
                 ScorePlusObject.transform.GetChild(0).GetComponent<UILabel>().text = missionReward.ToString();
             }
-            ScorePlusObject.GetComponent<Animator>().Play("ScorePlus");
+            ScorePlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus",-1,0f);
         }
 
         // Mission Completed 動畫
@@ -367,7 +384,7 @@ public class BattleHUD : MonoBehaviour
                 break;
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Completed!";
-        MissionObject.GetComponent<Animator>().Play("Completed");
+        MissionObject.GetComponent<Animator>().Play("Layer1.Completed",-1,0f);
     }
 
     public void OtherScoreMsg(float missionReward)
@@ -384,7 +401,7 @@ public class BattleHUD : MonoBehaviour
             {
                 OtherPlusObject.transform.GetChild(0).GetComponent<UILabel>().text = missionReward.ToString();
             }
-            OtherPlusObject.GetComponent<Animator>().Play("ScorePlus");
+            OtherPlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus",-1,0f);
         }
 
         Debug.Log("Other MissionCompleted! + " + missionReward);
@@ -407,7 +424,7 @@ public class BattleHUD : MonoBehaviour
             MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗";
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission Failed!";
-        MissionObject.GetComponent<Animator>().Play("Completed");
+        MissionObject.GetComponent<Animator>().Play("Layer1.Completed",-1,0f);
         Debug.Log("Mission Failed!");
     }
 
@@ -420,18 +437,18 @@ public class BattleHUD : MonoBehaviour
             {
                 Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
                 Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Combo";
-                Combo.GetComponent<Animator>().Play("ComboFadeIn", 0, 0);
+                Combo.GetComponent<Animator>().Play("Layer1.ComboFadeIn", -1, 0f);
             }
             else
             {
                 Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
                 Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Break";
-                Combo.GetComponent<Animator>().Play("ComboFadeOut");
+                Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut",-1,0f);
             }
         }
         else
         {
-            Combo.GetComponent<Animator>().Play("ComboFadeOut");
+            Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut",-1,0f);
         }
     }
 
@@ -495,14 +512,14 @@ public class BattleHUD : MonoBehaviour
     {
         if (_dictItemReward.Count != 0)
         {
-          //  assetLoader.LoadAsset("miceicon/", "miceicon");
+            //  assetLoader.LoadAsset("miceicon/", "miceicon");
             // dictItemReward {"10001":{"ItemCount":"0"}}
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
                 if (assetLoader.GetAsset(Global.IconSuffix + itemName) == null)
                     assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
-                  //  assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
+                //  assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
             }
             return false;
         }

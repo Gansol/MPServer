@@ -49,6 +49,7 @@ public class MessageManager : GameSystem
     /// <param name="MessageBoxType">訊息視窗型態</param>
     void OnMessage(string message, string MessageBoxType, int prevMask)
     {
+        m_MPGame.GetAssetLoader().init();  
         try
         {
             _prevMask = prevMask;

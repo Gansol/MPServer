@@ -2436,7 +2436,7 @@ namespace MPServer
                                         // 固定值 隨機版本
                                         Random rnd = new Random();
                                         //missionMethod = Convert.ToInt16(rnd.Next(10001, 10005 + 1));
-                                        missionMethod = Convert.ToInt16(10001);
+                                       // missionMethod = Convert.ToInt16(10001);
                                         Log.Debug("----------DevTest-------------");
                                         Room.RoomActor roomActor = _server.room.GetActorFromGuid(peerGuid);
 
@@ -2858,6 +2858,7 @@ namespace MPServer
                             {
                                 try
                                 {
+                                    // Client DictData => ItemID ItemType CurrencyType ItemName
                                     // Log.Debug("IN BuyItem");
                                     string account = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.Account];
                                     string miceAll = (string)operationRequest.Parameters[(byte)PlayerDataParameterCode.MiceAll];
@@ -2870,19 +2871,20 @@ namespace MPServer
                                     Log.Debug(string.Format("itemName={0}   itemType={1}   currencyType={2}   buyCount={3}", itemID, itemType, currencyType, buyCount));
                                     StoreDataUI storeDataUI = new StoreDataUI(); //實體化 IO (連結資料庫拿資料)
                                     StoreData storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.LoadStoreData(itemID, itemType)); //memberData的資料 = 資料庫拿的資料 用account, passowrd 去找
-
+                                    //上面錯誤 沒抓到道具價格
                                     if (storeData.ReturnCode == "S901") // 更新玩家貨幣
                                     {
                                         CurrencyData currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.UpdateCurrency(account, currencyType, -(storeData.Price * buyCount)));
 
-                                        //Log.Debug("花費金錢:" + -(storeData.Price * buyCount));
-                                        //Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode + "Rice:" + currencyData.Rice);
+                                        Log.Debug("花費金錢:" + -(storeData.Price * buyCount));
+                                        Log.Debug("BuyItem currencyData OK :" + currencyData.ReturnCode+ " currencyData.ReturnMessage :" + currencyData.ReturnMessage + "  Rice:" + currencyData.Rice);
 
                                         if (currencyData.ReturnCode == "S703") // 更新商店資料
                                         {
                                             #region UpdateStoreBuyCount
                                             storeData = (StoreData)TextUtility.DeserializeFromStream(storeDataUI.UpdateStoreBuyCount(itemID, itemType, buyCount));
 
+                                            Log.Debug("---------------storeData.ReturnCode: " + storeData.ReturnCode + "  " + "Message:" + storeData.ReturnMessage);
                                             if (storeData.ReturnCode == "S902") // 更新玩家資料
                                             {
                                                 currencyData = (CurrencyData)TextUtility.DeserializeFromStream(currencyUI.LoadCurrency(account));
@@ -2894,7 +2896,7 @@ namespace MPServer
                                                 if (playerData.ReturnCode == "S422" || playerData.ReturnCode == "S423") //更新玩家道具資料成功 回傳玩家資料
                                                 {
                                                     playerData = (PlayerData)TextUtility.DeserializeFromStream(playerUI.LoadPlayerData(account));
-                                                    // Log.Debug("BuyItem playerData OK");
+                                                     Log.Debug("BuyItem playerData OK");
 
                                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> {
                                                                      { (byte)MiceParameterCode.Ret, storeData.ReturnCode }, { (byte)PlayerDataParameterCode.MiceAll, playerData.MiceAll } ,

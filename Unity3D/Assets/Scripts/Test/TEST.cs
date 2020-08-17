@@ -6,46 +6,69 @@ using System.IO;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Linq;
+using System;
+
 public class TEST : MonoBehaviour
 {
 
+
     private void Start()
     {
-        Dictionary<string, object> dictMyMice = new Dictionary<string, object>();
-        Dictionary<string, object> dictOtherMice = new Dictionary<string, object>();
-        Dictionary<string, object> mergeMice;
-
-
-        dictMyMice.Add("a", "a");
-        dictMyMice.Add("b", "b");
-        dictMyMice.Add("f", "f");
-
-        dictOtherMice.Add("a", "a");
-        dictOtherMice.Add("b", "b");
-        dictOtherMice.Add("d", "d");
-        dictOtherMice.Add("e", "e");
-
-        mergeMice = new Dictionary<string, object>(dictMyMice);
-
-        foreach (KeyValuePair<string, object> item in mergeMice)
-        {
-            if (dictOtherMice.ContainsKey(item.Key))
-                dictOtherMice.Remove(item.Key);
-        }
-
-        dictMyMice =  dictMyMice.Concat(dictOtherMice).ToDictionary(x => x.Key, x => x.Value); ;
-
-        foreach (KeyValuePair<string, object> item in dictMyMice)
-        {
-            Debug.Log(item.Key);
-        }
-        Debug.Log("---------------------------------");
-        foreach (KeyValuePair<string, object> item in dictOtherMice)
-        {
-            Debug.Log(item.Key);
-        }
-        Debug.Log("---------------------------------");
+        // 第一個字母大寫
+    Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
     }
+
+
+    //// add dymic scripts componment
+    //private void Start()
+    //{
+
+    //    Type t = Type.GetType("EggMiceBoss");
+    //    gameObject.AddComponent(t);
+    //    MiceBossBase c = gameObject.GetComponent(t) as MiceBossBase;
+    //    c.enabled = true;
+    //}
+
+
+
+    // marge two dict , have same key value , diff key value and expect same
+    //private void Start()
+    //{
+    //    Dictionary<string, object> dictMyMice = new Dictionary<string, object>();
+    //    Dictionary<string, object> dictOtherMice = new Dictionary<string, object>();
+    //    Dictionary<string, object> mergeMice;
+
+
+    //    dictMyMice.Add("a", "a");
+    //    dictMyMice.Add("b", "b");
+    //    dictMyMice.Add("f", "f");
+
+    //    dictOtherMice.Add("a", "a");
+    //    dictOtherMice.Add("b", "b");
+    //    dictOtherMice.Add("d", "d");
+    //    dictOtherMice.Add("e", "e");
+
+    //    mergeMice = new Dictionary<string, object>(dictMyMice);
+
+    //    foreach (KeyValuePair<string, object> item in mergeMice)
+    //    {
+    //        if (dictOtherMice.ContainsKey(item.Key))
+    //            dictOtherMice.Remove(item.Key);
+    //    }
+
+    //    dictMyMice =  dictMyMice.Concat(dictOtherMice).ToDictionary(x => x.Key, x => x.Value); ;
+
+    //    foreach (KeyValuePair<string, object> item in dictMyMice)
+    //    {
+    //        Debug.Log(item.Key);
+    //    }
+    //    Debug.Log("---------------------------------");
+    //    foreach (KeyValuePair<string, object> item in dictOtherMice)
+    //    {
+    //        Debug.Log(item.Key);
+    //    }
+    //    Debug.Log("---------------------------------");
+    //}
 
     //private void Start()
     //{

@@ -140,7 +140,6 @@ public class AssetBundlesDownloader : MonoBehaviour
 
             if (!File.Exists(clientFilePath) || bModify)  //如果檔案不存在資料夾 開始下載
             {
-                bModify = false;
                 Debug.Log("正在下載 " + clientFilePath);
                 Global.ReturnMessage = "開始下載資源... " + filePath;
                 //Debug.Log("Start Downloading... " + assets);
@@ -193,6 +192,7 @@ public class AssetBundlesDownloader : MonoBehaviour
                 ChkDownloadedCount();
             }
         }
+ 
     }
     #endregion
 

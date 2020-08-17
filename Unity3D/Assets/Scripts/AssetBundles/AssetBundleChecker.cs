@@ -57,7 +57,7 @@ public class AssetBundleChecker : MonoBehaviour
     {
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
-    ReCheckFlag:
+   ReCheckFlag:
         using (UnityWebRequest wwwVersionList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
             yield return wwwVersionList.SendWebRequest();
@@ -69,6 +69,7 @@ public class AssetBundleChecker : MonoBehaviour
                 Debug.Log("Download Vision List Error !   " + wwwVersionList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
                 yield return new WaitForSeconds(1.0f);
                 goto ReCheckFlag;
+                //StartCoroutine(DownloadBundleVersion(localPathFile, serverPathFile));
             }
             if (wwwVersionList.isDone && wwwVersionList.error == null)
             {
@@ -91,7 +92,7 @@ public class AssetBundleChecker : MonoBehaviour
     {
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
-    ReCheckFlag:
+   ReCheckFlag:
 
         using (UnityWebRequest wwwItemList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
@@ -102,8 +103,9 @@ public class AssetBundleChecker : MonoBehaviour
                 reConnTimes++;
                 Global.ReturnMessage = "無法下載檔案列表，嘗試重新下載(" + reConnTimes + "/" + Global.maxConnTimes + ")";
                 Debug.LogError("Download Item List Error !   " + wwwItemList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
-                yield return new WaitForSeconds(1.0f);
+                yield return new WaitForSeconds(.5f);
                 goto ReCheckFlag;
+                //StartCoroutine(CompareAssetBundle(localPathFile, serverPathFile));
             }
             if (wwwItemList.isDone && wwwItemList.error == null)
             {

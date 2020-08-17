@@ -19,7 +19,9 @@ public class MissionManager : MonoBehaviour
     #region variables
     BattleManager battleManager;
     BattleHUD battleHUD;
-    
+    public delegate void MissionHandler();
+    public event MissionHandler SpawnBossEvent;
+
     public MissionMode missionMode { get { return _missionMode; } }
     public Mission mission { get { return _mission; } }
 
@@ -239,15 +241,17 @@ public class MissionManager : MonoBehaviour
                 {
                     if (BattleManager.gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
                     {
-                        if (battleManager.missionCombo > _missionScore)
+                        if (battleManager.missionCombo >= _missionScore)   // success 20200817 改動過 修正顯示任務失敗錯誤
                         {
-                            _missionMode = MissionMode.Completed;
-                            battleHUD.MissionFailedMsg(mission,0);
+                            _missionMode = MissionMode.Completing;
+                            battleHUD.MissionCompletedMsg(mission, 0);
+                            Global.isMissionCompleted = true;
+
                         }
                         else
                         {
-                            _missionMode = MissionMode.Completing;
-                            Global.isMissionCompleted = true;
+                            _missionMode = MissionMode.Completed;           // failed
+                            battleHUD.MissionFailedMsg(mission, 0);
                         }
                     }
                     break;
@@ -271,8 +275,9 @@ public class MissionManager : MonoBehaviour
                     break;
                 }
             case Mission.WorldBoss: // 要計算網路延遲... ＊＊＊＊＊＊＊＊＊＊還沒寫＊＊＊＊＊＊＊＊＊＊＊＊＊
-                // 在 BossPorperty在邏輯判斷
-                break;
+                                    // 在 BossPorperty在邏輯判斷
+
+                    break;
         }
     }
 

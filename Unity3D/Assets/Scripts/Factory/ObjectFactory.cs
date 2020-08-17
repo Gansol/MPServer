@@ -142,12 +142,18 @@ public class ObjectFactory : FactoryBase
     }
     #endregion
 
-
-    public object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string miceID)
+    /// <summary>
+    /// 從特定ID取得欄位資料
+    /// </summary>
+    /// <param name="dictionary">字典資料</param>
+    /// <param name="columns">欄位</param>
+    /// <param name="objectID">ID</param>
+    /// <returns></returns>
+    public object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string objectID)
     {
         object value;
 
-        if (dictionary.TryGetValue(miceID, out value))
+        if (dictionary.TryGetValue(objectID, out value))
         {
             Dictionary<string, object> dictSkill = value as Dictionary<string, object>;
             if (dictSkill.TryGetValue(columns, out value))

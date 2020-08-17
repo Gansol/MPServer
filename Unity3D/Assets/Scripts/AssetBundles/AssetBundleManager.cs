@@ -220,9 +220,9 @@ public static class AssetBundleManager
     }
 
     /// <summary>
-    /// 取得已載入資產
+    /// 取得已載入資產 (Path + AssetName)
     /// </summary>
-    /// <param name="assetName"></param>
+    /// <param name="assetName">FileNamePath</param>
     /// <returns></returns>
     public static bool bLoadedAssetbundle(string assetName)
     {
@@ -235,6 +235,12 @@ public static class AssetBundleManager
         return false;
     }
 
+
+    /// <summary>
+    /// 使用物件名稱 取得 物件名稱路徑
+    /// </summary>
+    /// <param name="assetName">物件名稱(不含附檔名)</param>
+    /// <returns></returns>
     public static string GetAssetBundleNamePath(string assetName)
     {
         if (!string.IsNullOrEmpty(assetName))

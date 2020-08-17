@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 487002}
   - component: {fileID: 11487002}
   m_Layer: 0
-  m_Name: FireBowICON
+  m_Name: icon_firebow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -112,7 +112,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 187002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 43.8, y: 115.1, z: 0}
+  m_LocalPosition: {x: 43.8, y: 115, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 487000}
@@ -172,7 +172,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: FireBowICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -259,7 +259,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: FireBowICON
   mFixedAspect: 0
   mFillCenter: 1

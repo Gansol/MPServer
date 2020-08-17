@@ -30,6 +30,8 @@ public abstract class MPPanel : MonoBehaviour
     {
         m_MPGame = MPGame;
         assetLoader = m_MPGame.GetAssetLoader();
+        assetLoader.init();
+        Debug.Log("MPPanel init!");
     }
 
     #region -- LoadActor 載入老鼠角色 --

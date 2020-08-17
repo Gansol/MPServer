@@ -75,6 +75,8 @@ public class FriendManager : MPPanel
         // Asset載入完成時 實體化道具
         if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
+            Debug.Log("FUCK");
+
             _bLoadedIcon = !_bLoadedIcon;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
 

@@ -40,7 +40,7 @@ public class SpawnAI
         _battleManager = battleManager;
         poolManager = battleManager.GetComponent<PoolManager>();
         objFactory = MPGFactory.GetObjFactory();
-      //  objFactory.TestMethod();
+        //  objFactory.TestMethod();
         miceSize = 3.5f;
         _hole = hole;
         Global.photonService.LoadSceneEvent += OnLoadScene;
@@ -167,7 +167,7 @@ public class SpawnAI
         if (reSpawn)
             startPos = endPos;
 
-        for (int i = startPos; count < spawnCount; )
+        for (int i = startPos; count < spawnCount;)
         {
             try
             {
@@ -197,7 +197,7 @@ public class SpawnAI
         {
             try
             {
-               // objFactory.TestMethod();
+                // objFactory.TestMethod();
                 objFactory.InstantiateMice(poolManager, miceID, miceSize, _hole[holeArray[holePos]], impose);
             }
             catch (Exception e)
@@ -333,6 +333,7 @@ public class SpawnAI
     #region -- SpawnBoss --
     public void SpawnBoss(short miceID, float lerpSpeed, float lerpTime, float upSpeed, float upDistance)// 怪怪的 程式碼太長 錯誤
     {
+        Debug.Log("------------------- Mice Boss ID:  " + miceID + " ------------------------");
         try
         {
             // 如果Hole上有Mice 移除Mice
@@ -345,7 +346,7 @@ public class SpawnAI
 
             // 播放洞口動畫
             _hole[4].GetComponent<Animator>().enabled = true;
-            _hole[4].GetComponent<Animator>().Play("HoleScale");
+            _hole[4].GetComponent<Animator>().Play("Layer1.HoleScale",-1,0f);
 
             // 產生MicBoss 並移除Mice Component
 
@@ -360,7 +361,13 @@ public class SpawnAI
             clone.transform.parent = _hole[4].transform;
             clone.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
             clone.transform.localPosition = new Vector3(0, 0, 0);
-          //  UnityEngineInternal.APIUpdaterRuntimeServices.AddComponent(clone, "Assets\Scripts\AI\BattleAI\SpawnAI.cs (363,13)", miceAttr.name + "Boss");
+            //   clone.AddComponent(clone, miceAttr.name + "Boss"); //需要改寫 新增BOSS PREFEB 初始就附加上去
+            Debug.Log("--------------------miceAttr.name" + miceAttr.name);
+            string titleUpcase = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(miceAttr.name.Replace("mice", "").ToLower()); // 第一個字母大寫
+            Type t = Type.GetType(titleUpcase + "MiceBoss");
+            clone.AddComponent(t);
+            MiceBossBase bossBase = clone.GetComponent(t) as MiceBossBase;
+            bossBase.enabled = true;
 
             // 初始化 MiceBoss數值
 
@@ -368,14 +375,15 @@ public class SpawnAI
             SkillBase skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
             MiceAnimState animState = new MiceAnimState(clone, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
 
-            boss.SetAnimState(animState);
             boss.SetArribute(miceAttr);
             boss.SetSkill(skill);
+            boss.SetAnimState(animState);
             boss.Initialize(0.1f, 6f, 60f, miceAttr.LifeTime);  // 錯誤 可能非必要
-            clone.transform.gameObject.SetActive(true);
+            clone.SetActive(true);
 
-            Debug.Log(MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID));
+            Debug.Log("Skill : " + MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID));
 
+            Debug.Log("----------------------------------------- " + clone.activeSelf + "----------------------------------------- ");
             // 加入老鼠陣列
             Global.dictBattleMice.Add(clone.transform.parent, clone);
         }
@@ -414,7 +422,7 @@ public class SpawnAI
     private Coroutine IESpawn(SpawnStatus spawnStatus, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool bRndPos, bool isSkill, bool reSpawn)
     {
         //        Debug.Log("Spawn spawnCount:" + spawnCount);
-        UnityEngine.Random.seed = unchecked((int)System.DateTime.Now.Ticks);
+        UnityEngine.Random.InitState(unchecked((int)System.DateTime.Now.Ticks));
         //bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
 
         // Random
@@ -452,7 +460,7 @@ public class SpawnAI
         //            sbyte[] data = SpawnData.GetSpawnData(spawnStatus) as sbyte[];
         //            int rndPos = -1;
 
-//            if (bRndPos) rndPos = UnityEngine.Random.Range(0, data.Length);
+        //            if (bRndPos) rndPos = UnityEngine.Random.Range(0, data.Length);
         //            coroutine = SpawnBy1D(miceName, data, spawnTime, intervalTime, lerpTime, spawnCount, rndPos, isSkill, reSpawn);
         ////            coroutine = StartCoroutine(IESpawnByCustom(miceName, data, spawnTime, intervalTime, lerpTime, spawnCount, isSkill, reSpawn));
         //        }

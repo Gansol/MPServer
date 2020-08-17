@@ -54,7 +54,7 @@ public class FeverTime : SkillItem {
         ObjectFactory objFactory = new ObjectFactory();
 
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
-        effects[0].GetComponent<Animator>().Play("Green");
+        effects[0].GetComponent<Animator>().Play("Layer1.Green",-1,0f);
 
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.High);
         Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.High);
