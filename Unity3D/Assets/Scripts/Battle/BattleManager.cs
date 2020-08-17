@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
         spawnAI = new SpawnAI(this, hole);
         SetSpawnState(new EasyBattleAIState());
         playerAIState = new PlayerAIState(this);
-      //  MPGame.Instance.GetMessageManager().messagePanel = transform.Find("Message(Panel)");
+        //  MPGame.Instance.GetMessageManager().messagePanel = transform.Find("Message(Panel)");
 
         dictMiceUseCount = new Dictionary<string, Dictionary<string, object>>();
         dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
@@ -116,7 +116,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void initUseCount()
     {
-//        Debug.Log(Global.dictTeam.Count);
+        //        Debug.Log(Global.dictTeam.Count);
         List<string> keys = new List<string>(Global.dictTeam.Keys);
         Dictionary<string, object> data;
 
@@ -124,7 +124,7 @@ public class BattleManager : MonoBehaviour
         {
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-         //   Debug.Log(short.Parse(key).ToString());
+            //   Debug.Log(short.Parse(key).ToString());
             dictMiceUseCount.Add(key, data);
 
 
@@ -132,7 +132,7 @@ public class BattleManager : MonoBehaviour
             string _itemID = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", key));
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-         //   Debug.Log(short.Parse(_itemID).ToString());
+            //   Debug.Log(short.Parse(_itemID).ToString());
             dictItemUseCount.Add(_itemID, data);
         }
 
@@ -143,7 +143,7 @@ public class BattleManager : MonoBehaviour
         {
             data = new Dictionary<string, object>();
             data.Add("UseCount", 0);
-//            Debug.Log(short.Parse(key).ToString());
+            //            Debug.Log(short.Parse(key).ToString());
             dictItemUseCount.Add(key, data);
         }
     }
@@ -190,7 +190,7 @@ public class BattleManager : MonoBehaviour
         if (!Global.isGameStart)
             _lastTime = Time.time; // 沒作用
 
-//        Debug.Log("poolManager.mergeFlag: " + poolManager.mergeFlag + " poolManager.poolingFlag: " + poolManager.poolingFlag + " isSyncStart: " + isSyncStart + " poolManager.dataFlag: " + poolManager.dataFlag);
+        //        Debug.Log("poolManager.mergeFlag: " + poolManager.mergeFlag + " poolManager.poolingFlag: " + poolManager.poolingFlag + " isSyncStart: " + isSyncStart + " poolManager.dataFlag: " + poolManager.dataFlag);
         // 同步開始遊戲
         if (poolManager.mergeFlag && poolManager.poolingFlag && isSyncStart && poolManager.dataFlag)
         {
@@ -425,7 +425,7 @@ public class BattleManager : MonoBehaviour
 
             _otherEnergy = Math.Min(energy, 100);
             _otherEnergy = Math.Max(energy, 0);
-//            Debug.Log("OtherEnergy:" + _otherEnergy);
+            //            Debug.Log("OtherEnergy:" + _otherEnergy);
         }
     }
 
@@ -517,6 +517,7 @@ public class BattleManager : MonoBehaviour
 
                 case Mission.WorldBoss:
                     {
+                        // 如果要測試 可以把 value改成Boss的ID
                         spawnAI.SpawnBoss(value, 0.1f, 0.1f, 6, 60);    //missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
                         break;
                     }
@@ -615,7 +616,7 @@ public class BattleManager : MonoBehaviour
             value = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
             _otherLife += value;
         }
-        
+
     }
 
 
@@ -652,7 +653,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("OnApplySkill miceID:" + miceID);
 
         //   0.OnApplySkill需要改寫，接收數量、參數
-       spawnAI.SpawnByRandom(miceID, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
+        spawnAI.SpawnByRandom(miceID, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
     }
 
     void OnApplySkillItem(int itemID)     // 收到技能攻擊 
@@ -719,8 +720,8 @@ public class BattleManager : MonoBehaviour
     private void FindHole()
     {
         hole = new List<GameObject>();
-        for (int i = 1; i <= 12; i++ )
-            hole.Add(GameObject.Find("Hole"+i.ToString()).gameObject);
+        for (int i = 1; i <= 12; i++)
+            hole.Add(GameObject.Find("Hole" + i.ToString()).gameObject);
     }
 
     public SpawnAI GetSpawnAI()

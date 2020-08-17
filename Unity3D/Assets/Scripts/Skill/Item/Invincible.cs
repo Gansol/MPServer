@@ -50,7 +50,7 @@ public class Invincible : SkillItem {
         ObjectFactory objFactory = new ObjectFactory();
 
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform,"effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
-        effects[0].GetComponent<Animator>().Play("Yellow");
+        effects[0].GetComponent<Animator>().Play("Layer1.Yellow",-1,0f);
 
         BattleManager.SetInvincible(true);  // 錯誤
 

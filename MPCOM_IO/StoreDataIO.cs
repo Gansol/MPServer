@@ -88,7 +88,7 @@ namespace MPCOM
                     storeData.PromotionsCount = Convert.ToInt16(DS.Tables[0].Rows[0]["PromotionsCount"]);
                     storeData.BuyCount = Convert.ToInt16(DS.Tables[0].Rows[0]["BuyCount"]);
                     storeData.Price = Convert.ToInt16(DS.Tables[0].Rows[0]["Price"]);
-                    storeData.Price = Convert.ToInt16(DS.Tables[0].Rows[0]["CurrencyType"]);
+                    storeData.CurrencyType = Convert.ToByte(DS.Tables[0].Rows[0]["CurrencyType"]);
 
                     storeData.ReturnCode = "S901"; //true
                     storeData.ReturnMessage = "取得商店資料成功！";

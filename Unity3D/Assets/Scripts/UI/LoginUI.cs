@@ -429,53 +429,53 @@ public class LoginUI : MonoBehaviour
     }
 
     //20200527
-    //#region GoogleLogin
-    //public void GoogleLogin()
-    //{
+    #region GoogleLogin
+    public void GoogleLogin()
+    {
 
-    //    if (!isLoginBtn)
-    //    {
-    //        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
-    //        LoginPanel.SetActive(false);
-    //        Debug.Log("Google Logining...");
-    //        isLoginBtn = true;
-    //        if (!Social.localUser.authenticated)
-    //            PlayGamesPlatform.Activate();
-    //        Social.localUser.Authenticate((bool success) =>
-    //        {
-    //            if (success)
-    //            {
-    //                Debug.Log("You've successfully logged in" + Social.localUser.id);
-    //                if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
-
-
-    //                Global.MemberType = MemberType.Google;
-    //                Debug.Log(Global.Account);
+        if (!isLoginBtn)
+        {
+            Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
+            LoginPanel.SetActive(false);
+            Debug.Log("Google Logining...");
+            isLoginBtn = true;
+            if (!Social.localUser.authenticated)
+                PlayGamesPlatform.Activate();
+            Social.localUser.Authenticate((bool success) =>
+            {
+                if (success)
+                {
+                    Debug.Log("You've successfully logged in" + Social.localUser.id);
+                    if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
 
 
-    //                // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
-    //                Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
-    //                Global.Hash = Encrypt(Global.Account);
-    //                Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
+                    Global.MemberType = MemberType.Google;
+                    Debug.Log(Global.Account);
 
-    //                //string email = ((PlayGamesLocalUser)Social.localUser).Email;
-    //                bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
-    //                int age = (underage) ? 88 : 6;
 
-    //                //if (String.IsNullOrEmpty(email))
-    //                //    email = "example@example.com";
+                    // Debug.Log("Local user's email is " + ((PlayGamesLocalUser)Social.localUser).Email);
+                    Global.Account = ((PlayGamesLocalUser)Social.localUser).id;
+                    Global.Hash = Encrypt(Global.Account);
+                    Global.Nickname = ((PlayGamesLocalUser)Social.localUser).userName;
 
-    //                Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
-    //                Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
-    //            }
-    //            else
-    //            {
-    //                Debug.Log("Login failed for some reason");
-    //            }
-    //        });
-    //    }
-    //}
-    //#endregion
+                    string email = ((PlayGamesLocalUser)Social.localUser).Email;
+                    bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
+                    int age = (underage) ? 88 : 6;
+
+                    //if (String.IsNullOrEmpty(email))
+                    //    email = "example@example.com";
+
+                    Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
+                    Global.photonService.LoginGoogle(Global.Account, Global.Hash, Global.Nickname, age, "example@example.com", MemberType.Google); // 登入
+                }
+                else
+                {
+                    Debug.Log("Login failed for some reason");
+                }
+            });
+        }
+    }
+    #endregion
 
     //#region  FBLogin
     //public void FaceBookLogin()

@@ -2015,8 +2015,8 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
-  mSpriteName: Question
+  mAtlas: {fileID: 11400000, guid: 94126a363f64e864992c5c503cdb396f, type: 2}
+  mSpriteName: Setting
   mFixedAspect: 0
   mFillCenter: 1
 --- !u!65 &6570848
@@ -2353,7 +2353,7 @@ GameObject:
   - component: {fileID: 11413238}
   - component: {fileID: 11419484}
   - component: {fileID: 11419482}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Store(Panel)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8826,7 +8826,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 204
   mHeight: 70
-  mDepth: -1
+  mDepth: 100
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -8913,7 +8913,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 95
   mHeight: 69
-  mDepth: 3
+  mDepth: 103
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -9000,7 +9000,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 100
   mHeight: 59
-  mDepth: 2
+  mDepth: 3076
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -9101,7 +9101,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 205
   mHeight: 66
-  mDepth: 1
+  mDepth: 102
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -9194,7 +9194,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 204
   mHeight: 59
-  mDepth: 0
+  mDepth: 101
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -9289,7 +9289,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132276}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4999.999, y: 0, z: 0}
+  m_LocalPosition: {x: 5000, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 446390}
@@ -15647,7 +15647,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3008
+  startingRenderQueue: 3010
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -16084,7 +16084,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3007
+  startingRenderQueue: 3005
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -16451,7 +16451,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3006
+  startingRenderQueue: 3004
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -19642,7 +19642,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3017
+  startingRenderQueue: 3011
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -20774,7 +20774,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 558
   mHeight: 41
-  mDepth: 100
+  mDepth: 105
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -20810,7 +20810,7 @@ GameObject:
   - component: {fileID: 11467504}
   - component: {fileID: 11467506}
   - component: {fileID: 11428920}
-  m_Layer: 13
+  m_Layer: 9
   m_Name: Purchase(Panel)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25065,7 +25065,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 75
   mHeight: 75
-  mDepth: 9
+  mDepth: 101
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -25153,7 +25153,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 37
   mHeight: 39
-  mDepth: 10
+  mDepth: 100
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
@@ -27642,7 +27642,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3013
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0

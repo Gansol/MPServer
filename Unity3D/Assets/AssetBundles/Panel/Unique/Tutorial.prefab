@@ -1456,7 +1456,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11480640, guid: f78d57510feb8394786fb66cdf87d785, type: 3}
+  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
   mSpriteName: Info_Title
   mFixedAspect: 0
   mFillCenter: 1

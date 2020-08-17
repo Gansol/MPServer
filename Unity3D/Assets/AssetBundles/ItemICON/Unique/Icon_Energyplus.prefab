@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 431738}
   - component: {fileID: 11431738}
   m_Layer: 0
-  m_Name: EnergyPlusICON
+  m_Name: icon_energyplus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: EnergyPlusICON
   mFixedAspect: 0
   mFillCenter: 1

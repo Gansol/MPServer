@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1589725335
+CRC: 186768989
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3260c1ea2bf67a4a5bbc9eb3c17f7a2a
+    Hash: 25aee9709354a0eefe787fda1d10ecb3
   TypeTreeHash:
     serializedVersion: 2
-    Hash: aa9875a461cbbae85139ea5121e0c3b4
+    Hash: 82e247e064f34f010bb58c0438fc44d9
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -32,8 +32,6 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: eb53a74ab3dcf1a4cae7b65c8f197a61, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 1a3c1ecb0cfff2e4d9d70fbd9552f19a, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
@@ -47,5 +45,6 @@ Dependencies:
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/gashapon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comicfont.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/lihei
+  pro.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

@@ -48,19 +48,19 @@ public class PoolManager : MonoBehaviour
     public GameObject skillArea;
 
     [Tooltip("產生數量")]
-    [Range(3, 5)]
+    [Range(3, 12)]
     public int spawnCount = 5;
 
     [Tooltip("物件池上限(各種類分開)")]
-    [Range(3, 10)]
+    [Range(3, 12)]
     public int clearLimit = 5;
 
-    [Tooltip("物件池上限(各種類分開)")]
+    [Tooltip("清除間格時間")]
     [Range(10, 20)]
     public int clearTime = 15;
 
     [Tooltip("物件池保留量(各種類分開)")]
-    [Range(2, 5)]
+    [Range(2, 12)]
     public int reserveCount = 3;
 
     private bool _mergeFlag = false;          // 合併老鼠完成
@@ -107,7 +107,7 @@ public class PoolManager : MonoBehaviour
 
     void Start()
     {
-        
+
         LoadMiceAsset();
         LoadSpecialAsset();
         LoadItemAsset();
@@ -125,7 +125,7 @@ public class PoolManager : MonoBehaviour
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
                 assetLoader.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
 
-  
+
             //foreach (KeyValuePair<int, string> item in _dictMiceObject)
             //    assetLoader.LoadAsset(item.Value + "/", item.Value);
 
@@ -145,7 +145,7 @@ public class PoolManager : MonoBehaviour
             // 載入 特殊老鼠
             foreach (KeyValuePair<int, string> item in _dictSpecialObject)
                 assetLoader.LoadAssetFormManifest(Global.CreaturePath + item.Value + Global.ext);
-          // assetLoader.LoadAsset(item.Value + "/", item.Value);
+            // assetLoader.LoadAsset(item.Value + "/", item.Value);
 
             //foreach (KeyValuePair<int, string> item in _dictSpecialObject)
             //    assetLoader.LoadAsset(item.Value + "/", item.Value);
@@ -181,17 +181,17 @@ public class PoolManager : MonoBehaviour
         // 載入 特效資產
         try
         {
-          //  assetLoader.LoadAsset("Effects" + "/share/", "Effects");
+            //  assetLoader.LoadAsset("Effects" + "/share/", "Effects");
 
             foreach (KeyValuePair<int, string> item in _dictMiceObject)
             {
                 int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
                 string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-                Debug.Log("Item Name:  " + item.Value);
-                if(item.Key!=10001)
-                    assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + item.Value + Global.ext);
+                Debug.Log("Item Name:  " + itemName);
+                //if(item.Key!=10001)
+                assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + itemName + Global.ext);
 
-              //  assetLoader.LoadPrefab("Effects" + "/unique/", "effect_" + itemName);
+                //  assetLoader.LoadPrefab("Effects" + "/unique/", "effect_" + itemName);
             }
         }
         catch
@@ -262,10 +262,9 @@ public class PoolManager : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in objectData)
         {
-
-            GameObject bundle = assetLoader.GetAsset(item.Value.ToString());
-            if (bundle != null)
+            if (assetLoader.GetAsset(item.Value.ToString().ToLower()) != null)
             {
+                GameObject bundle = assetLoader.GetAsset(item.Value.ToString().ToLower());
                 Vector3 scale = Vector3.zero;
                 Transform parent = skillArea.transform.GetChild(i);
                 clone = new GameObject();
@@ -283,23 +282,32 @@ public class PoolManager : MonoBehaviour
                 //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<SkillBtn>().OnClick);
 
 
-                // instantiate Item btn
-                int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
-                string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", Global.IconSuffix + itemID.ToString()).ToString();
+                // instantiate SkillItem btn
+                int itemID = -1;
+                string itemName = "";
+
+                itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", item.Key.ToString()));
+                itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
 
 
-                if (assetLoader.GetAsset(itemName) != null)
+                if (!string.IsNullOrEmpty(itemName))
                 {
-                    bundle = assetLoader.GetAsset(itemName);
-                    clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
-                    clone.SetActive(false);
-                    //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
+                    if (assetLoader.GetAsset(Global.IconSuffix+itemName) != null)
+                    {
+                        bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
+                        clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
+                        clone.SetActive(false);
+                        //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
+                    }
+                    else
+                    {
+                        Debug.LogError("*****************Item Bundle is Null!***********************");
+                    }
                 }
                 else
                 {
-                    Debug.Log("*****************Item Bundle is Null!***********************");
+                    Debug.LogError("*****************Item Name is Null!***********************");
                 }
-
 
 
 
@@ -440,13 +448,14 @@ public class PoolManager : MonoBehaviour
 
     public void MergeMice()
     {
-        Dictionary<string, object> dictMyMice = new Dictionary<string, object>( Global.dictTeam);
+        Dictionary<string, object> dictMyMice = new Dictionary<string, object>(Global.dictTeam);
         Dictionary<string, object> dictOtherMice = new Dictionary<string, object>(Global.OpponentData.Team);
-        int miceID = -1 ;
+        int miceID = -1;
 
+        Debug.Log("dictMyMice.Count:" + dictMyMice.Count);
+        Debug.Log("dictOtherMice.Count:" + dictOtherMice.Count);
 
-
-        foreach (KeyValuePair<string,object> item in dictMyMice)
+        foreach (KeyValuePair<string, object> item in dictMyMice)
         {
             if (dictOtherMice.ContainsKey(item.Key))
                 dictOtherMice.Remove(item.Key);
@@ -456,14 +465,15 @@ public class PoolManager : MonoBehaviour
 
         foreach (KeyValuePair<string, object> item in dictMyMice)
         {
-            miceID = MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString());
+            //  Debug.Log("----------------Before Pooling Mice Name:" + item.Value + "----------------------");
+            miceID = MPGFactory.GetObjFactory().GetIDFromName(Global.miceProperty, "MiceID", item.Value.ToString().ToLower());
             if (!_dictMiceObject.ContainsKey(miceID) && miceID != -1)
             {
-                _dictMiceObject.Add(miceID, item.Value.ToString());
-                Debug.Log("Mice ID:" + miceID);
+                _dictMiceObject.Add(miceID, item.Value.ToString().ToLower());
+                Debug.Log("----------------Pooling Mice ID:" + miceID + "----------------------");
             }
         }
-        
+
         // 亂寫 FUCK
         if (!_dictMiceObject.ContainsKey(10001))
             _dictMiceObject.Add(10001, "eggmice");

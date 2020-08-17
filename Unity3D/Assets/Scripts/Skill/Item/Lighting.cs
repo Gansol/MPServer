@@ -64,7 +64,7 @@ public class Lighting : SkillItem
             if (rndHole[i] != null)
             {
                 effects.Add(objFactory.Instantiate(bundle, rndHole[i], "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
-                effects[i].GetComponent<Animator>().Play("Effect1");
+                effects[i].GetComponent<Animator>().Play("Layer1.Effect1", -1, 0f);
             }
         }
         m_StartTime = Time.time;

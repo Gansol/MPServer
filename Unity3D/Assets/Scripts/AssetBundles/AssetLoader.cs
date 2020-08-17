@@ -65,26 +65,30 @@ public class AssetLoader : MonoBehaviour
             //    if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             //}
             //else 
-            if (AssetBundleManager.LoadedObjectCount == _objCount) // BUG味道
+
+            if (AssetBundleManager.LoadedObjectCount == (_objCount - _loadedCount)) // BUG味道
+            {
+                Debug.Log("(2)AssetBundleManager.LoadedObjectCount == _loadedCount");
+                init();
+                bLoadedObj = true;
+                
+               // if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+            }
+            else if (AssetBundleManager.LoadedObjectCount == _objCount) // BUG味道
             {
                 Debug.Log("(1)AssetBundleManager.LoadedObjectCount == _objCount");
                 init();
                 bLoadedObj = true;
-                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
-            }
-            else if (AssetBundleManager.LoadedObjectCount == (_objCount - _loadedCount)) // BUG味道
-            {
-                Debug.Log("(2)AssetBundleManager.LoadedObjectCount == _loadedCount");
-                init();
-                bLoadedObj = true;
-                if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
+                
+              //  if (AssetBundleManager.IsLoadPrefab) AssetBundleManager.init();
             }
 
-            if(bPreLoad && _objCount ==0 && _loadedCount > 0)
+            if (bPreLoad && _objCount == 0 && _loadedCount > 0)
             {
                 Debug.Log("(2)AssetBundleManager.LoadedObjectCount == _loadedCount");
                 init();
                 bLoadedObj = true;
+               
             }
 
             //else

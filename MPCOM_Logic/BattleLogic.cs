@@ -553,7 +553,7 @@ namespace MPCOM
                         }
                     case Mission.WorldBoss: // BOSS
                         {
-                            // missionRate 是老鼠ID
+                            // missionScore 是老鼠ID 錯誤亂寫拉
                             battleData.missionScore = (Int16)NinjaMice.ID;
                             battleData.bossHP = (Int16)NinjaMice.hp;
                             battleData.ReturnCode = "S505";

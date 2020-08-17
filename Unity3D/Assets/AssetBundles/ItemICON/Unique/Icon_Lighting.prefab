@@ -83,7 +83,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -171,7 +171,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -259,7 +259,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -346,7 +346,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -360,7 +360,7 @@ GameObject:
   m_Component:
   - component: {fileID: 493356}
   m_Layer: 0
-  m_Name: LightingICON
+  m_Name: icon_lighting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -466,7 +466,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1
@@ -554,7 +554,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11475010, guid: d4d37f31a84e1914d942e59cf0be0869, type: 3}
+  mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
   mSpriteName: LightingICON
   mFixedAspect: 0
   mFillCenter: 1

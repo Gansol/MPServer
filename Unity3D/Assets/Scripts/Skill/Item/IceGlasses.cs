@@ -61,7 +61,7 @@ public class IceGlasses : SkillItem
         bundle.AddComponent<TapBorad>().SetTimes(attr);
         tap = bundle.GetComponent<TapBorad>();
         effects.Add(bundle);
-        effects[0].GetComponent<Animator>().Play("Effect1");
+        effects[0].GetComponent<Animator>().Play("Layer1.Effect1",-1,0f);
         EventMaskSwitch.Switch(bundle/*, false*/);
         m_StartTime = Time.time;
     }

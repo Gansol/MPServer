@@ -1,23 +1,17 @@
 ManifestFileVersion: 0
-CRC: 2347957816
+CRC: 57347456
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6d03a6f0e35032a0b93ca1b7b34142ed
+    Hash: ea92194effb07dc4e779cf4d1e4944a2
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 0e52ee4d65da00ae04c9d21db1b1ab3b
+    Hash: dad01587df1aa8449c5b0ccdbfd96950
 HashAppended: 0
 ClassTypes:
 - Class: 1
   Script: {instanceID: 0}
 - Class: 4
-  Script: {instanceID: 0}
-- Class: 21
-  Script: {instanceID: 0}
-- Class: 28
-  Script: {instanceID: 0}
-- Class: 48
   Script: {instanceID: 0}
 - Class: 50
   Script: {instanceID: 0}
@@ -36,10 +30,6 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
-  Script: {instanceID: 0}
-- Class: 198
-  Script: {instanceID: 0}
-- Class: 199
   Script: {instanceID: 0}
 Assets:
 - Assets/AssetBundles/effects/unique/effect_lighting.prefab

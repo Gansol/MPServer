@@ -293,6 +293,7 @@ public class PhotonService : IPhotonPeerListener
                 Mission mission = (Mission)eventResponse.Parameters[(byte)BattleParameterCode.Mission];
                 Int16 missionScore = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.MissionScore];
                 ApplyMissionEvent(mission, missionScore);
+                //ApplyMissionEvent(Mission.WorldBoss, missionScore); //測試用 
                 break;
 
             //取得對方任務分數
@@ -1136,6 +1137,7 @@ public class PhotonService : IPhotonPeerListener
                             Mission mission = (Mission)operationResponse.Parameters[(byte)BattleParameterCode.Mission];
                             Int16 missionScore = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.MissionScore];
                             ApplyMissionEvent(mission, missionScore);
+                           // ApplyMissionEvent(Mission.WorldBoss, missionScore); //test mission 
                         }
                     }
                     catch (Exception e)
@@ -1295,8 +1297,8 @@ public class PhotonService : IPhotonPeerListener
                             Global.Rice = (int)operationResponse.Parameters[(byte)CurrencyParameterCode.Rice];
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
                             List<string> itemList = (List<string>)TextUtility.DeserializeFromStream((byte[])operationResponse.Parameters[(byte)PlayerDataParameterCode.SortedItem]);
-                            Global.playerItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem]) as Dictionary<string, object>; ;
-                            Global.storeItem = Json.Deserialize((string)operationResponse.Parameters[(byte)StoreParameterCode.StoreData]) as Dictionary<string, object>; ;
+                            Global.playerItem = Json.Deserialize((string)operationResponse.Parameters[(byte)PlayerDataParameterCode.PlayerItem]) as Dictionary<string, object> ;
+                            Global.storeItem = Json.Deserialize((string)operationResponse.Parameters[(byte)StoreParameterCode.StoreData]) as Dictionary<string, object>; 
 
                             GetGashaponEvent(itemList);
                             UpdateCurrencyEvent();

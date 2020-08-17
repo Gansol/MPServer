@@ -112,7 +112,7 @@ public static class Global
     public static int maxConnTimes = 5;                         // 重新連限次數
     public static DateTime ServerTime = System.DateTime.Now;    // 伺服器時間
     public static int GameTime = 150;        // 遊戲時間
-    public static int WaitTime = 10;        // 配對等待時間
+    public static int WaitTime = 2;        // 配對等待時間
     public static int OnlineActor = 0;        // 配對等待時間
 
     public static string PlayerImage = "";  // 玩家圖片
