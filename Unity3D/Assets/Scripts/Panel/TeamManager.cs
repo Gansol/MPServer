@@ -120,7 +120,7 @@ public class TeamManager : MPPanel
         {
             _bLoadedActor = !_bLoadedActor;
             
-            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - Global.extIconLength);
+            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace("icon_","");
             InstantiateActor(bundleName, _actorParent.transform, actorScale);
         }
     }

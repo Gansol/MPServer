@@ -54,7 +54,7 @@ public class ObjectFactory : FactoryBase
             }
             return _clone;
         }
-        Debug.Log("  Instantiate bundle is null !!!! ");
+        Debug.Log("  Instantiate bundle is null !!!! "+ name);
         return null;
     }
     #endregion

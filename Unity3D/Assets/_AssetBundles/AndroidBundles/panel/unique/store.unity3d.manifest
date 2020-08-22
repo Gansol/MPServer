@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 186768989
+CRC: 598798674
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 25aee9709354a0eefe787fda1d10ecb3
+    Hash: 4a9d688ee62f6277511e85069c6fe470
   TypeTreeHash:
     serializedVersion: 2
     Hash: 82e247e064f34f010bb58c0438fc44d9
@@ -42,9 +42,8 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/panel/unique/Store.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/gashapon.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/atlas_gashapon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/lihei
-  pro.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

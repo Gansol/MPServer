@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3153719621
+CRC: 1742784731
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8155230831011f155da436c686873d2d
+    Hash: 75f3c7a9e2b1c028a0da66bee3bd64d7
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_much.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

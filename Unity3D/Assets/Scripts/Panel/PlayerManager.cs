@@ -206,7 +206,7 @@ public class PlayerManager : MPPanel
         // 如果 有未載入物件 載入AB
         if (dictNotLoadedAsset.Count != 0)
         {
-            
+
             //assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
 
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _InvItem + Global.ext);
@@ -217,11 +217,11 @@ public class PlayerManager : MPPanel
         }
         else
         {
-            
+
             m_MPGame.GetAssetLoader().bLoadedObj = _LoadedAsset = true;
         }
 
-       
+
 
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
             assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
@@ -234,7 +234,7 @@ public class PlayerManager : MPPanel
     /// </summary>
     private void LoadPlayerAvatorIcon()
     {
-        Debug.Log(Global.PlayerImage);
+        //Debug.Log(Global.PlayerImage);
         Transform imageParent = playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
         imageParent.GetComponent<UISprite>().spriteName = Global.PlayerImage;
         playerImage = imageParent.GetComponent<UISprite>();
@@ -285,7 +285,7 @@ public class PlayerManager : MPPanel
                         imageParent.parent.name = itemID.ToString();
                         imageParent.parent.tag = "Inventory";
                         GameObject _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
-                       // _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
+                        // _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
 
                         object value;
                         nestedData.TryGetValue("ItemType", out value);
@@ -344,7 +344,7 @@ public class PlayerManager : MPPanel
                 if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                 {
                     string bundleName = Global.IconSuffix + itemName;
-                  //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
+                    //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
 
                     // 已載入資產時
                     if (!string.IsNullOrEmpty(bundleName) && assetLoader.GetAsset(bundleName) != null)
@@ -454,7 +454,7 @@ public class PlayerManager : MPPanel
             Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
 
             int i = 0;
-         //  itemName = AssetBundleManager.GetAssetBundleNamePath(itemName);
+            //  itemName = AssetBundleManager.GetAssetBundleNamePath(itemName);
 
             foreach (KeyValuePair<string, object> item in itemData)
             {

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1408560863
+CRC: 2559733457
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e1151c7eb75c23f9cbf7e6df9cd45526
+    Hash: 35a933b4088c69d67d7c6da37321fc16
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_magicmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

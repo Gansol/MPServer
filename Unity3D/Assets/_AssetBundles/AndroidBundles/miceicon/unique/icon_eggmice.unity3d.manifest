@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3241806694
+CRC: 2663466604
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: af46d45dff199cc7581460fba341a8ec
+    Hash: 6680efb35133f4efc112bfa3bbfd91fe
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_eggmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

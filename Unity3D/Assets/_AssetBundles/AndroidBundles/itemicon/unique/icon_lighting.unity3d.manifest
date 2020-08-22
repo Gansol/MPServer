@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3495316881
+CRC: 781500450
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8e161ae88caa8f435b100942978cf3c8
+    Hash: 4cb754b8d70226ebc57c2b197e399179
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_lighting.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 3274699475
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4f20efa872c3dd66dc80c8686239d0b1
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: cd4081c94633e7c3c8d496dd039c2374
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/gashapon/unique/icon_gashapon2.prefab
+Dependencies:
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/atlas_gashapon.unity3d

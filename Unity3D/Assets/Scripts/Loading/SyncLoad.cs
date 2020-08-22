@@ -46,7 +46,7 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-            assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ "menuui"+Global.ext);
+            assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ Global.Scene.MainGameAsset + Global.ext);
             bLoadAsset = true;
         }
 
@@ -77,7 +77,7 @@ public class SyncLoad : MonoBehaviour
         if (Global.dictLoadedScene.ContainsKey(sceneName))
             Global.dictLoadedScene.TryGetValue(sceneName, out _clone);
 
-        if (AssetBundleManager.bLoadedAssetbundle(Global.PanelUniquePath+ sceneName +Global.ext) && _clone == null)
+        if (AssetBundleManager.GetLoadedAssetbundle(Global.PanelUniquePath+ sceneName +Global.ext) && _clone == null)
         {
            // string assetName = Global.PanelUniquePath + sceneName + Global.ext;
             string assetName =  sceneName;
@@ -97,7 +97,7 @@ public class SyncLoad : MonoBehaviour
 
 
 
-        if (SceneManager.GetActiveScene().name != "BundleCheck")
+        if (SceneManager.GetActiveScene().name != Global.Scene.BundleCheck)
         {
             _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
             _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3522273036
+CRC: 2821861684
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b9b988b1771a30ca33f0655f723336f4
+    Hash: d441a5fc48ea7026aca645c9ec5c5b94
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_iceglasses.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

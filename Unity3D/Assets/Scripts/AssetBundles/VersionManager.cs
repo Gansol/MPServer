@@ -127,14 +127,16 @@ public class VersionManager : MonoBehaviour
 
         if (Global.isCompleted && bTwiceChk && !bCompleted)
         {
-            
            bCompleted = true;
+
             if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
             {
-                if (Global.connStatus) 
+                if (Global.connStatus)
+                {
                     StartCoroutine(visionChecker.ReplaceVisionList());
-                syncLoad = gameObject.AddComponent<SyncLoad>();
-                syncLoad.OnLoadScene();
+                    syncLoad = gameObject.AddComponent<SyncLoad>();
+                    syncLoad.OnLoadScene();
+                }
             }
             else if (!flag)
             {

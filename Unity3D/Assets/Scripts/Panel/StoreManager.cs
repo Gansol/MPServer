@@ -88,7 +88,7 @@ public class StoreManager : MPPanel
         { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" },
         { StoreParameterCode.ItemType.ToString(), "" }, { StoreParameterCode.CurrencyType.ToString(), "" }, { StoreParameterCode.BuyCount.ToString(), "" } };
 
-        _itemType = (int)StoreType.Gashapon;
+        _itemType = (int)StoreType.Mice;
         tablePageCount = 9;
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
@@ -112,11 +112,11 @@ public class StoreManager : MPPanel
 
 
         //// ins fisrt load panelScene : Gashapon
-        if (m_MPGame.GetAssetLoader().bLoadedObj && !_bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
-        {
-            Debug.Log("Gashapon!!!!!");
-            InstantiateGashapon(infoGroupsArea[(int)ENUM_Area.Tab].transform);
-        }
+        //if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedGashapon)                 // 載入轉蛋完成後 實體化 轉蛋
+        //{
+        //    Debug.Log("Gashapon!!!!!");
+        //    InstantiateGashapon(infoGroupsArea[(int)ENUM_Area.Gashapon].transform);
+        //}
 
         // 載入Panel完成後 
         if (_bLoadedStoreData && _bLoadedPlayerItem && _bLoadedItemData && _bLoadedCurrency && !_bLoadedPanel)
@@ -137,7 +137,10 @@ public class StoreManager : MPPanel
             _bLoadedAsset = !_bLoadedAsset;
             InstantiateStoreItem();
             LoadPrice(_itemData, _itemType);
+            switchInStorePanel(infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString()).gameObject);
             ResumeToggleTarget();
+            // switchTab(infoGroupsArea[(int)ENUM_Area.Tab].transform.GetChild(0).gameObject);
+            // assetLoader.init();
         }
 
         // 載入角色完成後 實體化 角色
@@ -184,7 +187,7 @@ public class StoreManager : MPPanel
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
 
-        LoadGashaponAsset();
+        // LoadGashaponAsset(); //暫時關閉 Gashapon功能
         Global.photonService.LoadStoreData();
         Global.photonService.LoadItemData();
         Global.photonService.LoadCurrency(Global.Account);
@@ -231,7 +234,7 @@ public class StoreManager : MPPanel
     #region -- LoadPlayerInfo 載入玩家資訊 --
     private void LoadPlayerInfo()
     {
-        Debug.Log("Rice: "+ Global.Rice.ToString());
+        Debug.Log("Rice: " + Global.Rice.ToString());
         Debug.Log("Gold: " + Global.Gold.ToString());
         infoGroupsArea[(int)ENUM_Area.PlayerInfo].transform.GetChild(0).GetComponent<UILabel>().text = Global.Rank.ToString();
         infoGroupsArea[(int)ENUM_Area.PlayerInfo].transform.GetChild(1).GetComponent<UILabel>().text = Global.Rice.ToString();
@@ -297,7 +300,7 @@ public class StoreManager : MPPanel
         object value;
 
         // 關閉上個Panel 顯示Panel 
-        switchTab(itemInfoBox.Find(StoreType.Item.ToString()).gameObject);
+        // switchInStorePanel(itemInfoBox.Find(StoreType.Item.ToString()).gameObject);
 
         //itemInfoBox.Find(StoreType.Item.ToString()).gameObject.SetActive(false);
         //itemInfoBox.Find(StoreType.Mice.ToString()).gameObject.SetActive(true);
@@ -331,7 +334,7 @@ public class StoreManager : MPPanel
         object value;
 
         // 關閉上個Panel 顯示Panel 
-        switchTab(itemInfoBox.Find(StoreType.Item.ToString()).gameObject);
+        //switchInStorePanel(itemInfoBox.Find(StoreType.Item.ToString()).gameObject);
         //itemInfoBox.Find(StoreType.Item.ToString()).gameObject.SetActive(true);
         //itemInfoBox.Find(StoreType.Mice.ToString()).gameObject.SetActive(false);
 
@@ -392,7 +395,7 @@ public class StoreManager : MPPanel
         buyingGoodsData[StoreProperty.ItemType.ToString()] = value.ToString();
 
         dictItemProperty.TryGetValue(StoreProperty.CurrencyType.ToString(), out value);
-        buyingGoodsData[StoreProperty.CurrencyType.ToString()] = value.ToString();  Debug.Log(value.ToString());
+        buyingGoodsData[StoreProperty.CurrencyType.ToString()] = value.ToString(); Debug.Log(value.ToString());
 
         dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
         buyingGoodsData[StoreProperty.ItemName.ToString()] = value.ToString();
@@ -462,8 +465,13 @@ public class StoreManager : MPPanel
     public void OnTabClick(GameObject obj)
     {
         _itemType = (obj == null) ? (int)StoreType.Mice : int.Parse(obj.name.Remove(0, 3));
+        Debug.Log("obj.name " + obj.name);
+        Debug.Log("_itemType " + _itemType);
+        Debug.Log("infoGroupsArea[(int)ENUM_Area.ItemPanel] " + infoGroupsArea[(int)ENUM_Area.ItemPanel].name);
+
+
         GetMustLoadAsset();
-        switchTab(infoGroupsArea[(int)ENUM_Area.ItemPanel]);
+        //assetLoader.init();
     }
     #endregion
 
@@ -577,6 +585,8 @@ public class StoreManager : MPPanel
             }
             i++;
         }
+
+        //switchInStorePanel(infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString()).gameObject);
         _bLoadedAsset = false;
     }
     #endregion
@@ -597,7 +607,7 @@ public class StoreManager : MPPanel
                 _itemData = Global.storeItem;
                 break;
             case StoreType.Gashapon:
-                _itemData = Global.gashaponItem;
+                _itemData = Global.storeItem;
                 break;
         }
 
@@ -621,7 +631,7 @@ public class StoreManager : MPPanel
         for (int i = 1; i <= 3; i++)
             assetLoader.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
         //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
-        _bLoadedGashapon = false; // 來用暫時停掉方便測試  並需要配合修改起始TAB頁面 
+        _bLoadedGashapon = true; // 來用暫時停掉方便測試  並需要配合修改起始TAB頁面 
     }
     #endregion
 
@@ -633,7 +643,7 @@ public class StoreManager : MPPanel
     /// <param name="folder">資料夾名稱</param>
     private void InstantiateGashapon(Transform myParent)
     {
-        _bLoadedGashapon = true;
+        // _bLoadedGashapon = true;
 
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
 
@@ -663,9 +673,13 @@ public class StoreManager : MPPanel
             if (assetLoader.GetAsset(gashaponNameList[i]) != null)                  // 已載入資產時
             {
                 GameObject bundle = assetLoader.GetAsset(gashaponNameList[i]);
-                Transform parent = infoGroupsArea[(int)ENUM_Area.Gashapon].transform.Find("Promotions");
-                bundle = MPGFactory.GetObjFactory().Instantiate(bundle, parent.GetChild(i), gashaponNameList[i], new Vector3(75, 100), Vector3.one, new Vector2(180, 180), -1);
-                parent.GetChild(i).name = gashaponNameList[i];
+                Transform parent = myParent.Find("Promotions").GetChild(i);
+
+                Debug.Log("parent name: " + parent.name);
+                Debug.Log("parent.Find()" + parent.Find("Imgae").name);
+                Debug.Log("gashaponNameList[i] " + gashaponNameList[i]);
+                parent.Find("Imgae").GetComponent<UISprite>().name = gashaponNameList[i];
+                parent.name = gashaponNameList[i];
             }
             else
             {
@@ -673,8 +687,8 @@ public class StoreManager : MPPanel
             }
             i++;
         }
-
-        switchTab(infoGroupsArea[(int)ENUM_Area.Gashapon]);
+        _bLoadedGashapon = false;
+        //  switchInStorePanel(infoGroupsArea[(int)ENUM_Area.Gashapon]);
     }
     #endregion
 
@@ -707,7 +721,7 @@ public class StoreManager : MPPanel
         // 暫存 將購買的商品資訊
         dictItemProperty.TryGetValue(StoreProperty.ItemID.ToString(), out value);
         buyingGoodsData[StoreProperty.ItemID.ToString()] = value.ToString();
-        
+
         dictItemProperty.TryGetValue(StoreProperty.ItemType.ToString(), out value);
         buyingGoodsData[StoreProperty.ItemType.ToString()] = value.ToString();
 
@@ -785,9 +799,9 @@ public class StoreManager : MPPanel
     /// 關閉前一個Panel 並儲存目前Panel等待下次關閉
     /// </summary>
     /// <param name="tab"></param>
-    private void switchTab(GameObject tab)
+    private void switchInStorePanel(GameObject tab)
     {
-        if (_lastPanel != null)
+        if (_lastPanel != null && _lastPanel != tab)
             _lastPanel.SetActive(false);
 
         _lastPanel = tab;

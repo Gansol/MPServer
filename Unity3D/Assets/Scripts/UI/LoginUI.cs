@@ -12,6 +12,7 @@ using Gansol;
 using System.Data;
 using System.Text;
 using GooglePlayGames.BasicApi;
+using UnityEngine.Networking;
 
 public class LoginUI : MonoBehaviour
 {
@@ -294,7 +295,7 @@ public class LoginUI : MonoBehaviour
             {
                 data.Add("Account", Global.Account);
             }
-            else if (data["Account"] != Global.Account)
+            else if (data["Account"].ToString() != Global.Account)
             {
                 data["Account"] = Global.Account;
                 bChange = true;
@@ -307,7 +308,7 @@ public class LoginUI : MonoBehaviour
             {
                 data.Add("Hash", Global.Hash);
             }
-            else if (data["Hash"] != Global.Hash)
+            else if (data["Hash"].ToString() != Global.Hash)
             {
                 data["Hash"] = Global.Hash;
                 bChange = true;
@@ -329,9 +330,23 @@ public class LoginUI : MonoBehaviour
 
     IEnumerator LoadFile(string filePath)
     {
-        WWW www = new WWW(filePath);
-        yield return www;
-        jString = www.text;
+        using (UnityWebRequest www = UnityWebRequest.Get(filePath))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                throw new Exception(www.error);
+            }
+            else if (www.isDone)
+            { 
+                jString = www.downloadHandler.text; // 儲存 下載好的檔案版本
+            }
+            www.Dispose();
+        }
+        //    WWW www = new WWW(filePath);
+        //yield return www;
+        //jString = www.text;
     }
 
     private Dictionary<string, object> GetSkillData(DataTable dt)

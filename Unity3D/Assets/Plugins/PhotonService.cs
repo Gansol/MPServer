@@ -2517,7 +2517,7 @@ public class PhotonService : IPhotonPeerListener
 
     private void FriendsChk(string friendString)
     {
-        Debug.Log(friendString);
+        //Debug.Log(friendString);
         string friends = (!string.IsNullOrEmpty(friendString)) ? friendString : "";
 
         Global.dictFriends.Clear();

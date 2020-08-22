@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 766935598
+CRC: 3015902349
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -75,307 +75,310 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: effects/share/effects.unity3d
     Info_19:
-      Name: gashapon/share/gashapon.unity3d
+      Name: gashapon/share/atlas_gashapon.unity3d
       Dependencies: {}
     Info_20:
-      Name: gashapon/unique/gashapon1.unity3d
-      Dependencies:
-        Dependency_0: gashapon/share/gashapon.unity3d
-    Info_21:
-      Name: gashapon/unique/gashapon2.unity3d
-      Dependencies:
-        Dependency_0: gashapon/share/gashapon.unity3d
-    Info_22:
-      Name: gashapon/unique/gashapon3.unity3d
-      Dependencies:
-        Dependency_0: gashapon/share/gashapon.unity3d
-    Info_23:
-      Name: itemicon/share/itemicon.unity3d
+      Name: gashapon/share/gashapon.unity3d
       Dependencies: {}
+    Info_21:
+      Name: gashapon/unique/icon_gashapon1.unity3d
+      Dependencies:
+        Dependency_0: gashapon/share/atlas_gashapon.unity3d
+    Info_22:
+      Name: gashapon/unique/icon_gashapon2.unity3d
+      Dependencies:
+        Dependency_0: gashapon/share/atlas_gashapon.unity3d
+    Info_23:
+      Name: gashapon/unique/icon_gashapon3.unity3d
+      Dependencies:
+        Dependency_0: gashapon/share/atlas_gashapon.unity3d
     Info_24:
+      Name: itemicon/share/atlas_itemicon.unity3d
+      Dependencies: {}
+    Info_25:
       Name: itemicon/unique/icon_energyplus.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_25:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_26:
       Name: itemicon/unique/icon_firebow.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_26:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_27:
       Name: itemicon/unique/icon_goldhammer.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_27:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_28:
       Name: itemicon/unique/icon_iceglasses.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_28:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_29:
       Name: itemicon/unique/icon_invincible.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_29:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_30:
       Name: itemicon/unique/icon_iornhammer.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_30:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_31:
       Name: itemicon/unique/icon_lighting.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_31:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_32:
       Name: itemicon/unique/icon_rattrap.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_32:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_33:
       Name: itemicon/unique/icon_reflection.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_33:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_34:
       Name: itemicon/unique/icon_scoreplus.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_34:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_35:
       Name: itemicon/unique/icon_snow.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_35:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_36:
       Name: itemicon/unique/icon_taco.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_36:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_37:
       Name: itemicon/unique/icon_woodhammer.unity3d
       Dependencies:
-        Dependency_0: itemicon/share/itemicon.unity3d
-    Info_37:
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+    Info_38:
       Name: mice/blackmice/share/atlas_blackmice.unity3d
       Dependencies: {}
-    Info_38:
+    Info_39:
       Name: mice/blackmice/unique/blackmice.unity3d
       Dependencies:
         Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
-    Info_39:
+    Info_40:
       Name: mice/candymice/share/atlas_candymice.unity3d
       Dependencies: {}
-    Info_40:
+    Info_41:
       Name: mice/candymice/unique/candymice.unity3d
       Dependencies:
         Dependency_0: mice/candymice/share/atlas_candymice.unity3d
-    Info_41:
+    Info_42:
       Name: mice/eggmice/share/atlas_eggmice.unity3d
       Dependencies: {}
-    Info_42:
+    Info_43:
       Name: mice/eggmice/unique/eggmice.unity3d
       Dependencies:
         Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
-    Info_43:
+    Info_44:
       Name: mice/engineermice/share/atlas_engineermice.unity3d
       Dependencies: {}
-    Info_44:
+    Info_45:
       Name: mice/engineermice/unique/engineermice.unity3d
       Dependencies:
         Dependency_0: mice/engineermice/share/atlas_engineermice.unity3d
-    Info_45:
+    Info_46:
       Name: mice/magicmice/share/atlas_magicmice.unity3d
       Dependencies: {}
-    Info_46:
+    Info_47:
       Name: mice/magicmice/unique/magicmice.unity3d
       Dependencies:
         Dependency_0: mice/magicmice/share/atlas_magicmice.unity3d
-    Info_47:
+    Info_48:
       Name: mice/ninjamice/share/atlas_ninjamice.unity3d
       Dependencies: {}
-    Info_48:
+    Info_49:
       Name: mice/ninjamice/unique/ninjamice.unity3d
       Dependencies:
         Dependency_0: mice/ninjamice/share/atlas_ninjamice.unity3d
-    Info_49:
+    Info_50:
       Name: mice/rabbitmice/share/atlas_rabbitmice.unity3d
       Dependencies: {}
-    Info_50:
+    Info_51:
       Name: mice/rabbitmice/unique/rabbitmice.unity3d
       Dependencies:
         Dependency_0: mice/rabbitmice/share/atlas_rabbitmice.unity3d
-    Info_51:
+    Info_52:
       Name: mice/thiefmice/share/atlas_thiefmice.unity3d
       Dependencies: {}
-    Info_52:
+    Info_53:
       Name: mice/thiefmice/unique/thiefmice.unity3d
       Dependencies:
         Dependency_0: mice/thiefmice/share/atlas_thiefmice.unity3d
-    Info_53:
-      Name: miceicon/share/miceicon.unity3d
-      Dependencies: {}
     Info_54:
+      Name: miceicon/share/atlas_miceicon.unity3d
+      Dependencies: {}
+    Info_55:
       Name: miceicon/unique/icon_bali.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_55:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_56:
       Name: miceicon/unique/icon_blackmice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_56:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_57:
       Name: miceicon/unique/icon_candymice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_57:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_58:
       Name: miceicon/unique/icon_eggmice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_58:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_59:
       Name: miceicon/unique/icon_engineermice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_59:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_60:
       Name: miceicon/unique/icon_heromice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_60:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_61:
       Name: miceicon/unique/icon_magicmice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_61:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_62:
       Name: miceicon/unique/icon_much.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_62:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_63:
       Name: miceicon/unique/icon_ninjamice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_63:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_64:
       Name: miceicon/unique/icon_rabbitmice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_64:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_65:
       Name: miceicon/unique/icon_thiefmice.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
-    Info_65:
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
+    Info_66:
       Name: panel/share/battlehud.unity3d
       Dependencies: {}
-    Info_66:
+    Info_67:
       Name: panel/share/comic.unity3d
       Dependencies: {}
-    Info_67:
+    Info_68:
       Name: panel/share/comicfont.unity3d
       Dependencies: {}
-    Info_68:
+    Info_69:
       Name: panel/share/comicfontoutline.unity3d
       Dependencies: {}
-    Info_69:
+    Info_70:
       Name: panel/share/gamescene.unity3d
       Dependencies: {}
-    Info_70:
-      Name: panel/share/lihei pro.unity3d
-      Dependencies: {}
     Info_71:
-      Name: panel/share/liheiprofont.unity3d
+      Name: panel/share/liheipro.unity3d
       Dependencies: {}
     Info_72:
-      Name: panel/share/mainback.unity3d
+      Name: panel/share/liheiprofont.unity3d
       Dependencies: {}
     Info_73:
-      Name: panel/share/mainfront.unity3d
+      Name: panel/share/mainback.unity3d
       Dependencies: {}
     Info_74:
-      Name: panel/share/panelui.unity3d
+      Name: panel/share/mainfront.unity3d
       Dependencies: {}
     Info_75:
-      Name: panel/share/shareobject.unity3d
+      Name: panel/share/panelui.unity3d
       Dependencies: {}
     Info_76:
+      Name: panel/share/shareobject.unity3d
+      Dependencies: {}
+    Info_77:
       Name: panel/unique/friend.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_77:
+    Info_78:
       Name: panel/unique/frienditem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_78:
+    Info_79:
       Name: panel/unique/gameui.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
         Dependency_1: panel/share/battlehud.unity3d
         Dependency_2: panel/share/comic.unity3d
         Dependency_3: panel/share/comicfontoutline.unity3d
         Dependency_4: panel/share/gamescene.unity3d
-        Dependency_5: panel/share/lihei pro.unity3d
+        Dependency_5: panel/share/liheipro.unity3d
         Dependency_6: panel/share/panelui.unity3d
         Dependency_7: panel/share/shareobject.unity3d
-    Info_79:
+    Info_80:
       Name: panel/unique/invitem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_80:
+    Info_81:
       Name: panel/unique/item.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_81:
+    Info_82:
       Name: panel/unique/match.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_82:
+    Info_83:
       Name: panel/unique/menuui.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
-        Dependency_1: panel/share/lihei pro.unity3d
+        Dependency_1: panel/share/liheipro.unity3d
         Dependency_2: panel/share/mainback.unity3d
         Dependency_3: panel/share/mainfront.unity3d
         Dependency_4: panel/share/panelui.unity3d
         Dependency_5: panel/share/shareobject.unity3d
-    Info_83:
+    Info_84:
       Name: panel/unique/player.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/miceicon.unity3d
+        Dependency_0: miceicon/share/atlas_miceicon.unity3d
         Dependency_1: panel/share/comic.unity3d
         Dependency_2: panel/share/panelui.unity3d
-    Info_84:
+    Info_85:
       Name: panel/unique/purchase.unity3d
       Dependencies:
         Dependency_0: panel/share/panelui.unity3d
-    Info_85:
+    Info_86:
       Name: panel/unique/purchaseitem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_86:
+    Info_87:
       Name: panel/unique/store.unity3d
       Dependencies:
-        Dependency_0: gashapon/share/gashapon.unity3d
-        Dependency_1: itemicon/share/itemicon.unity3d
+        Dependency_0: gashapon/share/atlas_gashapon.unity3d
+        Dependency_1: itemicon/share/atlas_itemicon.unity3d
         Dependency_2: panel/share/comic.unity3d
-        Dependency_3: panel/share/lihei pro.unity3d
+        Dependency_3: panel/share/liheipro.unity3d
         Dependency_4: panel/share/panelui.unity3d
-    Info_87:
+    Info_88:
       Name: panel/unique/team.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
-        Dependency_1: panel/share/lihei pro.unity3d
+        Dependency_1: panel/share/liheipro.unity3d
         Dependency_2: panel/share/panelui.unity3d
-    Info_88:
+    Info_89:
       Name: panel/unique/tutorial.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_89:
+    Info_90:
       Name: skill/blackmice.unity3d
       Dependencies:
         Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
-    Info_90:
+    Info_91:
       Name: skill/candymice.unity3d
       Dependencies:
         Dependency_0: mice/candymice/share/atlas_candymice.unity3d
-    Info_91:
+    Info_92:
       Name: skill/eggmice.unity3d
       Dependencies:
         Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
-    Info_92:
+    Info_93:
       Name: skill/ninjamice.unity3d
       Dependencies:
         Dependency_0: mice/ninjamice/share/atlas_ninjamice.unity3d
-    Info_93:
+    Info_94:
       Name: skill/rabbitmice.unity3d
       Dependencies:
         Dependency_0: mice/rabbitmice/share/atlas_rabbitmice.unity3d

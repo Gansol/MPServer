@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2190491117
+CRC: 3878322753
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9d98e63a83de418946b209d899c7a45e
+    Hash: 5dfd1d5105f667d01d19c24c7dd9518f
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_woodhammer.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

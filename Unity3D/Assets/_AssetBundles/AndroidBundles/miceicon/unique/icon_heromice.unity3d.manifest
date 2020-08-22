@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3427954981
+CRC: 3462609710
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 42be1845c00daa9c298c176ecde6bc3b
+    Hash: 044b4d1e6a77b6503f815f2413fe78d9
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_heromice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

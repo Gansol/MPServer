@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1059299584
+CRC: 350214184
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b0410d32ea3c1f588dc9aff0930e03be
+    Hash: 2da58322cd345fab566b0c30988ba2d7
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_bali.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

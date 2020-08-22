@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1889705406
+CRC: 1975569577
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e1c3dedfa4eb9459d7e3715d26c32476
+    Hash: cccc0defb1996e822240c0d9de7c6792
   TypeTreeHash:
     serializedVersion: 2
     Hash: 364e5bfcd0c635ab76a3421c998aa520
@@ -55,6 +55,5 @@ Assets:
 - Assets/AssetBundles/panel/unique/Team.prefab
 Dependencies:
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/lihei
-  pro.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
