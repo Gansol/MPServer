@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1109779759
+CRC: 527191889
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 93dd5a12e46b16891f5927dac931f950
+    Hash: 852f6965efd76064d986cf15acd8d854
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_iornhammer.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

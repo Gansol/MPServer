@@ -46,7 +46,7 @@ public abstract class MPPanel : MonoBehaviour
     {
         GameObject _miceImage;
         UISprite sprite = btn_click.transform.GetComponentInChildren<UISprite>();
-        string assetName = sprite.spriteName.Remove(sprite.spriteName.Length - Global.extIconLength);
+        string assetName = sprite.spriteName.Replace(Global.IconSuffix,""); // 移除icon_前綴詞
         //        Debug.Log(_dictActor.Count);
         //if (tmpActor != null) tmpActor.SetActive(false);          // 如果暫存老鼠圖片不是空的(防止第一次點擊出錯)，將上一個老鼠圖片隱藏
 
@@ -213,6 +213,7 @@ public abstract class MPPanel : MonoBehaviour
             {
                 if (!string.IsNullOrEmpty(item.Value.ToString()))
                     assetLoader.LoadAssetFormManifest(folder + Global.IconSuffix + item.Value + Global.ext);
+                Debug.Log("LoadIconObjects: "+item.Value);
                 //assetLoader.LoadPrefab(folder + "/", Global.IconSuffix + item.Value.ToString() );
             }
             return true;
@@ -298,7 +299,7 @@ public abstract class MPPanel : MonoBehaviour
         GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
         EventMaskSwitch.Switch(gameObject);
         EventMaskSwitch.lastPanel = gameObject;
-        assetLoader.init();
+     //   assetLoader.init();  // 錯誤 有可以會導致部分載入還沒完成就重製
     }
 
     public void SetLoadedActor(GameObject actor)

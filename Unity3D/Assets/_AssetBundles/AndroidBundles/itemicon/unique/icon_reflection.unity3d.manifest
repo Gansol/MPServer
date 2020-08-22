@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3269588276
+CRC: 2542192811
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ea9aeb4a3049e3d615fac998caca8f4d
+    Hash: e6ec82dd409be138cf08ea5d89305c0c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_reflection.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

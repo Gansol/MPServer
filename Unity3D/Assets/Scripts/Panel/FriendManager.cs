@@ -73,10 +73,8 @@ public class FriendManager : MPPanel
         }
 
         // Asset載入完成時 實體化道具
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
+        if (assetLoader.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
-            Debug.Log("FUCK");
-
             _bLoadedIcon = !_bLoadedIcon;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
 
@@ -121,8 +119,8 @@ public class FriendManager : MPPanel
     /// </summary>
     protected override void GetMustLoadAsset()
     {
-        if (enabled)
-        {
+        //if (enabled)
+        //{
             if (_bFirstLoad)
             {
                 object itemName;
@@ -135,16 +133,17 @@ public class FriendManager : MPPanel
                 }
                 _clientFriendsList = Global.dictFriends;
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
-                _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
                 assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);
-              //  assetLoader.LoadPrefab("panel/", slotItemName);
-                _bFirstLoad = false;
+          //  assetLoader.init();
+            _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
+            //  assetLoader.LoadPrefab("panel/", slotItemName);
+            _bFirstLoad = false;
             }
-        }
-        else
-        {
-            Debug.Log("dictFriends is null");
-        }
+        //}
+        //else
+        //{
+        //    Debug.Log("dictFriends is null");
+        //}
     }
 
     /// <summary>
@@ -152,7 +151,7 @@ public class FriendManager : MPPanel
     /// </summary>
     private void FriendSlotChk()
     {
-        List<string> buffer = new List<string>();
+     //   List<string> buffer = new List<string>();
 
         if (enabled)
         {
@@ -180,17 +179,17 @@ public class FriendManager : MPPanel
         int i = 0;
         foreach (KeyValuePair<string, object> friend in Global.dictOnlineFriendsDetail)
         {
-            object rank, nickname, imageName;
-            Dictionary<string, object> detail = friend.Value as Dictionary<string, object>;
+            object rank, nickname, actorImage;
+            Dictionary<string, object> details = friend.Value as Dictionary<string, object>;
             
-            detail.TryGetValue("Rank", out rank);
-            detail.TryGetValue("Nickname", out nickname);
-            detail.TryGetValue("Image", out imageName);
+            details.TryGetValue("Rank", out rank);
+            details.TryGetValue("Nickname", out nickname);
+            details.TryGetValue("Image", out actorImage);
 
             if (itemPanel.childCount != 0)
             {
                 itemPanel.GetChild(i).name = friend.Key;
-                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), itemPanel.Find(friend.Key));
+                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(),actorImage.ToString(), itemPanel.Find(friend.Key));
             }
 
             i++;
@@ -251,8 +250,9 @@ public class FriendManager : MPPanel
 
     private void InstantiateICON(string imageName, Transform friendItemSlot)
     {
+        Debug.Log("InstantiateICON: "+imageName);
         GameObject bundle = assetLoader.GetAsset(imageName.ToString());
-        MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
+        MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image") ,imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
     }
 
     /// <summary>
@@ -308,12 +308,14 @@ public class FriendManager : MPPanel
     /// <param name="account">帳號</param>
     /// <param name="rank">等級</param>
     /// <param name="nickname">暱稱</param>
+    /// <param name="actorImage">玩家頭像icon</param>
     /// <param name="friendItemSlot">位置</param>
-    private void LoadFriendData(string account, string rank, string nickname, Transform friendItemSlot)
+    private void LoadFriendData(string account, string rank, string nickname,string actorImage, Transform friendItemSlot)
     {
         friendItemSlot.name = account;
         friendItemSlot.Find("Rank").GetComponent<UILabel>().text = rank;
         friendItemSlot.Find("NickName").GetComponent<UILabel>().text = nickname;
+        friendItemSlot.Find("Image").GetComponentInChildren<UISprite>().name= actorImage.ToLower();
     }
 
     /// <summary>
@@ -325,13 +327,13 @@ public class FriendManager : MPPanel
     {
         Dictionary<string, object> details = detail as Dictionary<string, object>;
 
-        object rank, nickname, imageName;
+        object rank, nickname, actorImage;
         details.TryGetValue("Rank", out rank);
-        details.TryGetValue("Nickname", out nickname);
-        details.TryGetValue("Image", out imageName);
+        details.TryGetValue("Nickname", out  nickname);
+        details.TryGetValue("Image", out actorImage);
         GameObject friendItemSlot = InstantiateItem(itemPos);
-        InstantiateICON(imageName.ToString(), friendItemSlot.transform);
-        LoadFriendData(account, rank.ToString(), nickname.ToString(), friendItemSlot.transform);
+        InstantiateICON( actorImage.ToString().ToLower(), friendItemSlot.transform);
+        LoadFriendData(account, rank.ToString(), nickname.ToString(), actorImage.ToString(), friendItemSlot.transform);
         itemPos.y += offset.y;
     }
 

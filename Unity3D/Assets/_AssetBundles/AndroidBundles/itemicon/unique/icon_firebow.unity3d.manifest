@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1087542081
+CRC: 3731848926
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 201f34a775954dd1adacf676b6187240
+    Hash: 5e799d6f4d1f99e393ecb105faf79da2
   TypeTreeHash:
     serializedVersion: 2
     Hash: af4a21052e2a1880bacfaa1f8e858a1d
@@ -24,4 +24,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_firebow.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

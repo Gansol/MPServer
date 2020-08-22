@@ -123,7 +123,7 @@ public static class Global
     public static string Hash = "";           // ****欄位
     public static string Nickname = "";     // 暱稱
 
-    public static string IconSuffix = "Icon_";  // ICON附檔名
+    public static string IconSuffix = "icon_";  // ICON附檔名
     public static string EffectSuffix = "effect_";  // ICON附檔名
     public static string PanelPath = "panel/";  // panel路徑
     public static string PanelUniquePath = "panel/unique/";  // panel路徑

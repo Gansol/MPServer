@@ -5,7 +5,7 @@ public class InternetChecker : MonoBehaviour
     public bool ConnStatus { get { return Global.connStatus; } }
     private const bool allowCarrierDataNetwork = true;  // 同意使用 MOBILE 網路
     private const string pingAddress = "8.8.8.8"; // Google Public DNS server
-    private const float waitingTime = 2.0f;
+    private const float waitingTime = 1.0f;
 
     private Ping ping;
     private float pingStartTime;

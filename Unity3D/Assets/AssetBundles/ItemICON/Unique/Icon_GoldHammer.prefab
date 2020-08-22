@@ -84,6 +84,6 @@ MonoBehaviour:
   bottomType: 1
   topType: 1
   mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
-  mSpriteName: GoldHammerICON
+  mSpriteName: icon_goldhammer
   mFixedAspect: 0
   mFillCenter: 1

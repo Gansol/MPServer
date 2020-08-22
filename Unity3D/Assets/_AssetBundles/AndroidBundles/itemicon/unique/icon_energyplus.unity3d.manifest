@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3545605747
+CRC: 1050549442
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 05c4ec3294d45795e465670668cb84e5
+    Hash: 4d5c00efdd8e306d16f6486f75484779
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_energyplus.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/itemicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

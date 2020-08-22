@@ -1,0 +1,33 @@
+ManifestFileVersion: 0
+CRC: 2517352947
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b9fd02ad733b0700a8497d3a0f6750f1
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2636a2b4640e6305b30e1f6c6325bf0e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/gashapon/share/atlas_gashapon.mat
+- Assets/AssetBundles/gashapon/share/atlas_gashapon.png
+- Assets/AssetBundles/gashapon/share/atlas_gashapon.prefab
+- Assets/AssetBundles/gashapon/share/atlas_gashapon.asset
+Dependencies: []

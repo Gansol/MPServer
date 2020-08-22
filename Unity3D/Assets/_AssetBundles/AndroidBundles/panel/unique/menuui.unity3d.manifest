@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1043883850
+CRC: 1205440527
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 46ff71ea134ec2a65d62eba09686b50f
+    Hash: 8780202681ef35b9f02c2cc29a7905bc
   TypeTreeHash:
     serializedVersion: 2
     Hash: 80b9ead50c54be76de38a7c94d337f4c
@@ -113,8 +113,7 @@ Assets:
 - Assets/AssetBundles/panel/unique/MenuUI.prefab
 Dependencies:
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/lihei
-  pro.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainback.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainfront.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

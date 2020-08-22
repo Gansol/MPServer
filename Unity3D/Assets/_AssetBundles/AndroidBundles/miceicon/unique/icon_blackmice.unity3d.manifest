@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4293283675
+CRC: 1842353203
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5d6b90d8f2f202431928b1d4b66e4069
+    Hash: 2b7d893b4cc277b12238a9dda75d765d
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_blackmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

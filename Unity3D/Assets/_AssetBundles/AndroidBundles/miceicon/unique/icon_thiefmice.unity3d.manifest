@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3968218618
+CRC: 3607567382
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ce809c7e4ed5596fc4f4eb9c14795fae
+    Hash: 5fd60e6326e25efb6ea6234eaaaa2db2
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -22,4 +22,4 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/miceicon/unique/icon_thiefmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/miceicon.unity3d
+- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d
