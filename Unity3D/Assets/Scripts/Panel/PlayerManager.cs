@@ -26,7 +26,7 @@ using MPProtocol;
  * 20171119 v2.1.0   修正載入順序
  * ****************************************************************/
 
-public class PlayerManager : MPPanel
+public class PlayerManager : IMPPanelUI
 {
     public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
     public static Dictionary<string, GameObject> dictLoadedItem { get; set; }
@@ -35,13 +35,12 @@ public class PlayerManager : MPPanel
     public GameObject playerInfoArea, equipArea, playerRecordArea, playerAvatarIconGrid, inventoryArea, iconBtn, equipBtn;
     public Vector2 itemOffset, iconSize;
     public Vector3 actorScale;
-    public int itemCount = 8, row = 2, _itemType, iconDepth = 310;
+    public int itemCount = 12, row = 5, _itemType, iconDepth = 310;
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
     private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
-    private static string _InvItem = "invitem";
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bUpdatePlayerImage, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
-
+    private int _dataLoadedCount;
 
     public PlayerManager(MPGame MPGame) : base(MPGame) { }
 
@@ -57,6 +56,7 @@ public class PlayerManager : MPPanel
         _itemType = (int)StoreType.Armor;
         _bLoadedCurrency = _bLoadedPanel = _bImgActive = _bInvActive = false;
         _bPanelFirstLoad = _bFirstLoad = true;
+        m_RootUI = GameObject.Find("Player(Panel)");
     }
 
     void OnEnable()
@@ -72,9 +72,8 @@ public class PlayerManager : MPPanel
 
     void Update()
     {
-
         // 資料庫資料載入完成時 載入Asset
-        if (_bLoadedPlayerItem && _bLoadPlayerData && _bLoadedCurrency && _bLoadItem && !_bLoadedPanel)
+        if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
         {
             _bLoadedPanel = true;
             OnLoadPanel();
@@ -103,12 +102,9 @@ public class PlayerManager : MPPanel
             ResumeToggleTarget();
         }
 
-        //// 資料庫資料載入完成時 載入Asset
-        //if (_bUpdatePlayerImage)
-        //{
-        //    _bUpdatePlayerImage = false;
-        //    LoadPlayerAvatorIcon();
-        //}
+        // 重新載入玩家頭像
+        if (_bUpdatePlayerImage)
+            LoadPlayerAvatorIcon();
 
     }
 
@@ -117,6 +113,8 @@ public class PlayerManager : MPPanel
     /// </summary>
     protected override void OnLoading()
     {
+        _dataLoadedCount = (int)ENUM_Data.None;
+
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
 
@@ -127,53 +125,13 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
-    void OnLoadCurrency()
-    {
-
-        _bLoadedCurrency = true;
-    }
-
-    /// <summary>
-    /// 載入資料庫 道具資料完成時
-    /// </summary>
-    void OnLoadItem()
-    {
-        _bLoadItem = true;
-    }
-
-    /// <summary>
-    /// 載入資料庫 玩家資料完成時
-    /// </summary>
-    void OnLoadPlayerData()
-    {
-        _bLoadPlayerData = true;
-    }
-
-    /// <summary>
-    /// 載入資料庫 玩家資料完成時
-    /// </summary>
-    void OnUpdatePlayerImage()
-    {
-        _bUpdatePlayerImage = true;
-    }
-
-    /// <summary>
-    /// 載入資料庫 玩家道具資料完成時
-    /// </summary>
-    void OnLoadPlayerItem()
-    {
-        _bLoadedPlayerItem = true;
-    }
-
-
     /// <summary>
     /// 載入 Panel 完成時
     /// </summary>
     protected override void OnLoadPanel()
     {
-        // load asset
+        EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0).gameObject; //儲存目前Panel
         GetMustLoadAsset();
-        EventMaskSwitch.lastPanel = gameObject;
     }
 
     /// <summary>
@@ -186,7 +144,7 @@ public class PlayerManager : MPPanel
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
-            // assetLoader.LoadAsset(_MiceIconPath + "/", _MiceIconPath);
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -199,34 +157,21 @@ public class PlayerManager : MPPanel
             _dictItemData = Global.playerItem.Where(kvp => !_dictItemData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
-
-            ResumeToggleTarget();
         }
 
         // 如果 有未載入物件 載入AB
         if (dictNotLoadedAsset.Count != 0)
-        {
+            LoadIconObjects(dictNotLoadedAsset, Global.ItemIconUniquePath); // 載入道具ICON物件
 
-            //assetLoader.LoadAsset(assetFolder[_itemType] + "/", assetFolder[_itemType]);
-
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _InvItem + Global.ext);
-            //assetLoader.LoadPrefab(_PanelPath + "/", _InvItem); // old loadprefeb
-
-            //_LoadedIcon = LoadIconObject(dictNotLoadedAsset, assetFolder[_itemType]);
-            _LoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.ItemIconUniquePath);
-        }
-        else
-        {
-
-            m_MPGame.GetAssetLoader().bLoadedObj = _LoadedAsset = true;
-        }
-
-
-
+        // 載入老鼠ICON
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
-            assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
-        //  assetLoader.LoadPrefab(_MiceIconPath + "/", Global.IconSuffix+ item.Value);
+            if (!assetLoader.GetAsset(item.Value.ToString()))
+                assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
+
         _dictItemData = Global.playerItem;
+        _LoadedAsset = true;
+        AssetBundleManager.LoadedAllAsset();
+        ResumeToggleTarget();
     }
 
     /// <summary>
@@ -234,23 +179,27 @@ public class PlayerManager : MPPanel
     /// </summary>
     private void LoadPlayerAvatorIcon()
     {
-        //Debug.Log(Global.PlayerImage);
-        Transform imageParent = playerInfoArea.transform.Find("Image").GetChild(0).GetComponent<UISprite>().transform;
-        imageParent.GetComponent<UISprite>().spriteName = Global.PlayerImage;
-        playerImage = imageParent.GetComponent<UISprite>();
-        imageParent.parent.tag = "EquipICON";
+        _bUpdatePlayerImage = false;
+        Transform imageParent = playerInfoArea.transform.Find("Image");
+
+        if(imageParent.childCount==0)
+            MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(Global.PlayerImage), imageParent, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
+
+        playerImage = imageParent.GetChild(0).GetComponent<UISprite>();
+        playerImage.spriteName = Global.PlayerImage;
+     //   imageParent.parent.tag = "EquipICON";
     }
 
 
     // ins go
-    #region -- InstantiateItemIcon 實體化背包道具 --
+    #region -- InstantiateBagItemIcon 實體化背包道具 --
     /// <summary>
     /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
     /// </summary>
     /// <param name="itemData">資料字典</param>
     /// <param name="itemPanel">實體化父系位置</param>
     /// <param name="itemType">道具類別</param>
-    private void InstantiateItemIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
+    private void InstantiateBagItemIcon(Dictionary<string, object> itemData, Transform itemPanel, int itemType)
     {
         // 如果道具形態正確 取得 該道具形態 的 道具資料
         if (itemType != -1)
@@ -304,6 +253,10 @@ public class PlayerManager : MPPanel
                         //}
                     }
                 }
+                else
+                {
+                    Debug.LogError("AssetBundle is null !");
+                }
                 i++;
             }
         }
@@ -319,7 +272,8 @@ public class PlayerManager : MPPanel
     /// 實體化載入完成的遊戲物件，利用玩家JSON資料判斷必要實體物件
     /// </summary>
     /// <param name="itemData">資料字典</param>
-    /// <param name="parent">圖片位置</param>
+    /// <param name="myParent">圖片位置</param>
+    ///     /// <param name="itemType">道具型態</param>
     private void InstantiateEquipIcon(Dictionary<string, object> itemData, Transform myParent, int itemType)
     {
         int i = 0;
@@ -407,67 +361,70 @@ public class PlayerManager : MPPanel
     private void LoadPlayerRecord()
     {
         Transform parent = playerRecordArea.transform;
-        float winRate = ((float)Global.SumWin / (float)Global.SumBattle) * 100f;
+        float winRate = (Global.SumWin / Global.SumBattle) * 100f;
 
         parent.Find("HighScore").GetComponent<UILabel>().text = Global.MaxScore.ToString();
         parent.Find("Hit").GetComponent<UILabel>().text = Global.SumKill.ToString();
         parent.Find("Win").GetComponent<UILabel>().text = Global.SumWin.ToString();
         parent.Find("Combo").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.Find("WinRate").GetComponent<UILabel>().text = winRate.ToString("F2") + " %";
+        parent.Find("WinRate").GetComponent<UILabel>().text = winRate.ToString("F2") + " %";    //F2 = float 小數點第2位
         parent.Find("StrianghtWin").GetComponent<UILabel>().text = Global.SumWin.ToString();
         parent.Find("Lose").GetComponent<UILabel>().text = Global.SumLost.ToString();
     }
     #endregion
 
     // 當點擊 背包頭像時
-    public void OnPlayerAvatarIconClick()
+    public void OnPlayerAvatarIconClick(GameObject obj)
     {
+        // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
+        if (_playerEquipInventoryPanel.activeSelf)
+            OnEquipClick(obj);
+
         _bImgActive = !_bImgActive;
         _playerIconInventoryPanel.SetActive(_bImgActive);
 
-        // 如果裝備背包開啟 則 關閉
-        if (_playerEquipInventoryPanel.activeSelf)
-            _playerEquipInventoryPanel.SetActive(false);
+
 
         // 如果 頭像背包為空 實體化按鈕圖示
         if (playerAvatarIconGrid.transform.childCount == 0)
-            InstantiateICON(Global.dictMiceAll, "invitem", playerAvatarIconGrid.transform, itemOffset, itemCount, row);
+            InstantiateAvatarBagBtn(Global.dictMiceAll, Global.InvItemAssetName, playerAvatarIconGrid.transform, itemOffset, itemCount, row);
 
         // 開關防止Item按鈕失效
         playerAvatarIconGrid.SetActive(false);
         playerAvatarIconGrid.SetActive(true);
     }
 
-    #region -- InstantiateICON 實體化背包物件背景--
+    #region -- InstantiateAvatarBagIcon  實體化角色頭像背包物件--
     /// <summary>
-    /// 實體化商店物件背景
+    /// 實體化角色頭像背包物件
     /// </summary>
-    /// <param name="itemData">資料字典</param>
-    /// <param name="itemPanel">實體化父系位置</param>
-    /// <param name="itemType">道具類別</param>
-    public Dictionary<string, GameObject> InstantiateICON(Dictionary<string, object> itemData, string itemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    /// <param name="itemData">ICON道具資料</param>
+    /// <param name="invBtnItemName"></param>
+    /// <param name="itemPanel"></param>
+    /// <param name="offset"></param>
+    /// <param name="tableCount"></param>
+    /// <param name="rowCount"></param>
+    /// <returns></returns>
+    public Dictionary<string, GameObject> InstantiateAvatarBagBtn(Dictionary<string, object> itemData, string invBtnItemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
-            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, 1);
+            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, (int)StoreType.Mice);
             Vector2 pos = new Vector2();
-            Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
-
             int i = 0;
-            //  itemName = AssetBundleManager.GetAssetBundleNamePath(itemName);
 
             foreach (KeyValuePair<string, object> item in itemData)
             {
-                if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
+                if (assetLoader.GetAsset(invBtnItemName) != null)                  // 已載入按鈕資產時
                 {
 
-                    GameObject bundle = assetLoader.GetAsset(itemName);
-                    pos = sortItemPos(12, 5, offset, pos, i);
+                    GameObject bundle = assetLoader.GetAsset(invBtnItemName);
+                    pos = sortItemPos(tableCount, rowCount, offset, pos, i);
                     bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
                     string iconName = Global.IconSuffix + item.Value;
                     //string iconName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + item.Value);
-                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入資產時
+                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入ICON資產時
                     {
                         GameObject icon = assetLoader.GetAsset(iconName);
                         bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.Find("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
@@ -495,20 +452,16 @@ public class PlayerManager : MPPanel
     /// <param name="obj">裝備部位按鈕</param>
     public void OnEquipClick(GameObject obj)
     {
-        _bInvActive = !_bInvActive;
-
-        //如果 背包為開啟 關閉
+        // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
         if (_playerIconInventoryPanel.activeSelf)
-            _playerIconInventoryPanel.SetActive(false);
+            OnPlayerAvatarIconClick(obj);
 
+        _bInvActive = !_bInvActive;
         _playerEquipInventoryPanel.SetActive(_bInvActive);
 
         // 如果 玩家頭像背包 還沒有載入
-        if (playerAvatarIconGrid.transform.childCount == 0)
+        if (inventoryArea.transform.childCount == 0)
         {
-            // 如果裝備欄位是開啟的 關閉
-            if (_playerIconInventoryPanel.activeSelf) OnPlayerAvatarIconClick();
-
             //取得開啟的裝備類別(武器、衣服、道具等)
             if (obj.GetComponentInChildren<UISprite>())
                 _itemType = System.Convert.ToInt32(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
@@ -516,16 +469,53 @@ public class PlayerManager : MPPanel
                 _itemType = int.Parse(obj.transform.parent.name);
 
             //實體化道具格、圖示
-            Dictionary<string, GameObject> bag = InstantiateItemBG(_dictItemData, _InvItem, _itemType, inventoryArea.transform, itemOffset, itemCount, row);
-
-
-
-            InstantiateItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
+            Dictionary<string, GameObject> bag = InstantiateBagItemBG(_dictItemData, Global.InvItemAssetName, _itemType, inventoryArea.transform, itemOffset, itemCount, row);
+            InstantiateBagItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
         }
 
         // 開關防止Item按鈕失效
         inventoryArea.SetActive(false);
         inventoryArea.SetActive(true);
+    }
+
+    /// <summary>
+    /// 載入資料庫 玩家資料完成時
+    /// </summary>
+    void OnLoadPlayerData()
+    {
+        _dataLoadedCount *= (int)ENUM_Data.PlayerData;
+    }
+
+    /// <summary>
+    /// 載入資料庫 玩家道具資料完成時
+    /// </summary>
+    void OnLoadPlayerItem()
+    {
+        _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
+    }
+
+    /// <summary>
+    /// 載入資料庫 道具資料完成時
+    /// </summary>
+    void OnLoadItem()
+    {
+        _dataLoadedCount *= (int)ENUM_Data.ItemData;
+    }
+
+    /// <summary>
+    /// 載入資料庫 金流資料完成時
+    /// </summary>
+    void OnLoadCurrency()
+    {
+        _dataLoadedCount *= (int)ENUM_Data.CurrencyData;
+    }
+
+    /// <summary>
+    /// 載入資料庫 玩家資料完成時
+    /// </summary>
+    void OnUpdatePlayerImage()
+    {
+        _bUpdatePlayerImage = true;
     }
 
     /// <summary>
@@ -535,7 +525,8 @@ public class PlayerManager : MPPanel
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        ShowPanel(obj.transform.parent.name);
+        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
     }
 
     // Panel 關閉時
@@ -547,5 +538,10 @@ public class PlayerManager : MPPanel
         Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.UpdatePlayerImageEvent -= OnUpdatePlayerImage;
+    }
+
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem * (int)ENUM_Data.ItemData * (int)ENUM_Data.CurrencyData;
     }
 }

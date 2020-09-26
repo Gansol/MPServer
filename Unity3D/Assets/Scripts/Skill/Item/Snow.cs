@@ -36,7 +36,7 @@ public class Snow : SkillItem
     public override void Release()
     {
         // resume motion
-        foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMice)
+        foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMiceRefs)
         {
             if (mice.Value != null) 
                 mice.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, true);
@@ -68,7 +68,7 @@ public class Snow : SkillItem
         effects[0].GetComponent<Animator>().Play("Layer1.Effect1", -1, 0f);
 
         // stop motion
-        foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMice)
+        foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMiceRefs)
         {
             if (item.Value != null)
             {

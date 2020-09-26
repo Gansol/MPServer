@@ -9,6 +9,7 @@ public class Item : MonoBehaviour
 
     void OnClick()
     {
-       GetComponentInParent<StoreManager>().SendMessage("OnItemClick",gameObject);
+       GetComponentInParent<StoreManager>().OnItemClick(gameObject);
+    //    GetComponentInParent<StoreManager>()..SendMessage("OnItemClick", gameObject);
     }
 }

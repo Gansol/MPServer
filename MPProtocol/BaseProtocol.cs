@@ -29,5 +29,16 @@
         CustomError=4,              // 自訂錯誤
     }
 
-
+    public enum ENUM_Data : int
+    {
+        None = 1,
+        PlayerData = 2,
+        PlayerItem = 3,
+        CurrencyData = 5,
+        ItemData = 7,
+        StoreData = 11,
+        FriendsData = 13,
+        Purchase = 17, 
+        //19 23 29 31 37 41
+    }
 }

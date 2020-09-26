@@ -16,7 +16,7 @@ public class Bali : MiceBase
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
     }
@@ -52,7 +52,7 @@ public class Bali : MiceBase
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
         }
         else
         {
@@ -75,7 +75,7 @@ public class Bali : MiceBase
                 battleManager.BreakCombo(); // 如果上面修正了 這裡要取消 錯誤
             }
 
-            Global.dictBattleMice.Remove(transform.parent);
+            Global.dictBattleMiceRefs.Remove(transform.parent);
             gameObject.SetActive(false);
             this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
         }

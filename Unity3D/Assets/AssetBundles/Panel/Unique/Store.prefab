@@ -3207,7 +3207,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3017
+  startingRenderQueue: 3004
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -3421,7 +3421,7 @@ MonoBehaviour:
   bottomType: 1
   topType: 1
   mAtlas: {fileID: 11400000, guid: aa13119b1f4cdbc479c4cba993d1911f, type: 2}
-  mSpriteName: Gashapon11
+  mSpriteName: icon_gashapon3
   mFixedAspect: 0
   mFillCenter: 1
 --- !u!1 &121940
@@ -3948,7 +3948,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11404774, guid: 31c845f7430adec43b4729c7565706af, type: 3}
+  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
   mSpriteName: Cancel
   mFixedAspect: 0
   mFillCenter: 1
@@ -4184,7 +4184,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11404774, guid: 31c845f7430adec43b4729c7565706af, type: 3}
+  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
   mSpriteName: Buy
   mFixedAspect: 0
   mFillCenter: 1
@@ -4838,7 +4838,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11404774, guid: 31c845f7430adec43b4729c7565706af, type: 3}
+  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
   mSpriteName: Ret10_Line_Sh
   mFixedAspect: 0
   mFillCenter: 1
@@ -4925,7 +4925,7 @@ MonoBehaviour:
   rightType: 1
   bottomType: 1
   topType: 1
-  mAtlas: {fileID: 11404774, guid: 31c845f7430adec43b4729c7565706af, type: 3}
+  mAtlas: {fileID: 11400000, guid: 18c89c6fcdf0c624caa01776ec37fffa, type: 2}
   mSpriteName: Egg_BG2
   mFixedAspect: 0
   mFillCenter: 1
@@ -5640,14 +5640,14 @@ MonoBehaviour:
   updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
-  mWidth: 200
-  mHeight: 200
+  mWidth: 180
+  mHeight: 202
   mDepth: 500
   mMat: {fileID: 0}
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
-  keepAspectRatio: 1
-  aspectRatio: 1
+  keepAspectRatio: 0
+  aspectRatio: 0.8910891
   mType: 0
   mFillDirection: 4
   mFillAmount: 1
@@ -5662,7 +5662,7 @@ MonoBehaviour:
   bottomType: 1
   topType: 1
   mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
-  mSpriteName: EnergyPlusICON
+  mSpriteName: icon_rattrap
   mFixedAspect: 0
   mFillCenter: 1
 --- !u!1 &121990
@@ -7406,7 +7406,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3008
+  startingRenderQueue: 3004
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -7536,7 +7536,7 @@ MonoBehaviour:
   bottomType: 1
   topType: 1
   mAtlas: {fileID: 11400000, guid: eb06d1dc63424854db6ce6d52731334c, type: 2}
-  mSpriteName: EnergyPlusICON
+  mSpriteName: icon_rattrap
   mFixedAspect: 0
   mFillCenter: 1
 --- !u!1 &154546

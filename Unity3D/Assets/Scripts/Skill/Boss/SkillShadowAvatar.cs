@@ -31,7 +31,7 @@ public class ShadowAvatarSkill : SkillBoss
         buffer = new Dictionary<Transform, GameObject>(dictMice);
         foreach (KeyValuePair<Transform, GameObject> mice in buffer)
         {
-            if (Global.dictBattleMice.ContainsKey(mice.Key))
+            if (Global.dictBattleMiceRefs.ContainsKey(mice.Key))
                 dictMice[mice.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0);
             dictMice.Remove(mice.Key);
         }
@@ -74,7 +74,7 @@ public class ShadowAvatarSkill : SkillBoss
             foreach (KeyValuePair<Transform, GameObject> mice in buffer)
             {
                 // 如果 打到正確老鼠 
-                if (!Global.dictBattleMice.ContainsValue(mice.Value) && mice.Key == correctMice && skillFlag)
+                if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value) && mice.Key == correctMice && skillFlag)
                 {
                     Debug.Log("****Correct!");
                     dictMice.Remove(mice.Key);
@@ -82,7 +82,7 @@ public class ShadowAvatarSkill : SkillBoss
 
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer2)
                     {
-                        if (Global.dictBattleMice.ContainsKey(mice2.Key))
+                        if (Global.dictBattleMiceRefs.ContainsKey(mice2.Key))
                            dictMice[mice2.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0.0f);
                         dictMice.Remove(mice.Key);
                     }
@@ -92,7 +92,7 @@ public class ShadowAvatarSkill : SkillBoss
                     skillFlag = false;
                     break;
                 }
-                else if (!Global.dictBattleMice.ContainsValue(mice.Value) && skillFlag)
+                else if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value) && skillFlag)
                 {
                     Debug.Log("****Error!");
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using MPProtocol;
 //using Sdkbox;
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -20,7 +21,7 @@ using System;
  * 20180101 v1.0.0   完成功能、註解             
  * ****************************************************************/
 // 可以把PurchaseHandlder寫到這裡
-public class PurchaseManager : MPPanel
+public class PurchaseManager : IMPPanelUI
 {
     ObjectFactory objFactory;
 
@@ -31,9 +32,9 @@ public class PurchaseManager : MPPanel
     //private Sdkbox.Product[] _product;                              // 商品資料
     private Dictionary<string, GameObject> _dictitemSlot;           // 已實體化的商品
     private Dictionary<string, object> _dictProductsFitCurrency;    // 法幣道具價格
-    private bool _bLoadAsset, _bFirstLoad, _bLoadPanel, _bIABInit, _bLoadPurchase, _bLoadProduct, _bLoadCurrency;
+    private bool _bLoadAsset, _bFirstLoad, _bLoadPanel, _bIABInit /*,_bLoadProduct */;
     private string _currencyCode = "TWD";                           // 貨幣代號
-    private int _slotPosY;                                          // 道具位子偏移量
+    private int _dataLoadedCount, _slotPosY;                                          // 道具位子偏移量
 
     public PurchaseManager(MPGame MPGame) : base(MPGame) { }
 
@@ -45,7 +46,10 @@ public class PurchaseManager : MPPanel
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
         _bFirstLoad = true;
-        _bLoadProduct = true;
+
+        m_RootUI = GameObject.Find("Purchase(Panel)");
+
+        //  _bLoadProduct = true;
 
         //_iap.getProducts();
     }
@@ -53,9 +57,15 @@ public class PurchaseManager : MPPanel
     void OnEnable()
     {
         _bLoadPanel = false;
-
+        Debug.Log("OnEnable OnEnable OnEnable");
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
+        Global.photonService.UpdateCurrencyEvent += OnUpdateCurrency;
+    }
+
+    private void OnUpdateCurrency()
+    {
+        throw new NotImplementedException();
     }
 
 
@@ -66,7 +76,7 @@ public class PurchaseManager : MPPanel
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
         // 資料載入完成後 載入Panel
-        if (_bLoadCurrency && _bLoadPurchase && _bLoadProduct && !_bLoadPanel)
+        if (_dataLoadedCount == GetMustLoadedDataCount() /*&& _bLoadProduct */&& !_bLoadPanel)
         {
             if (!_bFirstLoad)
                 ResumeToggleTarget();
@@ -161,7 +171,7 @@ public class PurchaseManager : MPPanel
     /// </summary>
     private void LoadPurchaseProperty()
     {
-        object bSell,price, promotionsTime, newArrivalsTime, promotionsCount, buyCount, limitCount;
+        object bSell, price, promotionsTime, newArrivalsTime, promotionsCount, buyCount, limitCount;
         List<string> keys = _dictitemSlot.Keys.ToList();
 
         // 載入屬性
@@ -198,8 +208,6 @@ public class PurchaseManager : MPPanel
 
                 // 限制數量 檢查 附值
                 LimitCount_LabelChk(item.Key, int.Parse(limitCount.ToString()), buyCount.ToString());
-
-                
             }
         }
     }
@@ -215,7 +223,7 @@ public class PurchaseManager : MPPanel
         {
             _dictitemSlot[key].GetComponent<UIButton>().enabled = true;
             _dictitemSlot[key].transform.Find("BG").Find("ActiveBG").gameObject.SetActive(true);
-            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsTime).GetComponent<UILabel>().text ="~"+ promotionsTime.ToString("yyyy/MM/dd");
+            _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsTime).GetComponent<UILabel>().text = "~" + promotionsTime.ToString("yyyy/MM/dd");
         }
         else
         {
@@ -308,6 +316,8 @@ public class PurchaseManager : MPPanel
 
     protected override void OnLoading()
     {
+        _dataLoadedCount = (int)ENUM_Data.None;
+
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
 
@@ -318,12 +328,12 @@ public class PurchaseManager : MPPanel
     protected override void OnLoadPanel()
     {
         GetMustLoadAsset();
-        EventMaskSwitch.lastPanel = gameObject;
+        EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0).gameObject;
     }
 
     protected override void GetMustLoadAsset()
     {
-        if (enabled && !Global.isGameStart)
+        if (m_RootUI.activeSelf && !Global.isGameStart)
         {
             if (_bFirstLoad)
             {
@@ -332,17 +342,19 @@ public class PurchaseManager : MPPanel
             }
             _bLoadAsset = true;
         }
-       
+
     }
 
     private void OnLoadCurrency()
     {
-        _bLoadCurrency = true;
+        Debug.Log("OnLoadCurrency OnLoadCurrency OnLoadCurrency");
+        _dataLoadedCount *= (int)ENUM_Data.CurrencyData;
     }
 
     private void OnLoadPurchase()
     {
-        _bLoadPurchase = true;
+        Debug.Log("OnLoadPurchase OnLoadPurchase OnLoadPurchase");
+        _dataLoadedCount *= (int)ENUM_Data.Purchase;
     }
 
     //public void OnProductRequest(Dictionary<string, object> dictProducts, Product[] product, string currencyCode)
@@ -364,14 +376,21 @@ public class PurchaseManager : MPPanel
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        GameObject root = obj.transform.parent.gameObject;
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(root);
+      //  GameObject root = obj.transform.parent.gameObject;
+        ShowPanel(obj.transform.parent.name);
+       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(root);
         EventMaskSwitch.Resume();
     }
 
-    void OnDisEnable()
+    void OnDisable()
     {
         Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPurchaseEvent -= OnLoadPurchase;
+        Global.photonService.UpdateCurrencyEvent -= OnUpdateCurrency;
+    }
+
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.Purchase * (int)ENUM_Data.CurrencyData; ;
     }
 }

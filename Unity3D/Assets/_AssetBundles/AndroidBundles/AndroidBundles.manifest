@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 3015902349
+CRC: 2943263662
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -331,9 +331,8 @@ AssetBundleManifest:
     Info_84:
       Name: panel/unique/player.unity3d
       Dependencies:
-        Dependency_0: miceicon/share/atlas_miceicon.unity3d
-        Dependency_1: panel/share/comic.unity3d
-        Dependency_2: panel/share/panelui.unity3d
+        Dependency_0: panel/share/comic.unity3d
+        Dependency_1: panel/share/panelui.unity3d
     Info_85:
       Name: panel/unique/purchase.unity3d
       Dependencies:

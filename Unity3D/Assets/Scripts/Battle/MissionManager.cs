@@ -241,7 +241,7 @@ public class MissionManager : MonoBehaviour
                 {
                     if (BattleManager.gameTime - lastGameTime > missionTime)       //missionScore 這裡是 Combo任務目標
                     {
-                        if (battleManager.missionCombo >= _missionScore)   // success 20200817 改動過 修正顯示任務失敗錯誤
+                        if (battleManager.MissionCombo >= _missionScore)   // success 20200817 改動過 修正顯示任務失敗錯誤
                         {
                             _missionMode = MissionMode.Completing;
                             battleHUD.MissionCompletedMsg(mission, 0);

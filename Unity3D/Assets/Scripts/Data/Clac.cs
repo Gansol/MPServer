@@ -40,7 +40,7 @@ public static class Clac
         return Mathf.Round(rank * rank / 5f) + rank + 1f;
     }
 
-    public static int ClacCost(byte rank)
+    public static int ClacCost(byte rank) // 亂寫 FUCK
     {
         int cost = defaultCost;                                     // Cost = 初始值
         for (int i = 1; i <= rank; i++)

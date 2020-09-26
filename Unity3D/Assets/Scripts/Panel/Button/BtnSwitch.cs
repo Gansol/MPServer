@@ -57,7 +57,7 @@ public class BtnSwitch : MonoBehaviour
         Change, // 改變老鼠
     }
 
-    public void init(ref Dictionary<string, GameObject> dictLoadedMiceBtnRefs, ref   Dictionary<string, GameObject> dictLoadedTeamBtnRefs, ref Transform parentArea)
+    public void Init(ref Dictionary<string, GameObject> dictLoadedMiceBtnRefs, ref   Dictionary<string, GameObject> dictLoadedTeamBtnRefs, ref Transform parentArea)
     {
         _parent = parentArea;
         _dictLoadedMiceBtnRefs = dictLoadedMiceBtnRefs;
@@ -340,6 +340,8 @@ public class BtnSwitch : MonoBehaviour
                 UpdateTeam(otherName, _clone);
                 _clone.transform.GetChild(0).name = _other.transform.GetChild(0).name;
                 _clone.transform.GetChild(0).GetComponent<UISprite>().spriteName = _other.transform.GetChild(0).GetComponent<UISprite>().spriteName;
+                // _other.GetComponentInChildren<UISprite>().spriteName = _clone.transform.GetComponentInChildren<UISprite>().spriteName;   // 這是改成 交換SpriteName的寫法
+                //   _other.name = _clone.name;
                 EnDisableBtn(_clone, true);
                 Destroy(gameObject);
                 SortChildren.SortChildrenByID(_clone.transform.parent.gameObject, Global.extIconLength);
@@ -373,13 +375,8 @@ public class BtnSwitch : MonoBehaviour
     /// </summary>
     void Move2Clone()
     {
-        // _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MeunObjetDepth); // 移動時深度提到最高防止遮擋
+         _depth = DepthManager.SwitchDepthLayer(gameObject, transform, Global.MenuObjetDepth); // 移動時深度提到最高防止遮擋
         _clone = MPGFactory.GetObjFactory().Instantiate(gameObject, transform.parent, gameObject.name, transform.localPosition, transform.localScale, Vector2.zero, 400);
-
-        //  Transform btnArea = transform.parent;
-        //  _clone.GetComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref btnArea);
-
-        //   Debug.Log("parent: "+ transform.parent.parent.parent.parent.name+  " Clone   " + _dictLoadedMiceBtnRefs[transform.GetChild(0).name].transform.parent.parent.parent.parent.name);
 
         EnDisableBtn(_clone, false);
         _clone.tag = gameObject.tag;
@@ -434,6 +431,7 @@ public class BtnSwitch : MonoBehaviour
 
     }
     #endregion
+
     #region -- AddTeam 交換/加入隊伍 --
     /// <summary>
     /// 交換/加入隊伍(JSON)(順序採自動累計)

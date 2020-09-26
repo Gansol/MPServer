@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class FactoryBase  {
-
-}
+public abstract class FactoryBase  {}

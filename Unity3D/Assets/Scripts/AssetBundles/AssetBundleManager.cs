@@ -19,12 +19,12 @@ using System.IO;
 * v0.0.2 20160629  fixbug: loaded bundle check.
 * v0.0.1 20150000  AssetbundleManager publish.    
 * ***************************************************************/
-public static class AssetBundleManager
+public static class AssetBundleManager /*: GameSystem*/
 {
     public static AssetBundleRequest Request { get; private set; }
-    public static bool IsbLoadPrefab { get; private set; } = false;
+    public static bool IsbLoadAtlas { get; private set; } = false;
     public static int Progress { get; private set; } = 0;
-    public static int LoadedABCount { get; private set; } = 0;
+    // public static int LoadedABCount { get; private set; } = 0;    // 目前不使用Aseet來確認載入，只使用Gameobject數量確認，如發現錯誤再改回
     public static int LoadedObjectCount { get; private set; } = 0;
     public static string ReturnMessage { get; private set; } = "";
     public static string Ret { get; private set; } = "C000";
@@ -47,7 +47,7 @@ public static class AssetBundleManager
     public static Dictionary<string, AssetBundleRef> dictAssetBundleRefs;
     private static Dictionary<string, string> dictAssetBundleNameRefs;
 
-    static AssetBundleManager()
+    static  AssetBundleManager()/*(MPGame MPGame) : base(MPGame)*/
     {
         if (dictAssetBundleRefs == null)
         {
@@ -59,11 +59,11 @@ public static class AssetBundleManager
     public static void Init()
     {
         Request = null;
-        IsbLoadPrefab = false;
+        IsbLoadAtlas = false;
         ReturnMessage = "";
         Ret = "C000";
         Progress = 0;
-        LoadedABCount = 0;
+        // LoadedABCount = 0;
         LoadedObjectCount = 0;
     }
 
@@ -72,6 +72,11 @@ public static class AssetBundleManager
         public AssetBundle assetBundle = null;
     }
 
+    /// <summary>
+    /// 從manifest載入Assetbundle
+    /// </summary>
+    /// <param name="manifestPathName">資產名稱路徑(含副檔名)</param>
+    /// <returns></returns>
     public static IEnumerator LoadAtlas(string manifestPathName/*, System.Type type*/)
     {
         AssetBundleRef abRef;
@@ -91,7 +96,7 @@ public static class AssetBundleManager
                 if (www.isNetworkError || www.isHttpError)
                 {
                     Ret = "C002";
-                    ReturnMessage = "載入資源失敗！ : \n" + manifestPathName + "\n"+ "   assetPath:" + assetFullPath + "   bGetAsset: " + GetLoadedAssetbundle(manifestPathName);
+                    ReturnMessage = "載入資源失敗！ : \n" + manifestPathName + "\n" + "   assetPath:" + assetFullPath + "   bGetAsset: " + GetLoadedAssetbundle(manifestPathName);
                     //Debug.Log(ReturnMessage);
 
                     throw new Exception(www.error);
@@ -114,24 +119,26 @@ public static class AssetBundleManager
                 }
             }
         }
-        LoadedABCount++;   // 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
+        //   LoadedABCount++;   // 這非常可能導致錯誤 應放在www.Done可是他不會計算多次的IEnumerator累計直 3+3=6 會變成只有3
     }
 
-
-    public static IEnumerator LoadGameObject(string manifestPathName)   // 載入遊戲物件
+    /// <summary>
+    /// 從manifest載入遊戲物件
+    /// </summary>
+    /// <param name="manifestPathName">資產名稱路徑(含副檔名)</param>
+    /// <returns></returns>
+    public static IEnumerator LoadGameObject(string manifestPathName)
     {
         string assetFullPath = @"file:///" + Application.persistentDataPath + "/AssetBundles/" + manifestPathName;
         AssetBundleRef abRef;
 
         if (!GetLoadedAssetbundle(manifestPathName))
         {
-            while (IsbLoadPrefab == false)
+            while (IsbLoadAtlas == false)
                 yield return null;
 
             while (!Caching.ready)
                 yield return null;
-            //_isStartLoadAsset = true;
-            //Debug.Log("(2)New Path:" + Application.persistentDataPath + "/AssetBundles/" + assetName + Global.ext);
 
             using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(assetFullPath))
             {
@@ -164,7 +171,7 @@ public static class AssetBundleManager
                         LoadedObjectCount++;
                         Debug.Log("(AB)_loadedObjectCount:" + LoadedObjectCount);
                     }
-                   //  Request = abRef.assetBundle.LoadAssetAsync(manifestPathName);
+                    //  Request = abRef.assetBundle.LoadAssetAsync(manifestPathName);
                     www.Dispose();
                     //Debug.Log("( 4 ) :" + assetName);
 
@@ -231,10 +238,10 @@ public static class AssetBundleManager
     public static void LoadedBundle()
     {
         string msg = "";
+
         foreach (KeyValuePair<string, AssetBundleRef> item in dictAssetBundleRefs) // 查看載入物件
-        {
             msg += "\n" + item.Key.ToString();
-        }
+
         Debug.Log("AssetBundles in Dictinary: " + msg + "\n");
     }
 
@@ -257,35 +264,43 @@ public static class AssetBundleManager
         }
     }
 
+    ///// <summary>
+    ///// Split Path and Name 分開assetbundle和Path(沒用到可以刪除)
+    ///// string[0]=Path
+    ///// string[1]=assetName
+    ///// </summary>
+    ///// <param name="manifestAssetName"></param>
+    ///// <returns></returns>
+    //private static string[] SplitPathName(string manifestAssetName)
+    //{
+    //    manifestAssetName = manifestAssetName.Replace(" ", "");
+    //    string[] path = manifestAssetName.Split(new char[] { '/' });
+    //    string assetName = path[path.Length - 1];
+    //    string folderPath = "";
+    //    string[] assetPathName = new string[2];
+
+    //    for (int i = 0; i < path.Length - 1; i++)
+    //    {
+    //        folderPath += path[i] + "/";
+    //    }
+    //    assetPathName[0] = folderPath;
+    //    assetPathName[1] = assetName;
+    //    return assetPathName;
+    //}
+
     /// <summary>
-    /// Split Path and Name 分開assetbundle和Path(沒用到可以刪除)
-    /// string[0]=Path
-    /// string[1]=assetName
+    /// AssetLoader告知Manager已完成全部Asset預先載入動作
     /// </summary>
-    /// <param name="manifestAssetName"></param>
-    /// <returns></returns>
-    private static string[] SplitPathName(string manifestAssetName)
-    {
-        manifestAssetName = manifestAssetName.Replace(" ", "");
-        string[] path = manifestAssetName.Split(new char[] { '/' });
-        string assetName = path[path.Length - 1];
-        string folderPath = "";
-        string[] assetPathName = new string[2];
-
-        for (int i = 0; i < path.Length - 1; i++)
-        {
-            folderPath += path[i] + "/";
-        }
-        assetPathName[0] = folderPath;
-        assetPathName[1] = assetName;
-        return assetPathName;
-    }
-
+    /// 
     public static void LoadedAllAsset()
     {
-        IsbLoadPrefab = true;
+        IsbLoadAtlas = true;
     }
 
+    //public string GetReturnMessage()
+    //{
+    //    return ReturnMessage;
+    //}
 
     public static void UnloadUnusedAssets()
     {

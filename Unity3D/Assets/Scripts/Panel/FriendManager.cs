@@ -19,12 +19,12 @@ using MPProtocol;
  * 20171225 v1.1.3   優化
  * 20171215 v1.1.2   修正BUG、優化 註解                     
  * ****************************************************************/
-public class FriendManager : MPPanel
+public class FriendManager : IMPPanelUI
 {
     /// <summary>
     /// 圖片位子、slot名稱
     /// </summary>
-    public string  slotItemName;
+    public string slotItemName;
     /// <summary>
     /// 道具Panel
     /// </summary>               
@@ -41,6 +41,7 @@ public class FriendManager : MPPanel
     //          初次載入    是否載入ICON    是否載入玩家資料    是否取得線上玩家狀態  是否載入朋友資料    是否載入Panel   是否按下
     private bool _bFirstLoad, _bLoadedIcon, _bLoadPlayerData, _bLoadActoOnlinerState, _bLoadFriendsData, _bLoadedPanel, _bClick;
     private string _selectPlayerNickname, _inviteYouNameOfFriend;       // 選取得朋友名稱 邀請你的朋友名稱
+    private int _dataLoadedCount;
     private float _lastClickTime, _clickInterval;                      // 上次點擊時間 點擊間格
 
     public FriendManager(MPGame MPGame)
@@ -51,12 +52,13 @@ public class FriendManager : MPPanel
         _bFirstLoad = true;
         itemPos = new Vector2(0, 0);
         _clickInterval = 3;
+        m_RootUI = GameObject.Find("Friend(Panel)");
     }
 
     void OnEnable()
     {
         _bLoadedPanel = false;
-        Global.photonService.LoadPlayerDataEvent += OnPlayerDataEvent;
+        Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadFriendsDataEvent += OnLoadFriendsData;
         Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
         Global.photonService.ApplyInviteFriendEvent += OnApplyInviteFriend;
@@ -66,15 +68,13 @@ public class FriendManager : MPPanel
     void Update()
     {
         // 資料載入完成時 載入PanelAsset
-        if (_bLoadPlayerData && _bLoadFriendsData && !_bLoadedPanel)
-        {
+        if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
             OnLoadPanel();
-            _bLoadedPanel = true;
-        }
 
         // Asset載入完成時 實體化道具
         if (assetLoader.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
+            Debug.Log("FUCK");
             _bLoadedIcon = !_bLoadedIcon;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
 
@@ -99,17 +99,20 @@ public class FriendManager : MPPanel
 
     protected override void OnLoading()
     {
+        _dataLoadedCount = (int)ENUM_Data.None;
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadFriendsData(Global.dictFriends.ToArray());
         Global.photonService.GetOnlineActorState(Global.dictFriends.ToArray());
-        if (_bFirstLoad)
-            Global.photonService.LoadMiceData();
+
+        //if (_bFirstLoad)
+        //    Global.photonService.LoadMiceData();
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
     }
 
     protected override void OnLoadPanel()
     {
+        _bLoadedPanel = true;
         GetMustLoadAsset();
         ResumeToggleTarget();
     }
@@ -119,31 +122,21 @@ public class FriendManager : MPPanel
     /// </summary>
     protected override void GetMustLoadAsset()
     {
-        //if (enabled)
-        //{
-            if (_bFirstLoad)
+        if (_bFirstLoad)
+        {
+            Dictionary<string, object> dictMice = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, object> item in Global.miceProperty)
             {
-                object itemName;
-                Dictionary<string, object> dictMice = new Dictionary<string, object>();
-                foreach (KeyValuePair<string, object> item in Global.miceProperty)
-                {
-                    Dictionary<string, object> prop = item.Value as Dictionary<string, object>;
-                    prop.TryGetValue("ItemName", out itemName);
-                    dictMice.Add(item.Key, itemName);
-                }
-                _clientFriendsList = Global.dictFriends;
-                //assetLoader.LoadAsset(iconPath + "/", iconPath);
-                assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);
-          //  assetLoader.init();
-            _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
-            //  assetLoader.LoadPrefab("panel/", slotItemName);
-            _bFirstLoad = false;
+                Dictionary<string, object> prop = item.Value as Dictionary<string, object>;
+                prop.TryGetValue("ItemName", out object itemName);
+                dictMice.Add(item.Key, itemName);
             }
-        //}
-        //else
-        //{
-        //    Debug.Log("dictFriends is null");
-        //}
+            _clientFriendsList = new List<string>(Global.dictFriends);  // 新朋友名單存入client暫存朋友列表
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);  // 載入好友列表背景資產
+            _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
+
+            _bFirstLoad = false;
+        }
     }
 
     /// <summary>
@@ -151,9 +144,7 @@ public class FriendManager : MPPanel
     /// </summary>
     private void FriendSlotChk()
     {
-     //   List<string> buffer = new List<string>();
-
-        if (enabled)
+        if (m_RootUI.activeSelf)
         {
             List<string> newFriendList = Global.dictFriends.Except(_clientFriendsList).ToList();
             List<string> oldFriendList = _clientFriendsList.Except(Global.dictFriends).ToList();
@@ -161,13 +152,14 @@ public class FriendManager : MPPanel
             // add
             if (newFriendList.Count > 0) AddFriendSlot();
 
+            Debug.Log("newFriendList.Count newFriendList.Count :" + newFriendList.Count);
             //remove
             if (oldFriendList.Count > 0) RemoveFriendSlot();
 
             // reload
-            _clientFriendsList = new List<string>( Global.dictFriends);
+            _clientFriendsList = new List<string>(Global.dictFriends);
+            LoadFriendOnlineState();
             ReloadFriendSlot();
-            LoadFriendOnlineState();  
         }
     }
 
@@ -179,17 +171,16 @@ public class FriendManager : MPPanel
         int i = 0;
         foreach (KeyValuePair<string, object> friend in Global.dictOnlineFriendsDetail)
         {
-            object rank, nickname, actorImage;
             Dictionary<string, object> details = friend.Value as Dictionary<string, object>;
-            
-            details.TryGetValue("Rank", out rank);
-            details.TryGetValue("Nickname", out nickname);
-            details.TryGetValue("Image", out actorImage);
+
+            details.TryGetValue("Rank", out object rank);
+            details.TryGetValue("Nickname", out object nickname);
+            details.TryGetValue("Image", out object actorImage);
 
             if (itemPanel.childCount != 0)
             {
                 itemPanel.GetChild(i).name = friend.Key;
-                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(),actorImage.ToString(), itemPanel.Find(friend.Key));
+                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), actorImage.ToString(), itemPanel.Find(friend.Key));
             }
 
             i++;
@@ -201,15 +192,14 @@ public class FriendManager : MPPanel
     /// </summary>
     private void AddFriendSlot()
     {
+        Debug.Log("AddFriendSlot AddFriendSlot");
         List<string> addFriendsList = new List<string>();
 
         addFriendsList = Global.dictFriends.Except(_clientFriendsList).ToList();
 
-        //foreach (string friend in Global.dictFriends)
-        //    if (!_clientFriendsList.Contains(friend)) addFriendsList.Add(friend);
-
         foreach (string friend in addFriendsList)
-            InstantiateFriend(Global.dictOnlineFriendsDetail[friend], friend);
+            if (!_clientFriendsList.Contains(friend))
+                InstantiateFriend(Global.dictOnlineFriendsDetail[friend], friend);
     }
 
     /// <summary>
@@ -220,8 +210,6 @@ public class FriendManager : MPPanel
         List<string> removeFriendsList = new List<string>();
 
         removeFriendsList = _clientFriendsList.Except(Global.dictFriends).ToList();
-        //foreach (string friend in _clientFriendsList)
-        //    if (!Global.dictFriends.Contains(friend)) removeFriendsList.Add(friend);
 
         foreach (string removeName in removeFriendsList)
         {
@@ -250,9 +238,9 @@ public class FriendManager : MPPanel
 
     private void InstantiateICON(string imageName, Transform friendItemSlot)
     {
-        Debug.Log("InstantiateICON: "+imageName);
+       // Debug.Log("InstantiateICON: " + imageName);
         GameObject bundle = assetLoader.GetAsset(imageName.ToString());
-        MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image") ,imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
+        MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
     }
 
     /// <summary>
@@ -310,12 +298,12 @@ public class FriendManager : MPPanel
     /// <param name="nickname">暱稱</param>
     /// <param name="actorImage">玩家頭像icon</param>
     /// <param name="friendItemSlot">位置</param>
-    private void LoadFriendData(string account, string rank, string nickname,string actorImage, Transform friendItemSlot)
+    private void LoadFriendData(string account, string rank, string nickname, string actorImage, Transform friendItemSlot)
     {
         friendItemSlot.name = account;
         friendItemSlot.Find("Rank").GetComponent<UILabel>().text = rank;
         friendItemSlot.Find("NickName").GetComponent<UILabel>().text = nickname;
-        friendItemSlot.Find("Image").GetComponentInChildren<UISprite>().name= actorImage.ToLower();
+        friendItemSlot.Find("Image").GetComponentInChildren<UISprite>().name = actorImage.ToLower();
     }
 
     /// <summary>
@@ -329,10 +317,10 @@ public class FriendManager : MPPanel
 
         object rank, nickname, actorImage;
         details.TryGetValue("Rank", out rank);
-        details.TryGetValue("Nickname", out  nickname);
+        details.TryGetValue("Nickname", out nickname);
         details.TryGetValue("Image", out actorImage);
         GameObject friendItemSlot = InstantiateItem(itemPos);
-        InstantiateICON( actorImage.ToString().ToLower(), friendItemSlot.transform);
+        InstantiateICON(actorImage.ToString().ToLower(), friendItemSlot.transform);
         LoadFriendData(account, rank.ToString(), nickname.ToString(), actorImage.ToString(), friendItemSlot.transform);
         itemPos.y += offset.y;
     }
@@ -340,9 +328,9 @@ public class FriendManager : MPPanel
     /// <summary>
     /// 收到玩家資料時
     /// </summary>
-    private void OnPlayerDataEvent()
+    private void OnLoadPlayerData()
     {
-        _bLoadPlayerData = true;
+        _dataLoadedCount *= (int)ENUM_Data.PlayerData;
     }
 
     /// <summary>
@@ -350,7 +338,7 @@ public class FriendManager : MPPanel
     /// </summary>
     private void OnLoadFriendsData()
     {
-        _bLoadFriendsData = true;
+        _dataLoadedCount *= (int)ENUM_Data.FriendsData;
     }
 
     /// <summary>
@@ -358,7 +346,7 @@ public class FriendManager : MPPanel
     /// </summary>
     private void OnGetOnlineActorState()
     {
-        if (enabled)
+        if (m_RootUI.activeSelf)
         {
             _bLoadActoOnlinerState = true;
             if (!_bFirstLoad)
@@ -382,7 +370,8 @@ public class FriendManager : MPPanel
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        ShowPanel(obj.transform.parent.name);
+       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
     }
 
     public void OnPrev(GameObject obj)
@@ -463,10 +452,15 @@ public class FriendManager : MPPanel
         if (_lastMsgPanel != null)
             _lastMsgPanel.SetActive(false);
 
-        Global.photonService.LoadPlayerDataEvent -= OnLoadPanel;
+        Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
         Global.photonService.LoadFriendsDataEvent -= OnLoadFriendsData;
         Global.photonService.GetOnlineActorStateEvent -= OnGetOnlineActorState;
         Global.photonService.ApplyInviteFriendEvent -= OnApplyInviteFriend;
         Global.photonService.RemoveFriendEvent -= OnRemoveFriend;
+    }
+
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.FriendsData;
     }
 }

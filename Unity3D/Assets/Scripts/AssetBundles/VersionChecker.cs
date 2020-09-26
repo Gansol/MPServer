@@ -79,7 +79,6 @@ public class VersionChecker : MonoBehaviour
                 // 如果本機 版本列表檔案 不存在 建立空檔
                 if (!File.Exists(localVisionListFile))
                 {
-
                     File.Create(localVisionListFile).Close();
                     File.WriteAllText(localVisionListFile, Global.defaultVersion);
                 }

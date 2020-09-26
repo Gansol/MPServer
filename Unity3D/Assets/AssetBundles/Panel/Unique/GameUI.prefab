@@ -146,9 +146,9 @@ GameObject:
   - component: {fileID: 22401728}
   - component: {fileID: 11401368}
   - component: {fileID: 11401370}
-  - component: {fileID: 11401374}
   - component: {fileID: 11401376}
   - component: {fileID: 11401378}
+  - component: {fileID: 11401374}
   - component: {fileID: 11401380}
   - component: {fileID: 11443986}
   - component: {fileID: 11443988}
@@ -220,49 +220,6 @@ MonoBehaviour:
   clearLimit: 10
   clearTime: 15
   reserveCount: 5
---- !u!114 &11401374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 101316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beef96507a7788b408fe9f518075dccc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myName: {fileID: 11401400}
-  otherName: {fileID: 11401404}
-  myImage: {fileID: 11481336}
-  otherImage: {fileID: 11481334}
-  HPBar: {fileID: 11401410}
-  ComboLabel: {fileID: 11401426}
-  BlueScoreLabel: {fileID: 11401394}
-  RedScoreLabel: {fileID: 11401396}
-  BlueEnergyBar: {fileID: 11472070}
-  RedEnergyBar: {fileID: 11472072}
-  EnergyBar: {fileID: 11490376}
-  FeverBar: {fileID: 11454588}
-  BlueLifeText: {fileID: 11472066}
-  RedLifeText: {fileID: 11472084}
-  BlueLifeBar: {fileID: 11472078}
-  RedLifeBar: {fileID: 11472080}
-  Combo: {fileID: 101382}
-  MissionObject: {fileID: 101388}
-  WaitObject: {fileID: 101398}
-  StartObject: {fileID: 127784}
-  ScorePlusObject: {fileID: 101414}
-  OtherPlusObject: {fileID: 101418}
-  GGObject: {fileID: 101428}
-  BossHPBar: {fileID: 11401562}
-  GameTime: {fileID: 11428638}
-  StateICON:
-  - {fileID: 113626}
-  - {fileID: 113628}
-  - {fileID: 113624}
-  messagePanel: {fileID: 0}
-  _beautyHP: 0.5
 --- !u!114 &11401376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,14 +245,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startAnim: {fileID: 127784}
-  energyLabel: {fileID: 11483292}
   gameMode: {fileID: 11401566}
-  feverEnergy: 0
-  _healthValue: 0
-  maxLife: 0
   battleState: 1
   spawnStatus: 11
-  missionCombo: 0
+  feverEnergy: 0
+--- !u!114 &11401374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beef96507a7788b408fe9f518075dccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerName: {fileID: 0}
+  otherPlayerName: {fileID: 0}
+  avatarImage: {fileID: 0}
+  otherAvatarImage: {fileID: 0}
+  gameMode: {fileID: 11401566}
+  HPBar: {fileID: 11401410}
+  ComboLabel: {fileID: 11401426}
+  BlueScoreLabel: {fileID: 11401394}
+  RedScoreLabel: {fileID: 11401396}
+  BlueEnergyBar: {fileID: 11472070}
+  RedEnergyBar: {fileID: 11472072}
+  EnergyBar: {fileID: 11490376}
+  FeverBar: {fileID: 11454588}
+  BlueLifeText: {fileID: 11472066}
+  RedLifeText: {fileID: 11472084}
+  BlueLifeBar: {fileID: 11472078}
+  RedLifeBar: {fileID: 11472080}
+  Combo: {fileID: 101382}
+  MissionObject: {fileID: 101388}
+  WaitObject: {fileID: 101398}
+  StartObject: {fileID: 127784}
+  ScorePlusObject: {fileID: 101414}
+  OtherPlusObject: {fileID: 101418}
+  GGObject: {fileID: 101428}
+  BossHPBar: {fileID: 11401562}
+  GameTime: {fileID: 11428638}
+  energyLabel: {fileID: 11483292}
+  StateICON:
+  - {fileID: 113626}
+  - {fileID: 113628}
+  - {fileID: 113624}
+  messagePanel: {fileID: 0}
+  _beautyHP: 0.5
 --- !u!114 &11401380
 MonoBehaviour:
   m_ObjectHideFlags: 0

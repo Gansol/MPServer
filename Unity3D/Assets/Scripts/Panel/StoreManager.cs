@@ -28,7 +28,7 @@ using MPProtocol;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改     
  * 20200813 Store需要全部重寫
  * ****************************************************************/
-public class StoreManager : MPPanel
+public class StoreManager : IMPPanelUI
 {
     #region 欄位
     /// <summary>
@@ -60,14 +60,21 @@ public class StoreManager : MPPanel
     private Dictionary<string, string> buyingGoodsData;              // 儲存購買商品資料 
     private string _folderString;                                  // 資料夾名稱
     private int _itemType;                                        // 道具形態
-    private bool _bFirstLoad, _bLoadedGashapon, _bLoadedAsset, _bLoadedItem, _bLoadedActor, _bLoadedStoreData, _bLoadedItemData, _bLoadedCurrency, _bLoadedPlayerItem, _bLoadedPanel; // 是否載入轉蛋、是否載入圖片、是否載入角色 等
+    /// <summary>
+    /// 使用質數判斷資料載入完成  (無法整除的數 = 少載入的資料)
+    /// 2=StoreData  | 3=ItemData  |5=Currency  |7=PlayerItem  |9=Gashapon  |11=  |13=  |17=  |19=  |
+    /// </summary>
+    private int _dataLoadedCount;
+    private bool _bFirstLoad, _bLoadedGashapon, _bLoadedAsset, _bLoadedActor, _bLoadedPanel; // 是否載入轉蛋、是否載入圖片、是否載入角色 等
     private static GameObject _lastPanel, _lastItemBtn;                   // 暫存分頁、暫存按鈕
     private Dictionary<string, object> _itemData;                   // 道具資料
     private Dictionary<string, GameObject> dictItemRefs;
     #endregion
 
-    public StoreManager(MPGame MPGame) : base(MPGame) { }
+    public StoreManager(MPGame MPGame) : base(MPGame)
+    {
 
+    }
 
     enum ENUM_Area : int
     {
@@ -79,6 +86,8 @@ public class StoreManager : MPPanel
         CheckoutBox,
         GashaponBox
     }
+
+
 
     private void Awake()
     {
@@ -92,6 +101,8 @@ public class StoreManager : MPPanel
         tablePageCount = 9;
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
+
+        m_RootUI = GameObject.Find("Store(Panel)");
     }
 
     void OnEnable()
@@ -119,7 +130,7 @@ public class StoreManager : MPPanel
         //}
 
         // 載入Panel完成後 
-        if (_bLoadedStoreData && _bLoadedPlayerItem && _bLoadedItemData && _bLoadedCurrency && !_bLoadedPanel)
+        if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
         {
             _bLoadedPanel = true;
 
@@ -157,7 +168,7 @@ public class StoreManager : MPPanel
     private void InstantiateStoreItem()
     {
         // 實體化的商品背景(按鈕)
-        Dictionary<string, GameObject> itemBtnDict = InstantiateItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
+        Dictionary<string, GameObject> itemBtnDict = InstantiateBagItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
         Transform parent = infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString());
 
         // 如果有新商品 加入索引 並 加入按鈕事件
@@ -184,6 +195,7 @@ public class StoreManager : MPPanel
     #region -- OnLoadPanel 載入面板 --
     protected override void OnLoading()
     {
+        _dataLoadedCount = (int)ENUM_Data.None;
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
 
@@ -196,26 +208,27 @@ public class StoreManager : MPPanel
 
     private void OnLoadStoreData()
     {
-        _bLoadedStoreData = true;
+        _dataLoadedCount *= (int)ENUM_Data.StoreData;
     }
 
     private void OnLoadItemData()
     {
-        _bLoadedItemData = true;
+        _dataLoadedCount *= (int)ENUM_Data.ItemData;
     }
+
     private void OnLoadCurrency()
     {
-        _bLoadedCurrency = true;
+        _dataLoadedCount *= (int)ENUM_Data.CurrencyData;
     }
 
     private void OnLoadPlayerItem()
     {
-        _bLoadedPlayerItem = true;
+        _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
     }
 
     protected override void OnLoadPanel()
     {
-        if (transform.parent.gameObject.activeSelf)
+        if (m_RootUI.activeSelf)
         {
             if (_bFirstLoad)
                 _bFirstLoad = false;
@@ -225,7 +238,7 @@ public class StoreManager : MPPanel
             //   LoadGashaponAsset(assetFolder[0]);
             GetMustLoadAsset();
             LoadPlayerInfo();
-            EventMaskSwitch.lastPanel = gameObject;
+            EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0). gameObject;
         }
         Global.isStoreLoaded = false;
     }
@@ -441,9 +454,9 @@ public class StoreManager : MPPanel
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        GameObject root = obj.transform.parent.gameObject;
-
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        //GameObject root = obj.transform.parent.gameObject;
+        ShowPanel(obj.transform.parent.name);
+       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         EventMaskSwitch.Resume();
     }
 
@@ -793,7 +806,16 @@ public class StoreManager : MPPanel
     //        i++;
     //    }
     //}
+
     //#endregion
+    /// <summary>
+    /// 取得需要載入的資料總和
+    /// </summary>
+    /// <returns></returns>
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.CurrencyData * (int)ENUM_Data.ItemData * (int)ENUM_Data.PlayerItem * (int)ENUM_Data.StoreData;
+    }
 
     /// <summary>
     /// 關閉前一個Panel 並儲存目前Panel等待下次關閉

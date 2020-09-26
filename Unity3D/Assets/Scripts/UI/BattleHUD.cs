@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using MPProtocol;
 using System;
 using System.Collections.Generic;
 
 public class BattleHUD : MonoBehaviour
 {
-    public UILabel myName;
-    public UILabel otherName;
-    public UISprite myImage, otherImage;
+    public UILabel playerName;
+    public UILabel otherPlayerName;
+    public UISprite avatarImage, otherAvatarImage, gameMode;
     public UISlider HPBar;
     public UILabel ComboLabel;
     public UILabel BlueScoreLabel;
@@ -30,22 +29,24 @@ public class BattleHUD : MonoBehaviour
     public GameObject GGObject;
     public UISlider BossHPBar;
     public UILabel GameTime;
+    public UILabel energyLabel;
     public GameObject[] StateICON;
     public GameObject messagePanel;
 
     [Range(0.1f, 1.0f)]
     public float _beautyHP;                // 美化血條用
 
-    private Color _blueLifeColor, _redLifeColor;
-    private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife;
-    //private double _energy;
     private BattleManager battleManager;
     private AssetLoader assetLoader;
-    private bool bLoadPrefab;
+    private ObjectFactory objFactory;
+    private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
+    private Color _blueLifeColor, _redLifeColor;
+    private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife, energy, feverEnergy, blueLife, redLife, tmpBlueLifeBar, tmpRedLifeBar;
     private float _tmpLife, _tmpOhterLife;
-    Transform rewardPanel;
-    ObjectFactory objFactory;
+    //  private bool bLoadPrefab;
+    //private double _energy;
+
     void Start()
     {
         WaitObject.transform.gameObject.SetActive(true);
@@ -56,20 +57,18 @@ public class BattleHUD : MonoBehaviour
         Global.photonService.LoadSceneEvent += OnLoadScene;
 
         assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
-        // assetLoader.LoadPrefab("panel/", "invitem");
-        _beautyEnergy = _beautyFever = 0f;
+
         //_energy = 0d;
-        bLoadPrefab = true;
-        myName.text = Global.Nickname;
-        otherName.text = Global.OpponentData.Nickname;
+        _beautyEnergy = _beautyFever = 0f;
+        playerName.text = Global.Nickname;
+        otherPlayerName.text = Global.OpponentData.Nickname;
         rewardPanel = GGObject.transform.Find("Result").Find("Reward").GetChild(0).GetChild(0).GetChild(0);
 
-        myImage.spriteName = Global.PlayerImage;
-        otherImage.spriteName = Global.OpponentData.Image;
-
+        avatarImage.spriteName = Global.PlayerImage;
+        otherAvatarImage.spriteName = Global.OpponentData.Image;
 
         _tmpLife = battleManager.life;
-        _tmpOhterLife = battleManager.otherLife;
+        _tmpOhterLife = battleManager.OtherLife;
 
         _blueLifeColor = BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = RedLifeBar.GetComponent<UISprite>().color;
@@ -77,13 +76,6 @@ public class BattleHUD : MonoBehaviour
 
     void Update()
     {
-        if (assetLoader.bLoadedObj && !bLoadPrefab)
-        {
-            bLoadPrefab = true;
-            ShowItemReward();
-
-        }
-
         #region 動畫類判斷 DisActive
         if (WaitObject.activeSelf)
         {
@@ -95,7 +87,7 @@ public class BattleHUD : MonoBehaviour
             AnimatorStateInfo waitState = waitAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
             if (waitState.fullPathHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
-                if (waitState.normalizedTime > 0.1f)
+                if (waitState.normalizedTime > .1f)
                 {
                     WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
                     StartObject.SetActive(true);
@@ -110,7 +102,7 @@ public class BattleHUD : MonoBehaviour
             AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
             if (startState.fullPathHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
-                if (startState.normalizedTime > 1) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                if (startState.normalizedTime > .9f) StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
         }
 
         if (MissionObject.activeSelf)
@@ -153,52 +145,73 @@ public class BattleHUD : MonoBehaviour
         }
         #endregion
     }
-
-    private void ShowItemReward()
-    {
-        // todo show itemReward goldReward
-        if (_dictItemReward.Count != 0)
-        {
-            int i = 0;
-
-            // dictItemReward {"10001":{"ItemCount":"0"}}
-            foreach (KeyValuePair<string, object> item in _dictItemReward)
-            {
-                Dictionary<string, object> itemData = item.Value as Dictionary<string, object>;   // ItemCount:1
-
-                string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
-                string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
-                Debug.Log("Bundle:" + bundle);
-                if (bundle != null)
-                    bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
-
-
-                rewardPanel.GetChild(i).Find("text").GetComponent<UILabel>().text = itemCount;
-                i++;
-            }
-        }
-        bLoadPrefab = true;
-    }
-
-
     void OnGUI()
     {
-        float energy = BattleManager.Energy / 100f;
-        float feverEnergy = battleManager.feverEnergy / 100f;
-        float blueLife = battleManager.life / _tmpLife;
-        float redLife = battleManager.otherLife / _tmpOhterLife;
-        float tmpBlueLifeBar = BlueLifeBar.value, tmpRedLifeBar = RedLifeBar.value;
+        BattleState();
+        GUIVariables();
+        ScoreBarAnim();
+
+        BeautyBar(EnergyBar, energy, _beautyEnergy);
+        BeautyBar(BlueEnergyBar, energy, _beautyEnergy);
+        BeautyBar(RedEnergyBar, battleManager.otherEnergy / 100f, _beautyOtherEnergy);
+        BeautyBar(FeverBar, feverEnergy, _beautyFever);
+        BeautyBar(BlueLifeBar, blueLife, _beautyLife);
+        BeautyBar(RedLifeBar, redLife, _beautyOtherLife);
+    }
+
+    #region  BattleState 顯示目前遊戲狀態
+    // 顯示目前BattleState ICON
+    private void BattleState()
+    {
+        switch (battleManager.GetBattleState())
+        {
+            case ENUM_BattleAIState.EasyMode:
+                gameMode.spriteName = "Easy Mode";
+                break;
+            case ENUM_BattleAIState.NormalMode:
+                gameMode.spriteName = "NormalMode";
+                break;
+            case ENUM_BattleAIState.HardMode:
+                gameMode.spriteName = "HardMode";
+                break;
+            case ENUM_BattleAIState.CarzyMode:
+                gameMode.spriteName = "CarzyMode";
+                break;
+            case ENUM_BattleAIState.EndTimeMode:
+                gameMode.spriteName = "EndMode";
+                break;
+        }
+    }
+    #endregion
+
+    #region GUIVariables GUI數值顯示
+    // GUI 顯示數值
+    private void GUIVariables()
+    {
+        energy = BattleManager.Energy / 100f;
+        feverEnergy = battleManager.feverEnergy / 100f;
+        blueLife = battleManager.life / _tmpLife;
+        redLife = battleManager.OtherLife / _tmpOhterLife;
+        tmpBlueLifeBar = BlueLifeBar.value;
+        tmpRedLifeBar = RedLifeBar.value;
         GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - BattleManager.gameTime))).ToString();
         BlueScoreLabel.text = battleManager.score.ToString();         // 畫出分數值
         RedScoreLabel.text = battleManager.otherScore.ToString();     // 畫出分數值
         BlueLifeText.text = battleManager.life.ToString();
-        RedLifeText.text = battleManager.otherLife.ToString();
+        RedLifeText.text = battleManager.OtherLife.ToString();
+        ComboLabel.text = battleManager.combo.ToString();        // 畫出Combo值
 
-        #region Score Bar動畫
+        //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
+        //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
+        //else
+        //    BarTweenColor(BlueLifeBar, Color.red, _blueLifeColor);
+    }
+    #endregion
 
+    #region ScoreBarAnim 分數條動畫
+    private void ScoreBarAnim()
+    {
         float value = battleManager.score / (battleManager.score + battleManager.otherScore);                      // 得分百分比 兩邊都是0會 NaN
-
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
@@ -229,26 +242,23 @@ public class BattleHUD : MonoBehaviour
             if (_beautyHP >= HPBar.value && HPBar.value < 0.5f)
                 _beautyHP += 0.01f;
         }
-        #endregion
-
-        BeautyBar(EnergyBar, energy, _beautyEnergy);
-        BeautyBar(BlueEnergyBar, energy, _beautyEnergy);
-        BeautyBar(RedEnergyBar, battleManager.otherEnergy / 100f, _beautyOtherEnergy);
-        BeautyBar(FeverBar, feverEnergy, _beautyFever);
-        BeautyBar(BlueLifeBar, blueLife, _beautyLife);
-        BeautyBar(RedLifeBar, redLife, _beautyOtherLife);
-
-        //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
-        //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
-        //else
-        //    BarTweenColor(BlueLifeBar, Color.red, _blueLifeColor);
-
-        ComboLabel.text = battleManager.combo.ToString();        // 畫出Combo值
-
-        //        Debug.Log("_beautyEnergy: " + _beautyEnergy);
-        //        Debug.Log("battleManager.energy: " + battleManager.energy);
     }
+    #endregion
 
+    #region EnergyTextAnim 能量數值(數字) 動畫 ***還沒寫***
+    private void EnergyTextAnim()
+    {
+        energyLabel.text = battleManager.GetEnergy().ToString();
+    }
+    #endregion
+
+    #region BeautyBar 平滑Slider動畫
+    /// <summary>
+    /// 平滑Slider動畫
+    /// </summary>
+    /// <param name="bar"></param>
+    /// <param name="value"></param>
+    /// <param name="tmpValue"></param>
     private void BeautyBar(UISlider bar, float value, float tmpValue)
     {
 
@@ -271,26 +281,11 @@ public class BattleHUD : MonoBehaviour
         //    bar.value = value;
         //}
     }
+    #endregion
 
-    private void BarTweenColor(UISlider bar, Color toColor, Color defaultColor)
-    {
-        Color color = bar.GetComponent<UISprite>().color;
-        // 0.137255   // green -35
-        // 0.6471     // blue -165
-        if (toColor == Color.red)
-            bar.GetComponent<UISprite>().color = new Color(Mathf.Max(color.r + ((1 - defaultColor.r) * (1 - bar.value)), 1), Mathf.Min(color.g - (defaultColor.g * (1 - bar.value)), 0), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
-        if (toColor == Color.green)
-            bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)), 0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)), 1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
-        //  color = new Color(1 - bar.value, color.g - color.g * (1 - bar.value), Math.Max(color.b - color.b * (1 - bar.value), 0));
-    }
-
-    public void HPBar_Shing()
-    {
-        Debug.Log("HPBar_Shing !");
-    }
-
+    #region ShowBossHPBar 顯示BossHP Bar
     /// <summary>
-    /// 
+    /// 顯示BossHP Bar
     /// </summary>
     /// <param name="value">0~1顯示百分比</param>
     /// <param name="isDead">是否死亡</param>
@@ -308,7 +303,9 @@ public class BattleHUD : MonoBehaviour
             BossHPBar.gameObject.SetActive(false);
         }
     }
+    #endregion
 
+    #region MissionMsg 任務訊息
     public void MissionMsg(Mission mission, float value)
     {
         MissionObject.SetActive(true);
@@ -342,22 +339,16 @@ public class BattleHUD : MonoBehaviour
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission";
         MissionObject.GetComponent<Animator>().Play("Layer1.FadeIn");
     }
+    #endregion
 
+    #region MissionCompletedMsg 任務完成訊息
     public void MissionCompletedMsg(Mission mission, float missionReward)
     {
         if (missionReward != 0)     // ScorePlus 動畫
         {
             ScorePlusObject.SetActive(true);
-
-            if (missionReward > 0)
-            {
-                ScorePlusObject.transform.GetChild(0).GetComponent<UILabel>().text = "+" + missionReward.ToString();
-            }
-            else if (missionReward < 0)
-            {
-                ScorePlusObject.transform.GetChild(0).GetComponent<UILabel>().text = missionReward.ToString();
-            }
-            ScorePlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus",-1,0f);
+            ScorePlusObject.transform.GetChild(0).GetComponent<UILabel>().text = missionReward > 0 ? "+" : "" + missionReward.ToString();
+            ScorePlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus");
         }
 
         // Mission Completed 動畫
@@ -384,9 +375,11 @@ public class BattleHUD : MonoBehaviour
                 break;
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Completed!";
-        MissionObject.GetComponent<Animator>().Play("Layer1.Completed",-1,0f);
+        MissionObject.GetComponent<Animator>().Play("Layer1.Completed", -1, 0f);
     }
+    #endregion
 
+    #region OtherScoreMsg 顯示對手分數 訊息
     public void OtherScoreMsg(float missionReward)
     {
         if (missionReward != 0) // ScorePlus 動畫
@@ -401,12 +394,14 @@ public class BattleHUD : MonoBehaviour
             {
                 OtherPlusObject.transform.GetChild(0).GetComponent<UILabel>().text = missionReward.ToString();
             }
-            OtherPlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus",-1,0f);
+            OtherPlusObject.GetComponent<Animator>().Play("Layer1.ScorePlus", -1, 0f);
         }
 
         Debug.Log("Other MissionCompleted! + " + missionReward);
     }
+    #endregion
 
+    #region MissionFailedMsg 任務失敗訊息
     /// <summary>
     /// 任務失敗訊息
     /// </summary>
@@ -424,10 +419,12 @@ public class BattleHUD : MonoBehaviour
             MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "任務失敗";
         }
         MissionObject.transform.GetChild(1).GetComponent<UILabel>().text = "Mission Failed!";
-        MissionObject.GetComponent<Animator>().Play("Layer1.Completed",-1,0f);
+        MissionObject.GetComponent<Animator>().Play("Layer1.Completed", -1, 0f);
         Debug.Log("Mission Failed!");
     }
+    #endregion
 
+    #region ComboMsg 連擊訊息
     public void ComboMsg(int value)
     {
         if (Global.isGameStart)
@@ -443,15 +440,17 @@ public class BattleHUD : MonoBehaviour
             {
                 Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
                 Combo.transform.GetChild(1).GetComponent<UILabel>().text = "Break";
-                Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut",-1,0f);
+                Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut", -1, 0f);
             }
         }
         else
         {
-            Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut",-1,0f);
+            Combo.GetComponent<Animator>().Play("Layer1.ComboFadeOut", -1, 0f);
         }
     }
+    #endregion
 
+    #region GoodGameMsg 遊戲結束訊息
     /// <summary>
     /// 遊戲結束
     /// </summary>
@@ -462,37 +461,15 @@ public class BattleHUD : MonoBehaviour
     /// <param name="lost"></param>
     public void GoodGameMsg(int score, bool result, int exp, int sliverReward, int goldReward, string jItemReward, int combo, int killMice, int lostMice, string evaluate, bool isHighScore, bool isHighCombo)
     {
-
-        _dictItemReward = new Dictionary<string, object>(MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
-
-
         float maxExp = Clac.ClacExp(Global.Rank + 1);
         float _exp = Global.Exp + exp;
+        float value;
+        _dictItemReward = new Dictionary<string, object>(MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
 
-
-
-        // todo show itemReward goldReward
-        InstantiateItem(_dictItemReward, "invitem", rewardPanel, new Vector2(400, 0));
-        bLoadPrefab = LoadItemICON();
-
-        if (result)
-        {
-            GGObject.transform.GetChild(1).gameObject.SetActive(true);
-        }
-        else
-        {
-            GGObject.transform.GetChild(2).gameObject.SetActive(true);
-        }
-
-        GGObject.transform.Find("Result").Find("Score").GetComponent<UILabel>().text = score.ToString();
-        GGObject.transform.Find("Result").Find("Combo").GetComponent<UILabel>().text = combo.ToString();
-        GGObject.transform.Find("Result").Find("Kill").GetComponent<UILabel>().text = killMice.ToString();
-        GGObject.transform.Find("Result").Find("Lost").GetComponent<UILabel>().text = lostMice.ToString();
-        GGObject.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
-        GGObject.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
-
-
-
+        // 實體化 對戰獎勵
+        InstantiateRewardsBG(_dictItemReward, Global.InvItemAssetName, rewardPanel, new Vector2(400, 0));
+        LoadItemICON();
+        InstantiateItemReward();
 
         // EXP動畫還沒寫
         if (_exp > maxExp)
@@ -500,73 +477,87 @@ public class BattleHUD : MonoBehaviour
             Debug.Log("LEVEL UP!");
             _exp -= maxExp;
         }
-        float value = _exp;
-        value = value / maxExp;
+        value = _exp;
+        value /= maxExp;
         Debug.Log("Exp Percent:" + value + " _exp:" + _exp);
 
-        GGObject.SetActive(true);
+        // 顯示對戰結束 資訊
+        GGObject.transform.Find(result == true ? "Win" : "Lose").gameObject.SetActive(true);
+        GGObject.transform.Find("Result").Find("Score").GetComponent<UILabel>().text = score.ToString();
+        GGObject.transform.Find("Result").Find("Combo").GetComponent<UILabel>().text = combo.ToString();
+        GGObject.transform.Find("Result").Find("Kill").GetComponent<UILabel>().text = killMice.ToString();
+        GGObject.transform.Find("Result").Find("Lost").GetComponent<UILabel>().text = lostMice.ToString();
+        GGObject.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
+        GGObject.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
         GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
+        GGObject.SetActive(true);
     }
+    #endregion
 
+    #region LoadItemICON 載入道具圖示
     private bool LoadItemICON()
     {
         if (_dictItemReward.Count != 0)
         {
-            //  assetLoader.LoadAsset("miceicon/", "miceicon");
-            // dictItemReward {"10001":{"ItemCount":"0"}}
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
                 if (assetLoader.GetAsset(Global.IconSuffix + itemName) == null)
                     assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
-                //  assetLoader.LoadPrefab("miceicon/", Global.IconSuffix+ itemName );
             }
             return false;
         }
         return true;    // 已載入 不須再載入
     }
+    #endregion
 
-    void OnWaitingPlayer()
-    {
-        if (!Global.isGameStart)
-        {
-            WaitObject.transform.gameObject.SetActive(true);
-        }
-    }
+    #region -- InstantiateRewardsBG 實體化背包物件背景--
 
-    void OnLoadScene()
-    {
-        Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;
-        Global.photonService.LoadSceneEvent -= OnLoadScene;
-    }
-
-
-    #region -- InstantiateItem 實體化背包物件背景--
-
-    private Dictionary<string, GameObject> InstantiateItem(Dictionary<string, object> itemData, string itemName, Transform parent, Vector2 offset)
+    private Dictionary<string, GameObject> InstantiateRewardsBG(Dictionary<string, object> itemData, string itemName, Transform parent, Vector2 offset)
     {
         Vector2 pos = new Vector2();
         Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
-        int count = parent.childCount, i = 0;
 
         foreach (KeyValuePair<string, object> item in itemData)
         {
-            // id to name 
             if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(itemName);
-
-                bundle = objFactory.Instantiate(bundle, parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-                if (bundle != null) dictItem.Add(item.Key, bundle);    // 存入道具資料索引
+                GameObject obj = objFactory.Instantiate(assetLoader.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                 dictItem.Add(item.Key, obj);    // 存入道具資料索引
                 pos.x += offset.x;
             }
-            i++;
         }
-
         return dictItem;
     }
     #endregion
 
+    #region InstantiateItemReward 顯示道具獎勵
+    private void InstantiateItemReward()
+    {
+        // todo show itemReward goldReward
+        if (_dictItemReward.Count != 0)
+        {
+            int i = 0;
+
+            // dictItemReward {"10001":{"ItemCount":"0"}}
+            foreach (KeyValuePair<string, object> item in _dictItemReward)
+            {
+                Dictionary<string, object> itemData = item.Value as Dictionary<string, object>;   // ItemCount:1
+
+                string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
+                string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
+                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
+
+                if (bundle != null)
+                    bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
+
+                rewardPanel.GetChild(i).Find("text").GetComponent<UILabel>().text = itemCount;
+                i++;
+            }
+        }
+        //    bLoadPrefab = true;
+    }
+    #endregion
 
     #region -- SortItemPos 排序道具位置  --
     /// <summary>
@@ -578,7 +569,7 @@ public class BattleHUD : MonoBehaviour
     /// <param name="pos">初始位置</param>
     /// <param name="counter">計數</param>
     /// <returns>物件位置</returns>
-    public Vector2 sortItemPos(int xCount, int yCount, Vector2 offset, Vector2 pos, int counter)
+    public Vector2 SortItemPos(int xCount, int yCount, Vector2 offset, Vector2 pos, int counter)
     {
         // 物件位置排序
         if (counter % xCount == 0 && counter != 0) // 3 % 9 =0
@@ -594,4 +585,41 @@ public class BattleHUD : MonoBehaviour
         return pos;
     }
     #endregion
+
+    private void BarTweenColor(UISlider bar, Color toColor, Color defaultColor)
+    {
+        Color color = bar.GetComponent<UISprite>().color;
+        // 0.137255   // green -35
+        // 0.6471     // blue -165
+        if (toColor == Color.red)
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Max(color.r + ((1 - defaultColor.r) * (1 - bar.value)), 1), Mathf.Min(color.g - (defaultColor.g * (1 - bar.value)), 0), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
+        if (toColor == Color.green)
+            bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)), 0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)), 1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
+        //  color = new Color(1 - bar.value, color.g - color.g * (1 - bar.value), Math.Max(color.b - color.b * (1 - bar.value), 0));
+    }
+
+    /// <summary>
+    /// HPBar 受傷 閃爍
+    /// </summary>
+    public void HPBar_Shing()
+    {
+        Debug.Log("FUCK HPBar_Shing !");
+    }
+
+    void OnWaitingPlayer()
+    {
+        if (!Global.isGameStart)
+            WaitObject.transform.gameObject.SetActive(true);
+    }
+
+    void OnLoadScene()
+    {
+
+    }
+
+    private void OnDisable()
+    {
+        Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
+    }
 }
