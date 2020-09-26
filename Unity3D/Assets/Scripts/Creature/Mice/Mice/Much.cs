@@ -18,7 +18,7 @@ public class Much : MiceBase
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
         _bEat = false;
@@ -46,16 +46,16 @@ public class Much : MiceBase
             gameObject.SetActive(false);
         }
 
-        if (m_AnimState.GetAnimState() == AnimatorState.ENUM_AnimatorState.Eat && !_bEat)
+        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Eat && !_bEat)
         {
             _bEat = true;
             
-            Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMice);
+            Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
             foreach (KeyValuePair<Transform, GameObject> item in buffer)
             {
                 Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
                 pos.Add(0, transform.position);
-                if (item.Value != null && Global.dictBattleMice.ContainsKey(item.Key) && item.Value != gameObject)
+                if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key) && item.Value != gameObject)
                 {
                     if (item.Value.GetComponent<MiceBase>() != null)
                     {
@@ -80,7 +80,7 @@ public class Much : MiceBase
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
         }
         else
         {
@@ -101,7 +101,7 @@ public class Much : MiceBase
                 battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
             else
                 battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
-            Global.dictBattleMice.Remove(transform.parent);
+            Global.dictBattleMiceRefs.Remove(transform.parent);
             Global.MiceCount--;
 
             gameObject.SetActive(false);

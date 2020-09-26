@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1405631028
+CRC: 4061869527
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 16b1381ea2fc9f31faf7c95089eace7d
+    Hash: 5bbc9c1fd74e35d33f5c6dcbf625b480
   TypeTreeHash:
     serializedVersion: 2
     Hash: 3b3deeae03f2a86588e7adee014544f4
@@ -64,6 +64,5 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/panel/unique/Player.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

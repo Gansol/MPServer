@@ -202,7 +202,7 @@ public class SpawnAI
             }
             catch (Exception e)
             {
-                Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount + "G:" + Global.dictBattleMice.Count);
+                Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount + "G:" + Global.dictBattleMiceRefs.Count);
                 throw e;
             }
 
@@ -339,7 +339,7 @@ public class SpawnAI
             // 如果Hole上有Mice 移除Mice
             if (_hole[4].GetComponent<HoleState>().holeState == HoleState.State.Closed)
             {
-                Global.dictBattleMice.Remove(_hole[4].transform);
+                Global.dictBattleMiceRefs.Remove(_hole[4].transform);
                 if (_hole[4].transform.GetComponentInChildren<Mice>())
                     _hole[4].transform.GetComponentInChildren<Mice>().gameObject.SendMessage("OnDead", 0.0f);
             }
@@ -385,7 +385,7 @@ public class SpawnAI
 
             Debug.Log("----------------------------------------- " + clone.activeSelf + "----------------------------------------- ");
             // 加入老鼠陣列
-            Global.dictBattleMice.Add(clone.transform.parent, clone);
+            Global.dictBattleMiceRefs.Add(clone.transform.parent, clone);
         }
         catch
         {

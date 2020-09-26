@@ -2,7 +2,7 @@
 using System.Collections;
 using MPProtocol;
 
-public class EndlessBattleAIState : BattleAIState
+public class EndlessBattleAIState : IBattleAIState
 {
     public void Initialize()
     {

@@ -129,22 +129,22 @@ public class VersionManager : MonoBehaviour
         {
            bCompleted = true;
 
-            if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
-            {
+            //if (!bundleChecker.bundleChk && !bFirstDownload)   // 如果沒有新增檔案
+            //{
                 if (Global.connStatus)
                 {
                     StartCoroutine(visionChecker.ReplaceVisionList());
                     syncLoad = gameObject.AddComponent<SyncLoad>();
                     syncLoad.OnLoadScene();
                 }
-            }
-            else if (!flag)
-            {
-                flag = !flag;
-                message.SetActive(true);
-                message.GetComponentInChildren<UILabel>().text = "更新完畢 請重新啟動遊戲！";
-                Caching.ClearCache();
-            }
+            //}
+            //else if (!flag)
+            //{
+            //    flag = !flag;
+            //    message.SetActive(true);
+            //    message.GetComponentInChildren<UILabel>().text = "更新完畢 請重新啟動遊戲！";
+            //    Caching.ClearCache();
+            //}
         }
     }
 

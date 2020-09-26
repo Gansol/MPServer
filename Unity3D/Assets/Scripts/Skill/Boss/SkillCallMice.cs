@@ -58,7 +58,7 @@ public class SkillCallMice : SkillBoss
         {
             foreach (KeyValuePair<Transform, GameObject> mice in buffer)
             {
-                if (!Global.dictBattleMice.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
+                if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
             }
 
             Display(obj, null, null);

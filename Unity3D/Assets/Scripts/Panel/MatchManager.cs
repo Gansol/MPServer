@@ -27,7 +27,7 @@ using System;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
  * ****************************************************************/
 
-public class MatchManager : MPPanel
+public class MatchManager : IMPPanelUI
 {
     SwitchBtnComponent SwitchBtnMethod;
 
@@ -45,7 +45,7 @@ public class MatchManager : MPPanel
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
     private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private bool _bFirstLoad, _bLoadedAsset, _bLoadedActor, _bLoadedEffect, _bLoadedPlayerData, _bLoadedPlayerItem, _bLoadedPanel, _checkFlag; // 是否 第一次載入 載入圖片、是否載入角色
-    private int _miceCost, _page;   // 翻頁值(翻一頁+10)
+    private int _miceCost, _dataLoadedCount, _page;   // 翻頁值(翻一頁+10)
     private float _time, _lastTime, _escapeTime, _checkTime, _lastClickTime;    // 點擊間距時間
     #endregion
 
@@ -69,6 +69,7 @@ public class MatchManager : MPPanel
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
+        m_RootUI = GameObject.Find("Match(Panel)");
 
         UIEventListener.Get(ok_btn).onClick = OnMatchGame;
     }
@@ -86,7 +87,7 @@ public class MatchManager : MPPanel
 
     void Update()
     {
-        if (enabled)
+        if (m_RootUI.gameObject.activeSelf)
         {
             //// 除錯訊息
             //if (_bLoadedActor || _bLoadedAsset)
@@ -103,7 +104,7 @@ public class MatchManager : MPPanel
             }
 
             // 資料庫資料載入完成時 載入Panel
-            if (_bLoadedPlayerData && _bLoadedPlayerItem && !_bLoadedPanel)
+            if (_dataLoadedCount  == GetMustLoadedDataCount() && !_bLoadedPanel)
             {
                 if (!_bFirstLoad)
                     ResumeToggleTarget();
@@ -231,7 +232,7 @@ public class MatchManager : MPPanel
                 if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
                 {
                     MPGFactory.GetObjFactory().Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-                    miceBtn.gameObject.AddMissingComponent<BtnSwitch>().init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
+                    miceBtn.gameObject.AddMissingComponent<BtnSwitch>().Init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
                     miceBtn.GetComponent<BtnSwitch>().SendMessage("EnableBtn");          // 開啟按鈕功能
                 }
                 else if (item.Key.ToString() != keys[i])                                    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
@@ -285,18 +286,19 @@ public class MatchManager : MPPanel
     #region -- OnLoadPanel 載入面板--
     protected override void OnLoading()
     {
+        _dataLoadedCount = (int)ENUM_Data.None;
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
     void OnLoadPlayerData()
     {
-        _bLoadedPlayerData = true;
+        _dataLoadedCount *= (int)ENUM_Data.PlayerData;
     }
 
     void OnLoadPlayerItem()
     {
-        _bLoadedPlayerItem = true;
+        _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
     }
 
     protected override void OnLoadPanel()
@@ -320,7 +322,7 @@ public class MatchManager : MPPanel
 
         _dictMiceData = Global.dictMiceAll;
         _dictTeamData = Global.dictTeam;
-        EventMaskSwitch.lastPanel = gameObject;
+        EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0).gameObject;
         OnCostCheck();
     }
     #endregion
@@ -328,7 +330,7 @@ public class MatchManager : MPPanel
     // 載入必要資產
     protected override void GetMustLoadAsset()
     {
-        if (transform.parent.gameObject.activeSelf)     // 如果Panel是啟動狀態 接收Event
+        if (m_RootUI.activeSelf)     // 如果Panel是啟動狀態 接收Event
         {
             Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
 
@@ -368,7 +370,7 @@ public class MatchManager : MPPanel
 
             Global.isPlayerDataLoaded = false;
 
-            OnCostCheck();
+           // OnCostCheck();
         }
     }
 
@@ -380,7 +382,8 @@ public class MatchManager : MPPanel
         Panel[0].SetActive(true);
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        ShowPanel(obj.transform.parent.name);
+        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         Panel[1].SetActive(false);
         // EventMaskSwitch.Prev();
     }
@@ -497,10 +500,10 @@ public class MatchManager : MPPanel
         Panel[1].SetActive(false);
 
         EventMaskSwitch.Resume();
-        if (EventMaskSwitch.lastPanel != gameObject)
+        if (EventMaskSwitch.lastPanel != m_RootUI)  //m_RootUI = gameobject
             EventMaskSwitch.lastPanel.SetActive(false);
-        EventMaskSwitch.Switch(gameObject/*, false*/);
-        EventMaskSwitch.lastPanel = gameObject;
+        EventMaskSwitch.Switch(m_RootUI/*, false*/); //m_RootUI = gameobject
+        EventMaskSwitch.lastPanel = m_RootUI; //m_RootUI = gameobject
 
         UIEventListener.Get(ok_btn).onClick = MatchGameFriend;
     }
@@ -528,7 +531,8 @@ public class MatchManager : MPPanel
         EventMaskSwitch.lastPanel = null;
         Panel[0].SetActive(true);
         Panel[1].SetActive(false);
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(transform.parent.gameObject);
+        ShowPanel(m_RootUI.name);
+        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(m_RootUI.gameObject);
 
     }
     //-----------------------------------------------
@@ -546,5 +550,10 @@ public class MatchManager : MPPanel
         Panel[0].SetActive(true);
         Panel[1].SetActive(false);
         Panel[1].transform.parent.parent.gameObject.SetActive(false);
+    }
+
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.PlayerData* (int)ENUM_Data.PlayerItem ;
     }
 }

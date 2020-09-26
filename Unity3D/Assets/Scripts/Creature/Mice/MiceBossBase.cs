@@ -48,7 +48,7 @@ public abstract class MiceBossBase : Creature
         Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
         if (Global.isGameStart && enabled && m_Arribute.GetHP() > 0)
         {
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.OnHit);
 
             if (m_Arribute.GetHP() - 1 == 0) GetComponent<BoxCollider2D>().enabled = false;
 
@@ -84,7 +84,7 @@ public abstract class MiceBossBase : Creature
         }
         else
         {
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
             if (Global.OpponentData.RoomPlace != "Host")
             {
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
@@ -107,7 +107,7 @@ public abstract class MiceBossBase : Creature
             battleHUD.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
 
             Global.MiceCount--;
-            Global.dictBattleMice.Remove(transform);
+            Global.dictBattleMiceRefs.Remove(transform);
             OnDestory();
             Destroy(gameObject);
         }
@@ -142,7 +142,7 @@ public abstract class MiceBossBase : Creature
         this.m_Arribute = arribute;
     }
 
-    public override void SetAnimState(AnimatorState state)
+    public override void SetAnimState(IAnimatorState state)
     {
         if (this.m_AnimState != null)
             this.m_AnimState = null;

@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class SyncLoad : MonoBehaviour
 {
     AssetLoader assetLoader;
-    private bool bLoadAsset;
+    private bool _bLoadSceneAsset;
     private GameObject _clone;
 
     void Awake()
@@ -25,92 +25,98 @@ public class SyncLoad : MonoBehaviour
         //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-        if (assetLoader.bLoadedObj && bLoadAsset)
-        {
+        // 如果場景資產已經載入 實體化場景物件
+        if (assetLoader.bLoadedObj && _bLoadSceneAsset)
             InstantiateScene();
-            bLoadAsset = !bLoadAsset;
-        }
     }
 
     public void OnLoadScene()       // LoadScene
     {
+        // 顯示 "載入場景"  載入下一個場景
         SceneManager.LoadScene(Global.Scene.LoadScene);
     }
 
+    /// <summary>
+    /// 確認要載入的場景 並載入資產
+    /// </summary>
     private void LoadAssetCheck()
     {
         if (SceneManager.GetActiveScene().name == Global.Scene.BundleCheck)
         {
-            bLoadAsset = true;
+            _bLoadSceneAsset = true;
         }
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-            assetLoader.LoadAssetFormManifest( Global.PanelUniquePath+ Global.Scene.MainGameAsset + Global.ext);
-            bLoadAsset = true;
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.MainGameAsset + Global.ext);
+            _bLoadSceneAsset = true;
         }
 
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
-           assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
-            bLoadAsset = true;
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
+            _bLoadSceneAsset = true;
         }
     }
 
+    /// <summary>
+    /// 實體化場景物件
+    /// </summary>
     private void InstantiateScene()
     {
-        string sceneName = "";
+        string sceneAssetName = null;
+        _bLoadSceneAsset = !_bLoadSceneAsset;
 
+        // 選擇場景對應資產
         switch (SceneManager.GetActiveScene().name)
         {
-            case Global.Scene.BundleCheck:
-                sceneName = Global.Scene.MainGame;
-                break;
+            //case Global.Scene.BundleCheck:
+            //    sceneName = Global.Scene.MainGame;
+                //break;
             case Global.Scene.MainGame:
-                sceneName = Global.Scene.MainGameAsset;
+                sceneAssetName = Global.Scene.MainGameAsset;
                 break;
             case Global.Scene.Battle:
-                sceneName = Global.Scene.BattleAsset;
+                sceneAssetName = Global.Scene.BattleAsset;
                 break;
         }
 
-        if (Global.dictLoadedScene.ContainsKey(sceneName))
-            Global.dictLoadedScene.TryGetValue(sceneName, out _clone);
+        // 確認是否已經實體化
+        if (Global.dictLoadedScene.ContainsKey(sceneAssetName))
+            Global.dictLoadedScene.TryGetValue(sceneAssetName, out _clone);
 
-        if (AssetBundleManager.GetLoadedAssetbundle(Global.PanelUniquePath+ sceneName +Global.ext) && _clone == null)
+        // 如果場景資產已經載入 且 尚未實體化
+        if (AssetBundleManager.GetLoadedAssetbundle(AssetBundleManager.GetAssetBundleNamePath(sceneAssetName)) && _clone == null)
         {
-           // string assetName = Global.PanelUniquePath + sceneName + Global.ext;
-            string assetName =  sceneName;
+            _clone = Instantiate(assetLoader.GetAsset(sceneAssetName)) as GameObject;
+            _clone.name = sceneAssetName;
 
-            _clone = Instantiate(assetLoader.GetAsset(assetName)) as GameObject;
-            _clone.name = sceneName;
-            if (!Global.dictLoadedScene.ContainsKey(sceneName))
+            // 是否存在場景索引
+            if (!Global.dictLoadedScene.ContainsKey(sceneAssetName))
                 Global.dictLoadedScene.Add(_clone.name, _clone);
             else
-                Global.dictLoadedScene[sceneName] = _clone;
+                Global.dictLoadedScene[sceneAssetName] = _clone;
         }
 
+        //錯誤 這裡以後需要改寫 目前只有 MainGame和Battle在做切換隱藏/顯示
         if (Global.prevScene == Global.Scene.MainGame)
             Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(false);
         if (Global.nextScene == Global.Scene.MainGame)
             Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(true);
 
-
-
+        // 防止HUDCamera無法顯示
         if (SceneManager.GetActiveScene().name != Global.Scene.BundleCheck)
         {
             _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
             _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
         }
 
+        // 儲存目前場景
         Global.prevScene = SceneManager.GetActiveScene().name;
-
-
     }
 
     void OnDestory()
     {
         Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
-
 }

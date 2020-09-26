@@ -44,7 +44,7 @@ public class TestPanelScript : MonoBehaviour
 
     public void OnOFF()
     {
-        battleManager.tSpawnFlag = !battleManager.tSpawnFlag;
+        battleManager.SpawnFlag = !battleManager.SpawnFlag;
     }
 
     public void OnOpenTestPanel()

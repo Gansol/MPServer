@@ -175,7 +175,7 @@ public static class Global
    
 
     public static Dictionary<string, GameObject> dictLoadedScene = new Dictionary<string, GameObject>();
-    public static Dictionary<Transform, GameObject> dictBattleMice = new Dictionary<Transform, GameObject>();
+    public static Dictionary<Transform, GameObject> dictBattleMiceRefs = new Dictionary<Transform, GameObject>();   // <hole,mice>
     public static Dictionary<Transform, GameObject> dictSkillMice = new Dictionary<Transform, GameObject>();
     public static Dictionary<Transform, GameObject> dictBossMice = new Dictionary<Transform, GameObject>();
 
@@ -223,7 +223,7 @@ public static class Global
         public static string Image = "";
     }
 
-    public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData
+    public static int MiceCount = 0;        // 目前 對戰老鼠數量 要移到BattleData  FUCK 錯誤
 
 
 

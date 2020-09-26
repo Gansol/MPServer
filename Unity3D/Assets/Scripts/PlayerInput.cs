@@ -17,7 +17,11 @@ public class PlayerInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Global.ShowMessage("確定要離開遊戲嗎?", Global.MessageBoxType.YesNo, 0);
+            Global.ExitGame();
+        }
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 

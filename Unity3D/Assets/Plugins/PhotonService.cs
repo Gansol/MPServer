@@ -111,7 +111,7 @@ public class PhotonService : IPhotonPeerListener
 
     public delegate void UpdateValueHandler(short value);
     public event UpdateValueHandler UpdateLifeEvent;
-    public event UpdateValueHandler GetLifeEvent;
+    public event UpdateValueHandler GetOpponentLifeEvent;
 
     public delegate void GetListHandler(List<string> value);
     public event GetListHandler GetGashaponEvent;
@@ -285,7 +285,7 @@ public class PhotonService : IPhotonPeerListener
             //取得對方生命
             case (byte)BattleResponseCode.GetLife:
                 short life = (short)eventResponse.Parameters[(byte)BattleParameterCode.Life];
-                GetLifeEvent(life);
+                GetOpponentLifeEvent(life);
                 break;
 
             //取得任務
@@ -797,6 +797,7 @@ public class PhotonService : IPhotonPeerListener
                             Global.Gold = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Gold];
                             // Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
                             Global.isCurrencyLoaded = true;
+                            Debug.Log("Load CurrencyResponseCode");
 
                             LoadCurrencyEvent();
                         }
@@ -822,6 +823,7 @@ public class PhotonService : IPhotonPeerListener
                             string purchaseItem = (string)operationResponse.Parameters[(byte)PurchaseParameterCode.PurchaseItem];
                             Global.purchaseItem = Json.Deserialize(purchaseItem) as Dictionary<string, object>;
                             LoadPurchaseEvent();
+                            Debug.Log("Load PurchaseResponseCode");
                         }
                     }
                     catch (Exception e)
@@ -1003,7 +1005,6 @@ public class PhotonService : IPhotonPeerListener
             #endregion
 
             #region Updated 更新玩家資料
-
             case (byte)PlayerDataResponseCode.UpdatedPlayer:   // 載入玩家資料
                 {
                     try
@@ -1110,7 +1111,7 @@ public class PhotonService : IPhotonPeerListener
                             Global.Bonus = (Int16)operationResponse.Parameters[(byte)CurrencyParameterCode.Bonus];
                             Global.isCurrencyLoaded = true;
                             Debug.Log("PurchaseResponseCode.Confirmed: Global.Rice:" + Global.Rice + " Global.Gold:" + Global.Gold + " Global.Bonus:" + Global.Bonus);
-                            LoadCurrencyEvent();
+                            UpdateCurrencyEvent();
                         }
                         else
                         {
@@ -1127,7 +1128,6 @@ public class PhotonService : IPhotonPeerListener
             #endregion
 
             #region Recive Mission 接收任務
-
             case (byte)BattleResponseCode.Mission://取得老鼠資料
                 {
                     try

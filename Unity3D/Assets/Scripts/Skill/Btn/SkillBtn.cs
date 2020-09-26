@@ -88,7 +88,7 @@ public class SkillBtn : MonoBehaviour
                     _useTimes++;
                     _miceUsed++;
 
-                    Dictionary<string, object> data = battleManager.dictMiceUseCount[_miceID.ToString()];
+                    Dictionary<string, object> data = battleManager.GetMiceUseCount()[_miceID.ToString()];
                     data["UseCount"] = _miceUsed;
                 }
 
@@ -115,7 +115,7 @@ public class SkillBtn : MonoBehaviour
                 transform.GetChild(2).gameObject.SetActive(false);
                 _itemUsed++;
 
-                Dictionary<string, object> data = battleManager.dictItemUseCount[_itemID.ToString()];
+                Dictionary<string, object> data = battleManager.GetItemUseCount()[_itemID.ToString()];
                 data["UseCount"] = _miceUsed;
 
                 _btnFlag = !_btnFlag;

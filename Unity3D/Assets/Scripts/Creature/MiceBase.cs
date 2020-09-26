@@ -41,7 +41,7 @@ public abstract class MiceBase : Creature
         this.m_AIState = state;
     }
 
-    public override void SetAnimState(AnimatorState state)
+    public override void SetAnimState(IAnimatorState state)
     {
         if (this.m_AnimState != null)
             this.m_AnimState = null;

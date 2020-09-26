@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MuchAnimState : AnimatorState {
+public class MuchAnimState : IAnimatorState {
  private bool _toFlag,_toScale;
     private Vector3 _toWorldPos,_scale;
 
@@ -201,7 +201,7 @@ public class MuchAnimState : AnimatorState {
             obj.transform.localScale = Vector3.Lerp(obj.transform.localScale, _scale, _lerpSpeed);
         }
     }
-    public override void init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         animState = ENUM_AnimatorState.None;
         _isBoss = isBoss;

@@ -18,7 +18,7 @@ public class Mice : MiceBase
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
     }
@@ -54,9 +54,9 @@ public class Mice : MiceBase
             hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
-            Global.dictBattleMice.Remove(transform.parent);
+            Global.dictBattleMiceRefs.Remove(transform.parent);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
 
         }
         else
@@ -78,7 +78,7 @@ public class Mice : MiceBase
                 battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
             else
                 battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
-            Global.dictBattleMice.Remove(transform.parent);
+            Global.dictBattleMiceRefs.Remove(transform.parent);
             Global.MiceCount--;
 
             gameObject.SetActive(false);
@@ -102,7 +102,7 @@ public class Mice : MiceBase
             m_AnimState.SetMotion(true);
             state.SetToPos(pos[0]);
             state.SetToScale(new Vector3(0.25f, 0.25f));
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
         } 
         // play("Shadow"
     }

@@ -44,7 +44,7 @@ public class Lighting : SkillItem
         int count = skillData.Attr + Random.Range(0, skillData.AttrDice);
         
 
-        foreach (KeyValuePair<Transform, GameObject> go in Global.dictBattleMice)
+        foreach (KeyValuePair<Transform, GameObject> go in Global.dictBattleMiceRefs)
             holeBuffer.Add(go.Key);
 
         count = Mathf.Min(count, holeBuffer.Count);

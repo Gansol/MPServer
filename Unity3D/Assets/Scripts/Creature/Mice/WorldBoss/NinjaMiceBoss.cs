@@ -17,7 +17,7 @@ public class NinjaMiceBoss : MiceBossBase
     {
         if (Global.isGameStart /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& enabled && m_Arribute.GetHP() > 0)
         {
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.OnHit);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.OnHit);
             ShadowAvatarSkill skill = m_Skill as ShadowAvatarSkill;
 
             if (m_Arribute.GetHP() - 1 == 0) GetComponent<BoxCollider2D>().enabled = false;

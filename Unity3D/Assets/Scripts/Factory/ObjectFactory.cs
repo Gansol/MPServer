@@ -17,6 +17,8 @@ using UnityEngine;
 public class ObjectFactory : FactoryBase
 {
     GameObject _clone;
+
+
     public void TestMethod()
     {
         Debug.Log("ObjectFactory Init!");
@@ -36,25 +38,32 @@ public class ObjectFactory : FactoryBase
     /// <returns></returns>
     public GameObject Instantiate(GameObject bundle, Transform parent, string name, Vector3 localPosition, Vector3 localScale, Vector2 spriteScale, int depth)
     {
-        if (bundle != null)
+        try
         {
-            _clone = (GameObject)GameObject.Instantiate(bundle);             // 實體化
-            DepthManager.SwitchDepthLayer(_clone, parent, depth);
-            _clone.transform.parent = parent;
-            _clone.name = name;
-
-            _clone.transform.localPosition = localPosition;
-            _clone.transform.localScale = localScale;
-
-
-            if (spriteScale != Vector2.zero && _clone.GetComponent<UISprite>() != null)
+            if (bundle != null)
             {
-                _clone.GetComponent<UISprite>().width = System.Convert.ToInt32(spriteScale.x);
-                _clone.GetComponent<UISprite>().height = System.Convert.ToInt32(spriteScale.y);
+                _clone = GameObject.Instantiate(bundle);             // 實體化
+                DepthManager.SwitchDepthLayer(_clone, parent, depth);
+                _clone.transform.parent = parent;
+                _clone.name = name;
+
+                _clone.transform.localPosition = localPosition;
+                _clone.transform.localScale = localScale;
+
+
+                if (spriteScale != Vector2.zero && _clone.GetComponent<UISprite>() != null)
+                {
+                    _clone.GetComponent<UISprite>().width = System.Convert.ToInt32(spriteScale.x);
+                    _clone.GetComponent<UISprite>().height = System.Convert.ToInt32(spriteScale.y);
+                }
+                return _clone;
             }
-            return _clone;
         }
-        Debug.Log("  Instantiate bundle is null !!!! "+ name);
+        catch
+        {
+            throw;
+        }
+        Debug.Log("  Instantiate bundle is null !!!! " + name);
         return null;
     }
     #endregion
@@ -83,18 +92,22 @@ public class ObjectFactory : FactoryBase
     /// <summary>
     /// 產生老鼠 還不完整
     /// </summary>
+    /// <param name="poolManager"></param>
     /// <param name="miceID"></param>
+    /// <param name="miceSize"></param>
     /// <param name="hole"></param>
+    /// <param name="impose">強制產生</param>
+    /// <returns></returns>
     public GameObject InstantiateMice(PoolManager poolManager, short miceID, float miceSize, GameObject hole, bool impose)
     {
         Vector3 _miceSize;
         if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open || impose)
         {
-            if (impose && Global.dictBattleMice.ContainsKey(hole.transform))
-                Global.dictBattleMice[hole.transform].GetComponentInChildren<MiceBase>().SendMessage("OnDead", 0.0f);
+            if (impose && Global.dictBattleMiceRefs.ContainsKey(hole.transform))
+                Global.dictBattleMiceRefs[hole.transform].GetComponentInChildren<MiceBase>().SendMessage("OnDead", 0.0f);
 
-            if (Global.dictBattleMice.ContainsKey(hole.transform))
-                Global.dictBattleMice.Remove(hole.transform);
+            if (Global.dictBattleMiceRefs.ContainsKey(hole.transform))      // 錯誤 FUCK  還沒始就強制移除索引
+                Global.dictBattleMiceRefs.Remove(hole.transform);
 
             GameObject clone = poolManager.ActiveObject(miceID.ToString());
             if (clone != null)
@@ -107,8 +120,8 @@ public class ObjectFactory : FactoryBase
                 clone.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
                 //clone.GetComponent<BoxCollider2D>().enabled = true;
 
-                clone.GetComponent<Creature>().Play(AnimatorState.ENUM_AnimatorState.Hello);
-                Global.dictBattleMice.Add(clone.transform.parent, clone);
+                clone.GetComponent<Creature>().Play(IAnimatorState.ENUM_AnimatorState.Hello);
+                Global.dictBattleMiceRefs.Add(clone.transform.parent, clone);
                 clone.transform.gameObject.SetActive(false);
                 clone.transform.gameObject.SetActive(true);
                 return clone;
@@ -163,11 +176,6 @@ public class ObjectFactory : FactoryBase
         return -1;
     }
 
-
-
-
-
-
     #region -- GetItemInfoFromType 取得特定(類別)道具詳細資料  --
     public Dictionary<string, object> GetItemDetailsInfoFromType(Dictionary<string, object> itemData, int type)
     {
@@ -189,6 +197,13 @@ public class ObjectFactory : FactoryBase
     #endregion
 
     #region -- GetItemInfoFromType 取得道具(類別)資訊  --
+    /// <summary>
+    /// 取得道具(類別)資訊
+    /// </summary>
+    /// <param name="itemData">道具資料</param>
+    /// <param name="columns">要取得資料的欄位</param>
+    /// <param name="type">道具類型</param>
+    /// <returns></returns>
     public Dictionary<string, object> GetItemInfoFromID(Dictionary<string, object> itemData, string columns, int type)
     {
         Dictionary<string, object> data = new Dictionary<string, object>();
@@ -255,6 +270,4 @@ public class ObjectFactory : FactoryBase
     //    return "";
     //}
     //#endregion
-
-
 }

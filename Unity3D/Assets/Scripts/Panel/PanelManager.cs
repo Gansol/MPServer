@@ -18,9 +18,9 @@ using System.Linq;
  *                          ChangeLog
  * 20161102 v1.0.2  改變繼承至MPPanel
  * 20160711 v1.0.1  1次重構，獨立AssetLoader                            
- * 20160701 v1.0.0  0版完成 FUCK
+ * 20160701 v1.0.0  0版完成 
  * ****************************************************************/
-public class PanelManager : MPPanel
+public class PanelManager : IMPPanelUI
 {
     #region 欄位
     public static GameObject[] PanelRefs;
@@ -43,7 +43,7 @@ public class PanelManager : MPPanel
     public PanelManager(MPGame MPGame)
         : base(MPGame)
     {
-
+        m_RootUI = GameObject.Find("MenuUI");
     }
 
     void Awake()
@@ -58,13 +58,13 @@ public class PanelManager : MPPanel
     void OnEnable()
     {
         EventMaskSwitch.Resume();
-        Global.photonService.LoginEvent += OnLogin;
+        //Global.photonService.LoginEvent += OnLogin;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
 
     void OnDisable()
     {
-        Global.photonService.LoginEvent -= OnLogin;
+       // Global.photonService.LoginEvent -= OnLogin;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
     }
 
@@ -74,12 +74,6 @@ public class PanelManager : MPPanel
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Global.ShowMessage("確定要離開遊戲嗎?", Global.MessageBoxType.YesNo, 0);
-            Global.ExitGame();
-        }
-
         if (m_MPGame.GetAssetLoader().bLoadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
@@ -97,7 +91,7 @@ public class PanelManager : MPPanel
     }
 
     #region -- InstantiatePanel 實體化Panel--
-    private void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    protected override void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     {
         PanelState panelState = new PanelState();
 
@@ -113,7 +107,6 @@ public class PanelManager : MPPanel
             this._panelNo = no;
         }
 
-
         GameObject bundle = assetLoader.GetAsset(_panelName.ToLower());
         panelState.obj = MPGFactory.GetObjFactory().Instantiate(bundle, Panel[_panelNo].transform, _panelName, Vector3.zero, Vector3.one, Vector3.zero, -1);
         panelState.obj = panelState.obj.transform.parent.gameObject;
@@ -124,36 +117,36 @@ public class PanelManager : MPPanel
     }
     #endregion
 
-    #region -- LoadPanel 載入Panel(外部呼叫用) --
-    /// <summary>
-    /// 載入Panel
-    /// </summary>
-    /// <param name="panel">Panel</param>
-    /// <param name="obj">物件自己</param>
-    public void LoadPanel(GameObject panel)
-    {
-        _panelNo = 0;
+    //#region -- LoadPanel 載入Panel(外部呼叫用) --
+    ///// <summary>
+    ///// 載入Panel
+    ///// </summary>
+    ///// <param name="panel">Panel</param>
+    ///// <param name="obj">物件自己</param>
+    //public void LoadPanel(GameObject panel)
+    //{
+    //    _panelNo = 0;
 
-        foreach (GameObject item in Panel)  // 取得Panel編號
-        {
-            if (item == panel)
-                break;
-            _panelNo++;
-        }
-        _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
+    //    foreach (GameObject item in Panel)  // 取得Panel編號
+    //    {
+    //        if (item == panel)
+    //            break;
+    //        _panelNo++;
+    //    }
+    //    _panelName = Panel[_panelNo].name.Remove(Panel[_panelNo].name.Length - 7);   // 7 = xxx(Panel) > xxx
 
-        if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
-        {
+    //    if (!dictPanelRefs.ContainsKey(_panelName))         // 如果還沒載入Panel AB 載入AB
+    //    {
             
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
-            _loadedPanel = true;
-        }
-        else
-        {
-            PanelSwitch();// 已載入AB 顯示Panel
-        }
-    }
-    #endregion
+    //        assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + _panelName.ToLower() + Global.ext);
+    //        _loadedPanel = true;
+    //    }
+    //    else
+    //    {
+    //        PanelSwitch();// 已載入AB 顯示Panel
+    //    }
+    //}
+    //#endregion
 
 
     #region LoadPanel 亂寫的 給 叫出未實體的Panel使用
@@ -221,12 +214,12 @@ public class PanelManager : MPPanel
     }
     #endregion
 
-    #region -- 字典 檢查/取值 片段 --
-    public bool bLoadedPanel(string panelName)
-    {
-        return dictPanelRefs.ContainsKey(panelName) ? true : false;
-    }
-    #endregion
+    //#region -- 字典 檢查/取值 片段 --
+    //private bool bLoadedPanel(string panelName)
+    //{
+    //    return dictPanelRefs.ContainsKey(panelName) ? true : false;
+    //}
+    //#endregion
 
 
 
@@ -238,10 +231,10 @@ public class PanelManager : MPPanel
     //    }
     //}
 
-    private void OnLogin(bool loginStatus, string message, string returnCode)
-    {
-        _loginStatus = loginStatus;
-    }
+    //private void OnLogin(bool loginStatus, string message, string returnCode)
+    //{
+    //    _loginStatus = loginStatus;
+    //}
 
     protected override void OnLoading()
     {
@@ -280,6 +273,11 @@ public class PanelManager : MPPanel
     }
 
     public override void OnClosed(GameObject obj)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override int GetMustLoadedDataCount()
     {
         throw new System.NotImplementedException();
     }

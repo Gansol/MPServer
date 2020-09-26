@@ -198,6 +198,6 @@
         UpdatedEnergyRate = 60,     // 更新能量倍率
         SkillBoss = 61,             // 技能老鼠發動技能判斷
         UpdateLife = 63,            // 更新生命值
-        GetLife = 64,               // 取得對方生命
+        GetOpponentLife = 64,               // 取得對方生命
     }
     }

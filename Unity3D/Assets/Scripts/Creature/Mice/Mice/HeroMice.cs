@@ -15,7 +15,7 @@ public class HeroMice : MiceBase
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
         if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
-        m_AnimState.init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
         bDead = false;
@@ -40,19 +40,19 @@ public class HeroMice : MiceBase
             gameObject.SetActive(false);
         }
 
-        if (m_AnimState.GetAnimState() == AnimatorState.ENUM_AnimatorState.Die && !bDead)
+        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Die && !bDead)
         {
             bDead = true;
             GetComponent<BoxCollider2D>().enabled = false;
             if (Global.isGameStart && enabled /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& m_Arribute.GetHP() > 0)
             {
-                m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Eat);
-                Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMice);
+                m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Eat);
+                Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
                 foreach (KeyValuePair<Transform, GameObject> item in buffer)
                 {
                     Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
                     pos.Add(0, transform.position);
-                    if (item.Value != null && Global.dictBattleMice.ContainsKey(item.Key))
+                    if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key))
                     {
                         if (item.Value.GetComponent<MiceBase>()!=null)
                             item.Value.GetComponent<MiceBase>().OnEffect("HeroMice", pos);
@@ -70,7 +70,7 @@ public class HeroMice : MiceBase
             GetComponent<BoxCollider2D>().enabled = false;
             hitSound.Play();
             //OnInjured(1, true);
-            m_AnimState.Play(AnimatorState.ENUM_AnimatorState.Eat);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Eat);
         }
     }
 
@@ -78,7 +78,7 @@ public class HeroMice : MiceBase
     {
         if (Global.isGameStart)
         {
-            Global.dictBattleMice.Remove(transform.parent);
+            Global.dictBattleMiceRefs.Remove(transform.parent);
             gameObject.SetActive(false);
             this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
         }

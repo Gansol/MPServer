@@ -43,6 +43,7 @@ public class AssetLoader : MonoBehaviour
 
     private void Update()
     {
+        
         _returnMessage = AssetBundleManager.ReturnMessage;
 
         // 如果有載入物件
@@ -75,46 +76,53 @@ public class AssetLoader : MonoBehaviour
     /// <param name="manifestAssetName">資產名稱路徑(含副檔名)</param>
     public void LoadAssetFormManifest(string manifestAssetName)
     {
-        if (!string.IsNullOrEmpty(manifestAssetName))
+        try
         {
-            // 載入Mainfest
-            manipath = Application.persistentDataPath + "/AssetBundles/";
-            manifestAssetName = manifestAssetName.ToLower();
-            if (assetBundle == null)
+            if (!string.IsNullOrEmpty(manifestAssetName))
             {
-                assetBundle = AssetBundle.LoadFromFile(Path.Combine(manipath, "AndroidBundles"));
-                manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            }
-
-            dependenciesManifestAssetPath = manifest.GetAllDependencies(manifestAssetName);
-
-            AssetBundleManager.Init();
-
-            if (!AssetBundleManager.GetLoadedAssetbundle(manifestAssetName))
-            {
-                // 載入Mainfest 中GameObject Dependencies資產物件
-                foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
+                // 載入Mainfest
+                manipath = Application.persistentDataPath + "/AssetBundles/";
+                manifestAssetName = manifestAssetName.ToLower();
+                if (assetBundle == null)
                 {
-                    if (!atlasNamePath.Contains(dependencyManifestAssetPath))
-                    {
-                        atlasNamePath.Add(dependencyManifestAssetPath);
-                        LoadAsset(dependencyManifestAssetPath);
-                    }
+                    assetBundle = AssetBundle.LoadFromFile(Path.Combine(manipath, "AndroidBundles"));
+                    manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 }
-                AssetBundleManager.LoadedAllAsset();    // 告知Manager已載入全部資產數量
 
-                // 載入遊戲物件
-                LoadPrefab(manifestAssetName);
-                _objCount++;
-                Debug.Log("_objCount:" + _objCount);
+                dependenciesManifestAssetPath = manifest.GetAllDependencies(manifestAssetName);
+
+                AssetBundleManager.Init();
+
+                if (!AssetBundleManager.GetLoadedAssetbundle(manifestAssetName))
+                {
+                    // 載入Mainfest 中GameObject Dependencies資產物件
+                    foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
+                    {
+                        if (!atlasNamePath.Contains(dependencyManifestAssetPath))
+                        {
+                            atlasNamePath.Add(dependencyManifestAssetPath);
+                            LoadAsset(dependencyManifestAssetPath);
+                        }
+                    }
+                    AssetBundleManager.LoadedAllAsset();    // 告知Manager已載入全部資產數量
+
+                    // 載入遊戲物件
+                    LoadPrefab(manifestAssetName);
+                    _objCount++;
+                    Debug.Log("_objCount:" + _objCount);
+                }
+                else
+                {
+                    // 物件已經載入
+                    _loadedCount++;
+                    Debug.Log("_loadedCount:" + _loadedCount);
+                }
+                bPreLoad = true;
             }
-            else
-            {
-                // 物件已經載入
-                _loadedCount++;
-                Debug.Log("_loadedCount:" + _loadedCount);
-            }
-            bPreLoad = true;
+        }
+        catch
+        {
+            throw;
         }
     }
 

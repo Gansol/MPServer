@@ -2,7 +2,7 @@
 using System.Collections;
 using MPProtocol;
 
-public class NormalBattleAIState : BattleAIState
+public class NormalBattleAIState : IBattleAIState
 {
     int hardScore = 3000, hardMaxScore = 5000, hardCombo = 75, normalMaxScore = 1000, normalCombo = 50;
 

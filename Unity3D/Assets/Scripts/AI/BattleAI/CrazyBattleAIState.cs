@@ -2,7 +2,7 @@
 using System.Collections;
 using MPProtocol;
 
-public class CrazyBattleAIState : BattleAIState
+public class CrazyBattleAIState : IBattleAIState
 {
     int carzyMaxScore = 10000, carzyCombo = 100;
 

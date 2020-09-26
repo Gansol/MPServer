@@ -60,7 +60,7 @@ public class BotAI
     // Update is called once per frame
     public void UpdateAI()
     {
-        if (Global.isGameStart && Global.dictBattleMice.Count > 0 && Time.fixedTime > lastAITime)
+        if (Global.isGameStart && Global.dictBattleMiceRefs.Count > 0 && Time.fixedTime > lastAITime)
         {
             lastAITime += hitIntervalTime * botLevel;
 
@@ -79,7 +79,7 @@ public class BotAI
     private void HitAI()
     {
 
-        buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMice);
+        buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
 
         List<Transform> keys = new List<Transform>(buffer.Keys);
 
@@ -89,7 +89,7 @@ public class BotAI
             //    break;
 
             int value = rnd.Next(keys.Count);
-            if (Global.dictBattleMice.ContainsKey(keys[value]) != null)
+            if (Global.dictBattleMiceRefs.ContainsKey(keys[value]) != null)
             {
                 //if (buffer[keys[value]].GetComponent<MiceBossBase>() != null && lastBossHitTime > Time.fixedTime)
                 //{
