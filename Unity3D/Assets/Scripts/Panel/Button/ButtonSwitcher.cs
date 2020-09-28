@@ -16,6 +16,7 @@ using System.Linq;
  *  目前道具排序只有寫好一半(更新、取的資料完成) 實體化更新後的資料(未完成)
  * ***************************************************************
  *                           ChangeLog
+ *  20200927 v1.0.2 槓掉199行按鈕顯示方式，因程式修改移除PanelManager
  * 20160705 v1.0.0  0版完成，Team點兩下回彈還沒寫 
  * 20161029 v1.0.1  改變陣列搜尋至字典搜尋
  * ****************************************************************/
@@ -195,16 +196,16 @@ public class ButtonSwitcher : MPButton
                 if (PlayerManager.dictLoadedItem.ContainsKey(itemID))
                 {
                     GameObject invButton = PlayerManager.dictLoadedItem[itemID];
-                    if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
-                    {
-                        invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法
+                    //if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
+                    //{
+                    //    invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法 FUCK 錯誤
+                    //    invButton.SendMessage("EnableBtn");
+                    //    invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法 FUCK 錯誤
+                    //}
+                    //else
+                    //{
                         invButton.SendMessage("EnableBtn");
-                        invButton.transform.parent.gameObject.SetActive(false); // // 白癡寫法
-                    }
-                    else
-                    {
-                        invButton.SendMessage("EnableBtn");
-                    }
+                    //}
                 }
 
                 PlayerManager.dictLoadedEquiped.Remove(itemID);

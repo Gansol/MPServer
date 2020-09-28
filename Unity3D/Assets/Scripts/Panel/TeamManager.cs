@@ -77,7 +77,7 @@ public class TeamManager : IMPPanelUI
         Global.photonService.UpdateMiceEvent += OnCostCheck;
     }
 
-    void Update()
+    public override void Update()
     {
         // 除錯訊息
         if (_bLoadedActor || _bLoadedAsset)
@@ -411,6 +411,16 @@ public class TeamManager : IMPPanelUI
     protected override int GetMustLoadedDataCount()
     {
         return (int)ENUM_Data.PlayerItem * (int)ENUM_Data.PlayerData;
+    }
+
+    public override void Initinal()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new NotImplementedException();
     }
 
 

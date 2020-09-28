@@ -116,7 +116,7 @@ public class StoreManager : IMPPanelUI
         Global.photonService.GetGashaponEvent += OnGetGashapon;
     }
 
-    private void Update()
+    public override void Update()
     {
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log("訊息：" + assetLoader.ReturnMessage);
@@ -827,5 +827,16 @@ public class StoreManager : IMPPanelUI
             _lastPanel.SetActive(false);
 
         _lastPanel = tab;
+    }
+
+    public override void Initinal()
+    {
+        throw new System.NotImplementedException();
+    }
+
+
+    public override void Release()
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -14,19 +14,26 @@ using System.Text;
 using GooglePlayGames.BasicApi;
 using UnityEngine.Networking;
 
-public class LoginUI : MonoBehaviour
-{
-    public GameObject LoginPanel;
-    public GameObject JoinPanel;
-    public GameObject MatchGame;
-    public GameObject LicensePanel;
-    public UIInput accountField, passwordField;
-    public UILabel LoginMessageBox;
-    public UIToggle accountToggle, passwordToggle;
+/// 
+/// 年齡驗證沒寫
+/// 
 
-    public GameObject[] LoginType;
-    AssetLoader assetLoader;
-    public GameObject[] ErrorText;
+public class LoginUI : IMPPanelUI
+{
+    private GameObject LoginPanel;
+    private GameObject JoinPanel;
+    private GameObject LicensePanel;
+
+    private UIInput login_AccountField, login_PasswordField, join_AccountField, join_PasswordField, join_Password2Field, join_ConfrimPasswordField, join_NicknameField, join_AgeField, join_SexField;
+    private UILabel LoginMessageBox;
+    private UIToggle accountToggle, passwordToggle, login_AgreeLicenseField, join_AgreeLicense_Field;
+
+    private GameObject SNSLogin, GansolLogin;
+    private GameObject FBLoginBtn, GansolLoginBtn, JoinBtn, Switch_Btn, join_JoinBtn, join_ExitBtn;
+    private GameObject ErrorText_Email;
+    private GameObject ErrorText_Password;
+    private GameObject ErrorText_Password2;
+    private GameObject ErrorText_NickName;
 
     TextUtility textUtility = new TextUtility();
 
@@ -50,6 +57,8 @@ public class LoginUI : MonoBehaviour
     Dictionary<string, object> data;
 
     GameObject tmpPanel;
+
+    public LoginUI(MPGame MPGame) : base(MPGame) { }
 
     public void OnLicenseClickOn(GameObject panel)
     {
@@ -89,8 +98,9 @@ public class LoginUI : MonoBehaviour
 
     }
     // 在Start裡建立好Login的回應事件
-    void Start()
+    public override void Initinal()
     {
+
         assetLoader = MPGame.Instance.GetAssetLoader();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
@@ -101,6 +111,56 @@ public class LoginUI : MonoBehaviour
         // PlayGamesPlatform.DebugLogEnabled = true;//20200527
         // PlayGamesPlatform.Activate();//20200527
 
+
+        m_RootUI = GameObject.Find("Login(Panel)");
+
+        LoginPanel = m_RootUI.transform.Find("Login_Panel").gameObject;
+        JoinPanel = m_RootUI.transform.Find("Join_Panel").gameObject;
+        LicensePanel = m_RootUI.transform.Find("License_Panel").gameObject;
+
+        // LoginPanel
+        login_AccountField = LoginPanel.transform.Find("Account_Field").GetComponent<UIInput>();
+        login_PasswordField = LoginPanel.transform.Find("Password_Field").GetComponent<UIInput>();
+        LoginMessageBox = LoginPanel.transform.Find("LoginMessage_Label").GetComponent<UILabel>();
+        accountToggle = LoginPanel.transform.Find("Account_Toggle").GetComponent<UIToggle>();
+        passwordToggle = LoginPanel.transform.Find("Password_Toggle").GetComponent<UIToggle>();
+        login_AgreeLicenseField = LoginPanel.transform.Find("AgreeLicense_Field").GetComponent<UIToggle>();
+
+        GansolLogin = LoginPanel.transform.Find("GansolLogin").gameObject;
+        SNSLogin = LoginPanel.transform.Find("SNSLogin").gameObject;
+
+        FBLoginBtn = LoginPanel.transform.Find("FB_Btn").gameObject;
+        GansolLoginBtn = LoginPanel.transform.Find("Login_Btn").gameObject;
+        JoinBtn = LoginPanel.transform.Find("Join_Btn").gameObject;
+        Switch_Btn = LoginPanel.transform.Find("Switch_Btn").gameObject;
+
+        // JoinPanel
+        join_AccountField = JoinPanel.transform.Find("Account_Label").GetComponent<UIInput>();
+        join_PasswordField = JoinPanel.transform.Find("Password_label").GetComponent<UIInput>();
+        join_ConfrimPasswordField = JoinPanel.transform.Find("ConfrimPassword_label").GetComponent<UIInput>();
+        join_NicknameField = JoinPanel.transform.Find("Nickname_label").GetComponent<UIInput>();
+        join_AgeField = JoinPanel.transform.Find("Age_Label").GetComponent<UIInput>();
+        join_SexField = JoinPanel.transform.Find("Sex_Label").GetComponent<UIInput>();
+        join_AgreeLicense_Field = LoginPanel.transform.Find("AgreeLicense_Field").GetComponent<UIToggle>();
+
+        join_JoinBtn = LoginPanel.transform.Find("Join_Btn").gameObject;
+        join_ExitBtn = LoginPanel.transform.Find("Exit_Btn").gameObject;
+        ErrorText_Email = JoinPanel.transform.Find("AccountError_Label").gameObject;
+        ErrorText_Password = JoinPanel.transform.Find("PasswordError_Label").gameObject;
+        ErrorText_Password2 = JoinPanel.transform.Find("ConfrimPasswordError_Label").gameObject;
+        ErrorText_NickName = JoinPanel.transform.Find("NicknameError_Label").gameObject;
+
+        // UIEventListener.Get(FBLogin_Btn).onClick += FBLogin;
+        UIEventListener.Get(GansolLoginBtn).onClick += Login;
+        UIEventListener.Get(JoinBtn).onClick += ShowJoinPanel;
+        UIEventListener.Get(Switch_Btn).onClick += SwitchLoginType;
+
+
+        UIEventListener.Get(join_JoinBtn).onClick += JoinMember;
+        UIEventListener.Get(join_ExitBtn).onClick += ShowLoginPanel;
+
+
+
         passwordChk = confirmPasswordChk = nicknameChk = emailChk = equalPassword = -1;
 
         if (!Global.connStatus)
@@ -108,29 +168,16 @@ public class LoginUI : MonoBehaviour
     }
 
 
-    void OnGUI()
+    public override void Update()
     {
-        //if (Global.photonService.ServerConnected)  // 若已連線成功才顯示登入對話盒
-        //{
-        //    GUI.Label(new Rect(130, 10, 100, 20), "Connecting . . ."); // 已連線
-        //}
-
-        ShowChkMsg();
+        ShowChkMsg();   // 原本在OnGUI
     }
 
 
-    public void SwitchLoginType()
+    public void SwitchLoginType(GameObject obj)
     {
-        if (bSwitchLoginType)
-        {
-            LoginType[0].SetActive(true);
-            LoginType[1].SetActive(false);
-        }
-        else
-        {
-            LoginType[0].SetActive(false);
-            LoginType[1].SetActive(true);
-        }
+        GansolLogin.SetActive(bSwitchLoginType);
+        SNSLogin.SetActive(!bSwitchLoginType);
         bSwitchLoginType = !bSwitchLoginType;
     }
 
@@ -141,151 +188,167 @@ public class LoginUI : MonoBehaviour
             // 帳號檢查
             if (emailChk == 0)
             {
-                ErrorText[0].SetActive(true);
-                ErrorText[0].GetComponent<UILabel>().color = new Color(1, 0, 0);
-                ErrorText[0].GetComponent<UILabel>().text = "X  Email Error!";
+                ErrorText_Email.SetActive(true);
+                ErrorText_Email.GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText_Email.GetComponent<UILabel>().text = "X  Email Error!";
             }
             else if (emailChk == 1)
             {
-                ErrorText[0].SetActive(true);
-                ErrorText[0].GetComponent<UILabel>().color = new Color(0, 1, 0);
-                ErrorText[0].GetComponent<UILabel>().text = "O  Correct!";
+                ErrorText_Email.SetActive(true);
+                ErrorText_Email.GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText_Email.GetComponent<UILabel>().text = "O  Correct!";
             }
 
 
             // 密碼檢查 1
             if (passwordChk == 0)
             {
-                ErrorText[1].SetActive(true);
-                ErrorText[1].GetComponent<UILabel>().color = new Color(1, 0, 0);
-                ErrorText[1].GetComponent<UILabel>().text = "X  Password Error!";
+                ErrorText_Password.SetActive(true);
+                ErrorText_Password.GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText_Password.GetComponent<UILabel>().text = "X  Password Error!";
             }
             else if (passwordChk == 1)
             {
-                ErrorText[1].SetActive(true);
-                ErrorText[1].GetComponent<UILabel>().color = new Color(0, 1, 0);
-                ErrorText[1].GetComponent<UILabel>().text = "O  Correct!";
+                ErrorText_Password.SetActive(true);
+                ErrorText_Password.GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText_Password.GetComponent<UILabel>().text = "O  Correct!";
             }
 
 
             // 密碼檢查 2
             if (confirmPasswordChk == 0 || equalPassword == 0)
             {
-                ErrorText[2].SetActive(true);
-                ErrorText[2].GetComponent<UILabel>().color = new Color(1, 0, 0);
-                ErrorText[2].GetComponent<UILabel>().text = "X  Password Error!";
+                ErrorText_Password2.SetActive(true);
+                ErrorText_Password2.GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText_Password2.GetComponent<UILabel>().text = "X  Password Error!";
             }
             else if (confirmPasswordChk == 1)
             {
-                ErrorText[2].SetActive(true);
-                ErrorText[2].GetComponent<UILabel>().color = new Color(0, 1, 0);
-                ErrorText[2].GetComponent<UILabel>().text = "O  Correct!";
+                ErrorText_Password2.SetActive(true);
+                ErrorText_Password2.GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText_Password2.GetComponent<UILabel>().text = "O  Correct!";
             }
 
 
             // 暱稱檢查
             if (nicknameChk == 0)
             {
-                ErrorText[3].SetActive(true);
-                ErrorText[3].GetComponent<UILabel>().color = new Color(1, 0, 0);
-                ErrorText[3].GetComponent<UILabel>().text = "X  Nickname Error!";
+                ErrorText_NickName.SetActive(true);
+                ErrorText_NickName.GetComponent<UILabel>().color = new Color(1, 0, 0);
+                ErrorText_NickName.GetComponent<UILabel>().text = "X  Nickname Error!";
             }
             else if (nicknameChk == 1)
             {
-                ErrorText[3].SetActive(true);
-                ErrorText[3].GetComponent<UILabel>().color = new Color(0, 1, 0);
-                ErrorText[3].GetComponent<UILabel>().text = "O  Correct!";
+                ErrorText_NickName.SetActive(true);
+                ErrorText_NickName.GetComponent<UILabel>().color = new Color(0, 1, 0);
+                ErrorText_NickName.GetComponent<UILabel>().text = "O  Correct!";
             }
         }
     }
 
-    public void Login(UILabel email, UIInput password)
+    public void Login(GameObject obj)
     {
         Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
         LoginPanel.SetActive(false);
         isLoginBtn = true;
-        Global.Hash = Encrypt(password.value);
+        Global.Hash = Encrypt(login_PasswordField.value);
         char[] splitChar = new char[] { '@' };
-        string[] account = email.text.Split(splitChar);
+        string[] account = login_AccountField.value.Split(splitChar);
         Global.Account = account[0];
         Global.MemberType = MemberType.Gansol;
         Global.photonService.Login(Global.Account, Global.Hash, MemberType.Gansol); // 登入
     }
 
-    public void OpenJoinPanel(GameObject myPanel, GameObject joinPanel)
+    public void SwichLoginType(GameObject obj)
     {
-        EventMaskSwitch.Switch(myPanel/*, true*/);
-        myPanel.SetActive(false);
-        joinPanel.SetActive(true);
+
+        LoginPanel.SetActive(false);
+        JoinPanel.SetActive(true);
     }
 
-    public void OpenLoginPanel(GameObject myPanel, GameObject loginPanel)
+    public void ShowJoinPanel(GameObject obj)
     {
-        myPanel.SetActive(false);
-        loginPanel.SetActive(true);
+        LoginPanel.SetActive(false);
+        JoinPanel.SetActive(true);
     }
 
-    public void JoinMember(UILabel email, UIInput password, UIInput confrimPassword, UILabel nickname, UILabel age, UILabel sex)
+    public void ShowLoginPanel(GameObject obj)
     {
-        int getSex = -1;
+        LoginPanel.SetActive(true);
+        JoinPanel.SetActive(false);
+    }
+
+    // public void JoinMember(UILabel email, UIInput password, UIInput confrimPassword, UILabel nickname, UILabel age, UILabel sex)
+    public void JoinMember(GameObject obj)
+    {
+        join_AccountField = JoinPanel.transform.Find("Account_Label").GetComponent<UIInput>();
+        join_PasswordField = JoinPanel.transform.Find("Password_label").GetComponent<UIInput>();
+        join_ConfrimPasswordField = JoinPanel.transform.Find("ConfrimPassword_label").GetComponent<UIInput>();
+        join_NicknameField = JoinPanel.transform.Find("Nickname_label").GetComponent<UIInput>();
+        join_AgeField = JoinPanel.transform.Find("Age_Label").GetComponent<UIInput>();
+        join_SexField = JoinPanel.transform.Find("Sex_Label").GetComponent<UIInput>();
+
+        int sex = -1, age = -1;
         char[] sTrim = { ' ', '-', '+' };
 
         // 帳號檢查
-        if (!String.IsNullOrEmpty(email.text))
-            emailChk = (textUtility.EMailChk(email.text) == 1 && email.text.Length >= 8) ? 1 : 0;
+        if (!String.IsNullOrEmpty(join_AccountField.value))
+            emailChk = (textUtility.EMailChk(join_AccountField.value) == 1 && join_AccountField.value.Length >= 8) ? 1 : 0;
 
         // 密碼檢查 1
-        if (!String.IsNullOrEmpty(password.value))
-            passwordChk = (textUtility.SaveTextChk(password.value) == 1 && password.value.Length >= 8) ? 1 : 0;
+        if (!String.IsNullOrEmpty(join_PasswordField.value))
+            passwordChk = (textUtility.SaveTextChk(join_PasswordField.value) == 1 && join_PasswordField.value.Length >= 8) ? 1 : 0;
 
         // 密碼檢查 2
-        if (!String.IsNullOrEmpty(confrimPassword.value))
-            confirmPasswordChk = (textUtility.SaveTextChk(confrimPassword.value) == 1 && confrimPassword.value.Length >= 8) ? 1 : 0;
+        if (!String.IsNullOrEmpty(join_ConfrimPasswordField.value))
+            confirmPasswordChk = (textUtility.SaveTextChk(join_ConfrimPasswordField.value) == 1 && join_ConfrimPasswordField.value.Length >= 8) ? 1 : 0;
 
         // 暱稱檢查
-        if (!String.IsNullOrEmpty(nickname.text))
-            nicknameChk = (textUtility.SaveTextChk(nickname.text) == 1 && nickname.text.Length >= 3) ? 1 : 0;
+        if (!String.IsNullOrEmpty(join_NicknameField.value))
+            nicknameChk = (textUtility.SaveTextChk(join_NicknameField.value) == 1 && join_NicknameField.value.Length >= 3) ? 1 : 0;
 
         // 性別檢查
-        if (!String.IsNullOrEmpty(sex.text))
-            getSex = SelectGender(sex.text);
+        if (!String.IsNullOrEmpty(join_SexField.value))
+            sex = SelectGender(join_SexField.value);
 
         // 年齡檢查
-        if (!String.IsNullOrEmpty(sex.text))
-            getSex = SelectGender(sex.text);
+        //if (!String.IsNullOrEmpty(join_AgeField.value))
+        //    age = SelectGender(join_AgeField.value);
 
-        if ((password.value == confrimPassword.value) && emailChk == 1 && passwordChk == 1 && confirmPasswordChk == 1 && nicknameChk == 1)
+        if ((join_PasswordField.value == join_ConfrimPasswordField.value) && emailChk == 1 && passwordChk == 1 && confirmPasswordChk == 1 && nicknameChk == 1)
         {
-            foreach (GameObject obj in ErrorText)
-            {
-                obj.SetActive(false);
-            }
+            ErrorText_Email.SetActive(false);
+            ErrorText_Password.SetActive(false);
+            ErrorText_Password2.SetActive(false);
+            ErrorText_NickName.SetActive(false);
+
 
 
             char[] splitChar = new char[] { '@' };
-            string[] account = email.text.Split(splitChar);
+            string[] account = join_AccountField.value.Split(splitChar);
             Global.Account = account[0];
-            Global.Hash = Encrypt(password.value);
+            Global.Hash = Encrypt(join_PasswordField.value);
             Global.MemberType = MemberType.Gansol;
 
             //SaveLoginInfo(accountToggle.value, passwordToggle.value);
 
 
-            Global.photonService.JoinMember(email.text, Global.Hash, nickname.text, System.Convert.ToByte(age.text.TrimEnd(sTrim)), (byte)getSex, GetPublicIP(), MemberType.Gansol);
-            OpenLoginPanel(JoinPanel, LoginPanel);
+            Global.photonService.JoinMember(join_AccountField.value, Global.Hash, join_NicknameField.value, System.Convert.ToByte(join_AgeField.value.Trim(sTrim)), (byte)sex, GetPublicIP(), MemberType.Gansol);
+            JoinPanel.SetActive(false);
+            LoginPanel.SetActive(true);
         }
         else
         {
-            if (password.value != confrimPassword.value) equalPassword = 0;
-            password.value = "";
-            confrimPassword.value = "";
+            if (join_PasswordField.value != join_ConfrimPasswordField.value) equalPassword = 0;
+            join_PasswordField.value = "";
+            join_ConfrimPasswordField.value = "";
         }
     }
 
     private void SaveLoginInfo(bool memAccount, bool memPD)
     {
         bool bChange = false;
-        StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+        m_MPGame.StartCoroutine(LoadFile(Global.dataPath + "data.json"));
 
         Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
 
@@ -339,7 +402,7 @@ public class LoginUI : MonoBehaviour
                 throw new Exception(www.error);
             }
             else if (www.isDone)
-            { 
+            {
                 jString = www.downloadHandler.text; // 儲存 下載好的檔案版本
             }
             www.Dispose();
@@ -405,7 +468,7 @@ public class LoginUI : MonoBehaviour
         {
             //  ShowMatchGame();
             LoginPanel.SetActive(false);
-            Global.ShowMessage("登入成功！", Global.MessageBoxType.Yes,0);
+            Global.ShowMessage("登入成功！", Global.MessageBoxType.Yes, 0);
             //EventMaskSwitch.PrevToFirst();
             Global.photonService.LoadItemData();
             LoginPanel.SetActive(false);
@@ -415,7 +478,7 @@ public class LoginUI : MonoBehaviour
             isLoginBtn = false;
             LoginPanel.SetActive(true);
             LoginMessageBox.gameObject.SetActive(true);
-            Global.ShowMessage(message, Global.MessageBoxType.Yes,0);
+            Global.ShowMessage(message, Global.MessageBoxType.Yes, 0);
             LoginMessageBox.color = Color.red;
             LoginMessageBox.text = "X  " + message;
         }
@@ -445,7 +508,7 @@ public class LoginUI : MonoBehaviour
 
     //20200527
     #region GoogleLogin
-    public void GoogleLogin()
+    public void GoogleLogin(GameObject obj)
     {
 
         if (!isLoginBtn)
@@ -461,7 +524,7 @@ public class LoginUI : MonoBehaviour
                 if (success)
                 {
                     Debug.Log("You've successfully logged in" + Social.localUser.id);
-                    if (!Global.photonService.ServerConnected) gameObject.GetComponent<PhotonConnect>().ConnectToServer();
+                    if (!Global.photonService.ServerConnected) m_RootUI.GetComponentInParent<PhotonConnect>().ConnectToServer();
 
 
                     Global.MemberType = MemberType.Google;
@@ -475,7 +538,7 @@ public class LoginUI : MonoBehaviour
 
                     string email = ((PlayGamesLocalUser)Social.localUser).Email;
                     bool underage = ((PlayGamesLocalUser)Social.localUser).underage;
-                    int age = (underage) ? 88 : 6;
+                    byte age = (underage) ? (byte)88 : (byte)6;
 
                     //if (String.IsNullOrEmpty(email))
                     //    email = "example@example.com";
@@ -600,7 +663,7 @@ public class LoginUI : MonoBehaviour
     // 加入會員後 再度取得資料並登入
     void OnGetProfile()
     {
-        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk,0);
+        Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
         LoginPanel.SetActive(false);
         Debug.Log("HAHA1");
         switch ((byte)Global.MemberType)
@@ -703,5 +766,35 @@ public class LoginUI : MonoBehaviour
     {
         string tmpString = TextUtility.SHA512Complier(Gansol.TextUtility.SerializeToStream(data));
         return TextUtility.SHA1Complier(Gansol.TextUtility.SerializeToStream(tmpString));
+    }
+
+    public override void Release()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void OnLoading()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void OnLoadPanel()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void GetMustLoadAsset()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override int GetMustLoadedDataCount()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void OnClosed(GameObject obj)
+    {
+        throw new NotImplementedException();
     }
 }

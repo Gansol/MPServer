@@ -65,7 +65,7 @@ public class FriendManager : IMPPanelUI
         Global.photonService.RemoveFriendEvent += OnRemoveFriend;
     }
 
-    void Update()
+    public override void  Update()
     {
         // 資料載入完成時 載入PanelAsset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
@@ -462,5 +462,15 @@ public class FriendManager : IMPPanelUI
     protected override int GetMustLoadedDataCount()
     {
         return (int)ENUM_Data.PlayerData * (int)ENUM_Data.FriendsData;
+    }
+
+    public override void Initinal()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new NotImplementedException();
     }
 }

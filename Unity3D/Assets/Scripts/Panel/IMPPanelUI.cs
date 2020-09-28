@@ -23,10 +23,11 @@ using MPProtocol;
 
 public abstract class IMPPanelUI 
 {
+    private ScrollView scrollView;
     protected static AssetLoader assetLoader;
     protected static MPGame m_MPGame;
 
-    private static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
+    protected static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject[] PanelRefs;
     public static GameObject _lastEmptyItemGroup;
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
@@ -34,26 +35,41 @@ public abstract class IMPPanelUI
     private static GameObject _lastPanel;
     protected GameObject m_RootUI = null;
 
+    protected string panelName; 
     private bool _loadedPanel,m_bActive = true;
     private int _panelNo;
 
-    public  IMPPanelUI(MPGame MPGame)
+    public  IMPPanelUI(MPGame MPGame) 
     {
         m_MPGame = MPGame;
        if (dictPanelRefs == null)
             dictPanelRefs = new Dictionary<string, PanelState>();
         assetLoader = m_MPGame.GetAssetLoader();
         assetLoader.init();
+        scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
         Debug.Log("MPPanel init!");
     }
 
     #region
-    private class PanelState                                         // 存放Pnael物件 狀態
+    protected class PanelState                                         // 存放Pnael物件 狀態
     {
         public bool onOff;                                          // Panel開關
         public GameObject obj;                                      // Panel物件
     }
     #endregion
+
+    public abstract void Initinal();
+    public virtual void Update()
+    {
+        if (m_MPGame.GetAssetLoader().bLoadedObj && _loadedPanel)                 // 載入Panel完成時
+        {
+            _loadedPanel = !_loadedPanel;
+
+            InstantiatePanel();
+            PanelSwitch(panelName);
+        }
+    }
+    public abstract void Release();
 
     #region -- LoadActor 載入老鼠角色 --
     /// <summary>
@@ -317,7 +333,8 @@ public abstract class IMPPanelUI
     protected void ResumeToggleTarget()
     {
         EventMaskSwitch.Resume();
-        GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+        m_RootUI.transform.Find("Loading(Panel)").gameObject.SetActive(false);
+     //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
         EventMaskSwitch.Switch(m_RootUI);
         EventMaskSwitch.lastPanel = m_RootUI;
         //   assetLoader.init();  // 錯誤 有可以會導致部分載入還沒完成就重製
@@ -385,6 +402,7 @@ public abstract class IMPPanelUI
     public virtual void ShowPanel(string panelName)
     {
         GameObject panel = m_RootUI.transform.Find(panelName + "(Panel)").gameObject;
+        this.panelName = panelName;
 
         if (!dictPanelRefs.ContainsKey(panelName))         // 如果還沒載入Panel AB 載入AB
         {
@@ -413,7 +431,7 @@ public abstract class IMPPanelUI
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
-                //scrollView.scroll = false;
+                scrollView.scroll = false;
                 if (_lastPanel != null) _lastPanel.SetActive(false);
                 loadingPanel.SetActive(true);
                 panelState.obj.SetActive(true);
@@ -428,7 +446,7 @@ public abstract class IMPPanelUI
             }                                                   // 如果Panel已開啟
             else
             {
-               // scrollView.scroll = true;
+                scrollView.scroll = true;
                 EventMaskSwitch.Resume();
                 panelState.obj.SetActive(false);
                 _lastPanel = panelState.obj;

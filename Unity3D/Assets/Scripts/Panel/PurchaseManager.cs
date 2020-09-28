@@ -70,7 +70,7 @@ public class PurchaseManager : IMPPanelUI
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
@@ -392,5 +392,15 @@ public class PurchaseManager : IMPPanelUI
     protected override int GetMustLoadedDataCount()
     {
         return (int)ENUM_Data.Purchase * (int)ENUM_Data.CurrencyData; ;
+    }
+
+    public override void Initinal()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new NotImplementedException();
     }
 }

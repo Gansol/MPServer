@@ -70,7 +70,7 @@ public class PlayerManager : IMPPanelUI
         Global.photonService.UpdatePlayerImageEvent += OnUpdatePlayerImage;
     }
 
-    void Update()
+    public override void Update()
     {
         // 資料庫資料載入完成時 載入Asset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
@@ -543,5 +543,15 @@ public class PlayerManager : IMPPanelUI
     protected override int GetMustLoadedDataCount()
     {
         return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem * (int)ENUM_Data.ItemData * (int)ENUM_Data.CurrencyData;
+    }
+
+    public override void Initinal()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new System.NotImplementedException();
     }
 }
