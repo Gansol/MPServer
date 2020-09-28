@@ -129,13 +129,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 127164}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11400976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1418,7 +1412,7 @@ GameObject:
   - component: {fileID: 11470848}
   - component: {fileID: 11457618}
   m_Layer: 0
-  m_Name: Battle
+  m_Name: Battle_Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1532,13 +1526,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 132276}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11457618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1622,7 +1610,7 @@ GameObject:
   - component: {fileID: 11470846}
   - component: {fileID: 11457620}
   m_Layer: 0
-  m_Name: Survival
+  m_Name: Survival_Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1943,7 +1931,7 @@ GameObject:
   - component: {fileID: 11470844}
   - component: {fileID: 11492330}
   m_Layer: 0
-  m_Name: Set
+  m_Name: Setting_Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2057,13 +2045,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 113242}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11492330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3410,7 +3392,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OpenJoinPanel
     mParameters:
     - obj: {fileID: 151658}
@@ -4692,7 +4674,7 @@ GameObject:
   - component: {fileID: 11419472}
   - component: {fileID: 11457626}
   m_Layer: 0
-  m_Name: Store
+  m_Name: Store_Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4823,13 +4805,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 113238}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11419472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9255,13 +9231,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 113240}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &132276
 GameObject:
   m_ObjectHideFlags: 0
@@ -13733,7 +13703,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OnLicenseClickOn
     mParameters:
     - obj: {fileID: 132468}
@@ -13852,7 +13822,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OnLicenseClickOff
     mParameters: []
     oneShot: 0
@@ -14648,7 +14618,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OnLicenseClickOn
     mParameters:
     - obj: {fileID: 151658}
@@ -15771,7 +15741,6 @@ GameObject:
   - component: {fileID: 11453312}
   - component: {fileID: 11435960}
   - component: {fileID: 11435958}
-  - component: {fileID: 11435962}
   - component: {fileID: 8200950}
   - component: {fileID: 11400950}
   - component: {fileID: 11470820}
@@ -15841,29 +15810,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7d07c7bf3bea5a458888e4355a42be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11435962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 146382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b9d039053351f4ca90578b7e0977bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Panel:
-  - {fileID: 116180}
-  - {fileID: 127164}
-  - {fileID: 113238}
-  - {fileID: 132276}
-  - {fileID: 113242}
-  - {fileID: 146380}
-  - {fileID: 113240}
-  - {fileID: 113242}
-  - {fileID: 167506}
-  loginPanel: {fileID: 198770}
 --- !u!82 &8200950
 AudioSource:
   m_ObjectHideFlags: 0
@@ -16033,6 +15979,7 @@ MonoBehaviour:
   - {fileID: 113050}
   - {fileID: 113054}
   - {fileID: 113060}
+  LoginBtn: []
 --- !u!1 &146384
 GameObject:
   m_ObjectHideFlags: 0
@@ -16706,7 +16653,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OnLicenseClickOn
     mParameters:
     - obj: {fileID: 151658}
@@ -17409,7 +17356,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: GoogleLogin
     mParameters: []
     oneShot: 0
@@ -17577,7 +17524,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: Login
     mParameters:
     - obj: {fileID: 11480280}
@@ -23045,7 +22992,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: SwitchLoginType
     mParameters: []
     oneShot: 0
@@ -23194,13 +23141,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 167506}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11419494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23370,7 +23311,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: FaceBookLogin
     mParameters: []
     oneShot: 0
@@ -23519,13 +23460,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11435962}
-    mMethodName: LoadPanel
-    mParameters:
-    - obj: {fileID: 116180}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!114 &11419496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26047,7 +25982,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OnLicenseClickOff
     mParameters: []
     oneShot: 0
@@ -27188,7 +27123,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: OpenJoinPanel
     mParameters:
     - obj: {fileID: 132468}
@@ -27526,7 +27461,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11498770}
+  - mTarget: {fileID: 0}
     mMethodName: JoinMember
     mParameters:
     - obj: {fileID: 11480316}
@@ -27584,7 +27519,6 @@ GameObject:
   m_Component:
   - component: {fileID: 498770}
   - component: {fileID: 11498768}
-  - component: {fileID: 11498770}
   m_Layer: 0
   m_Name: Login(Panel)
   m_TagString: Untagged
@@ -27659,32 +27593,3 @@ MonoBehaviour:
   mSortingLayerName: 
   mClipOffset: {x: 0, y: 0}
   useSortingOrder: 0
---- !u!114 &11498770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 198770}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d72aab060fd8641a1def228922599a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LoginPanel: {fileID: 151658}
-  JoinPanel: {fileID: 132468}
-  MatchGame: {fileID: 0}
-  LicensePanel: {fileID: 144554}
-  accountField: {fileID: 11480280}
-  passwordField: {fileID: 11495662}
-  LoginMessageBox: {fileID: 11462062}
-  accountToggle: {fileID: 11480286}
-  passwordToggle: {fileID: 11426744}
-  LoginType:
-  - {fileID: 176984}
-  - {fileID: 150024}
-  ErrorText:
-  - {fileID: 158904}
-  - {fileID: 158898}
-  - {fileID: 158890}
-  - {fileID: 158896}

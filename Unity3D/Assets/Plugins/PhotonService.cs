@@ -1430,7 +1430,7 @@ public class PhotonService : IPhotonPeerListener
     /// <summary>
     /// 登入會員 傳送資料到Server
     /// </summary>
-    public void LoginGoogle(string Account, string Password, string name, int age, string email, MemberType memberType)
+    public void LoginGoogle(string Account, string Password, string name, byte age, string email, MemberType memberType)
     {
         Debug.Log("memberType:" + (byte)memberType);
         try

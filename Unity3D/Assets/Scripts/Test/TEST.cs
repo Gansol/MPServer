@@ -15,7 +15,9 @@ public class TEST : MonoBehaviour
     private void Start()
     {
         // 第一個字母大寫
-    Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
+        //Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
+
+    Debug.Log( GameObject.Find("A"));
     }
 
 

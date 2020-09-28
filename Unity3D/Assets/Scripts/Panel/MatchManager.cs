@@ -81,11 +81,12 @@ public class MatchManager : IMPPanelUI
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
         Global.photonService.UpdateMiceEvent += OnUpdateMice;
+        Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
 
         _checkTime = 0;
     }
 
-    void Update()
+    public override void Update()
     {
         if (m_RootUI.gameObject.activeSelf)
         {
@@ -104,7 +105,7 @@ public class MatchManager : IMPPanelUI
             }
 
             // 資料庫資料載入完成時 載入Panel
-            if (_dataLoadedCount  == GetMustLoadedDataCount() && !_bLoadedPanel)
+            if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
             {
                 if (!_bFirstLoad)
                     ResumeToggleTarget();
@@ -222,7 +223,7 @@ public class MatchManager : IMPPanelUI
         List<string> keys = loadedBtnRefs.Keys.ToList();
         foreach (KeyValuePair<string, object> item in dictServerData)
         {
-            string bundleName = Global.IconSuffix+ item.Value.ToString() ;
+            string bundleName = Global.IconSuffix + item.Value.ToString();
 
             if (assetLoader.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
@@ -358,7 +359,7 @@ public class MatchManager : IMPPanelUI
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
-                
+
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
                 _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
@@ -370,7 +371,7 @@ public class MatchManager : IMPPanelUI
 
             Global.isPlayerDataLoaded = false;
 
-           // OnCostCheck();
+            // OnCostCheck();
         }
     }
 
@@ -382,7 +383,7 @@ public class MatchManager : IMPPanelUI
         Panel[0].SetActive(true);
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
-        ShowPanel(obj.transform.parent.name);
+        m_MPGame.ShowPanel(obj.transform.parent.gameObject);
         //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         Panel[1].SetActive(false);
         // EventMaskSwitch.Prev();
@@ -496,6 +497,12 @@ public class MatchManager : IMPPanelUI
     // 接收 同意好友對戰
     private void OnApplyMatchGameFriend()
     {
+        if (Global.LoginStatus && !Global.isMatching)
+        {
+            //if (dictPanelRefs.ContainsKey(panelName))
+                m_MPGame.ShowPanel(m_RootUI);
+        }
+
         Panel[0].SetActive(true);
         Panel[1].SetActive(false);
 
@@ -546,6 +553,7 @@ public class MatchManager : IMPPanelUI
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ExitWaitingEvent -= OnExitWaiting;
+        Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
 
         Panel[0].SetActive(true);
         Panel[1].SetActive(false);
@@ -554,6 +562,16 @@ public class MatchManager : IMPPanelUI
 
     protected override int GetMustLoadedDataCount()
     {
-        return (int)ENUM_Data.PlayerData* (int)ENUM_Data.PlayerItem ;
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem;
+    }
+
+    public override void Initinal()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Release()
+    {
+        throw new NotImplementedException();
     }
 }

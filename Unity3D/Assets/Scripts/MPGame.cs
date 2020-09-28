@@ -5,7 +5,7 @@ public class MPGame
 {
 
     private static MPGame _instance = null;
-    private static bool _loginStatus;
+    private static bool _loginStatus,_bLoadMatchPanel;
 
     // GameSystem
     private CreatureSystem m_CreatureSystem = null;
@@ -14,20 +14,21 @@ public class MPGame
 
 
     // UserInterface
-    private BattleHUD battleHUD = null;
+
 
     private static AssetLoader m_AssetLoader = null;
     private GameLoop m_StartCoroutine = null;
 
-    private PanelManager m_MPPanel = null;
 
     private LoginUI m_LoginUI = null;
+    private MenuUI m_MenuUI = null;
     private PlayerManager m_PlayerManager = null;
     private TeamManager m_TeamManager = null;
     private StoreManager m_StoreManager = null;
     private MatchManager m_MatchManager = null;
     private PurchaseManager m_PurchaseManager = null;
     private FriendManager m_FriendManager = null;
+    private BattleHUD battleHUD = null;
 
     public static MPGame Instance
     {
@@ -42,21 +43,33 @@ public class MPGame
     public void Initinal(GameLoop gameLoop)
     {
         Debug.Log("MPGame Initinal.");
+
+        // Init Event
         Global.photonService.LoginEvent += OnLogin;
+
+        // Init Compoment
         m_StartCoroutine = gameLoop;
+
+        // Iint GameSystem
         m_CreatureSystem = new CreatureSystem(this);
         m_MessageManager = new MessageManager(this);
-        // m_AssetBundleManager = new AssetBundleManager(this);
         m_AssetLoader = gameLoop.GetComponent<AssetLoader>();
-        m_MPPanel = new PanelManager(this);
-        //        Debug.Log(m_AssetLoader);
 
-        //        MPFactory m_MPFactory = new MPFactory(this);
+        // Init GameUI
+        m_MenuUI = new MenuUI(this);
     }
 
     public void Update()
     {
-
+        m_LoginUI.Update();
+        m_MenuUI.Update();
+        //m_PlayerManager.Update();
+        //m_TeamManager.Update();
+        //m_StoreManager.Update();
+        if (_bLoadMatchPanel)
+            m_MatchManager.Update();
+        //m_PurchaseManager.Update();
+        //m_FriendManager.Update();
     }
 
     public void Release()
@@ -87,6 +100,9 @@ public class MPGame
                 break;
             case "Match":
                 m_MatchManager.ShowPanel(panelName);
+                if(!_bLoadMatchPanel)
+                    m_MatchManager = new MatchManager(this);
+                _bLoadMatchPanel = true;
                 break;
             default:
                 break;
