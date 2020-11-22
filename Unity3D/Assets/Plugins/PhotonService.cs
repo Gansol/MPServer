@@ -182,9 +182,9 @@ public class PhotonService : IPhotonPeerListener
             if (this.peer != null)
                 this.peer.Service();
         }
-        catch (Exception e)
+        catch 
         {
-            throw e;
+            throw ;
         }
     }
 
@@ -283,7 +283,7 @@ public class PhotonService : IPhotonPeerListener
                 break;
 
             //取得對方生命
-            case (byte)BattleResponseCode.GetLife:
+            case (byte)BattleResponseCode.GetOpponentLife:
                 short life = (short)eventResponse.Parameters[(byte)BattleParameterCode.Life];
                 GetOpponentLifeEvent(life);
                 break;

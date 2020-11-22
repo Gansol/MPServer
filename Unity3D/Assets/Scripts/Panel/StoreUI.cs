@@ -20,6 +20,7 @@ using MPProtocol;
  * 部分程式碼 在MPPanel
  * ***************************************************************
  *                           ChangeLog
+ * 20201027 v3.0.0  繼承重構
  * 20171226 v1.1.4   簡化載入流程 註解                          
  * 20171119 v1.1.3   修正載入流程 
  * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
@@ -28,34 +29,28 @@ using MPProtocol;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改     
  * 20200813 Store需要全部重寫
  * ****************************************************************/
-public class StoreManager : IMPPanelUI
+public class StoreUI : IMPPanelUI
 {
     #region 欄位
-    /// <summary>
-    /// 物件存放區
-    /// </summary>
-    public GameObject[] infoGroupsArea;
-    /// <summary>
-    /// 資產資料夾名稱
-    /// </summary>
-    public string[] assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
+    private AttachBtn_StoreUI UI;
+ //assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
 
     /// <summary>
     /// 偏移量
     /// </summary>
-    public Vector2 itemOffset;
+    private Vector2 itemOffset;
     /// <summary>
     /// 每頁物件矩總量
     /// </summary>
-    public int tablePageCount;
+    private int tablePageCount;
     /// <summary>
     /// 物件矩 每行物件數量
     /// </summary>
-    public int tableRowCount;
+    private int tableRowCount;
     /// <summary>
     /// 角色縮放
     /// </summary>     
-    public Vector3 actorScale;
+    private Vector3 actorScale;
 
     private Dictionary<string, string> buyingGoodsData;              // 儲存購買商品資料 
     private string _folderString;                                  // 資料夾名稱
@@ -71,9 +66,14 @@ public class StoreManager : IMPPanelUI
     private Dictionary<string, GameObject> dictItemRefs;
     #endregion
 
-    public StoreManager(MPGame MPGame) : base(MPGame)
+    public StoreUI(MPGame MPGame) : base(MPGame)
     {
-
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().storePanel;
+        _bFirstLoad = true;
+        dictItemRefs = new Dictionary<string, GameObject>();
+        buyingGoodsData = new Dictionary<string, string> {
+        { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" },
+        { StoreParameterCode.ItemType.ToString(), "" }, { StoreParameterCode.CurrencyType.ToString(), "" }, { StoreParameterCode.BuyCount.ToString(), "" } };
     }
 
     enum ENUM_Area : int
@@ -88,26 +88,15 @@ public class StoreManager : IMPPanelUI
     }
 
 
-
-    private void Awake()
+    public override void Initinal()
     {
-        _bFirstLoad = true;
-        dictItemRefs = new Dictionary<string, GameObject>();
-        buyingGoodsData = new Dictionary<string, string> {
-        { StoreParameterCode.ItemID.ToString(), "" }, { StoreParameterCode.ItemName.ToString(), "" },
-        { StoreParameterCode.ItemType.ToString(), "" }, { StoreParameterCode.CurrencyType.ToString(), "" }, { StoreParameterCode.BuyCount.ToString(), "" } };
-
         _itemType = (int)StoreType.Mice;
         tablePageCount = 9;
         tableRowCount = 3;
         actorScale = new Vector3(1.5f, 1.5f, 1f);
-
-        m_RootUI = GameObject.Find("Store(Panel)");
-    }
-
-    void OnEnable()
-    {
+        itemOffset = new Vector2(295, -350);
         _bLoadedPanel = false;
+
         Global.photonService.LoadStoreDataEvent += OnLoadStoreData;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
@@ -116,8 +105,11 @@ public class StoreManager : IMPPanelUI
         Global.photonService.GetGashaponEvent += OnGetGashapon;
     }
 
+
     public override void Update()
     {
+        base.Update();
+
         if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
@@ -136,7 +128,7 @@ public class StoreManager : IMPPanelUI
 
             // 顯示 Tab下 第一個商品類別
             if (!_bFirstLoad)
-                OnTabClick(infoGroupsArea[(int)ENUM_Area.Tab].transform.GetChild(0).gameObject);
+                OnTabClick(UI.miceTab);
 
             ResumeToggleTarget();
             OnLoadPanel();
@@ -148,7 +140,7 @@ public class StoreManager : IMPPanelUI
             _bLoadedAsset = !_bLoadedAsset;
             InstantiateStoreItem();
             LoadPrice(_itemData, _itemType);
-            switchInStorePanel(infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString()).gameObject);
+            switchInStorePanel(UI.itemPanel.transform.Find(_itemType.ToString()).gameObject);
             ResumeToggleTarget();
             // switchTab(infoGroupsArea[(int)ENUM_Area.Tab].transform.GetChild(0).gameObject);
             // assetLoader.init();
@@ -158,7 +150,7 @@ public class StoreManager : IMPPanelUI
         if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
-            _bLoadedActor = InstantiateActor(_lastItemBtn.GetComponentInChildren<UISprite>().name, infoGroupsArea[(int)ENUM_Area.ItemInfoBox].transform.Find(StoreType.Mice.ToString()).GetChild(0).Find("Image"), actorScale);
+            _bLoadedActor = InstantiateActor(_lastItemBtn.GetComponentInChildren<UISprite>().name, UI.miceInfo_msgBox.transform.GetChild(0).Find("Image"), actorScale);
         }
     }
 
@@ -168,8 +160,8 @@ public class StoreManager : IMPPanelUI
     private void InstantiateStoreItem()
     {
         // 實體化的商品背景(按鈕)
-        Dictionary<string, GameObject> itemBtnDict = InstantiateBagItemBG(_itemData, StoreType.Item.ToString(), _itemType, infoGroupsArea[(int)ENUM_Area.ItemPanel].transform, itemOffset, tablePageCount, tableRowCount);
-        Transform parent = infoGroupsArea[(int)ENUM_Area.ItemPanel].transform.Find(_itemType.ToString());
+        Dictionary<string, GameObject> itemBtnDict = InstantiateBagItemBG(_itemData, StoreType.Item.ToString(), _itemType, UI.itemPanel.transform, itemOffset, tablePageCount, tableRowCount);
+        Transform parent = UI.itemPanel.transform.Find(_itemType.ToString());
 
         // 如果有新商品 加入索引 並 加入按鈕事件
         if (itemBtnDict != null)
@@ -189,15 +181,37 @@ public class StoreManager : IMPPanelUI
     private void AddItemBtnEvent_OnClick(Dictionary<string, GameObject> itemBtnDict)
     {
         foreach (KeyValuePair<string, GameObject> item in itemBtnDict)
-            UIEventListener.Get(item.Value).onClick += OnItemClick;
+            UIEventListener.Get(item.Value).onClick = OnItemClick;
     }
 
     #region -- OnLoadPanel 載入面板 --
     protected override void OnLoading()
     {
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_StoreUI>();
         _dataLoadedCount = (int)ENUM_Data.None;
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
+
+        UIEventListener.Get(UI.gashaponTab).onClick = OnTabClick;
+        UIEventListener.Get(UI.miceTab).onClick = OnTabClick;
+        UIEventListener.Get(UI.ItemTab).onClick = OnTabClick;
+        UIEventListener.Get(UI.skillTab).onClick = OnTabClick;
+
+        UIEventListener.Get(UI.miceBuyBtn).onClick = OnBuyClick;
+        UIEventListener.Get(UI.itemBuyBtn).onClick = OnBuyClick;
+        UIEventListener.Get(UI.minusBtn).onClick = OnQuantity;
+        UIEventListener.Get(UI.minusBtn).onClick = OnQuantity;
+        UIEventListener.Get(UI.addBtn).onClick = OnQuantity;
+        UIEventListener.Get(UI.chkoutCancelBtn).onClick = OnReturn;
+        UIEventListener.Get(UI.gashaponCancelBtn).onClick = OnReturn;
+        UIEventListener.Get(UI.chkoutConfirmBtn).onClick = OnComfirm;
+        UIEventListener.Get(UI.gashaponConfirmBtn).onClick = OnConfirmGashapon;
+
+        UIEventListener.Get(UI.chcekoutBoxCollider).onClick = OnReturn;
+        UIEventListener.Get(UI.gashaponBoxCollider).onClick = OnReturn;
+        UIEventListener.Get(UI.itemCollider).onClick = OnReturn;
+        UIEventListener.Get(UI.miceCollider).onClick = OnReturn;
+        UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
 
         // LoadGashaponAsset(); //暫時關閉 Gashapon功能
         Global.photonService.LoadStoreData();
@@ -238,7 +252,7 @@ public class StoreManager : IMPPanelUI
             //   LoadGashaponAsset(assetFolder[0]);
             GetMustLoadAsset();
             LoadPlayerInfo();
-            EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0). gameObject;
+            EventMaskSwitch.lastPanel = m_RootUI.gameObject ;
         }
         Global.isStoreLoaded = false;
     }
@@ -249,9 +263,9 @@ public class StoreManager : IMPPanelUI
     {
         Debug.Log("Rice: " + Global.Rice.ToString());
         Debug.Log("Gold: " + Global.Gold.ToString());
-        infoGroupsArea[(int)ENUM_Area.PlayerInfo].transform.GetChild(0).GetComponent<UILabel>().text = Global.Rank.ToString();
-        infoGroupsArea[(int)ENUM_Area.PlayerInfo].transform.GetChild(1).GetComponent<UILabel>().text = Global.Rice.ToString();
-        infoGroupsArea[(int)ENUM_Area.PlayerInfo].transform.GetChild(2).GetComponent<UILabel>().text = Global.Gold.ToString();
+       UI.level.text = Global.Rank.ToString();
+       UI.rice.text = Global.Rice.ToString();
+       UI.gold.text = Global.Gold.ToString();
     }
     #endregion
 
@@ -269,7 +283,6 @@ public class StoreManager : IMPPanelUI
     {
         _lastItemBtn = obj;
 
-        Transform itemInfoBox = infoGroupsArea[(int)ENUM_Area.ItemInfoBox].transform;
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
         Dictionary<string, object> playerItemData = new Dictionary<string, object>();
 
@@ -277,28 +290,32 @@ public class StoreManager : IMPPanelUI
         if (Global.playerItem.ContainsKey(_lastItemBtn.name)) playerItemData = Global.playerItem[_lastItemBtn.name] as Dictionary<string, object>;
 
         // 取得商品類別 資產資料夾位子
-        _folderString = assetFolder[_itemType];
+        //GetStoreItemDataAndFolderPath(_itemType);
 
         // 因為子物件不能有不同的Layer強制改變
-        itemInfoBox.gameObject.SetActive(true);
-        itemInfoBox.gameObject.layer = itemInfoBox.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+     
+        
 
         // 載入選擇的資料
         switch (_itemType)
         {
             default:
             case (int)StoreType.Mice:
+                UI.miceInfo_msgBox.SetActive(true);
+               // UI.miceInfo_msgBox.layer = UI.miceInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
                 _itemData = Global.miceProperty;
-                LoadMicePorperty(obj, itemInfoBox, playerItemData, dictItemProperty);
+                LoadMicePorperty(obj, UI.miceInfo_msgBox.transform, playerItemData, dictItemProperty);
+                EventMaskSwitch.Switch(UI.miceInfo_msgBox.gameObject);
                 break;
             case (int)StoreType.Item:
             case (int)StoreType.Armor:
+                UI.itemInfo_msgBox.SetActive(true);
+              // UI.itemInfo_msgBox.layer = UI.itemInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
                 _itemData = Global.itemProperty;
-                LoadItemPorperty(obj, itemInfoBox, playerItemData, dictItemProperty);
+                LoadItemPorperty(obj, UI.itemInfo_msgBox.transform, playerItemData, dictItemProperty);
+                EventMaskSwitch.Switch(UI.itemInfo_msgBox.gameObject);
                 break;
         }
-
-        EventMaskSwitch.Switch(itemInfoBox.gameObject);
     }
 
     /// <summary>
@@ -319,20 +336,20 @@ public class StoreManager : IMPPanelUI
         //itemInfoBox.Find(StoreType.Mice.ToString()).gameObject.SetActive(true);
 
         // 載入商品資訊
-        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.Find(StoreType.Mice.ToString()).GetChild(0).gameObject, Global.miceProperty, _itemType);
-        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.Find(StoreType.Mice.ToString()).GetChild(0).gameObject, _itemData, _itemType);
-        LoadProperty.LoadPrice(item_Click, itemInfoBox.transform.Find(StoreType.Mice.ToString()).GetChild(0).gameObject, _itemType);
+        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.GetChild(0), Global.miceProperty, _itemType);
+        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.GetChild(0), _itemData, _itemType);
+        LoadProperty.LoadPrice(item_Click, itemInfoBox.transform.GetChild(0).gameObject, _itemType);
 
         // 異步載入角色
-        _bLoadedActor = LoadActor(item_Click, itemInfoBox.Find(StoreType.Mice.ToString()).GetChild(0).Find("Image"), actorScale);
+        _bLoadedActor = LoadActor(item_Click, itemInfoBox.GetChild(0).Find("Image"), actorScale);
 
         // 載入 對應商品 的 玩家道具數量
         playerItemData.TryGetValue(PlayerItem.ItemCount.ToString(), out value);
-        itemInfoBox.Find(StoreType.Mice.ToString()).GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
+        itemInfoBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
 
         // 載入商品資訊
         dictItemProperty.TryGetValue(StoreProperty.Description.ToString(), out value);
-        itemInfoBox.Find(StoreType.Mice.ToString()).GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
+        itemInfoBox.GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
     }
 
     /// <summary>
@@ -352,20 +369,20 @@ public class StoreManager : IMPPanelUI
         //itemInfoBox.Find(StoreType.Mice.ToString()).gameObject.SetActive(false);
 
         // 載入商品資訊
-        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).gameObject, _itemData, _itemType);
-        LoadProperty.LoadPrice(item_Click, itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).gameObject, _itemType);
+        LoadProperty.LoadItemProperty(item_Click, itemInfoBox.GetChild(0), _itemData, _itemType);
+        LoadProperty.LoadPrice(item_Click, itemInfoBox.GetChild(0).gameObject, _itemType);
 
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
+        itemInfoBox.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
 
         // 載入商品資訊
         dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
+        itemInfoBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
         dictItemProperty.TryGetValue(StoreProperty.Description.ToString(), out value);
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
+        itemInfoBox.GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
 
         // 載入 對應商品 的 玩家道具數量
         playerItemData.TryGetValue(PlayerItem.ItemCount.ToString(), out value);
-        itemInfoBox.Find(StoreType.Item.ToString()).GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
+        itemInfoBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = value.ToString();
     }
 
     /// <summary>
@@ -374,16 +391,18 @@ public class StoreManager : IMPPanelUI
     /// <param name="myPanel"></param>
     public void OnBuyClick(GameObject myPanel)
     {
+        Debug.Log("ItemType: " +_itemType);
         // 關閉 商品詳情視窗 並顯示 購買數量視窗
-        myPanel.SetActive(false);
-        infoGroupsArea[(int)ENUM_Area.CheckoutBox].SetActive(true);
+
 
         // 初始化視窗資訊
         BuyWindowsInit();
 
-        // 因為子物件不能有不同的Layer強制改變
-        infoGroupsArea[(int)ENUM_Area.CheckoutBox].layer = LayerMask.NameToLayer("BuyInfo");
-        EventMaskSwitch.Switch(infoGroupsArea[(int)ENUM_Area.CheckoutBox]);
+        // // 因為子物件不能有不同的Layer強制改變
+        //UI.checkout_msgBox.layer = LayerMask.NameToLayer("BuyInfo");
+        UI.checkout_msgBox.SetActive(true);
+        EventMaskSwitch.openedPanel.SetActive(false);
+        EventMaskSwitch.Switch(UI.checkout_msgBox);
     }
 
     /// <summary>
@@ -391,8 +410,6 @@ public class StoreManager : IMPPanelUI
     /// </summary>
     private void BuyWindowsInit()
     {
-        object value;
-        Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.CheckoutBox].transform;
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
 
         //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
@@ -401,7 +418,7 @@ public class StoreManager : IMPPanelUI
         buyingGoodsData[StoreProperty.BuyCount.ToString()] = "1";
 
         // 暫存 將購買的商品資訊
-        dictItemProperty.TryGetValue(StoreProperty.ItemID.ToString(), out value);
+        dictItemProperty.TryGetValue(StoreProperty.ItemID.ToString(), out object value);
         buyingGoodsData[StoreProperty.ItemID.ToString()] = value.ToString();
 
         dictItemProperty.TryGetValue(StoreProperty.ItemType.ToString(), out value);
@@ -414,14 +431,14 @@ public class StoreManager : IMPPanelUI
         buyingGoodsData[StoreProperty.ItemName.ToString()] = value.ToString();
 
         // 顯示圖示
-        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
-        checkoutBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
+        UI.checkout_msgBox.transform.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
+        UI.checkout_msgBox.transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
 
         // 顯示商品資訊
-        checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = "1";  // count = 1
+        UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text = "1";  // count = 1
         dictItemProperty.TryGetValue("Price", out value);
-        checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text = value.ToString(); // price
-        checkoutBox.GetChild(0).Find("Price").GetComponent<UILabel>().text = value.ToString(); // price
+        UI.checkout_msgBox.transform.GetChild(0).Find("Sum").GetComponent<UILabel>().text = value.ToString(); // price
+        UI.checkout_msgBox.transform.GetChild(0).Find("Price").GetComponent<UILabel>().text = value.ToString(); // price
     }
 
     /// <summary>
@@ -430,24 +447,23 @@ public class StoreManager : IMPPanelUI
     /// <param name="obj"></param>
     public void OnQuantity(GameObject obj)
     {
-        Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.CheckoutBox].transform;
-        int price = int.Parse(checkoutBox.GetChild(0).Find("Price").GetComponent<UILabel>().text);
-        int sum = int.Parse(checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text);
-        int count = int.Parse(checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text);
+        int price = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Price").GetComponent<UILabel>().text);
+        int sum = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Sum").GetComponent<UILabel>().text);
+        int count = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text);
 
         count += (obj.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
-        buyingGoodsData[StoreProperty.BuyCount.ToString()] = checkoutBox.GetChild(0).Find("Count").GetComponent<UILabel>().text = count.ToString();
-        checkoutBox.GetChild(0).Find("Sum").GetComponent<UILabel>().text = (price * count).ToString();
+        buyingGoodsData[StoreProperty.BuyCount.ToString()] = UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text = count.ToString();
+        UI.checkout_msgBox.transform.GetChild(0).Find("Sum").GetComponent<UILabel>().text = (price * count).ToString();
     }
 
     /// <summary>
     /// 確認購買
     /// </summary>
     /// <param name="myPanel"></param>
-    public void OnComfirm(GameObject myPanel)
+    public void OnComfirm(GameObject obj)
     {
-        myPanel.SetActive(false);
+        UI.checkout_msgBox.SetActive(false);
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
@@ -455,7 +471,7 @@ public class StoreManager : IMPPanelUI
     {
         EventMaskSwitch.lastPanel = null;
         //GameObject root = obj.transform.parent.gameObject;
-        ShowPanel(obj.transform.parent.name);
+        ShowPanel(m_RootUI.name);
        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         EventMaskSwitch.Resume();
     }
@@ -466,7 +482,7 @@ public class StoreManager : IMPPanelUI
     /// <param name="obj"></param>
     public void OnReturn(GameObject obj)
     {
-        int level = int.Parse(obj.name);
+        int level = int.Parse(obj.name); // 會回遮罩層級 1=上一層 2=上兩層
         EventMaskSwitch.openedPanel.SetActive(false);
         EventMaskSwitch.Prev(level);
     }
@@ -480,7 +496,7 @@ public class StoreManager : IMPPanelUI
         _itemType = (obj == null) ? (int)StoreType.Mice : int.Parse(obj.name.Remove(0, 3));
         Debug.Log("obj.name " + obj.name);
         Debug.Log("_itemType " + _itemType);
-        Debug.Log("infoGroupsArea[(int)ENUM_Area.ItemPanel] " + infoGroupsArea[(int)ENUM_Area.ItemPanel].name);
+        Debug.Log("infoGroupsArea[(int)ENUM_Area.ItemPanel] " +UI.itemPanel.name);
 
 
         GetMustLoadAsset();
@@ -610,20 +626,23 @@ public class StoreManager : IMPPanelUI
     /// <param name="_itemType">道具類別</param>
     private Dictionary<string, object> GetStoreItemDataAndFolderPath(int _itemType)
     {
-        _folderString = assetFolder[_itemType];
-
         switch ((StoreType)_itemType)
         {
-            default:
             case StoreType.Mice:
+           //     _itemData = Global.storeItem;
+                _folderString = Global.MiceIconUniquePath;
+                break;
             case StoreType.Item:
-                _itemData = Global.storeItem;
+            case StoreType.Armor:
+                //   _itemData = Global.storeItem;
+                _folderString = Global.ItemIconUniquePath;
                 break;
             case StoreType.Gashapon:
-                _itemData = Global.storeItem;
+             //   _itemData = Global.storeItem;
+                _folderString = Global.GashaponUniquePath;
                 break;
         }
-
+        _itemData = Global.storeItem;
         return _itemData;
     }
 
@@ -710,20 +729,21 @@ public class StoreManager : IMPPanelUI
     public void OnBuyGashapon(GameObject go)
     {
         _lastItemBtn = go;
-        infoGroupsArea[(int)ENUM_Area.GashaponBox].SetActive(true);
+        UI.gashapon_msgBox.SetActive(true);
 
         // 初始化視窗資訊
         GashaponWindowsInit();
 
-        // 因為子物件不能有不同的Layer強制改變
-        infoGroupsArea[(int)ENUM_Area.GashaponBox].layer = LayerMask.NameToLayer("BuyInfo");
-        EventMaskSwitch.Switch(infoGroupsArea[(int)ENUM_Area.GashaponBox]);
+        //// 因為子物件不能有不同的Layer強制改變
+        //UI.gashapon_msgBox.layer = LayerMask.NameToLayer("BuyInfo");
+        EventMaskSwitch.openedPanel.SetActive(false);
+        EventMaskSwitch.Switch(UI.gashapon_msgBox);
     }
 
     private void GashaponWindowsInit()
     {
         object value;
-        Transform checkoutBox = infoGroupsArea[(int)ENUM_Area.GashaponBox].transform;
+        Transform checkoutBox = UI.gashapon_msgBox.transform;
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
 
         //string colunmsName = (_itemType == (int)MPProtocol.StoreType.Mice) ? "MiceID" : "ItemID";
@@ -829,14 +849,16 @@ public class StoreManager : IMPPanelUI
         _lastPanel = tab;
     }
 
-    public override void Initinal()
-    {
-        throw new System.NotImplementedException();
-    }
+
 
 
     public override void Release()
     {
-        throw new System.NotImplementedException();
+        Global.photonService.LoadStoreDataEvent -= OnLoadStoreData;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
+        Global.photonService.LoadItemDataEvent -= OnLoadItemData;
+        Global.photonService.UpdateCurrencyEvent -= LoadPlayerInfo;
+        Global.photonService.GetGashaponEvent -= OnGetGashapon;
     }
 }

@@ -24,54 +24,54 @@ using MPProtocol;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改
  * 20170321 v2.0.0   1版完成           
  * 20171119 v2.1.0   修正載入順序
+ * 20201027 v3.0.0  繼承重構
  * ****************************************************************/
 
-public class PlayerManager : IMPPanelUI
+public class PlayerUI : IMPPanelUI
 {
+    AttachBtn_PlayerUI UI;
+
     public static Dictionary<string, GameObject> dictLoadedEquiped { get; set; }
     public static Dictionary<string, GameObject> dictLoadedItem { get; set; }
-    public static UISprite playerImage;
-
-    public GameObject playerInfoArea, equipArea, playerRecordArea, playerAvatarIconGrid, inventoryArea, iconBtn, equipBtn;
-    public Vector2 itemOffset, iconSize;
-    public Vector3 actorScale;
-    public int itemCount = 12, row = 5, _itemType, iconDepth = 310;
-
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
-    private GameObject _playerIconInventoryPanel, _playerEquipInventoryPanel;
+
+    private int itemCount = 8, row = 2, iconDepth = 310, _itemType, _dataLoadedCount;
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bUpdatePlayerImage, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
-    private int _dataLoadedCount;
+    private Vector2 itemOffset, iconSize;
 
-    public PlayerManager(MPGame MPGame) : base(MPGame) { }
-
-    //init
-    void Awake()
+    public PlayerUI(MPGame MPGame) : base(MPGame)
     {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().playerPanel;
         dictLoadedEquiped = new Dictionary<string, GameObject>();
         dictLoadedItem = new Dictionary<string, GameObject>();
+    }
 
-        _playerIconInventoryPanel = playerAvatarIconGrid.transform.parent.parent.parent.gameObject;
-        _playerEquipInventoryPanel = inventoryArea.transform.parent.parent.parent.gameObject;
+    public override void Initinal()
+    {
+        itemOffset = new Vector2(180, -180);
+        iconSize = new Vector2(100, 100);
+        itemCount = 8;
+        row = 2;
+        iconDepth = 310;
+
         _dictItemData = Global.dictSortedItem;
         _itemType = (int)StoreType.Armor;
         _bLoadedCurrency = _bLoadedPanel = _bImgActive = _bInvActive = false;
         _bPanelFirstLoad = _bFirstLoad = true;
-        m_RootUI = GameObject.Find("Player(Panel)");
-    }
-
-    void OnEnable()
-    {
         _bLoadedPanel = false;
+
         // 監聽事件
         Global.photonService.LoadItemDataEvent += OnLoadItem;
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.UpdatePlayerImageEvent += OnUpdatePlayerImage;
+        Debug.Log("Player Init.");
     }
 
     public override void Update()
     {
+        base.Update();
         // 資料庫資料載入完成時 載入Asset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
         {
@@ -84,7 +84,7 @@ public class PlayerManager : IMPPanelUI
         {
             _LoadedAsset = false;
             LoadPlayerAvatorIcon();
-            InstantiateEquipIcon(Global.playerItem, equipArea.transform, (int)StoreType.Armor);
+            InstantiateEquipIcon(Global.playerItem, UI.weaponEquip.transform, (int)StoreType.Armor);
         }
 
         // 裝備實體化完成 載入 資料
@@ -113,11 +113,19 @@ public class PlayerManager : IMPPanelUI
     /// </summary>
     protected override void OnLoading()
     {
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_PlayerUI>();
+
         _dataLoadedCount = (int)ENUM_Data.None;
 
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
 
+        UIEventListener.Get(UI.playerImageBtn).onClick = OnPlayerImageClick;
+        UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
+        UIEventListener.Get(UI.weaponEquip).onClick = OnEquipClick;
+
+        //UIEventListener.Get(UI.renameBtn).onClick = OnInvAvatorIamgeClick;
+        //UIEventListener.Get(UI.saveNoteBtn).onClick = OnInvAvatorIamgeClick;
         // 載入 資料庫資料
         Global.photonService.LoadItemData();
         Global.photonService.LoadPlayerData(Global.Account);
@@ -180,14 +188,14 @@ public class PlayerManager : IMPPanelUI
     private void LoadPlayerAvatorIcon()
     {
         _bUpdatePlayerImage = false;
-        Transform imageParent = playerInfoArea.transform.Find("Image");
+        // Transform imageParent = playerInfoArea.transform.Find("Image");
 
-        if(imageParent.childCount==0)
-            MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(Global.PlayerImage), imageParent, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
+        if (UI.playerImageBtn.transform.childCount == 0)
+            MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(Global.PlayerImage), UI.playerImageBtn.transform, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
 
-        playerImage = imageParent.GetChild(0).GetComponent<UISprite>();
+        UISprite playerImage = UI.playerImageBtn.transform.GetChild(0).GetComponent<UISprite>();
         playerImage.spriteName = Global.PlayerImage;
-     //   imageParent.parent.tag = "EquipICON";
+        //   imageParent.parent.tag = "EquipICON";
     }
 
 
@@ -233,11 +241,10 @@ public class PlayerManager : IMPPanelUI
                     {
                         imageParent.parent.name = itemID.ToString();
                         imageParent.parent.tag = "Inventory";
-                        GameObject _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
+                        GameObject invBtn = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, itemName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
                         // _clone.GetComponentInParent<ButtonSwitcher>()._activeBtn = true;
 
-                        object value;
-                        nestedData.TryGetValue("ItemType", out value);
+                        nestedData.TryGetValue("ItemType", out object value);
 
                         // 加入索引 老鼠所在的MiceBtn位置
                         if (itemType.ToString() == value.ToString())
@@ -308,11 +315,19 @@ public class PlayerManager : IMPPanelUI
                         {
                             imageParent.parent.name = itemID.ToString();
                             imageParent.parent.tag = "Equip";
+
                             UIEventListener.Get(imageParent.parent.gameObject).onClick += OnEquipClick;
                             GameObject _clone, bundle = assetLoader.GetAsset(bundleName);
                             _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
                             _clone.GetComponentInParent<ButtonSwitcher>().enabled = true;
                             _clone.GetComponentInParent<ButtonSwitcher>().SendMessage("EnableBtn");
+
+                            // 刪除 weapon拖曳按鈕 錯誤 暫時移除的方法
+                            GameObject.Destroy(_clone.GetComponentInParent<ButtonSwitcher>());
+                            GameObject.Destroy(_clone.GetComponentInParent<UIDragScrollView>());
+                            GameObject.Destroy(_clone.GetComponentInParent<Rigidbody>());
+                            GameObject.Destroy(_clone.GetComponentInParent<UIDragObject>());
+                            //UI.weaponBtn = imageParent.parent.gameObject;
 
                             if (!dictLoadedEquiped.ContainsKey(itemID.ToString()))
                                 dictLoadedEquiped.Add(itemID.ToString(), imageParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
@@ -328,11 +343,11 @@ public class PlayerManager : IMPPanelUI
             }
         }
 
-        // 加入按鈕監聽事件
-        if (imageParent.childCount == 0)
-        {
-            UIEventListener.Get(imageParent.parent.gameObject).onClick += OnEquipClick;
-        }
+        //// 加入按鈕監聽事件
+        //if (imageParent.childCount == 0)
+        //{
+        //    UIEventListener.Get(imageParent.parent.gameObject).onClick += OnEquipClick;
+        //}
 
         _bInsEquip = true;
     }
@@ -341,16 +356,16 @@ public class PlayerManager : IMPPanelUI
     #region -- LoadPlayer(Info、Equip、Record) 載入玩家資訊 --
     private void LoadPlayerInfo()
     {
-        Transform parent = playerInfoArea.transform;
         int exp = Clac.ClacExp(Mathf.Min(Global.Rank + 1, 100));
 
-        parent.Find("Lv").GetComponent<UILabel>().text = Global.Rank.ToString();
-        parent.Find("Rice").GetComponent<UILabel>().text = Global.Rice.ToString();
-        parent.Find("Gold").GetComponent<UILabel>().text = Global.Gold.ToString();
-        // parent.FindChild("Note").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.Find("Exp").GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + exp.ToString();
-        parent.Find("Exp").Find("ExpBar").GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(exp);
-        parent.Find("Name").GetComponent<UILabel>().text = Global.Nickname.ToString();
+        UI.playerName.GetComponent<UILabel>().text = Global.Nickname.ToString();
+        UI.level.GetComponent<UILabel>().text = Global.Rank.ToString();
+        UI.rice.GetComponent<UILabel>().text = Global.Rice.ToString();
+        UI.gold.GetComponent<UILabel>().text = Global.Gold.ToString();
+        // UI.note.GetComponent<UILabel>().text = Global.MaxCombo.ToString();
+        UI.exp.GetComponent<UILabel>().text = Global.Exp.ToString() + " / " + exp.ToString();
+        UI.expSilder.GetComponent<UISlider>().value = System.Convert.ToSingle(Global.Exp) / System.Convert.ToSingle(exp);
+
     }
 
     private void LoadPlayerEquip()
@@ -360,41 +375,42 @@ public class PlayerManager : IMPPanelUI
 
     private void LoadPlayerRecord()
     {
-        Transform parent = playerRecordArea.transform;
         float winRate = (Global.SumWin / Global.SumBattle) * 100f;
 
-        parent.Find("HighScore").GetComponent<UILabel>().text = Global.MaxScore.ToString();
-        parent.Find("Hit").GetComponent<UILabel>().text = Global.SumKill.ToString();
-        parent.Find("Win").GetComponent<UILabel>().text = Global.SumWin.ToString();
-        parent.Find("Combo").GetComponent<UILabel>().text = Global.MaxCombo.ToString();
-        parent.Find("WinRate").GetComponent<UILabel>().text = winRate.ToString("F2") + " %";    //F2 = float 小數點第2位
-        parent.Find("StrianghtWin").GetComponent<UILabel>().text = Global.SumWin.ToString();
-        parent.Find("Lose").GetComponent<UILabel>().text = Global.SumLost.ToString();
+        UI.maxScore.GetComponent<UILabel>().text = Global.MaxScore.ToString();
+        UI.sumKill.GetComponent<UILabel>().text = Global.SumKill.ToString();
+        UI.sumWin.GetComponent<UILabel>().text = Global.SumWin.ToString();
+        UI.maxCombo.GetComponent<UILabel>().text = Global.MaxCombo.ToString();
+        UI.winRate.GetComponent<UILabel>().text = winRate.ToString("F2") + " %";    //F2 = float 小數點第2位
+        UI.strianghtWin.GetComponent<UILabel>().text = Global.SumWin.ToString(); // 還沒有寫連贏場數 錯誤FUCK
+        UI.sumlost.GetComponent<UILabel>().text = Global.SumLost.ToString();
     }
     #endregion
 
     // 當點擊 背包頭像時
-    public void OnPlayerAvatarIconClick(GameObject obj)
+    public void OnPlayerImageClick(GameObject obj)
     {
         // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
-        if (_playerEquipInventoryPanel.activeSelf)
+        if (UI.playerEquipInvPanel.activeSelf)
             OnEquipClick(obj);
 
         _bImgActive = !_bImgActive;
-        _playerIconInventoryPanel.SetActive(_bImgActive);
+        UI.playerImageInvPanel.SetActive(_bImgActive);
 
 
 
         // 如果 頭像背包為空 實體化按鈕圖示
-        if (playerAvatarIconGrid.transform.childCount == 0)
-            InstantiateAvatarBagBtn(Global.dictMiceAll, Global.InvItemAssetName, playerAvatarIconGrid.transform, itemOffset, itemCount, row);
+        if (UI.playerImageInvGrid.transform.childCount == 0)
+        {
+            InstantiatePlayerImageBagBtn(Global.dictMiceAll, Global.InvItemAssetName, UI.playerImageInvGrid.transform, itemOffset, itemCount, row);
 
-        // 開關防止Item按鈕失效
-        playerAvatarIconGrid.SetActive(false);
-        playerAvatarIconGrid.SetActive(true);
+            // 開關防止Item按鈕失效
+            UI.playerImageInvGrid.SetActive(false);
+            UI.playerImageInvGrid.SetActive(true);
+        }
     }
 
-    #region -- InstantiateAvatarBagIcon  實體化角色頭像背包物件--
+    #region -- InstantiatePlayerImageBagBtn  實體化角色頭像背包物件--
     /// <summary>
     /// 實體化角色頭像背包物件
     /// </summary>
@@ -405,7 +421,7 @@ public class PlayerManager : IMPPanelUI
     /// <param name="tableCount"></param>
     /// <param name="rowCount"></param>
     /// <returns></returns>
-    public Dictionary<string, GameObject> InstantiateAvatarBagBtn(Dictionary<string, object> itemData, string invBtnItemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
+    public Dictionary<string, GameObject> InstantiatePlayerImageBagBtn(Dictionary<string, object> itemData, string invBtnItemName, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
@@ -418,22 +434,23 @@ public class PlayerManager : IMPPanelUI
                 if (assetLoader.GetAsset(invBtnItemName) != null)                  // 已載入按鈕資產時
                 {
 
-                    GameObject bundle = assetLoader.GetAsset(invBtnItemName);
+                    GameObject invBtn = assetLoader.GetAsset(invBtnItemName);
                     pos = sortItemPos(tableCount, rowCount, offset, pos, i);
-                    bundle = MPGFactory.GetObjFactory().Instantiate(bundle, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                    invBtn = MPGFactory.GetObjFactory().Instantiate(invBtn, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
                     string iconName = Global.IconSuffix + item.Value;
                     //string iconName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + item.Value);
                     if (assetLoader.GetAsset(iconName) != null)                  // 已載入ICON資產時
                     {
-                        GameObject icon = assetLoader.GetAsset(iconName);
-                        bundle = MPGFactory.GetObjFactory().Instantiate(icon, bundle.transform.Find("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
-                        bundle.transform.parent.parent.gameObject.tag = "InventoryICON";
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<ButtonSwitcher>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragScrollView>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<Rigidbody>());
-                        GameObject.Destroy(bundle.transform.parent.parent.GetComponent<UIDragObject>());
-                        bundle.transform.parent.parent.gameObject.AddComponent<ChangeICON>();
+                        GameObject iconBundle = assetLoader.GetAsset(iconName);
+                        MPGFactory.GetObjFactory().Instantiate(iconBundle, invBtn.transform.Find("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
+                        invBtn.tag = "InventoryICON";
+                        GameObject.Destroy(invBtn.GetComponent<ButtonSwitcher>());
+                        GameObject.Destroy(invBtn.GetComponent<UIDragScrollView>());
+                        GameObject.Destroy(invBtn.GetComponent<Rigidbody>());
+                        GameObject.Destroy(invBtn.GetComponent<UIDragObject>());
+                        UIEventListener.Get(invBtn).onClick += OnPlayerImageInvBtnClick;
+                        // bundle.transform.parent.parent.gameObject.AddComponent<ChangeICON>();
                     }
                     pos.x += offset.x;
                 }
@@ -453,14 +470,14 @@ public class PlayerManager : IMPPanelUI
     public void OnEquipClick(GameObject obj)
     {
         // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
-        if (_playerIconInventoryPanel.activeSelf)
-            OnPlayerAvatarIconClick(obj);
+        if (UI.playerImageInvPanel.activeSelf)
+            OnPlayerImageClick(obj);
 
         _bInvActive = !_bInvActive;
-        _playerEquipInventoryPanel.SetActive(_bInvActive);
+        UI.playerEquipInvPanel.SetActive(_bInvActive);
 
         // 如果 玩家頭像背包 還沒有載入
-        if (inventoryArea.transform.childCount == 0)
+        if (UI.playerEquipInvGrid.transform.childCount == 0)
         {
             //取得開啟的裝備類別(武器、衣服、道具等)
             if (obj.GetComponentInChildren<UISprite>())
@@ -469,13 +486,37 @@ public class PlayerManager : IMPPanelUI
                 _itemType = int.Parse(obj.transform.parent.name);
 
             //實體化道具格、圖示
-            Dictionary<string, GameObject> bag = InstantiateBagItemBG(_dictItemData, Global.InvItemAssetName, _itemType, inventoryArea.transform, itemOffset, itemCount, row);
+            Dictionary<string, GameObject> bag = InstantiateBagItemBG(_dictItemData, Global.InvItemAssetName, _itemType, UI.playerEquipInvGrid.transform, itemOffset, itemCount, row);
             InstantiateBagItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
-        }
 
-        // 開關防止Item按鈕失效
-        inventoryArea.SetActive(false);
-        inventoryArea.SetActive(true);
+            foreach (KeyValuePair<string, GameObject> go in bag)
+                UIEventListener.Get(go.Value).onClick += OnEquipInvBtnClick;
+
+            // 開關防止Item按鈕失效
+            UI.playerEquipInvGrid.SetActive(false);
+            UI.playerEquipInvGrid.SetActive(true);
+        }
+    }
+
+    private void OnPlayerImageInvBtnClick(GameObject obj)
+    {
+        string imageName = obj.transform.GetComponentInChildren<UISprite>().spriteName;
+        UI.playerImageBtn.GetComponentInChildren<UISprite>().name = imageName;
+        Global.photonService.UpdatePlayerData(imageName);
+    }
+
+    //暫時亂寫的 直接運GameObject名稱來更新資料庫 會導致嚴重錯誤
+    private void OnEquipInvBtnClick(GameObject obj)
+    {
+        if (obj.name != UI.weaponBtn.name)
+        {
+            string imageName = obj.transform.GetComponentInChildren<UISprite>().spriteName;
+
+            Global.photonService.UpdatePlayerItem(short.Parse(obj.name), true);
+            Global.photonService.UpdatePlayerItem(short.Parse(UI.weaponBtn.name), false);
+            UI.weaponBtn.GetComponentInChildren<UISprite>().spriteName = imageName;
+            UI.weaponBtn.name = obj.name;
+        }
     }
 
     /// <summary>
@@ -524,13 +565,22 @@ public class PlayerManager : IMPPanelUI
     /// <param name="obj">Panel</param>
     public override void OnClosed(GameObject obj)
     {
-        EventMaskSwitch.lastPanel = null;
-        ShowPanel(obj.transform.parent.name);
+     //   EventMaskSwitch.lastPanel = null;
+        ShowPanel(m_RootUI.name);
         //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
     }
 
+
+
+
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem * (int)ENUM_Data.ItemData * (int)ENUM_Data.CurrencyData;
+    }
+
+
     // Panel 關閉時
-    void OnDisable()
+    public override void Release()
     {
         // -event 移除事件監聽 (載入道具資料時、載入玩家資料時、載入玩家道具資料時)
         Global.photonService.LoadItemDataEvent -= OnLoadItem;
@@ -538,20 +588,6 @@ public class PlayerManager : IMPPanelUI
         Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.UpdatePlayerImageEvent -= OnUpdatePlayerImage;
-    }
-
-    protected override int GetMustLoadedDataCount()
-    {
-        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem * (int)ENUM_Data.ItemData * (int)ENUM_Data.CurrencyData;
-    }
-
-    public override void Initinal()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override void Release()
-    {
-        throw new System.NotImplementedException();
+        Debug.Log("Player Release.");
     }
 }

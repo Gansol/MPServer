@@ -9,7 +9,7 @@ public class Item : MonoBehaviour
 
     void OnClick()
     {
-       GetComponentInParent<StoreManager>().OnItemClick(gameObject);
+       GetComponentInParent<StoreUI>().OnItemClick(gameObject);
     //    GetComponentInParent<StoreManager>()..SendMessage("OnItemClick", gameObject);
     }
 }

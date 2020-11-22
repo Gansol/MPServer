@@ -4,7 +4,7 @@ using System.Collections;
 public abstract class MiceBossBase : Creature
 {
     public static UICamera cam;
-    public static BattleHUD battleHUD = null;
+    public static BattleUI battleUI = null;
     protected int _shield = 0;
     protected int myHits, otherHits;              // 打擊紀錄
     protected float m_LastTime, m_StartTime;
@@ -12,7 +12,7 @@ public abstract class MiceBossBase : Creature
 
     protected virtual void Awake()
     {
-        if (battleHUD == null) battleHUD = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleHUD>();
+        if (battleUI == null) battleUI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleUI>();
         if (cam == null) cam = Camera.main.GetComponent<UICamera>();
 
         m_StartTime = m_LastTime = Time.time;
@@ -28,7 +28,7 @@ public abstract class MiceBossBase : Creature
         // 遊戲開始時
         if (Global.isGameStart)
         {
-            battleHUD.ShowBossHPBar(m_Arribute.GetHPPrecent(), false);    // 顯示血調
+            battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), false);    // 顯示血調
             m_AnimState.UpdateAnimation();
             if (Time.time < m_StartTime + m_Skill.GetSkillTime())
                 m_Skill.UpdateEffect();
@@ -104,7 +104,7 @@ public abstract class MiceBossBase : Creature
         if (Global.isGameStart)
         {
             // 關閉血調顯示
-            battleHUD.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
+            battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
 
             Global.MiceCount--;
             Global.dictBattleMiceRefs.Remove(transform);

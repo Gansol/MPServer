@@ -8,9 +8,19 @@ public class GameLoop : MonoBehaviour {
         GameObject.DontDestroyOnLoad(this.gameObject);
         MPGame.Instance.Initinal(this);
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    private void OnGUI()
+    {
+        MPGame.Instance.OnGUI();
+    }
+
+    // Update is called once per frame
+    void Update () {
         MPGame.Instance.Update();
 	}
+
+    void FixedUpdate()
+    {
+        MPGame.Instance.FixedUpdate();
+    }
 }

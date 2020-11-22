@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 638669008
+CRC: 1440188433
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 29d9019173ef4647f52528087f4934c7
+    Hash: f7bb1d3cf937522428d4ece9f87881dc
   TypeTreeHash:
     serializedVersion: 2
     Hash: d847dd5a2e9930d4fcfe69e49bfd6a1a
@@ -30,7 +30,7 @@ ClassTypes:
 - Class: 128
   Script: {instanceID: 0}
 Assets:
-- Assets/AssetBundles/panel/unique/FriendItem.prefab
+- Assets/AssetBundles/panel/unique/friendItem.prefab
 Dependencies:
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

@@ -18,7 +18,7 @@ public class MissionManager : MonoBehaviour
 {
     #region variables
     BattleManager battleManager;
-    BattleHUD battleHUD;
+    BattleUI battleUI;
     public delegate void MissionHandler();
     public event MissionHandler SpawnBossEvent;
 
@@ -64,7 +64,7 @@ public class MissionManager : MonoBehaviour
         Global.photonService.MissionCompleteEvent += OnMissionComplete;         // 加入 完成任務 監聽事件
         Global.photonService.LoadSceneEvent += OnLoadScene;                       // 移除 離開房間 監聽事件
         battleManager = GetComponent<BattleManager>();
-        battleHUD = GetComponent<BattleHUD>();
+        battleUI = GetComponent<BattleUI>();
 
         activeScore = 1000;
         activeTime = 15;//15
@@ -219,7 +219,7 @@ public class MissionManager : MonoBehaviour
                     else if (BattleManager.gameTime - lastGameTime > missionTime)                            // failed
                     {
                         _missionMode = MissionMode.Completed;
-                        battleHUD.MissionFailedMsg(mission,0);
+                        battleUI.MissionFailedMsg(mission,0);
                     }
                     break;
                 }
@@ -228,7 +228,7 @@ public class MissionManager : MonoBehaviour
                     double endTime = BattleManager.gameTime - lastGameTime - missionTime;
                     if (endTime > -5 && endTime < 0) // 減少糧食 這比較特殊 需要顯示閃爍血調 還沒寫
                     {
-                        battleHUD.HPBar_Shing();
+                        battleUI.HPBar_Shing();
                     }
                     else if (BattleManager.gameTime - lastGameTime > missionTime)
                     {
@@ -244,14 +244,14 @@ public class MissionManager : MonoBehaviour
                         if (battleManager.MissionCombo >= _missionScore)   // success 20200817 改動過 修正顯示任務失敗錯誤
                         {
                             _missionMode = MissionMode.Completing;
-                            battleHUD.MissionCompletedMsg(mission, 0);
+                            battleUI.MissionCompletedMsg(mission, 0);
                             Global.isMissionCompleted = true;
 
                         }
                         else
                         {
                             _missionMode = MissionMode.Completed;           // failed
-                            battleHUD.MissionFailedMsg(mission, 0);
+                            battleUI.MissionFailedMsg(mission, 0);
                         }
                     }
                     break;
@@ -285,7 +285,7 @@ public class MissionManager : MonoBehaviour
     {
         if (Global.isGameStart)
         {
-            if (mission != Mission.HarvestRate) battleHUD.MissionMsg(mission, missionScore);
+            if (mission != Mission.HarvestRate) battleUI.MissionMsg(mission, missionScore);
             _missionScore = missionScore;
             _mission = mission;
             lastGameTime = BattleManager.gameTime;                // 任務開始時時間
@@ -302,11 +302,11 @@ public class MissionManager : MonoBehaviour
             Debug.Log("OnMissionManager:" + missionReward);
             if (mission == Mission.WorldBoss && missionReward < 0)
             {
-                battleHUD.MissionFailedMsg(mission,0);
+                battleUI.MissionFailedMsg(mission,0);
             }
             else
             {
-                battleHUD.MissionCompletedMsg(mission, missionReward);
+                battleUI.MissionCompletedMsg(mission, missionReward);
             }
             Global.isMissionCompleted = false;
             _missionMode = MissionMode.Completed;
@@ -316,7 +316,7 @@ public class MissionManager : MonoBehaviour
     void OnOtherMissionComplete(Int16 otherMissioReward)
     {
         if (Global.isGameStart)
-            battleHUD.OtherScoreMsg(otherMissioReward);
+            battleUI.OtherScoreMsg(otherMissioReward);
     }
 
     void OnAnsycTime()

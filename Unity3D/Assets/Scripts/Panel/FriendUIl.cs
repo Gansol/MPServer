@@ -17,18 +17,12 @@ using MPProtocol;
  * ***************************************************************
  *                           ChangeLog
  * 20171225 v1.1.3   優化
- * 20171215 v1.1.2   修正BUG、優化 註解                     
+ * 20171215 v1.1.2   修正BUG、優化 註解             
+ * 20201027 v3.0.0  繼承重構
  * ****************************************************************/
-public class FriendManager : IMPPanelUI
+public class FriendUI : IMPPanelUI
 {
-    /// <summary>
-    /// 圖片位子、slot名稱
-    /// </summary>
-    public string slotItemName;
-    /// <summary>
-    /// 道具Panel
-    /// </summary>               
-    public Transform itemPanel;
+    private AttachBtn_FriendUI UI;
     /// <summary>
     /// slot偏移量(間距)
     /// </summary>
@@ -44,20 +38,20 @@ public class FriendManager : IMPPanelUI
     private int _dataLoadedCount;
     private float _lastClickTime, _clickInterval;                      // 上次點擊時間 點擊間格
 
-    public FriendManager(MPGame MPGame)
-        : base(MPGame) { }
-
-    void Awake()
+    public FriendUI(MPGame MPGame): base(MPGame)
     {
-        _bFirstLoad = true;
-        itemPos = new Vector2(0, 0);
-        _clickInterval = 3;
-        m_RootUI = GameObject.Find("Friend(Panel)");
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().friendPanel;
     }
 
-    void OnEnable()
+    public override void Initinal()
     {
+        Debug.Log("Frined Init!");
+        _bFirstLoad = true;
         _bLoadedPanel = false;
+        itemPos = new Vector2(0, 0);
+        offset = new Vector2(0, -150);
+        _clickInterval = 3;
+
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadFriendsDataEvent += OnLoadFriendsData;
         Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
@@ -65,8 +59,9 @@ public class FriendManager : IMPPanelUI
         Global.photonService.RemoveFriendEvent += OnRemoveFriend;
     }
 
-    public override void  Update()
+    public override  void  Update()
     {
+        base.Update();
         // 資料載入完成時 載入PanelAsset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
             OnLoadPanel();
@@ -74,8 +69,7 @@ public class FriendManager : IMPPanelUI
         // Asset載入完成時 實體化道具
         if (assetLoader.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
-            Debug.Log("FUCK");
-            _bLoadedIcon = !_bLoadedIcon;
+            _bLoadedIcon = true;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
 
             // 實體化 朋友資訊列
@@ -93,16 +87,23 @@ public class FriendManager : IMPPanelUI
         if (Time.time > _lastClickTime + _clickInterval && _bClick)
         {
             _bClick = false;
-            itemPanel.Find(_inviteYouNameOfFriend).Find("Match").gameObject.SetActive(true);
+            UI.itemPanel.Find(_inviteYouNameOfFriend).Find("Match").gameObject.SetActive(true);
         }
     }
 
     protected override void OnLoading()
     {
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_FriendUI>();
         _dataLoadedCount = (int)ENUM_Data.None;
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadFriendsData(Global.dictFriends.ToArray());
         Global.photonService.GetOnlineActorState(Global.dictFriends.ToArray());
+
+        UIEventListener.Get(UI.addBtn).onClick = ShowInviteFirend;
+        UIEventListener.Get(UI.okBtn).onClick = InviteFirend;
+        UIEventListener.Get(UI.removeBtn).onClick = RemoveFriend;
+        UIEventListener.Get(UI.closeFriendCollider).onClick = OnClosed;
+        UIEventListener.Get(UI.closeInviteCollider).onClick = OnPrev;
 
         //if (_bFirstLoad)
         //    Global.photonService.LoadMiceData();
@@ -115,6 +116,7 @@ public class FriendManager : IMPPanelUI
         _bLoadedPanel = true;
         GetMustLoadAsset();
         ResumeToggleTarget();
+
     }
 
     /// <summary>
@@ -132,7 +134,7 @@ public class FriendManager : IMPPanelUI
                 dictMice.Add(item.Key, itemName);
             }
             _clientFriendsList = new List<string>(Global.dictFriends);  // 新朋友名單存入client暫存朋友列表
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + slotItemName + Global.ext);  // 載入好友列表背景資產
+            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + UI.slotItemName + Global.ext);  // 載入好友列表背景資產
             _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
 
             _bFirstLoad = false;
@@ -177,10 +179,10 @@ public class FriendManager : IMPPanelUI
             details.TryGetValue("Nickname", out object nickname);
             details.TryGetValue("Image", out object actorImage);
 
-            if (itemPanel.childCount != 0)
+            if ( UI.itemPanel.childCount != 0)
             {
-                itemPanel.GetChild(i).name = friend.Key;
-                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), actorImage.ToString(), itemPanel.Find(friend.Key));
+                UI.itemPanel.GetChild(i).name = friend.Key;
+                LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), actorImage.ToString(), UI.itemPanel.Find(friend.Key));
             }
 
             i++;
@@ -213,9 +215,9 @@ public class FriendManager : IMPPanelUI
 
         foreach (string removeName in removeFriendsList)
         {
-            if (itemPanel.childCount != 0)
+            if (UI.itemPanel.childCount != 0)
             {
-                NGUITools.Destroy(itemPanel.GetChild(itemPanel.childCount - 1));
+                NGUITools.Destroy(UI.itemPanel.GetChild(UI.itemPanel.childCount - 1));
                 Global.dictOnlineFriendsDetail.Remove(removeName);
                 _clientFriendsList.Remove(removeName);
                 itemPos.y -= offset.y;
@@ -230,8 +232,8 @@ public class FriendManager : IMPPanelUI
     /// <returns></returns>
     private GameObject InstantiateItem(Vector2 offset)
     {
-        GameObject bundle = assetLoader.GetAsset(slotItemName);
-        GameObject item = MPGFactory.GetObjFactory().Instantiate(bundle, itemPanel, slotItemName, offset, Vector2.one, Vector2.zero, -1);
+        GameObject bundle = assetLoader.GetAsset(UI.slotItemName);
+        GameObject item = MPGFactory.GetObjFactory().Instantiate(bundle, UI.itemPanel, UI.slotItemName, offset, Vector2.one, Vector2.zero, -1);
         UIEventListener.Get(item).onClick = SelectPlayer;
         return item;
     }
@@ -252,12 +254,12 @@ public class FriendManager : IMPPanelUI
         ENUM_MemberState ActorOnlineState;
 
         // 如果 朋友、欄位>0 載入資料
-        if (itemPanel.childCount > 0 && !string.IsNullOrEmpty(Global.dictFriends[0]))
+        if (UI.itemPanel.childCount > 0 && !string.IsNullOrEmpty(Global.dictFriends[0]))
             foreach (string friend in Global.dictFriends)
             {
                 if (Global.dictOnlineFriendsState.ContainsKey(friend))
                 {
-                    itemPanel.GetChild(i).Find("BG").gameObject.SetActive(true);
+                    UI.itemPanel.GetChild(i).Find("BG").gameObject.SetActive(true);
                     ActorOnlineState = (ENUM_MemberState)Convert.ToInt16(Global.dictOnlineFriendsState[friend]);
 
                     switch (ActorOnlineState)
@@ -265,26 +267,26 @@ public class FriendManager : IMPPanelUI
                         case ENUM_MemberState.Online:
                         case ENUM_MemberState.Idle:
                             {
-                                if (!_bClick) itemPanel.Find(friend).Find("Match").gameObject.SetActive(true);
-                                UIEventListener.Get(itemPanel.Find(friend).Find("Match").gameObject).onClick = InviteMatchGame;
+                                if (!_bClick) UI.itemPanel.Find(friend).Find("Match").gameObject.SetActive(true);
+                                UIEventListener.Get(UI.itemPanel.Find(friend).Find("Match").gameObject).onClick = InviteMatchGame;
                                 break;
                             }
                         case ENUM_MemberState.Offline:
                         case ENUM_MemberState.Playing:
                             {
-                                itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
+                                UI.itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
                                 break;
                             }
                         default:
-                            itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
+                            UI.itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
                             break;
                     }
                 }
                 else
                 {
                     // 不再線上 顯示無法使用狀態
-                    itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
-                    itemPanel.Find(friend).Find("BG").gameObject.SetActive(false);
+                    UI.itemPanel.Find(friend).Find("Match").gameObject.SetActive(false);
+                    UI.itemPanel.Find(friend).Find("BG").gameObject.SetActive(false);
                 }
                 i++;
             }
@@ -370,7 +372,7 @@ public class FriendManager : IMPPanelUI
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        ShowPanel(obj.transform.parent.name);
+        ShowPanel(m_RootUI.name);
        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
     }
 
@@ -396,9 +398,9 @@ public class FriendManager : IMPPanelUI
     /// <param name="message"></param>
     public void ShowInviteFirend(GameObject message)
     {
-        _lastMsgPanel = message;
-        message.SetActive(true);
-        EventMaskSwitch.Switch(message);
+        _lastMsgPanel = UI.messagePanel;
+        _lastMsgPanel.SetActive(true);
+        EventMaskSwitch.Switch(_lastMsgPanel);
     }
 
     /// <summary>
@@ -406,14 +408,15 @@ public class FriendManager : IMPPanelUI
     /// </summary>
     /// <param name="message"></param>
     /// <param name="input"></param>
-    public void InviteFirend(GameObject message, UIInput input)
+    public void InviteFirend(GameObject message)
     {
-        if (!string.IsNullOrEmpty(input.value))
+        string friendName = UI.account_Label.GetComponent<UILabel>().text;
+        if (!string.IsNullOrEmpty(friendName))
         {
-            if (!Global.dictFriends.Contains(input.value))
+            if (!Global.dictFriends.Contains(friendName))
             {
-                Global.photonService.InviteFriend(input.value);
-                message.SetActive(false);
+                Global.photonService.InviteFriend(friendName);
+             UI.messagePanel.SetActive(false);
                 return;
             }
             Global.ShowMessage("已新增為好友！", Global.MessageBoxType.Yes, 0);
@@ -425,7 +428,7 @@ public class FriendManager : IMPPanelUI
     /// <summary>
     /// 按下移除好友時
     /// </summary>
-    public void RemoveFriend()
+    public void RemoveFriend(GameObject btn)
     {
         if (!string.IsNullOrEmpty(_selectPlayerNickname))
         {
@@ -441,13 +444,19 @@ public class FriendManager : IMPPanelUI
     private void InviteMatchGame(GameObject go)
     {
         _inviteYouNameOfFriend = go.transform.parent.name;
-        itemPanel.Find(_inviteYouNameOfFriend).Find("Match").gameObject.SetActive(false);
+        UI.itemPanel.Find(_inviteYouNameOfFriend).Find("Match").gameObject.SetActive(false);
         _lastClickTime = Time.time;
         _bClick = true;
         Global.photonService.InviteMatchGame(_inviteYouNameOfFriend);
     }
 
-    void OnDisable()
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.FriendsData;
+    }
+
+
+    public override void Release()
     {
         if (_lastMsgPanel != null)
             _lastMsgPanel.SetActive(false);
@@ -457,20 +466,5 @@ public class FriendManager : IMPPanelUI
         Global.photonService.GetOnlineActorStateEvent -= OnGetOnlineActorState;
         Global.photonService.ApplyInviteFriendEvent -= OnApplyInviteFriend;
         Global.photonService.RemoveFriendEvent -= OnRemoveFriend;
-    }
-
-    protected override int GetMustLoadedDataCount()
-    {
-        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.FriendsData;
-    }
-
-    public override void Initinal()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void Release()
-    {
-        throw new NotImplementedException();
     }
 }

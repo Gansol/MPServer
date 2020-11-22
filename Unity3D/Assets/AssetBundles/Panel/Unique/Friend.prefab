@@ -295,7 +295,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 408580}
-  - component: {fileID: 11408580}
+  - component: {fileID: 7767812255183578553}
   m_Layer: 9
   m_Name: Friend
   m_TagString: Untagged
@@ -323,7 +323,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11408580
+--- !u!114 &7767812255183578553
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -332,12 +332,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 108580}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 894967cd8c44830419c77afaec779618, type: 3}
+  m_Script: {fileID: 11500000, guid: baff6866c04b43a478339957e0a84b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slotItemName: frienditem
+  addBtn: {fileID: 108582}
+  removeBtn: {fileID: 108594}
+  account_Label: {fileID: 147304}
+  okBtn: {fileID: 147292}
+  closeFriendCollider: {fileID: 143240}
+  closeInviteCollider: {fileID: 108592}
+  messagePanel: {fileID: 147308}
   itemPanel: {fileID: 408574}
-  offset: {x: 0, y: -150}
+  slotItemName: frienditem
 --- !u!1 &108582
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,7 +473,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11408580}
+  - mTarget: {fileID: 0}
     mMethodName: ShowInviteFirend
     mParameters:
     - obj: {fileID: 147308}
@@ -1003,13 +1009,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11408580}
-    mMethodName: OnPrev
-    mParameters:
-    - obj: {fileID: 0}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &108594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1138,11 +1138,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11408580}
-    mMethodName: RemoveFriend
-    mParameters: []
-    oneShot: 0
+  onClick: []
 --- !u!1 &143240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1241,13 +1237,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11408580}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 108580}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &147290
 GameObject:
   m_ObjectHideFlags: 0
@@ -1477,15 +1467,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11408580}
-    mMethodName: InviteFirend
-    mParameters:
-    - obj: {fileID: 147308}
-      field: 
-    - obj: {fileID: 11447300}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &147294
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 //
 /* ***************************************************************
  * -----Copyright c 2018 Gansol Studio.  All Rights Reserved.-----
@@ -34,14 +35,14 @@ public static class EventMaskSwitch
     public static void Init()
     {
         // 儲存初始事件遮罩 減少尋找時間
-        if (!dictSceneDefaultEventMask.ContainsKey(Application.loadedLevelName))
+        if (!dictSceneDefaultEventMask.ContainsKey(SceneManager.GetActiveScene().name))
         {
             defalutLayerMask = new List<LayerMask>();
             foreach (Camera c in Camera.allCameras)
             {
                 defalutLayerMask.Add(c.GetComponent<UICamera>().eventReceiverMask);
             }
-            dictSceneDefaultEventMask.Add(Application.loadedLevelName, defalutLayerMask);
+            dictSceneDefaultEventMask.Add(SceneManager.GetActiveScene().name, defalutLayerMask);
         }
     }
 
@@ -106,7 +107,7 @@ public static class EventMaskSwitch
         int i = Camera.allCamerasCount - 1;
         foreach (Camera c in Camera.allCameras)
         {
-            c.GetComponent<UICamera>().eventReceiverMask = dictSceneDefaultEventMask[Application.loadedLevelName][i];
+            c.GetComponent<UICamera>().eventReceiverMask = dictSceneDefaultEventMask[SceneManager.GetActiveScene().name ][i];
             i--;
         }
         prevLayerMask.Clear(); // 最後要清除所有Mask 因為會回到DefaultMask

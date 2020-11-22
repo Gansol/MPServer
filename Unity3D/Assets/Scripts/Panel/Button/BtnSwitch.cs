@@ -449,7 +449,7 @@ public class BtnSwitch : MonoBehaviour
                 string teamID = teamBtn.transform.GetChild(0).name;
                 string spriteName = GetLoadedMice(miceID).GetComponentInChildren<UISprite>().spriteName;
 
-                dictTeam[teamID] = spriteName.Remove(spriteName.Length - Global.extIconLength);
+                dictTeam[teamID] = spriteName.Replace(Global.IconSuffix,"");
                 Global.RenameKey(dictTeam, teamID, miceID);
                 EnDisableBtn(GetLoadedMice(teamID), true);
 
@@ -482,7 +482,7 @@ public class BtnSwitch : MonoBehaviour
                 string teamID = teamBtn.transform.GetChild(0).name;
                 string spriteName = GetLoadedMice(toID).GetComponentInChildren<UISprite>().spriteName;
 
-                dictTeam[teamID] = spriteName.Remove(spriteName.Length - Global.extIconLength);
+                dictTeam[teamID] = spriteName.Replace(Global.IconSuffix, "");
                 Global.RenameKey(dictTeam, teamID, toID);
                 EnDisableBtn(GetLoadedMice(teamID), true);
                 ModifyTeamRefs(teamID, toID, null);

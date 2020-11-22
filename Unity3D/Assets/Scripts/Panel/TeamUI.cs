@@ -19,6 +19,7 @@ using System;
  * + pageVaule 還沒加入翻頁值
  * ***************************************************************
  *                           ChangeLog
+ * 20201027 v3.0.0  繼承重構
  * 20171213 v1.1.3   交換按鈕功能合併修改至SwitchBtnComponent      
  * 20171211 v1.1.2   修正索引問題                  
  * 20171201 v1.1.1   修正隊伍交換問題         
@@ -29,48 +30,41 @@ using System;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
  * ****************************************************************/
 
-public class TeamManager : IMPPanelUI
+public class TeamUI : IMPPanelUI
 {
+    AttachBtn_TeamUI UI;
     SwitchBtnComponent SwitchBtnMethod;
 
     #region 欄位
-    public GameObject[] infoGroupsArea;                                             // 物件群組位置
+
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
-    [Range(0.2f, 0.4f)]
-    public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
-    public Vector3 actorScale;                                                      // 角色縮放
-    public GameObject startShowActor;                                               // 起始顯示老鼠
+    private float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
+
 
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
 
-    private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
+    private GameObject _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
     private bool _bFirstLoad, _bLoadedAsset, _bLoadedActor, _bLoadedEffect, _bLoadedPanel; // 是否 第一次載入 載入圖片、是否載入角色
     private int _miceCost, _dataLoadedCount, _page;   // 翻頁值(翻一頁+10)
     private float _lastClickTime;                                                   // 點擊間距時間
+    private Vector2 actorScale;
     #endregion
 
-    public TeamManager(MPGame MPGame) : base(MPGame) { }
-
-
-    //infoGroupsArea[0].transform = mice
-    //infoGroupsArea[2].transform = team
-    void Awake()
+    public TeamUI(MPGame MPGame) : base(MPGame)
     {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().teamPanel;
         SwitchBtnMethod = new SwitchBtnComponent();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         _dictTeamData = new Dictionary<string, object>();
-        m_RootUI = GameObject.Find("Team(Panel)");
-
-        //_page = 0;
         _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
-        actorScale = new Vector3(0.8f, 0.8f, 1);
-        _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
+                            //_page = 0;
     }
 
-    void OnEnable()
+    public override void Initinal()
     {
+        actorScale = new Vector3(0.8f, 0.8f, 1);
         _bLoadedPanel = false;
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
@@ -79,6 +73,7 @@ public class TeamManager : IMPPanelUI
 
     public override void Update()
     {
+        base.Update();
         // 除錯訊息
         if (_bLoadedActor || _bLoadedAsset)
             if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
@@ -102,7 +97,7 @@ public class TeamManager : IMPPanelUI
             //InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform);
 
             // 載入道具數量資訊
-            LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+            LoadItemCount(Global.playerItem, UI.miceGroup.transform);
             // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
 
             //// Enable按鈕
@@ -119,7 +114,7 @@ public class TeamManager : IMPPanelUI
             _bLoadedActor = !_bLoadedActor;
 
             string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace(Global.IconSuffix, "");
-            InstantiateActor(bundleName, _actorParent.transform, actorScale);
+            InstantiateActor(bundleName, UI.miceImage.transform, actorScale);
         }
     }
 
@@ -142,11 +137,11 @@ public class TeamManager : IMPPanelUI
             yield break;
         if (miceBtn.GetComponentInChildren<UISprite>())
         {
-            _bLoadedActor = LoadActor(miceBtn, _actorParent.transform, actorScale);
+            _bLoadedActor = LoadActor(miceBtn, UI.miceImage.transform, actorScale);
             _btnClick = miceBtn;
 
 
-            LoadProperty.LoadItemProperty(miceBtn.GetComponentInChildren<UISprite>().gameObject, infoGroupsArea[1], Global.miceProperty, (int)StoreType.Mice);    // 載入老鼠屬性   
+            LoadProperty.LoadItemProperty(miceBtn.GetComponentInChildren<UISprite>().gameObject, UI.infoGroup, Global.miceProperty, (int)StoreType.Mice);    // 載入老鼠屬性   
             LoadPlayerMiceProp(miceBtn.GetComponentInChildren<UISprite>().gameObject); // 載入玩家老鼠資料
             // InstantiateItem(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
             // InstantiateSkill(infoGroupsArea[3].transform.GetChild(0), miceBtn.GetComponentInChildren<UISprite>().name);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
@@ -195,9 +190,9 @@ public class TeamManager : IMPPanelUI
         miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
         miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
-        infoGroupsArea[1].transform.Find("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
-        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
-        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
+        UI.rank.text = rank.ToString();
+        UI.expSlider.value = Convert.ToSingle(exp) / miceMaxExp;
+        UI.exp.text = exp.ToString() + " / " + miceMaxExp.ToString();
     }
     #endregion
 
@@ -237,7 +232,7 @@ public class TeamManager : IMPPanelUI
                     miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;  // 如果Key不相同 重新載入ICON 修正ICON ID
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;     // 如果Key不相同 重新載入ICON 修正ICON SPRITE
                 }
-
+                UIEventListener.Get(miceBtn.gameObject).onClick = OnMiceClick;
                 //Debug.Log("Btn: " + miceBtn.parent.parent.parent.name + "   " + miceBtn.parent.parent.parent.parent.name);
 
                 SwitchBtnMethod.Add2Refs(loadedBtnRefs, _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs, i, item.Key, miceBtn.gameObject);                   // 加入物件參考
@@ -286,6 +281,9 @@ public class TeamManager : IMPPanelUI
     #region -- OnLoadPanel 載入面板--
     protected override void OnLoading()
     {
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_TeamUI>();
+        UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
+
         _dataLoadedCount = (int)ENUM_Data.None;
 
         if (Global.isMatching)
@@ -311,14 +309,14 @@ public class TeamManager : IMPPanelUI
         _bLoadedPanel = true;
 
         // 實體化按鈕  如果第一載入，不檢查隊伍變動
-        if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform) || _bFirstLoad)
-            InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform);
+        if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.miceGroup) || _bFirstLoad)
+            InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.miceGroup);
 
-        if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform) || _bFirstLoad)
-            InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform);
+        if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.teamGroup) || _bFirstLoad)
+            InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.teamGroup);
 
         SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);                                                     // Enable按鈕
-        m_MPGame.StartCoroutine(OnClickActorCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));          // 顯示老鼠角色 Actor
+        m_MPGame.StartCoroutine(OnClickActorCoroutine(UI.startShowActor));          // 顯示老鼠角色 Actor
 
         _bFirstLoad = false;
         _dictMiceData = Global.dictMiceAll;
@@ -343,7 +341,7 @@ public class TeamManager : IMPPanelUI
             {
                 Dictionary<string, object> newAssetData;
 
-                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+                LoadItemCount(Global.playerItem, UI.miceGroup);
                 LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
                 LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
                 // Where 找不存在的KEY 再轉換為Dictionary
@@ -375,8 +373,8 @@ public class TeamManager : IMPPanelUI
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        ShowPanel(obj.transform.parent.name);
-       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        ShowPanel(m_RootUI.name);
+        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
         // EventMaskSwitch.Prev();
     }
 
@@ -396,9 +394,9 @@ public class TeamManager : IMPPanelUI
         }
 
         if (_miceCost > maxCost)
-            infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
+            UI.cost.text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
         else
-            infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+            UI.cost.text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
     }
 
     void OnDisable()
@@ -413,14 +411,12 @@ public class TeamManager : IMPPanelUI
         return (int)ENUM_Data.PlayerItem * (int)ENUM_Data.PlayerData;
     }
 
-    public override void Initinal()
-    {
-        throw new NotImplementedException();
-    }
 
     public override void Release()
     {
-        throw new NotImplementedException();
+        Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
+        Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
+        Global.photonService.UpdateMiceEvent += OnCostCheck;
     }
 
 

@@ -31,7 +31,7 @@ public class Taco : SkillItem
 
         if (Time.time - m_StartTime > _skillTime - 3)
         {
-            // battleHUD shing
+            // battleUI shing
             // playerAIState.ShingICON();
         }
 

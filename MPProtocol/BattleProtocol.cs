@@ -138,7 +138,7 @@
         SkillBoss = 61,             // 技能老鼠發動技能判斷
         RoomMice = 62,              // 房間老鼠
         UpdateLife = 63,            // 更新生命值
-        //GetLife = 64,               // 取得對方生命
+        GetOpponentLife = 64,               // 取得對方生命
     }
 
     public enum BattleParameterCode

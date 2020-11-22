@@ -10,7 +10,7 @@ public class Bali : MiceBase
 
     public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
+     //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;

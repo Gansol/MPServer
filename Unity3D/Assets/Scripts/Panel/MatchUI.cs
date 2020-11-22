@@ -19,6 +19,7 @@ using System;
  * + pageVaule 還沒加入翻頁值
  * ***************************************************************
  *                           ChangeLog
+ * 20201027 v3.0.0  繼承重構
  * 20171213 v1.1.1   交換按鈕功能合併修改至SwitchBtnComponent                        
  * 20171211 v1.1.0   重製、修正索引問題   
  * 20161102 v1.0.2   3次重構，改變繼承至 PanelManager>MPPanel
@@ -27,19 +28,19 @@ using System;
  * 20160705 v1.0.0   0版完成，載入老鼠部分未來需要修改                    
  * ****************************************************************/
 
-public class MatchManager : IMPPanelUI
+public class MatchUI : IMPPanelUI
 {
-    SwitchBtnComponent SwitchBtnMethod;
-
+    private SwitchBtnComponent SwitchBtnMethod;
+    private AttachBtn_MatchUI UI;
     #region 欄位
-    public GameObject[] Panel;
-    public GameObject[] infoGroupsArea;                                             // 物件群組位置
-    public UILabel matchText, timeText;
+    //public GameObject[] Panel;
+    //public GameObject[] infoGroupsArea;                                             // 物件群組位置
+    // public UILabel matchText, timeText;
     public GameObject ok_btn;
 
     [Range(0.2f, 0.4f)]
-    public float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
-    public Vector3 actorScale;                                                      // 角色縮放
+    private float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
+    private Vector3 actorScale;                                                      // 角色縮放
 
     private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
     private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
@@ -49,45 +50,43 @@ public class MatchManager : IMPPanelUI
     private float _time, _lastTime, _escapeTime, _checkTime, _lastClickTime;    // 點擊間距時間
     #endregion
 
-    public MatchManager(MPGame MPGame) : base(MPGame) { }
-
-
-    //infoGroupsArea[0].transform = mice
-    //infoGroupsArea[1].transform = info
-    //infoGroupsArea[2].transform = team
-    void Awake()
+    public MatchUI(MPGame MPGame) : base(MPGame)
     {
         SwitchBtnMethod = new SwitchBtnComponent();
-        _checkTime = 0;
-
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         _dictTeamData = new Dictionary<string, object>();
-
-        //_page = 0;
-        _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
-        actorScale = new Vector3(0.8f, 0.8f, 1);
-        _actorParent = infoGroupsArea[1].transform.GetChild(0).gameObject;    // 方便程式辨認用 infoGroupsArea[1].transform.GetChild(0).gameObject = image
-        m_RootUI = GameObject.Find("Match(Panel)");
-
-        UIEventListener.Get(ok_btn).onClick = OnMatchGame;
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
     }
 
-    void OnEnable()
+
+    public override void Initinal()
     {
-        _bLoadedPanel = false;
+       
+        actorScale = new Vector3(0.8f, 0.8f, 1);
+
+        _checkTime = 0;
+        _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
+
+        //_page = 0;
+        //_actorParent = UI.info_group.transform.GetChild(0).gameObject;    // 方便程式辨認用 UI.info_group.transform.GetChild(0).gameObject = image
+
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
         Global.photonService.UpdateMiceEvent += OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
-
-        _checkTime = 0;
     }
+
+    //UI.mice_group.transform = mice
+    //UI.info_group.transform = info
+    //UI.team_group.transform = team
+
 
     public override void Update()
     {
+        base.Update();
         if (m_RootUI.gameObject.activeSelf)
         {
             //// 除錯訊息
@@ -121,17 +120,17 @@ public class MatchManager : IMPPanelUI
                 _bLoadedEffect = !_bLoadedEffect;
 
                 // 實體化按鈕
-                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform);
-                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform);
+                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
+                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
 
                 // 載入道具數量資訊
-                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
-                // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
+                LoadItemCount(Global.playerItem, UI.mice_group.transform);
+                // LoadItemCount(Global.playerItem, UI.team_group.transform);
 
                 // Enable按鈕
                 SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
                 // 顯示老鼠角色 Actor
-                // StartCoroutine(OnClickCoroutine(infoGroupsArea[0].transform.GetChild(0).gameObject));
+                // StartCoroutine(OnClickCoroutine(UI.mice_group.transform.GetChild(0).gameObject));
 
                 ResumeToggleTarget();
             }
@@ -199,9 +198,9 @@ public class MatchManager : IMPPanelUI
         miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
         miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
-        infoGroupsArea[1].transform.Find("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
-        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
-        infoGroupsArea[1].transform.Find("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
+        UI.info_group.transform.Find("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
+        UI.info_group.transform.Find("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
+        UI.info_group.transform.Find("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
     }
     #endregion
 
@@ -287,7 +286,17 @@ public class MatchManager : IMPPanelUI
     #region -- OnLoadPanel 載入面板--
     protected override void OnLoading()
     {
+        _bLoadedPanel = false;
+        _checkTime = 0;
         _dataLoadedCount = (int)ENUM_Data.None;
+
+       
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_MatchUI>();
+
+        UIEventListener.Get(UI.okBtn).onClick = OnMatchGame;
+        UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
+        UIEventListener.Get(UI.exitBtn).onClick = OnClosed;
+
         Global.photonService.LoadPlayerData(Global.Account);
         Global.photonService.LoadPlayerItem(Global.Account);
     }
@@ -308,11 +317,11 @@ public class MatchManager : IMPPanelUI
 
         if (!_bFirstLoad)
         {
-            if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform))
-                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, infoGroupsArea[0].transform);
+            if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.mice_group.transform))
+                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
 
-            if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform))
-                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, infoGroupsArea[2].transform);
+            if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.team_group.transform))
+                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
 
             SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
         }
@@ -345,7 +354,7 @@ public class MatchManager : IMPPanelUI
             {
                 Dictionary<string, object> newAssetData;
 
-                LoadItemCount(Global.playerItem, infoGroupsArea[0].transform);
+                LoadItemCount(Global.playerItem, UI.mice_group.transform);
                 LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
                 LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
 
@@ -380,12 +389,12 @@ public class MatchManager : IMPPanelUI
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-        Panel[0].SetActive(true);
+        UI.beforeMatchPanel.SetActive(true);
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
-        m_MPGame.ShowPanel(obj.transform.parent.gameObject);
+        ShowPanel(m_RootUI.transform.GetChild(0).name);
         //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
-        Panel[1].SetActive(false);
+        UI.matchingPanel.SetActive(false);
         // EventMaskSwitch.Prev();
     }
 
@@ -407,12 +416,12 @@ public class MatchManager : IMPPanelUI
             _miceCost += Convert.ToInt32(value);
         }
 
-        infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
-        ok_btn.SetActive(true);
+        UI.info_group.transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+        UI.okBtn.SetActive(true);
         if (_miceCost > maxCost)
         {
-            infoGroupsArea[1].transform.Find("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
-            ok_btn.SetActive(false);
+            UI.info_group.transform.Find("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
+            UI.okBtn.SetActive(false);
             return false;
         }
         else
@@ -459,7 +468,7 @@ public class MatchManager : IMPPanelUI
     {
         try
         {
-            timeText.text = "(" + _escapeTime.ToString() + ")";
+            UI.time_label.text = "(" + _escapeTime.ToString() + ")";
         }
         catch
         {
@@ -467,7 +476,7 @@ public class MatchManager : IMPPanelUI
         }
         //if (_lastTime > _time)
         //{
-        //    matchText.text = "尋找玩家...";
+        //    matching_label.text = "尋找玩家...";
         //}
     }
 
@@ -483,12 +492,12 @@ public class MatchManager : IMPPanelUI
         {
             if (TeamCountChk())
             {
-                matchText.text = "尋找玩家...";
+                UI.matching_label.text = "尋找玩家...";
                 _escapeTime = 0;
                 Global.isMatching = true;
-                Panel[1].SetActive(true);
-                Panel[0].SetActive(false);
-                timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
+                UI.matchingPanel.SetActive(true);
+                UI.beforeMatchPanel.SetActive(false);
+                UI.time_label = UI.matching_label.transform.GetChild(0).GetComponent<UILabel>();
                 Global.photonService.MatchGame(Global.PrimaryID, Global.dictTeam);
             }
         }
@@ -500,11 +509,11 @@ public class MatchManager : IMPPanelUI
         if (Global.LoginStatus && !Global.isMatching)
         {
             //if (dictPanelRefs.ContainsKey(panelName))
-                m_MPGame.ShowPanel(m_RootUI);
+            ShowPanel(m_RootUI.transform.GetChild(0).name);
         }
 
-        Panel[0].SetActive(true);
-        Panel[1].SetActive(false);
+        UI.beforeMatchPanel.SetActive(true);
+        UI.matchingPanel.SetActive(false);
 
         EventMaskSwitch.Resume();
         if (EventMaskSwitch.lastPanel != m_RootUI)  //m_RootUI = gameobject
@@ -520,13 +529,13 @@ public class MatchManager : IMPPanelUI
     {
         if (!Global.isMatching && Global.LoginStatus && OnCostCheck())
         {
-            matchText.text = "等待好友同意...";
+            UI.matching_label.text = "等待好友同意...";
             _escapeTime = 0;
             Global.isMatching = true;
             UIEventListener.Get(ok_btn).onClick = OnMatchGame;
-            Panel[1].SetActive(true);
-            Panel[0].SetActive(false);
-            timeText = matchText.transform.GetChild(0).GetComponent<UILabel>();
+            UI.matchingPanel.SetActive(true);
+            UI.beforeMatchPanel.SetActive(false);
+            UI.time_label = UI.matching_label.transform.GetChild(0).GetComponent<UILabel>();
             Global.isFriendMatching = true;
             Global.photonService.MatchGameFriend();
         }
@@ -534,44 +543,39 @@ public class MatchManager : IMPPanelUI
 
     private void OnExitWaiting()
     {
-        //matchText.text = "等待超時，請重新配對！";
+        //matching_label.text = "等待超時，請重新配對！";
         EventMaskSwitch.lastPanel = null;
-        Panel[0].SetActive(true);
-        Panel[1].SetActive(false);
-        ShowPanel(m_RootUI.name);
+        UI.beforeMatchPanel.SetActive(true);
+        UI.matchingPanel.SetActive(false);
+        ShowPanel(m_RootUI.transform.GetChild(0).name);
         // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(m_RootUI.gameObject);
 
     }
     //-----------------------------------------------
 
-    void OnDisable()
-    {
-        //if (Global.isMatching)
-        //    Global.photonService.ExitWaitingRoom();
-
-        Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
-        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
-        Global.photonService.UpdateMiceEvent -= OnUpdateMice;
-        Global.photonService.ExitWaitingEvent -= OnExitWaiting;
-        Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
-
-        Panel[0].SetActive(true);
-        Panel[1].SetActive(false);
-        Panel[1].transform.parent.parent.gameObject.SetActive(false);
-    }
 
     protected override int GetMustLoadedDataCount()
     {
         return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem;
     }
 
-    public override void Initinal()
-    {
-        throw new NotImplementedException();
-    }
+
 
     public override void Release()
     {
-        throw new NotImplementedException();
+        Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+        Global.photonService.ExitWaitingEvent -= OnExitWaiting;
+        Global.photonService.UpdateMiceEvent -= OnUpdateMice;
+        Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
+
+
+
+        //if (Global.isMatching)
+        //    Global.photonService.ExitWaitingRoom();
+
+        UI.beforeMatchPanel.SetActive(true);
+        UI.matchingPanel.SetActive(false);
+        //UI.matchingPanel.transform.parent.parent.gameObject.SetActive(false);
     }
 }

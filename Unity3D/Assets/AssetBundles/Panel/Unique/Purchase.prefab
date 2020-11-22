@@ -261,7 +261,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 415658}
-  - component: {fileID: 11474880}
+  - component: {fileID: 7904123923118222376}
   m_Layer: 9
   m_Name: Purchase
   m_TagString: Untagged
@@ -285,7 +285,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11474880
+--- !u!114 &7904123923118222376
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -294,11 +294,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 115658}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff540e9439994bc46868ac4edca0d21d, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a71220e41b5de746a07e9d6ce3e0fe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: 275
   itemPanel: {fileID: 174322}
+  closeCollider: {fileID: 121370}
 --- !u!1 &121370
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,13 +375,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11474880}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 115658}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521380
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -531,7 +525,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3001
+  startingRenderQueue: 3003
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 3
