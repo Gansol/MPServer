@@ -10,7 +10,7 @@ public static class LoadProperty
     /// <param name="name"></param>
     /// <param name="parent"></param>
     /// <param name="offset">基本=0。載入欄位偏移值</param>
-    public static void LoadItemProperty(GameObject item, GameObject parent, Dictionary<string, object> itemData, int itemType)
+    public static void LoadItemProperty(GameObject item, Transform parent, Dictionary<string, object> itemData, int itemType)
     {
         string ColunmsName = itemType == (int)StoreType.Mice ? "MiceID" : "ItemID";
 

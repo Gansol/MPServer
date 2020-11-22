@@ -142,7 +142,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412174}
   - component: {fileID: 11412172}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +243,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412176}
   - component: {fileID: 11412174}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -375,7 +375,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412180}
   - component: {fileID: 11412176}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Price
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -476,7 +476,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412182}
   - component: {fileID: 11412178}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: LifeTime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -577,7 +577,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412184}
   - component: {fileID: 11412180}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Life
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -678,7 +678,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412186}
   - component: {fileID: 11412182}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: EatFull
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -779,7 +779,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412188}
   - component: {fileID: 11412184}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MiceSpeed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -880,7 +880,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412190}
   - component: {fileID: 11412186}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -981,7 +981,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412192}
   - component: {fileID: 11412188}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1068,7 +1068,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412194}
   - component: {fileID: 11412190}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1187,7 +1187,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412198}
   - component: {fileID: 11412192}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1340,7 +1340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412210}
   - component: {fileID: 11412194}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1441,7 +1441,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412212}
   - component: {fileID: 11412196}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1530,7 +1530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412214}
   - component: {fileID: 11412198}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1617,7 +1617,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412216}
   - component: {fileID: 11412200}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1736,7 +1736,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412218}
   - component: {fileID: 11412202}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1837,7 +1837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412220}
   - component: {fileID: 11412204}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1926,7 +1926,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412222}
   - component: {fileID: 11412206}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2013,7 +2013,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412224}
   - component: {fileID: 11412208}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2132,7 +2132,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412226}
   - component: {fileID: 11412210}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2233,7 +2233,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412228}
   - component: {fileID: 11412212}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2322,7 +2322,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412230}
   - component: {fileID: 11412214}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2409,7 +2409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412232}
   - component: {fileID: 11412216}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2528,7 +2528,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412234}
   - component: {fileID: 11412218}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2629,7 +2629,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412236}
   - component: {fileID: 11412220}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2718,7 +2718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412238}
   - component: {fileID: 11412222}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2805,7 +2805,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412240}
   - component: {fileID: 11412224}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2892,7 +2892,7 @@ GameObject:
   m_Component:
   - component: {fileID: 412242}
   - component: {fileID: 11412226}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: EatingRate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3044,7 +3044,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnClosed
     mParameters:
     - obj: {fileID: 168574}
@@ -3117,7 +3117,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &421932
 Transform:
   m_ObjectHideFlags: 0
@@ -3207,7 +3207,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3004
+  startingRenderQueue: 3002
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -3977,13 +3977,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnReturn
-    mParameters:
-    - obj: {fileID: 121932}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521930
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4213,13 +4207,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnConfirmGashapon
-    mParameters:
-    - obj: {fileID: 121932}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521932
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4481,13 +4469,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnQuantity
-    mParameters:
-    - obj: {fileID: 121960}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521934
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4615,13 +4597,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnQuantity
-    mParameters:
-    - obj: {fileID: 121962}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521936
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5484,13 +5460,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnReturn
-    mParameters:
-    - obj: {fileID: 121984}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6521940
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5588,7 +5558,7 @@ GameObject:
   m_Component:
   - component: {fileID: 421992}
   - component: {fileID: 11460728}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5675,7 +5645,7 @@ GameObject:
   m_Component:
   - component: {fileID: 421994}
   - component: {fileID: 11421982}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ItemName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5776,7 +5746,7 @@ GameObject:
   m_Component:
   - component: {fileID: 421996}
   - component: {fileID: 11421984}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Count
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5912,7 +5882,7 @@ GameObject:
   - component: {fileID: 11422002}
   - component: {fileID: 6521946}
   - component: {fileID: 11422004}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Buy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6028,13 +5998,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnBuyClick
-    mParameters:
-    - obj: {fileID: 121930}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &122014
 GameObject:
   m_ObjectHideFlags: 0
@@ -6045,7 +6009,7 @@ GameObject:
   m_Component:
   - component: {fileID: 422018}
   - component: {fileID: 11422006}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6146,7 +6110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 422020}
   - component: {fileID: 11422008}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MsgBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6235,7 +6199,7 @@ GameObject:
   m_Component:
   - component: {fileID: 422030}
   - component: {fileID: 11422010}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MsgBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6322,7 +6286,7 @@ GameObject:
   m_Component:
   - component: {fileID: 422032}
   - component: {fileID: 11422012}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6414,7 +6378,7 @@ GameObject:
   - component: {fileID: 6521952}
   - component: {fileID: 6521954}
   - component: {fileID: 6573572}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6517,7 +6481,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnReturn
     mParameters:
     - obj: {fileID: 122060}
@@ -6585,7 +6549,7 @@ GameObject:
   m_Component:
   - component: {fileID: 428706}
   - component: {fileID: 11428708}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MiceCost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6686,7 +6650,7 @@ GameObject:
   m_Component:
   - component: {fileID: 428708}
   - component: {fileID: 11428710}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6773,7 +6737,7 @@ GameObject:
   m_Component:
   - component: {fileID: 428710}
   - component: {fileID: 11428712}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: OutLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6860,7 +6824,7 @@ GameObject:
   m_Component:
   - component: {fileID: 428712}
   - component: {fileID: 11428714}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ICON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6949,7 +6913,7 @@ GameObject:
   m_Component:
   - component: {fileID: 428714}
   - component: {fileID: 11428716}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7406,7 +7370,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3004
+  startingRenderQueue: 3002
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -8092,13 +8056,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnReturn
-    mParameters:
-    - obj: {fileID: 154540}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6554574
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8328,13 +8286,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnComfirm
-    mParameters:
-    - obj: {fileID: 154540}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6554576
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8596,13 +8548,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnQuantity
-    mParameters:
-    - obj: {fileID: 154566}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6554578
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8730,13 +8676,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnQuantity
-    mParameters:
-    - obj: {fileID: 154568}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6554580
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9599,13 +9539,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnReturn
-    mParameters:
-    - obj: {fileID: 154588}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6554582
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9617,8 +9551,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 400, y: 1920, z: 0}
-  m_Center: {x: -600, y: 0, z: 0}
+  m_Size: {x: 1111, y: 1953, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &6554584
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9754,7 +9688,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 468574}
-  - component: {fileID: 11468590}
+  - component: {fileID: 6360438322588973095}
   m_Layer: 9
   m_Name: Store
   m_TagString: Untagged
@@ -9780,7 +9714,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11468590
+--- !u!114 &6360438322588973095
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9789,32 +9723,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 168574}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb53a74ab3dcf1a4cae7b65c8f197a61, type: 3}
+  m_Script: {fileID: 11500000, guid: 56b2c0bd58930094eaff20c49ce09b78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infoGroupsArea:
-  - {fileID: 168650}
-  - {fileID: 168604}
-  - {fileID: 168648}
-  - {fileID: 168622}
-  - {fileID: 121930}
-  - {fileID: 154540}
-  - {fileID: 121932}
-  assetFolder:
-  - 
-  - miceicon/unique/
-  - itemicon/unique/
-  - itemicon/unique/
-  - 
-  - 
-  - 
-  - 
-  - 
-  - gashapon/unique/
-  itemOffset: {x: 295, y: -350}
-  tablePageCount: 9
-  tableRowCount: 3
-  actorScale: {x: 1.5, y: 1.5, z: 1}
+  level: {fileID: 11403466}
+  rice: {fileID: 11468652}
+  gold: {fileID: 11468654}
+  miceTab: {fileID: 168658}
+  ItemTab: {fileID: 168660}
+  skillTab: {fileID: 168666}
+  gashaponTab: {fileID: 168606}
+  itemPanel: {fileID: 168622}
+  miceInfo_msgBox: {fileID: 173574}
+  itemInfo_msgBox: {fileID: 173572}
+  checkout_msgBox: {fileID: 154540}
+  gashapon_msgBox: {fileID: 121932}
+  miceBuyBtn: {fileID: 173588}
+  itemBuyBtn: {fileID: 122012}
+  minusBtn: {fileID: 154566}
+  addBtn: {fileID: 154568}
+  chkoutConfirmBtn: {fileID: 154560}
+  chkoutCancelBtn: {fileID: 154556}
+  gashaponConfirmBtn: {fileID: 121954}
+  gashaponCancelBtn: {fileID: 121950}
+  miceCollider: {fileID: 122060}
+  itemCollider: {fileID: 173578}
+  chcekoutBoxCollider: {fileID: 154588}
+  gashaponBoxCollider: {fileID: 121984}
+  closeCollider: {fileID: 113444}
 --- !u!1 &168576
 GameObject:
   m_ObjectHideFlags: 0
@@ -10941,7 +10877,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnTabClick
     mParameters:
     - obj: {fileID: 168606}
@@ -13310,13 +13246,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11468590}
-    mMethodName: OnTabClick
-    mParameters:
-    - obj: {fileID: 168658}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!1 &168660
 GameObject:
   m_ObjectHideFlags: 0
@@ -13446,7 +13376,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnTabClick
     mParameters:
     - obj: {fileID: 168660}
@@ -13757,7 +13687,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnTabClick
     mParameters:
     - obj: {fileID: 168666}
@@ -13892,7 +13822,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnTabClick
     mParameters:
     - obj: {fileID: 168668}
@@ -14524,7 +14454,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473570}
   - component: {fileID: 11473570}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Count
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14691,7 +14621,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473576}
   - component: {fileID: 11473572}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14797,7 +14727,7 @@ GameObject:
   - component: {fileID: 6573576}
   - component: {fileID: 6573574}
   - component: {fileID: 6573570}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14900,7 +14830,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnReturn
     mParameters:
     - obj: {fileID: 173578}
@@ -14968,7 +14898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473578}
   - component: {fileID: 11473578}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15055,7 +14985,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473580}
   - component: {fileID: 11473580}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MsgBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15142,7 +15072,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473592}
   - component: {fileID: 11473582}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: MsgBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15231,7 +15161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473582}
   - component: {fileID: 11473584}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15334,7 +15264,7 @@ GameObject:
   - component: {fileID: 11473588}
   - component: {fileID: 6573582}
   - component: {fileID: 11473586}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Buy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15451,7 +15381,7 @@ MonoBehaviour:
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
   onClick:
-  - mTarget: {fileID: 11468590}
+  - mTarget: {fileID: 0}
     mMethodName: OnBuyClick
     mParameters:
     - obj: {fileID: 121930}
@@ -15467,7 +15397,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473584}
   - component: {fileID: 11473590}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15599,7 +15529,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473586}
   - component: {fileID: 11473592}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15802,7 +15732,7 @@ GameObject:
   m_Component:
   - component: {fileID: 473598}
   - component: {fileID: 11473594}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: ItemName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15974,7 +15904,7 @@ GameObject:
   m_Component:
   - component: {fileID: 494026}
   - component: {fileID: 11494026}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Price
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16075,7 +16005,7 @@ GameObject:
   m_Component:
   - component: {fileID: 494028}
   - component: {fileID: 11494028}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}

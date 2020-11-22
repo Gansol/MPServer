@@ -1680,7 +1680,7 @@ namespace MPServer
                                             Log.Debug("Other GUID:" + roomOtherActor.guid);
                                             otherPeer = _server.Actors.GetPeerFromGuid(roomOtherActor.guid);
                                             parameter = new Dictionary<byte, object>() { { (byte)BattleParameterCode.Life, roomActor.life }, { (byte)BattleResponseCode.DebugMessage, "取得對方生命資料." } };
-                                            EventData eventData = new EventData((byte)BattleResponseCode.GetLife, parameter);
+                                            EventData eventData = new EventData((byte)BattleResponseCode.GetOpponentLife, parameter);
                                             otherPeer.SendEvent(eventData, new SendParameters());
                                         }
 

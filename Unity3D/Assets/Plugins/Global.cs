@@ -8,7 +8,8 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static string serverPath = "http://180.218.140.27:58767/MicePowBETA";//Server路徑
+    public static string serverIP = "180.218.166.204";
+    public static string serverPath = "http://180.218.166.204:58767/MicePowBETA";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
@@ -132,6 +133,7 @@ public static class Global
     public static string MiceIconUniquePath = "miceicon/unique/";  // miceicon路徑
     public static string ItemIconUniquePath = "itemicon/unique/";  // itemicon路徑
     public static string EffectsUniquePath = "effects/unique/";  // effects路徑
+    public static string GashaponUniquePath = "gashapon/unique/";  // gashapon路徑
     public static string InvItemAssetName = "invitem";
     public static string StoreItemAssetName = "item";
     public static string PurchaseItemAssetName = "purchaseitem"; 

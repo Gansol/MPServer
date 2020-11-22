@@ -17,7 +17,12 @@ public class TEST : MonoBehaviour
         // 第一個字母大寫
         //Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
 
-    Debug.Log( GameObject.Find("A"));
+        string a = "ASSSS";
+
+        string s;
+        s = a.Replace("SSSS", "");
+        Debug.Log(s);
+        Debug.Log(a.Replace("D", ""));
     }
 
 

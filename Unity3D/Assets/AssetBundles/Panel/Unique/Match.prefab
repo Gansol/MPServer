@@ -115,13 +115,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11471390}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 171390}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6509266
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6189,13 +6183,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11471390}
-    mMethodName: OnMatchGame
-    mParameters:
-    - obj: {fileID: 171390}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6509264
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8550,7 +8538,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 471390}
-  - component: {fileID: 11471390}
+  - component: {fileID: 822239935450068739}
   m_Layer: 9
   m_Name: Match
   m_TagString: Untagged
@@ -8574,7 +8562,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11471390
+--- !u!114 &822239935450068739
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8583,21 +8571,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 171390}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f68a6d9a7bad9e148891bb05c33ac075, type: 3}
+  m_Script: {fileID: 11500000, guid: 9ef6ec72631f0e04f990a75bc7d69c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Panel:
-  - {fileID: 171324}
-  - {fileID: 171316}
-  infoGroupsArea:
-  - {fileID: 171330}
-  - {fileID: 109268}
-  - {fileID: 171332}
-  matchText: {fileID: 11471332}
-  timeText: {fileID: 11415514}
-  ok_btn: {fileID: 171334}
-  delayBetween2Clicks: 0.3
-  actorScale: {x: 0, y: 0, z: 0}
+  okBtn: {fileID: 171334}
+  exitBtn: {fileID: 109264}
+  mice_group: {fileID: 471330}
+  team_group: {fileID: 471332}
+  info_group: {fileID: 409268}
+  matching_label: {fileID: 11471332}
+  time_label: {fileID: 11415514}
+  beforeMatchPanel: {fileID: 171324}
+  matchingPanel: {fileID: 171316}
+  closeCollider: {fileID: 194712}
 --- !u!1 &192610
 GameObject:
   m_ObjectHideFlags: 0
@@ -9523,13 +9509,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11471390}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 171390}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6594700
 BoxCollider:
   m_ObjectHideFlags: 0

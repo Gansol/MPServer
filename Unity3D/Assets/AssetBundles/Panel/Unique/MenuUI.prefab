@@ -1412,7 +1412,7 @@ GameObject:
   - component: {fileID: 11470848}
   - component: {fileID: 11457618}
   m_Layer: 0
-  m_Name: Battle_Btn
+  m_Name: Match_Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2395,7 +2395,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3011
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -2579,7 +2579,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3013
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -2763,7 +2763,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3007
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -3589,7 +3589,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3012
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -8302,7 +8302,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3007
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -9304,7 +9304,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3007
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -15574,7 +15574,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 467508}
-  - {fileID: 467512}
   m_Father: {fileID: 446390}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15746,7 +15745,7 @@ GameObject:
   - component: {fileID: 11470820}
   - component: {fileID: 11437394}
   - component: {fileID: 11435956}
-  - component: {fileID: 1129145527900488026}
+  - component: {fileID: 3989336243936856167}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GM
@@ -15959,7 +15958,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a721a8bfffce7154ea7c942bec5797d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1129145527900488026
+--- !u!114 &3989336243936856167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -15968,18 +15967,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 146382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e052537bd45a859448d32bd5d8c89114, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e796d6fe129c4b4a87d4140263fc4c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuBtn:
-  - {fileID: 176978}
-  - {fileID: 100974}
-  - {fileID: 176974}
-  - {fileID: 132274}
-  - {fileID: 113050}
-  - {fileID: 113054}
-  - {fileID: 113060}
-  LoginBtn: []
+  playerBtn: {fileID: 176978}
+  teamBtn: {fileID: 100974}
+  storeBtn: {fileID: 124580}
+  purchaseBtn: {fileID: 176974}
+  friendBtn: {fileID: 132274}
+  settingBtn: {fileID: 113060}
+  battleBtn: {fileID: 113050}
+  survivalBtn: {fileID: 113054}
+  playerPanel: {fileID: 116180}
+  teamPanel: {fileID: 127164}
+  storePanel: {fileID: 113238}
+  matchPanel: {fileID: 132276}
+  purchasePanel: {fileID: 167506}
+  loginPanel: {fileID: 198770}
+  tutorialPanel: {fileID: 113242}
+  friendPanel: {fileID: 113240}
+  messagePanel: {fileID: 153316}
+  loadingPanel: {fileID: 146380}
 --- !u!1 &146384
 GameObject:
   m_ObjectHideFlags: 0
@@ -17523,15 +17531,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: Login
-    mParameters:
-    - obj: {fileID: 11480280}
-      field: label
-    - obj: {fileID: 11495662}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6580274
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18261,7 +18261,7 @@ GameObject:
   - component: {fileID: 451652}
   - component: {fileID: 11451654}
   m_Layer: 0
-  m_Name: Password_label
+  m_Name: ConfrimPassword_label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18498,6 +18498,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 451658}
+  - component: {fileID: 3466685322048663295}
   m_Layer: 0
   m_Name: Login_Panel
   m_TagString: Untagged
@@ -18523,6 +18524,46 @@ Transform:
   m_Father: {fileID: 498770}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3466685322048663295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ea68eda9b10e0438f5a5e3d5995035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loginPanel: {fileID: 151658}
+  joinPanel: {fileID: 132468}
+  licensePanel: {fileID: 144554}
+  loginMessageBox: {fileID: 11462062}
+  login_AccountField: {fileID: 11480278}
+  login_PasswordField: {fileID: 11495660}
+  join_AccountField: {fileID: 11480316}
+  join_PasswordField: {fileID: 11414376}
+  join_ConfrimPasswordField: {fileID: 11451654}
+  join_NicknameField: {fileID: 11495670}
+  join_AgeField: {fileID: 11451632}
+  join_SexField: {fileID: 11426726}
+  accountToggle: {fileID: 11480286}
+  passwordToggle: {fileID: 11426744}
+  login_AgreeLicenseToggle: {fileID: 11450036}
+  join_AgreeLicenseToggle: {fileID: 11444566}
+  snsLogin: {fileID: 176984}
+  gansolLogin: {fileID: 150024}
+  facebookLoginBtn: {fileID: 176976}
+  gansolLoginBtn: {fileID: 151618}
+  joinBtn: {fileID: 115712}
+  switch_Btn: {fileID: 176972}
+  join_JoinBtn: {fileID: 195682}
+  join_ExitBtn: {fileID: 195682}
+  errorText_Email: {fileID: 11458904}
+  errorText_Password: {fileID: 11458898}
+  errorText_Password2: {fileID: 11458890}
+  errorText_NickName: {fileID: 11458896}
 --- !u!1 &151660
 GameObject:
   m_ObjectHideFlags: 0
@@ -20837,7 +20878,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3012
+  startingRenderQueue: 3008
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -20978,6 +21019,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 467510}
+  - {fileID: 467512}
   m_Father: {fileID: 446380}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -21162,11 +21204,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 167512}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 446380}
+  m_Father: {fileID: 467508}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &11467512
@@ -22991,11 +23033,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: SwitchLoginType
-    mParameters: []
-    oneShot: 0
+  onClick: []
 --- !u!114 &11495306
 MonoBehaviour:
   m_ObjectHideFlags: 0

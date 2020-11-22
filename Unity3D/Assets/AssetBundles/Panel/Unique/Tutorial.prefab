@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 496124}
-  - component: {fileID: 11496124}
+  - component: {fileID: 3860982302400640370}
   m_Layer: 9
   m_Name: Tutorial
   m_TagString: Untagged
@@ -38,7 +38,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11496124
+--- !u!114 &3860982302400640370
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,9 +47,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 196124}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0420e94809eca64c9c987bf7343c032, type: 3}
+  m_Script: {fileID: 11500000, guid: 99fc113588c94b545b2645e7621e3e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  okBtn: {fileID: 196160}
+  closeCollider: {fileID: 196164}
 --- !u!1 &196126
 GameObject:
   m_ObjectHideFlags: 0
@@ -1763,13 +1765,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11496124}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 196124}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6596160
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1955,13 +1951,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 11496124}
-    mMethodName: OnClosed
-    mParameters:
-    - obj: {fileID: 196124}
-      field: 
-    oneShot: 0
+  onClick: []
 --- !u!65 &6596164
 BoxCollider:
   m_ObjectHideFlags: 0

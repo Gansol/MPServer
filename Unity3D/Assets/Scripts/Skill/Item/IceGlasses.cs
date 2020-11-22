@@ -24,7 +24,7 @@ public class IceGlasses : SkillItem
         animTime = tap.gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime;
         if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
-            // battleHUD shing
+            // battleUI shing
             // playerAIState.ShingICON();
         }
 

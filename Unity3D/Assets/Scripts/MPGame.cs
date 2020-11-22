@@ -5,13 +5,13 @@ public class MPGame
 {
 
     private static MPGame _instance = null;
-    private static bool _loginStatus,_bLoadMatchPanel;
+    public static bool _loginStatus, _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
 
     // GameSystem
     private CreatureSystem m_CreatureSystem = null;
     private MessageManager m_MessageManager = null;
-    private PoolManager m_PoolManager = null;
-
+    private readonly PoolManager m_PoolManager = null;
+    private BattleManager m_BattleSystem = null;
 
     // UserInterface
 
@@ -22,13 +22,14 @@ public class MPGame
 
     private LoginUI m_LoginUI = null;
     private MenuUI m_MenuUI = null;
-    private PlayerManager m_PlayerManager = null;
-    private TeamManager m_TeamManager = null;
-    private StoreManager m_StoreManager = null;
-    private MatchManager m_MatchManager = null;
-    private PurchaseManager m_PurchaseManager = null;
-    private FriendManager m_FriendManager = null;
-    private BattleHUD battleHUD = null;
+    private PlayerUI m_PlayerUI = null;
+    private TeamUI m_TeamUI = null;
+    private StoreUI m_StoreUI = null;
+    private MatchUI m_MatchUI = null;
+    private PurchaseUI m_PurchaseUI = null;
+    private FriendUI m_FriendUI = null;
+    private TutorialUI m_TutorialUI = null;
+    private BattleUI m_BattleUI = null;
 
     public static MPGame Instance
     {
@@ -42,8 +43,6 @@ public class MPGame
 
     public void Initinal(GameLoop gameLoop)
     {
-        Debug.Log("MPGame Initinal.");
-
         // Init Event
         Global.photonService.LoginEvent += OnLogin;
 
@@ -57,19 +56,46 @@ public class MPGame
 
         // Init GameUI
         m_MenuUI = new MenuUI(this);
+
+        Debug.Log("MPGame Initinal.");
+    }
+    public void OnGUI()
+    {
+        if (_bLoadBattlelPanel)
+            m_BattleUI.OnGUI();
     }
 
     public void Update()
     {
-        m_LoginUI.Update();
-        m_MenuUI.Update();
-        //m_PlayerManager.Update();
-        //m_TeamManager.Update();
-        //m_StoreManager.Update();
+        if (_bloadMainScene)
+        {
+            m_LoginUI.Update();
+            m_MenuUI.Update();
+            //   m_TutorialManager.Update();
+        }
+        if (_bLoadPlayerPanel)
+            m_PlayerUI.Update();
+        if (_bLoadTeamPanel)
+            m_TeamUI.Update();
+        if (_bLoadStorePanel)
+            m_StoreUI.Update();
         if (_bLoadMatchPanel)
-            m_MatchManager.Update();
-        //m_PurchaseManager.Update();
-        //m_FriendManager.Update();
+            m_MatchUI.Update();
+        if (_bLoadPurchasePanel)
+            m_PurchaseUI.Update();
+        if (_bLoadFriendPanel)
+            m_FriendUI.Update();
+        if (_bLoadTutorialPanel)
+            m_TutorialUI.Update();
+        if (_bLoadBattlelPanel)
+        {
+            m_BattleUI.Update();
+            m_BattleSystem.Update();
+        }
+    }
+    public void FixedUpdate()
+    {
+
     }
 
     public void Release()
@@ -77,38 +103,130 @@ public class MPGame
         m_CreatureSystem.Release();
     }
 
-    public void ShowPanel(GameObject btnName)
+    public void ShowPanel(GameObject panel_btn)
     {
-        string panelName = btnName.name.Remove(btnName.name.Length - 4); // panelName =>  Player_Btn - 4 = Player
-
-        switch (panelName)
+        if (Global.LoginStatus)
         {
-            case "Player":
-                m_StoreManager.ShowPanel(panelName);
+            string panelName = panel_btn.name.Replace("_Btn", "");//.Remove(panel_btn.name.Length - 4) ; // panelName =>  Player_Btn - 4 = Player
+
+            switch (panelName)
+            {
+                case "Player":
+                    if (!_bLoadPlayerPanel)
+                        m_PlayerUI = new PlayerUI(this);
+                    m_PlayerUI.ShowPanel(panelName);
+                    _bLoadPlayerPanel = true;
+                    break;
+                case "Team":
+                    if (!_bLoadTeamPanel)
+                        m_TeamUI = new TeamUI(this);
+                    m_TeamUI.ShowPanel(panelName);
+                    _bLoadTeamPanel = true;
+                    break;
+                case "Store":
+                    if (!_bLoadStorePanel)
+                        m_StoreUI = new StoreUI(this);
+                    m_StoreUI.ShowPanel(panelName);
+                    _bLoadStorePanel = true;
+                    break;
+                case "Purchase":
+                    if (!_bLoadPurchasePanel)
+                        m_PurchaseUI = new PurchaseUI(this);
+                    m_PurchaseUI.ShowPanel(panelName);
+                    _bLoadPurchasePanel = true;
+                    break;
+                case "Friend":
+                    if (!_bLoadFriendPanel)
+                        m_FriendUI = new FriendUI(this);
+                    m_FriendUI.ShowPanel(panelName);
+                    _bLoadFriendPanel = true;
+                    break;
+                case "Match":
+                    if (!_bLoadMatchPanel)
+                        m_MatchUI = new MatchUI(this);
+                    m_MatchUI.ShowPanel(panelName);
+                    _bLoadMatchPanel = true;
+                    break;
+                case "Tutorial":
+                    if (!_bLoadTutorialPanel)
+                        m_TutorialUI = new TutorialUI(this);
+                    m_TutorialUI.ShowPanel(panelName);
+                    _bLoadTutorialPanel = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void InitScene(GameObject panelName)
+    {
+        switch (panelName.name)
+        {
+
+            case "menuui":
+                m_MenuUI = new MenuUI(this);
+                m_LoginUI = new LoginUI(this);
+                m_MenuUI.Initinal();
+                m_LoginUI.Initinal();
                 break;
-            case "Team":
-                m_StoreManager.ShowPanel(panelName);
-                break;
-            case "Store":
-                m_StoreManager.ShowPanel(panelName);
-                break;
-            case "Purchase":
-                m_PurchaseManager.ShowPanel(panelName);
-                break;
-            case "Friend":
-                m_FriendManager.ShowPanel(panelName);
-                break;
-            case "Match":
-                m_MatchManager.ShowPanel(panelName);
-                if(!_bLoadMatchPanel)
-                    m_MatchManager = new MatchManager(this);
-                _bLoadMatchPanel = true;
-                break;
-            default:
+            case "gameui":
+                if (!_bLoadBattlelPanel)
+                    m_BattleUI = new BattleUI(this);
+                m_BattleSystem = new BattleManager(this);
+                m_BattleUI.Initinal();
+                m_BattleSystem.Initinal();
+                _bLoadBattlelPanel = true;
                 break;
         }
     }
 
+    //public void InitScene(string panelName)
+    //{
+    //    //  Debug.Log("panelName" + panelName);
+    //    switch (panelName)
+    //    {
+    //        case "menuui":
+
+    //            break;
+    //        case "battle":
+    //            //battleUI.Initinal();
+    //            break;
+    //        case "Player":
+    //            // m_StoreManager.ShowPanel(panelName);
+    //            break;
+    //        case "Team":
+    //            //  m_StoreManager.ShowPanel(panelName);
+    //            break;
+    //        case "Store":
+    //            //  m_StoreManager.ShowPanel(panelName);
+    //            break;
+    //        case "Purchase":
+    //            //  m_PurchaseManager.ShowPanel(panelName);
+    //            break;
+    //        case "Friend":
+    //            //   m_FriendManager.ShowPanel(panelName);
+    //            break;
+    //        case "Match":
+    //            //m_MatchManager.ShowPanel(panelName);
+    //            //if (!_bLoadMatchPanel)
+    //            //    m_MatchManager = new MatchManager(this);
+    //            //_bLoadMatchPanel = true;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
+
+    public void LoadedScene(string sceneName)
+    {
+        switch (sceneName)
+        {
+            case (string)Global.Scene.MainGame:
+                _bloadMainScene = true;
+                break;
+        }
+    }
 
     public MessageManager GetMessageManager()
     {
@@ -130,6 +248,17 @@ public class MPGame
             m_AssetLoader = m_StartCoroutine.GetComponent<AssetLoader>();
         return m_AssetLoader;
     }
+
+    public BattleUI GetBattleUI()
+    {
+        if (m_BattleUI == null)
+        {
+            m_BattleUI = new BattleUI(this);
+            m_BattleUI.Initinal();
+        }
+        return m_BattleUI;
+    }
+
 
     public Coroutine StartCoroutine(IEnumerator IEnumerator)
     {

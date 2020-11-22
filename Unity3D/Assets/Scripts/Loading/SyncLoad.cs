@@ -5,10 +5,12 @@ public class SyncLoad : MonoBehaviour
 {
     AssetLoader assetLoader;
     private bool _bLoadSceneAsset;
-    private GameObject _clone;
+    private GameObject _scene;
+    MPGame m_MPGame;
 
     void Awake()
     {
+       
         Global.photonService.LoadSceneEvent += OnLoadScene;
         AssetBundleManager.UnloadUnusedAssets();
         System.GC.Collect();
@@ -83,34 +85,37 @@ public class SyncLoad : MonoBehaviour
 
         // 確認是否已經實體化
         if (Global.dictLoadedScene.ContainsKey(sceneAssetName))
-            Global.dictLoadedScene.TryGetValue(sceneAssetName, out _clone);
+            Global.dictLoadedScene.TryGetValue(sceneAssetName, out _scene);
 
         // 如果場景資產已經載入 且 尚未實體化
-        if (AssetBundleManager.GetLoadedAssetbundle(AssetBundleManager.GetAssetBundleNamePath(sceneAssetName)) && _clone == null)
+        if (AssetBundleManager.GetLoadedAssetbundle(AssetBundleManager.GetAssetBundleNamePath(sceneAssetName)) && _scene == null)
         {
-            _clone = Instantiate(assetLoader.GetAsset(sceneAssetName)) as GameObject;
-            _clone.name = sceneAssetName;
+            _scene = Instantiate(assetLoader.GetAsset(sceneAssetName)) as GameObject;
+            _scene.name = sceneAssetName;
 
             // 是否存在場景索引
             if (!Global.dictLoadedScene.ContainsKey(sceneAssetName))
-                Global.dictLoadedScene.Add(_clone.name, _clone);
+                Global.dictLoadedScene.Add(_scene.name, _scene);
             else
-                Global.dictLoadedScene[sceneAssetName] = _clone;
+                Global.dictLoadedScene[sceneAssetName] = _scene;
         }
 
         //錯誤 這裡以後需要改寫 目前只有 MainGame和Battle在做切換隱藏/顯示
         if (Global.prevScene == Global.Scene.MainGame)
             Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(false);
+
         if (Global.nextScene == Global.Scene.MainGame)
             Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(true);
+            
 
         // 防止HUDCamera無法顯示
         if (SceneManager.GetActiveScene().name != Global.Scene.BundleCheck)
         {
-            _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
-            _clone.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
+            _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
+            _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
         }
-
+        MPGame.Instance.LoadedScene(SceneManager.GetActiveScene().name);
+        MPGame.Instance.InitScene(_scene);
         // 儲存目前場景
         Global.prevScene = SceneManager.GetActiveScene().name;
     }

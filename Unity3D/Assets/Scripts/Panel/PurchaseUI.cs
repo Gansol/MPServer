@@ -18,15 +18,15 @@ using MPProtocol;
  * 
  * ***************************************************************
  *                           ChangeLog
+ * 20201027 v3.0.0  繼承重構
  * 20180101 v1.0.0   完成功能、註解             
  * ****************************************************************/
 // 可以把PurchaseHandlder寫到這裡
-public class PurchaseManager : IMPPanelUI
+public class PurchaseUI : IMPPanelUI
 {
     ObjectFactory objFactory;
-
-    public int offset = 275;
-    public GameObject itemPanel;
+    private AttachBtn_PurchaseUI UI;
+    private int offset = 275;
 
     //private Sdkbox.IAP _iap;                                        // IAP資料
     //private Sdkbox.Product[] _product;                              // 商品資料
@@ -36,42 +36,30 @@ public class PurchaseManager : IMPPanelUI
     private string _currencyCode = "TWD";                           // 貨幣代號
     private int _dataLoadedCount, _slotPosY;                                          // 道具位子偏移量
 
-    public PurchaseManager(MPGame MPGame) : base(MPGame) { }
-
-    // Use this for initialization
-    void Start()
+    public PurchaseUI(MPGame MPGame) : base(MPGame)
     {
-        //_iap = FindObjectOfType<Sdkbox.IAP>();
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().purchasePanel;
         objFactory = new ObjectFactory();
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
         _bFirstLoad = true;
-
-        m_RootUI = GameObject.Find("Purchase(Panel)");
-
+        //_iap = FindObjectOfType<Sdkbox.IAP>();
         //  _bLoadProduct = true;
-
         //_iap.getProducts();
     }
 
-    void OnEnable()
+    public override void Initinal()
     {
         _bLoadPanel = false;
-        Debug.Log("OnEnable OnEnable OnEnable");
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
         Global.photonService.UpdateCurrencyEvent += OnUpdateCurrency;
     }
 
-    private void OnUpdateCurrency()
-    {
-        throw new NotImplementedException();
-    }
-
-
     // Update is called once per frame
     public override void Update()
     {
+        base.Update();
         //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
@@ -140,8 +128,8 @@ public class PurchaseManager : IMPPanelUI
                 {
                     values.TryGetValue(PurchaseProperty.ItemName, out value);
 
-                    itemSlot = objFactory.Instantiate(bundle, itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
-                    //UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
+                    itemSlot = objFactory.Instantiate(bundle,UI.itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
+                    UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
                     Add2Refs(item.Key, itemSlot.gameObject);
                     _slotPosY += offset;
                 }
@@ -311,12 +299,16 @@ public class PurchaseManager : IMPPanelUI
 
     private void OnPurchase(GameObject go)
     {
+        Debug.Log("OnPurchase Need New version Scripts!");
         //GetComponentInParent<PurchaseHandler>().Purchase(go.name);
     }
 
     protected override void OnLoading()
     {
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_PurchaseUI>();
         _dataLoadedCount = (int)ENUM_Data.None;
+        UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
+
 
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
@@ -328,7 +320,7 @@ public class PurchaseManager : IMPPanelUI
     protected override void OnLoadPanel()
     {
         GetMustLoadAsset();
-        EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0).gameObject;
+        EventMaskSwitch.lastPanel = m_RootUI.gameObject;
     }
 
     protected override void GetMustLoadAsset()
@@ -342,18 +334,15 @@ public class PurchaseManager : IMPPanelUI
             }
             _bLoadAsset = true;
         }
-
     }
 
     private void OnLoadCurrency()
     {
-        Debug.Log("OnLoadCurrency OnLoadCurrency OnLoadCurrency");
         _dataLoadedCount *= (int)ENUM_Data.CurrencyData;
     }
 
     private void OnLoadPurchase()
     {
-        Debug.Log("OnLoadPurchase OnLoadPurchase OnLoadPurchase");
         _dataLoadedCount *= (int)ENUM_Data.Purchase;
     }
 
@@ -366,6 +355,11 @@ public class PurchaseManager : IMPPanelUI
     //    Debug.Log("Manager OnProductRequest");
     //}
 
+    private void OnUpdateCurrency()
+    {
+        Debug.Log("NOT ME!!!");
+        throw new NotImplementedException();
+    }
 
 
     public void OnIABInit(bool status)
@@ -376,17 +370,7 @@ public class PurchaseManager : IMPPanelUI
     public override void OnClosed(GameObject obj)
     {
         EventMaskSwitch.lastPanel = null;
-      //  GameObject root = obj.transform.parent.gameObject;
-        ShowPanel(obj.transform.parent.name);
-       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(root);
-        EventMaskSwitch.Resume();
-    }
-
-    void OnDisable()
-    {
-        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
-        Global.photonService.LoadPurchaseEvent -= OnLoadPurchase;
-        Global.photonService.UpdateCurrencyEvent -= OnUpdateCurrency;
+        ShowPanel(m_RootUI.name);
     }
 
     protected override int GetMustLoadedDataCount()
@@ -394,13 +378,11 @@ public class PurchaseManager : IMPPanelUI
         return (int)ENUM_Data.Purchase * (int)ENUM_Data.CurrencyData; ;
     }
 
-    public override void Initinal()
-    {
-        throw new NotImplementedException();
-    }
 
     public override void Release()
     {
-        throw new NotImplementedException();
+        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
+        Global.photonService.LoadPurchaseEvent -= OnLoadPurchase;
+        Global.photonService.UpdateCurrencyEvent -= OnUpdateCurrency;
     }
 }

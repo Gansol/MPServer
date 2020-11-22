@@ -35,10 +35,10 @@ public class SpawnAI
     //    Initinal();
     //}
 
-    public SpawnAI(BattleManager battleManager, List<GameObject> hole)
+    public SpawnAI(BattleManager battleManager,PoolManager poolManager, List<GameObject> hole)
     {
-        _battleManager = battleManager;
-        poolManager = battleManager.GetComponent<PoolManager>();
+        _battleManager = battleManager; // / 有問題 錯誤 FUCK
+        this. poolManager = poolManager; // 有問題 錯誤 FUCK
         objFactory = MPGFactory.GetObjFactory();
         //  objFactory.TestMethod();
         miceSize = 3.5f;

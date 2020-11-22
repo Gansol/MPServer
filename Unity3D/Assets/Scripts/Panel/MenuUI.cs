@@ -4,40 +4,28 @@ using UnityEngine;
 
 public class MenuUI : IMPPanelUI
 {
-    private GameObject playerBtn;
-    private GameObject teamBtn;
-    private GameObject storeBtn;
-    private GameObject purchaseBtn;
-    private GameObject friendBtn;
-    private GameObject settingBtn;
-    private GameObject battleBtn;
-    private GameObject survivalBtn;
+    private AttachBtn_MenuUI UI;
 
     public MenuUI(MPGame MPGame)
         : base(MPGame)
     {
-        m_RootUI = GameObject.Find("MenuUI");
+       
     }
 
     public override void Initinal()
     {
-        playerBtn = m_RootUI.gameObject.transform.Find("Player_Btn").gameObject;
-        teamBtn = m_RootUI.gameObject.transform.Find("Team_Btn").gameObject;
-        purchaseBtn = m_RootUI.gameObject.transform.Find("Purchase_Btn").gameObject;
-        friendBtn = m_RootUI.gameObject.transform.Find("Friend_Btn").gameObject;
-        storeBtn = m_RootUI.gameObject.transform.Find("Store_Btn").gameObject;
-        settingBtn = m_RootUI.gameObject.transform.Find("Setting_Btn").gameObject;
-        battleBtn = m_RootUI.gameObject.transform.Find("Battle_Btn").gameObject;
-        survivalBtn = m_RootUI.gameObject.transform.Find("Survival_Btn").gameObject;
-
-        UIEventListener.Get(playerBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(teamBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(purchaseBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(friendBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(storeBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(settingBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(battleBtn).onClick += m_MPGame.ShowPanel;
-        UIEventListener.Get(survivalBtn).onClick += m_MPGame.ShowPanel;
+        Debug.Log("MenUI Init!");
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString());
+        EventMaskSwitch.Init();
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_MenuUI>();
+        UIEventListener.Get(UI.playerBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.teamBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.purchaseBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.friendBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.storeBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.settingBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.battleBtn).onClick = m_MPGame.ShowPanel;
+        UIEventListener.Get(UI.survivalBtn).onClick = m_MPGame.ShowPanel;
     }
 
     public override void Update()
@@ -76,13 +64,13 @@ public class MenuUI : IMPPanelUI
 
     public override void Release()
     {
-        UIEventListener.Get(playerBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(teamBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(purchaseBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(friendBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(storeBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(settingBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(battleBtn).onClick -= m_MPGame.ShowPanel;
-        UIEventListener.Get(survivalBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.playerBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.teamBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.purchaseBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.friendBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.storeBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.settingBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.battleBtn).onClick -= m_MPGame.ShowPanel;
+        //UIEventListener.Get(UI.survivalBtn).onClick -= m_MPGame.ShowPanel;
     }
 }

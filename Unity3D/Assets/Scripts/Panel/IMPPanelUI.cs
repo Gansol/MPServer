@@ -21,32 +21,35 @@ using MPProtocol;
  * 20171016 v1.0.1  加入    MPGame
  * ****************************************************************/
 
-public abstract class IMPPanelUI 
+public abstract class IMPPanelUI
 {
+    //  private AttachBtn_MenuUI UI;
     private ScrollView scrollView;
     protected static AssetLoader assetLoader;
-    protected static MPGame m_MPGame;
+    protected MPGame m_MPGame = null;
 
     protected static Dictionary<string, PanelState> dictPanelRefs;    // Panel參考
     private static GameObject[] PanelRefs;
     public static GameObject _lastEmptyItemGroup;
     private static Dictionary<string, GameObject> _dictActor = new Dictionary<string, GameObject>(); // 已載入角色參考
     private GameObject _tmpActor, _clone;
-    private static GameObject _lastPanel;
+    // private static GameObject _lastPanel;
     protected GameObject m_RootUI = null;
 
-    protected string panelName; 
-    private bool _loadedPanel,m_bActive = true;
+    protected string activePanelName;
+    private bool _loadedPanel, m_bActive = true;
     private int _panelNo;
 
-    public  IMPPanelUI(MPGame MPGame) 
+    public IMPPanelUI(MPGame MPGame)
     {
         m_MPGame = MPGame;
-       if (dictPanelRefs == null)
+        //UI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponent<AttachBtn_MenuUI>();
+        if (dictPanelRefs == null)
             dictPanelRefs = new Dictionary<string, PanelState>();
         assetLoader = m_MPGame.GetAssetLoader();
         assetLoader.init();
-        scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
+
+        //scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
         Debug.Log("MPPanel init!");
     }
 
@@ -59,14 +62,16 @@ public abstract class IMPPanelUI
     #endregion
 
     public abstract void Initinal();
+
+    public virtual void OnGUI() { }
+
     public virtual void Update()
     {
         if (m_MPGame.GetAssetLoader().bLoadedObj && _loadedPanel)                 // 載入Panel完成時
         {
             _loadedPanel = !_loadedPanel;
-
             InstantiatePanel();
-            PanelSwitch(panelName);
+            PanelSwitch(activePanelName);
         }
     }
     public abstract void Release();
@@ -124,11 +129,8 @@ public abstract class IMPPanelUI
                 bundle.name = actorName;
                 SetLoadedActor(bundle);
             }
-
             //else
             //    _clone = GetLoadedActor(bundle.name);
-
-
             return false;
         }
         else
@@ -193,10 +195,11 @@ public abstract class IMPPanelUI
             if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
             {
                 pos = sortItemPos(tableCount, rowCount, offset, pos, count + i);
-                GameObject bundle = assetLoader.GetAsset(itemName);
+                GameObject itemBundle = assetLoader.GetAsset(itemName);
 
-                bundle = MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemID.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-                if (bundle != null) dictItem.Add(itemID.ToString(), bundle);    // 存入道具資料索引
+                itemBundle = MPGFactory.GetObjFactory().Instantiate(itemBundle, parent, itemID.ToString(), new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+
+                if (itemBundle != null) dictItem.Add(itemID.ToString(), itemBundle);    // 存入道具資料索引
                 pos.x += offset.x;
             }
             i++;
@@ -333,8 +336,11 @@ public abstract class IMPPanelUI
     protected void ResumeToggleTarget()
     {
         EventMaskSwitch.Resume();
-        m_RootUI.transform.Find("Loading(Panel)").gameObject.SetActive(false);
-     //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
+        //  UI.loadingPanel.SetActive(false);
+        m_RootUI.transform.parent.GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel.SetActive(false);
+
+        //  m_RootUI.transform.Find("Loading(Panel)").gameObject.SetActive(false);
+        //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
         EventMaskSwitch.Switch(m_RootUI);
         EventMaskSwitch.lastPanel = m_RootUI;
         //   assetLoader.init();  // 錯誤 有可以會導致部分載入還沒完成就重製
@@ -396,13 +402,21 @@ public abstract class IMPPanelUI
 
     #region -- ShowPanel 開啟Panel --
     /// <summary>
-    /// 開啟Panel
+    ///  開啟Panel
     /// </summary>
     /// <param name="panelName">Panel名稱，不含(Panel)</param>
+    /// <returns>Panel</returns>
     public virtual void ShowPanel(string panelName)
     {
-        GameObject panel = m_RootUI.transform.Find(panelName + "(Panel)").gameObject;
-        this.panelName = panelName;
+        panelName = panelName.Replace("(Panel)", "");
+        this.activePanelName = panelName;
+
+        // 開啟LoadingPanel
+        GameObject loadingPanel = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel;
+        loadingPanel.SetActive(true);
+        EventMaskSwitch.Switch(loadingPanel);
+        EventMaskSwitch.lastPanel = loadingPanel;
+        //_lastPanel = loadingPanel;
 
         if (!dictPanelRefs.ContainsKey(panelName))         // 如果還沒載入Panel AB 載入AB
         {
@@ -412,8 +426,15 @@ public abstract class IMPPanelUI
         else
         {
             PanelSwitch(panelName);// 已載入AB 顯示Panel
+            //m_RootUI.SetActive(true);
         }
-        panel.SetActive(true);
+
+        Debug.Log(panelName);
+        Debug.Log(m_RootUI);
+        //   Transform panel = m_RootUI.transform.Find(panelName + "(Panel)");
+        //  
+
+
     }
     #endregion
 
@@ -424,35 +445,40 @@ public abstract class IMPPanelUI
     /// <param name="panelNo">Panel編號</param>
     private GameObject PanelSwitch(string panelName)
     {
-        GameObject loadingPanel = m_RootUI.transform.Find("Loading(Panel)").gameObject;
+
         PanelState panelState = dictPanelRefs[panelName];      // 取得目前Panel狀態
 
         if (panelState.obj != null && (m_MPGame.GetLoginStatus() || !Global.connStatus))
         {
             if (!panelState.obj.activeSelf)                     // 如果Panel是關閉狀態
             {
-                scrollView.scroll = false;
-                if (_lastPanel != null) _lastPanel.SetActive(false);
-                loadingPanel.SetActive(true);
+                Initinal();
+                Debug.Log("Open Panel : " + panelName);
+                //scrollView.scroll = false;
+                if (EventMaskSwitch.lastPanel != null)
+                    EventMaskSwitch.lastPanel.SetActive(false);
+
                 panelState.obj.SetActive(true);
                 OnLoading();
-                panelState.onOff = !panelState.onOff;
-                _lastPanel = panelState.obj;
+                panelState.onOff = true; ;
+                // _lastPanel = panelState.obj;
+                EventMaskSwitch.Switch(panelState.obj);
+                EventMaskSwitch.lastPanel = panelState.obj;
 
-                EventMaskSwitch.Switch(loadingPanel);
-                EventMaskSwitch.lastPanel = loadingPanel;
-
-                return _lastPanel;
+                return panelState.obj;
             }                                                   // 如果Panel已開啟
             else
             {
-                scrollView.scroll = true;
+                Debug.Log("Closed Panel : " + panelName);
+                Release();
+                //  scrollView.scroll = true;
+                EventMaskSwitch.lastPanel.SetActive(false);
                 EventMaskSwitch.Resume();
                 panelState.obj.SetActive(false);
-                _lastPanel = panelState.obj;
-                panelState.onOff = !panelState.onOff;
-                Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
-                return _lastPanel;
+                //_lastPanel = panelState.obj;
+                panelState.onOff = false;
+                //Camera.main.GetComponent<UICamera>().eventReceiverMask = (int)Global.UILayer.Default;
+                return panelState.obj;
             }
         }
         else
@@ -465,17 +491,17 @@ public abstract class IMPPanelUI
     #endregion
 
     #region -- InstantiatePanel 實體化Panel--
-    protected virtual void  InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    protected virtual void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
     {
-        GameObject bundle = assetLoader.GetAsset(_lastPanel.name.ToLower());
+        GameObject bundle = assetLoader.GetAsset(activePanelName.ToLower());
         PanelState panelState = new PanelState();
 
-        panelState.obj = MPGFactory.GetObjFactory().Instantiate(bundle, m_RootUI.transform, _lastPanel.name, Vector3.zero, Vector3.one, Vector3.zero, -1);
+        panelState.obj = MPGFactory.GetObjFactory().Instantiate(bundle, m_RootUI.transform, activePanelName, Vector3.zero, Vector3.one, Vector3.zero, -1);
         panelState.obj = panelState.obj.transform.parent.gameObject;
         panelState.obj.layer = m_RootUI.layer;
 
-        if (!dictPanelRefs.ContainsKey(_lastPanel.name))
-            dictPanelRefs.Add(_lastPanel.name, panelState);
+        if (!dictPanelRefs.ContainsKey(activePanelName))
+            dictPanelRefs.Add(activePanelName, panelState);
     }
     #endregion
 

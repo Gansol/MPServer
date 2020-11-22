@@ -18,7 +18,7 @@ public class Reflection : SkillItem {
     {
         if (Time.time - m_StartTime > skillData.SkillTime - 3)
         {
-            // battleHUD shing
+            // battleUI shing
             // playerAIState.ShingICON();
         }
 

@@ -13,7 +13,7 @@ public class Much : MiceBase
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
-        if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
+       // if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;

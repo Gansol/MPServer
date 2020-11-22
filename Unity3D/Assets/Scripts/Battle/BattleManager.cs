@@ -4,19 +4,35 @@ using System.Collections.Generic;
 using System;
 using MPProtocol;
 using System.Linq;
-
-public class BattleManager : MonoBehaviour
+/* ***************************************************************
+ * -----Copyright © 2020 Gansol Studio.  All Rights Reserved.-----
+ * -----------            CC BY-NC-SA 4.0            -------------
+ * -----------  @Website:  EasyUnity@blogspot.com    -------------
+ * -----------  @Email:    GansolTW@gmail.com        -------------
+ * -----------  @Author:   Krola.                    -------------
+ * ***************************************************************
+ *                          Description
+ * ***************************************************************
+ * 
+ * 
+ * ***************************************************************
+ *                           ChangeLog
+ * 20201027 v3.0.0  繼承重構    
+ * ****************************************************************/
+public class BattleManager : GameSystem
 {
+    private AttachBtn_BattleUI UI;
     public IBattleAIState battleAIState;           // 產生AI狀態 正式版要改private
     public PlayerAIState playerAIState;             // Player狀態
     public GameObject startAnim;
+    protected GameObject m_RootUI = null;
 
     public UISprite gameMode;
 
     private SpawnAI spawnAI;
     private PoolManager poolManager;        // 物件池     
     private MissionManager missionManager;  // 任務管理員
-    private BattleHUD battleHUD;            // HUD
+    private BattleUI battleUI;            // HUD
     private BotAI BotAI;
     //   public Dictionary<GameObject, GameObject> mice = new Dictionary<GameObject, GameObject>();
 
@@ -48,17 +64,24 @@ public class BattleManager : MonoBehaviour
     public bool SpawnFlag { get; set; }     // public 是給TestPanel使用的
     public int MissionCombo { get; private set; }
 
+
+    public BattleManager(MPGame MPGame) : base(MPGame)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
+    }
+
     // Use this for initialization
-    void Awake()
+    public override void Initinal()
     {
         Debug.Log("-------Battle Start-------");
         EventMaskSwitch.Init();
         FindHole();
 
-        poolManager = GetComponent<PoolManager>();
-        missionManager = GetComponent<MissionManager>();
-        battleHUD = GetComponent<BattleHUD>();
-        spawnAI = new SpawnAI(this, hole);
+        poolManager = m_RootUI.GetComponentInChildren<PoolManager>();
+        missionManager = m_RootUI.GetComponentInChildren<MissionManager>();
+        battleUI = m_MPGame.GetBattleUI();
+
+        spawnAI = new SpawnAI(this, poolManager, hole);
         SetSpawnState(new EasyBattleAIState());
         playerAIState = new PlayerAIState(this);
 
@@ -118,7 +141,7 @@ public class BattleManager : MonoBehaviour
         Global.photonService.ExitRoom();
     }
 
-    void Update()
+  public override  void Update()
     {
         battleState = battleAIState.GetState();
         GameConnStatusChk();
@@ -179,7 +202,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    public override void FixedUpdate()
     {
         if (Global.isGameStart && Time.time > _lastTime + 3)
         {
@@ -280,7 +303,7 @@ public class BattleManager : MonoBehaviour
         }
 
         if (_isCombo)
-            battleHUD.ComboMsg(_combo);
+            battleUI.ComboMsg(_combo);
     }
 
     public void BreakCombo()
@@ -293,7 +316,7 @@ public class BattleManager : MonoBehaviour
                 _isCombo = false;           // 結束 連擊
                 _combo = 0;                 // 恢復0
                 _nowCombo = 0;
-                battleHUD.ComboMsg(_combo);
+                battleUI.ComboMsg(_combo);
                 battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() + .1f, 0);
             }
         }
@@ -499,7 +522,7 @@ public class BattleManager : MonoBehaviour
             _isHighCombo = true;
         }
 
-        battleHUD.GoodGameMsg(score, result, exp, sliverReward, goldReward, jItemReward, _maxCombo, _killMice, _lostMice, evaluate, _isHighScore, _isHighCombo);
+        battleUI.GoodGameMsg(score, result, exp, sliverReward, goldReward, jItemReward, _maxCombo, _killMice, _lostMice, evaluate, _isHighScore, _isHighCombo);
         Global.photonService.LoadPlayerData(Global.Account);
     }
 
@@ -551,7 +574,7 @@ public class BattleManager : MonoBehaviour
         // 把所有老鼠所提供的生命值加總
         foreach (KeyValuePair<string, object> item in Global.dictTeam)
         {
-             value = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
+            value = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
             _life += value;
         }
 
@@ -572,7 +595,7 @@ public class BattleManager : MonoBehaviour
     private void SetPlayerState(short skillID)
     {
         Debug.Log("SetPlayerState:" + skillID);
-        // BattleHUD show skill image
+        // BattlePanel show skill image
         SkillBase skill = MPGFactory.GetSkillFactory().GetSkill(Global.dictSkills, skillID);
         skill.SetAIController(playerAIState);
         playerAIState.SetPlayerAIState(skill.GetPlayerState(), skill);

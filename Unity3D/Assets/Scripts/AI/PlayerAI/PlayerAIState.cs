@@ -87,7 +87,7 @@ public class PlayerAIState
         if (_dictSkills.ContainsKey(state))
         {
             Debug.Log("Release:" + state);
-            // BattleHUD disable image
+            // BattlePanel disable image
             _dictSkills.Remove(state);
             this.State ^= (short)state;
         }
