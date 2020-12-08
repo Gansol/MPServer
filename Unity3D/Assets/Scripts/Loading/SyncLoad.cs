@@ -51,6 +51,8 @@ public class SyncLoad : MonoBehaviour
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
             assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.MainGameAsset + Global.ext);
+            assetLoader.LoadAssetFormManifest(Global.MusicsPath + "bgm_001" + Global.ext);
+            assetLoader.LoadAssetFormManifest(Global.SoundsPath + "se_click001" + Global.ext);
             _bLoadSceneAsset = true;
         }
 

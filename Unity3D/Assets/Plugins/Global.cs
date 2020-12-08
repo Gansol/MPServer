@@ -76,6 +76,8 @@ public static class Global
     public static readonly string downloadListFile = "DownloadList.json";  // 下載列表
     public static readonly string fullPackageFile = "FullPackageList.json";// 完整下載列表
     public static readonly string bundleVersionFile = "BundleVersion.json"; // 資源版本
+    public static readonly string MusicsFile = "MusicsList.json"; // 資源版本
+    public static readonly string SoundsFile = "SoundsList.json"; // 資源版本
 
     public static bool isCheckBundle = false;       // 是否檢查資源
     public static bool isNewlyVision = true;        // 是否為新版本
@@ -132,6 +134,8 @@ public static class Global
     public static string CreaturePath = "creature/unique/";  // mice路徑
     public static string MiceIconUniquePath = "miceicon/unique/";  // miceicon路徑
     public static string ItemIconUniquePath = "itemicon/unique/";  // itemicon路徑
+    public static string MusicsPath = "musics/bgm/";  // miceicon路徑
+    public static string SoundsPath = "musics/se/";  // itemicon路徑
     public static string EffectsUniquePath = "effects/unique/";  // effects路徑
     public static string GashaponUniquePath = "gashapon/unique/";  // gashapon路徑
     public static string InvItemAssetName = "invitem";

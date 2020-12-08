@@ -47,10 +47,9 @@ public class FireBow : SkillItem
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
         AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
-        ObjectFactory objFactory = new ObjectFactory();
         
        // effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
-        effects.Add(objFactory.Instantiate(bundle, GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().GetSpawnAI().GetHole(0).transform.parent.transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
+        effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, MPGame.Instance.GetBattleSystem().GetHole()[0].transform.parent.transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Effect1",-1,0f);
 
         m_StartTime = Time.time;

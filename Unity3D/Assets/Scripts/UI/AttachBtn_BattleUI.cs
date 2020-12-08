@@ -32,7 +32,8 @@ public class AttachBtn_BattleUI : MonoBehaviour
     public UILabel energyLabel;
     public GameObject[] StateICON;
     public GameObject messagePanel;
+    public List<GameObject> hole;
 
-    [Range(0.1f, 1.0f)]
+  [Range(0.1f, 1.0f)]
     public float _beautyHP;                // 美化血條用
 }

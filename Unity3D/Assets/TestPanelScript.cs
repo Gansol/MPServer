@@ -13,33 +13,33 @@ public class TestPanelScript : MonoBehaviour
     public UILabel lb_spawnCount;
     public UIScrollBar scrollBar;
 
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     // Use this for initialization
     void Start()
     {
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        battleManager = MPGame.Instance.GetBattleSystem();
 
-        lb_status.text = battleManager.spawnStatus.ToString();
-        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
-        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
-        lb_spawnTime.text = battleManager.battleAIState.GetSpawnOffset().ToString();
-        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
+       // lb_status.text = battleManager.spawnStatus.ToString();
+        lb_spawnLerp.text = battleManager.GetBattleAIState().GetIntervalTime().ToString();
+        lb_betweenLerp.text = battleManager.GetBattleAIState().GetLerpTime().ToString();
+        lb_spawnTime.text = battleManager.GetBattleAIState().GetSpawnOffset().ToString();
+        lb_spawnCount.text = battleManager.GetBattleAIState().GetSpawnCount().ToString();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        lb_status.text = battleManager.spawnStatus.ToString();
-        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
-        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
-        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
-        lb_spawnTime.text = battleManager.battleAIState.GetSpawnTime().ToString();
+      //  lb_status.text = battleManager.spawnStatus.ToString();
+        lb_spawnLerp.text = battleManager.GetBattleAIState().GetIntervalTime().ToString();
+        lb_betweenLerp.text = battleManager.GetBattleAIState().GetLerpTime().ToString();
+        lb_spawnCount.text = battleManager.GetBattleAIState().GetSpawnCount().ToString();
+        lb_spawnTime.text = battleManager.GetBattleAIState().GetSpawnTime().ToString();
     }
 
     public void OnScroll()
     {
-        battleManager.battleAIState.SetSpeed(scrollBar.value * 2);
+        battleManager.GetBattleAIState().SetSpeed(scrollBar.value * 2);
     }
 
     public void OnOFF()
@@ -63,12 +63,12 @@ public class TestPanelScript : MonoBehaviour
         if (obj.name == "+")
         {
             Debug.Log("已無法調整");
-            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.battleAIState.GetSpawnStatus() + 1);
+            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.GetBattleAIState().GetSpawnStatus() + 1);
         }
         else
         {
             Debug.Log("已無法調整");
-            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.battleAIState.GetSpawnStatus() - 1);
+            // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.GetBattleAIState().GetSpawnStatus() - 1);
         }
 
         // lb_status.text = battleManager.spawnStatus.ToString();
@@ -78,52 +78,52 @@ public class TestPanelScript : MonoBehaviour
     {
         if (obj.name == "+")
         {
-            battleManager.SetValue(0, 0, battleManager.battleAIState.GetIntervalTime() + 0.5f, 0);
+            battleManager.SetValue(0, 0, battleManager.GetBattleAIState().GetIntervalTime() + 0.5f, 0);
         }
         else
         {
-            battleManager.SetValue(0, 0, battleManager.battleAIState.GetIntervalTime() - 0.5f, 0);
+            battleManager.SetValue(0, 0, battleManager.GetBattleAIState().GetIntervalTime() - 0.5f, 0);
         }
-        lb_spawnLerp.text = battleManager.battleAIState.GetIntervalTime().ToString();
+        lb_spawnLerp.text = battleManager.GetBattleAIState().GetIntervalTime().ToString();
     }
 
     public void OnMiceLerp(GameObject obj)
     {
         if (obj.name == "+")
         {
-            battleManager.battleAIState.SetValue(battleManager.battleAIState.GetLerpTime() + .05f, 0, 0, 0);
+            battleManager.GetBattleAIState().SetValue(battleManager.GetBattleAIState().GetLerpTime() + .05f, 0, 0, 0);
         }
         else
         {
-            battleManager.battleAIState.SetValue(battleManager.battleAIState.GetLerpTime() - .05f, 0, 0, 0);
+            battleManager.GetBattleAIState().SetValue(battleManager.GetBattleAIState().GetLerpTime() - .05f, 0, 0, 0);
         }
-        lb_betweenLerp.text = battleManager.battleAIState.GetLerpTime().ToString();
+        lb_betweenLerp.text = battleManager.GetBattleAIState().GetLerpTime().ToString();
     }
 
     public void OnCount(GameObject obj)
     {
         if (obj.name == "+")
         {
-            battleManager.battleAIState.SetValue(0, 0, 0, battleManager.battleAIState.GetSpawnCount() + 1);
+            battleManager.GetBattleAIState().SetValue(0, 0, 0, battleManager.GetBattleAIState().GetSpawnCount() + 1);
         }
         else
         {
-            battleManager.battleAIState.SetValue(0, 0, 0, battleManager.battleAIState.GetSpawnCount() - 1);
+            battleManager.GetBattleAIState().SetValue(0, 0, 0, battleManager.GetBattleAIState().GetSpawnCount() - 1);
         }
 
-        lb_spawnCount.text = battleManager.battleAIState.GetSpawnCount().ToString();
+        lb_spawnCount.text = battleManager.GetBattleAIState().GetSpawnCount().ToString();
     }
 
     public void OnMiceSpawnTime(GameObject obj)
     {
         if (obj.name == "+")
         {
-            battleManager.battleAIState.SetValue(0, battleManager.battleAIState.GetSpawnTime() + .05f, 0, 0);
+            battleManager.GetBattleAIState().SetValue(0, battleManager.GetBattleAIState().GetSpawnTime() + .05f, 0, 0);
         }
         else
         {
-            battleManager.battleAIState.SetValue(0, battleManager.battleAIState.GetSpawnTime() - .05f, 0, 0);
+            battleManager.GetBattleAIState().SetValue(0, battleManager.GetBattleAIState().GetSpawnTime() - .05f, 0, 0);
         }
-        lb_spawnTime.text = battleManager.battleAIState.GetSpawnTime().ToString();
+        lb_spawnTime.text = battleManager.GetBattleAIState().GetSpawnTime().ToString();
     }
 }

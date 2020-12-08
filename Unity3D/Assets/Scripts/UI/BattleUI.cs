@@ -7,8 +7,9 @@ using UnityEngine;
 public class BattleUI : IMPPanelUI
 {
     private AttachBtn_BattleUI UI;
-    private BattleManager battleManager;
+    private BattleSystem battleSystem;
     private ObjectFactory objFactory;
+
     private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
     private Color _blueLifeColor, _redLifeColor;
@@ -29,7 +30,7 @@ public class BattleUI : IMPPanelUI
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         _beautyHP = 0.5f;
         UI.WaitObject.transform.gameObject.SetActive(true);
-        battleManager = m_RootUI.GetComponentInChildren<BattleManager>();
+        battleSystem = m_MPGame.GetBattleSystem();
         assetLoader = MPGame.Instance.GetAssetLoader();
         objFactory = new ObjectFactory();
 
@@ -44,8 +45,8 @@ public class BattleUI : IMPPanelUI
         UI.avatarImage.spriteName = Global.PlayerImage;
         UI.otherAvatarImage.spriteName = Global.OpponentData.Image;
 
-        _tmpLife = battleManager.life;
-        _tmpOhterLife = battleManager.OtherLife;
+        _tmpLife = battleSystem.life;
+        _tmpOhterLife = battleSystem.OtherLife;
 
         _blueLifeColor = UI.BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = UI.RedLifeBar.GetComponent<UISprite>().color;
@@ -135,7 +136,7 @@ public class BattleUI : IMPPanelUI
 
         BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
         BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
-        BeautyBar(UI.RedEnergyBar, battleManager.otherEnergy / 100f, _beautyOtherEnergy);
+        BeautyBar(UI.RedEnergyBar, battleSystem.otherEnergy / 100f, _beautyOtherEnergy);
         BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
         BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
         BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
@@ -145,7 +146,7 @@ public class BattleUI : IMPPanelUI
     // 顯示目前BattleState ICON
     private void BattleState()
     {
-        switch (battleManager.GetBattleState())
+        switch (battleSystem.GetBattleState())
         {
             case ENUM_BattleAIState.EasyMode:
                 UI.gameMode.spriteName = "Easy Mode";
@@ -170,18 +171,18 @@ public class BattleUI : IMPPanelUI
     // GUI 顯示數值
     private void GUIVariables()
     {
-        energy = BattleManager.Energy / 100f;
-        feverEnergy = battleManager.feverEnergy / 100f;
-        blueLife = battleManager.life / _tmpLife;
-        redLife = battleManager.OtherLife / _tmpOhterLife;
+        energy = m_MPGame.GetBattleSystem().GetEnergy() / 100f;
+        feverEnergy = battleSystem.feverEnergy / 100f;
+        blueLife = battleSystem.life / _tmpLife;
+        redLife = battleSystem.OtherLife / _tmpOhterLife;
         tmpBlueLifeBar = UI.BlueLifeBar.value;
         tmpRedLifeBar = UI.RedLifeBar.value;
-        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - BattleManager.gameTime))).ToString();
-        UI.BlueScoreLabel.text = battleManager.score.ToString();         // 畫出分數值
-        UI.RedScoreLabel.text = battleManager.otherScore.ToString();     // 畫出分數值
-        UI.BlueLifeText.text = battleManager.life.ToString();
-        UI.RedLifeText.text = battleManager.OtherLife.ToString();
-        UI.ComboLabel.text = battleManager.combo.ToString();        // 畫出 UI.Combo值
+        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_MPGame.GetBattleSystem().gameTime))).ToString();
+        UI.BlueScoreLabel.text = battleSystem.score.ToString();         // 畫出分數值
+        UI.RedScoreLabel.text = battleSystem.otherScore.ToString();     // 畫出分數值
+        UI.BlueLifeText.text = battleSystem.life.ToString();
+        UI.RedLifeText.text = battleSystem.OtherLife.ToString();
+        UI.ComboLabel.text = battleSystem.combo.ToString();        // 畫出 UI.Combo值
 
         //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
         //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
@@ -193,7 +194,7 @@ public class BattleUI : IMPPanelUI
     #region ScoreBarAnim 分數條動畫
     private void ScoreBarAnim()
     {
-        float value = battleManager.score / (battleManager.score + battleManager.otherScore);                      // 得分百分比 兩邊都是0會 NaN
+        float value = battleSystem.score / (battleSystem.score + battleSystem.otherScore);                      // 得分百分比 兩邊都是0會 NaN
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
@@ -213,7 +214,7 @@ public class BattleUI : IMPPanelUI
             if (_beautyHP <= value)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (battleManager.score == 0 && battleManager.otherScore == 0)
+        else if (battleSystem.score == 0 && battleSystem.otherScore == 0)
         {
             UI.HPBar.value = _beautyHP;
             if (_beautyHP <= UI.HPBar.value && UI.HPBar.value > 0.5f)
@@ -230,7 +231,7 @@ public class BattleUI : IMPPanelUI
     #region EnergyTextAnim 能量數值(數字) 動畫 ***還沒寫***
     private void EnergyTextAnim()
     {
-        UI.energyLabel.text = battleManager.GetEnergy().ToString();
+        UI.energyLabel.text = battleSystem.GetEnergy().ToString();
     }
     #endregion
 

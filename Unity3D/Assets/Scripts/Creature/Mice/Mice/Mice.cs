@@ -4,17 +4,16 @@ using System.Collections.Generic;
 
 public class Mice : MiceBase
 {
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
+    MPGame m_MPGame;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
 
-    UICamera cam;
 
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
 
      //   if (hitSound==null) hitSound = battleManager.GetComponent<UIPlaySound>();
-        cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
@@ -57,6 +56,7 @@ public class Mice : MiceBase
             Global.dictBattleMiceRefs.Remove(transform.parent);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
             m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
+            m_MPGame.GeAudioSystem().PlaySound("Hit");
 
         }
         else

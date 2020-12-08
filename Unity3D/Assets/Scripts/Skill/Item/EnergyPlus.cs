@@ -40,9 +40,8 @@ public class EnergyPlus : SkillItem
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
         AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
         GameObject bundle = assetLoader.GetAsset("effect_"+skillData.SkillName );
-        ObjectFactory objFactory = new ObjectFactory();
-
-        effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName , Vector3.zero, Vector3.one, Vector2.one, 1));
+       
+        effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName , Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Blue",-1,0f);
 
         Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.High);

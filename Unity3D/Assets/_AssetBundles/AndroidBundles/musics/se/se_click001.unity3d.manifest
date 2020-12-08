@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 2341962881
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d331c9b8cc1f595fd16233c2f52dc51d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8de51064219e4f947fb7fea9d09a4e34
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/musics/se/se_click001.prefab
+Dependencies: []

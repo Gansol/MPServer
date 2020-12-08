@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 3910859767
+CRC: 3329661952
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -251,49 +251,76 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: miceicon/share/atlas_miceicon.unity3d
     Info_66:
-      Name: panel/share/battlehud.unity3d
+      Name: musics/bgm/bgm_001.unity3d
       Dependencies: {}
     Info_67:
-      Name: panel/share/comic.unity3d
+      Name: musics/bgm/bgm_002.unity3d
       Dependencies: {}
     Info_68:
-      Name: panel/share/comicfont.unity3d
+      Name: musics/bgm/bgm_003.unity3d
       Dependencies: {}
     Info_69:
-      Name: panel/share/comicfontoutline.unity3d
+      Name: musics/bgm/bgm_004.unity3d
       Dependencies: {}
     Info_70:
-      Name: panel/share/gamescene.unity3d
+      Name: musics/se/se_click001.unity3d
       Dependencies: {}
     Info_71:
-      Name: panel/share/liheipro.unity3d
+      Name: musics/se/se_firebow.unity3d
       Dependencies: {}
     Info_72:
-      Name: panel/share/liheiprofont.unity3d
+      Name: musics/se/se_hammer001.unity3d
       Dependencies: {}
     Info_73:
-      Name: panel/share/mainback.unity3d
+      Name: musics/se/se_neko.unity3d
       Dependencies: {}
     Info_74:
-      Name: panel/share/mainfront.unity3d
+      Name: musics/se/se_snow.unity3d
       Dependencies: {}
     Info_75:
-      Name: panel/share/panelui.unity3d
+      Name: panel/share/battlehud.unity3d
       Dependencies: {}
     Info_76:
-      Name: panel/share/shareobject.unity3d
+      Name: panel/share/comic.unity3d
       Dependencies: {}
     Info_77:
+      Name: panel/share/comicfont.unity3d
+      Dependencies: {}
+    Info_78:
+      Name: panel/share/comicfontoutline.unity3d
+      Dependencies: {}
+    Info_79:
+      Name: panel/share/gamescene.unity3d
+      Dependencies: {}
+    Info_80:
+      Name: panel/share/liheipro.unity3d
+      Dependencies: {}
+    Info_81:
+      Name: panel/share/liheiprofont.unity3d
+      Dependencies: {}
+    Info_82:
+      Name: panel/share/mainback.unity3d
+      Dependencies: {}
+    Info_83:
+      Name: panel/share/mainfront.unity3d
+      Dependencies: {}
+    Info_84:
+      Name: panel/share/panelui.unity3d
+      Dependencies: {}
+    Info_85:
+      Name: panel/share/shareobject.unity3d
+      Dependencies: {}
+    Info_86:
       Name: panel/unique/friend.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_78:
+    Info_87:
       Name: panel/unique/frienditem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_79:
+    Info_88:
       Name: panel/unique/gameui.unity3d
       Dependencies:
         Dependency_0: miceicon/share/atlas_miceicon.unity3d
@@ -304,22 +331,22 @@ AssetBundleManifest:
         Dependency_5: panel/share/liheipro.unity3d
         Dependency_6: panel/share/panelui.unity3d
         Dependency_7: panel/share/shareobject.unity3d
-    Info_80:
+    Info_89:
       Name: panel/unique/invitem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_81:
+    Info_90:
       Name: panel/unique/item.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_82:
+    Info_91:
       Name: panel/unique/match.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_83:
+    Info_92:
       Name: panel/unique/menuui.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
@@ -328,21 +355,21 @@ AssetBundleManifest:
         Dependency_3: panel/share/mainfront.unity3d
         Dependency_4: panel/share/panelui.unity3d
         Dependency_5: panel/share/shareobject.unity3d
-    Info_84:
+    Info_93:
       Name: panel/unique/player.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_85:
+    Info_94:
       Name: panel/unique/purchase.unity3d
       Dependencies:
         Dependency_0: panel/share/panelui.unity3d
-    Info_86:
+    Info_95:
       Name: panel/unique/purchaseitem.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_87:
+    Info_96:
       Name: panel/unique/store.unity3d
       Dependencies:
         Dependency_0: gashapon/share/atlas_gashapon.unity3d
@@ -350,34 +377,34 @@ AssetBundleManifest:
         Dependency_2: panel/share/comic.unity3d
         Dependency_3: panel/share/liheipro.unity3d
         Dependency_4: panel/share/panelui.unity3d
-    Info_88:
+    Info_97:
       Name: panel/unique/team.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/liheipro.unity3d
         Dependency_2: panel/share/panelui.unity3d
-    Info_89:
+    Info_98:
       Name: panel/unique/tutorial.unity3d
       Dependencies:
         Dependency_0: panel/share/comic.unity3d
         Dependency_1: panel/share/panelui.unity3d
-    Info_90:
+    Info_99:
       Name: skill/blackmice.unity3d
       Dependencies:
         Dependency_0: mice/blackmice/share/atlas_blackmice.unity3d
-    Info_91:
+    Info_100:
       Name: skill/candymice.unity3d
       Dependencies:
         Dependency_0: mice/candymice/share/atlas_candymice.unity3d
-    Info_92:
+    Info_101:
       Name: skill/eggmice.unity3d
       Dependencies:
         Dependency_0: mice/eggmice/share/atlas_eggmice.unity3d
-    Info_93:
+    Info_102:
       Name: skill/ninjamice.unity3d
       Dependencies:
         Dependency_0: mice/ninjamice/share/atlas_ninjamice.unity3d
-    Info_94:
+    Info_103:
       Name: skill/rabbitmice.unity3d
       Dependencies:
         Dependency_0: mice/rabbitmice/share/atlas_rabbitmice.unity3d

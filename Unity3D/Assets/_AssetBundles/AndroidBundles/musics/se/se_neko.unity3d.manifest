@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 4255918746
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8a8cb415e827c57d6a6861c6c9d1d2ba
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8de51064219e4f947fb7fea9d09a4e34
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundles/musics/se/se_neko.prefab
+Dependencies: []

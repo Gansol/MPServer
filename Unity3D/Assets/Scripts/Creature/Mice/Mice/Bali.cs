@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 public class Bali : MiceBase
 {
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
     UICamera cam;
 
     public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
      //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;

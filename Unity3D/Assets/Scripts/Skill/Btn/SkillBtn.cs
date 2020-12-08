@@ -13,7 +13,7 @@ public class SkillBtn : MonoBehaviour
     private float _upDistance = 30, _lerpSpeedParm1 = 0.1f, lerpSpeedParm2 = 8f;   // 上升速度、能量值、加速參數1、加速參數2
 
     private UILabel label;
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     UISprite sprite;
     // 初始化
     public void init(short miceID, float lerpSpeed, float upDistance, int energyValue)
@@ -46,7 +46,7 @@ public class SkillBtn : MonoBehaviour
     void Start()
     {
         label = GetComponentInChildren<UILabel>();
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
         label.text = _useTimes.ToString() + " / " + _skillTimes.ToString();
 
 //        Debug.Log("**************************Item Name*************************:" + transform.GetChild(2).gameObject.name);
@@ -56,9 +56,9 @@ public class SkillBtn : MonoBehaviour
     void Update()
     {
 
-        if (BattleManager.Energy  >= _cost)
+        if (BattleSystem.Energy  >= _cost)
             AnimationColor(true);
-        if (BattleManager.Energy < _cost)
+        if (BattleSystem.Energy < _cost)
             AnimationColor(false);
 
         //if (BattleManager.energy >= _energyValue && _upFlag)
@@ -80,7 +80,7 @@ public class SkillBtn : MonoBehaviour
             if (!_btnFlag)
             {
                 // 能量是否足夠使用技能
-                if (BattleManager.Energy >= _cost && _miceCount > _miceUsed)
+                if (BattleSystem.Energy >= _cost && _miceCount > _miceUsed)
                 {
                     Global.photonService.SendSkillMice(_miceID, _cost);
                     battleManager.UpadateEnergy(-_cost);

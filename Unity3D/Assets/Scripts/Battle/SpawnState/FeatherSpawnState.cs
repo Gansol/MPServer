@@ -9,14 +9,14 @@ public class FeatherSpawnState : SpawnState
     {
     }
 
-    public override IEnumerator Spawn(SpawnAI spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
+    public override IEnumerator Spawn( short miceID,BattleAIStateAttr stateAttr, bool reSpawn)
     {
         spawnIntervalTime = 6f * spawnIntervalTimes;
         yield return new WaitForSeconds(1f * spawnIntervalTimes);
         Debug.Log("Feather State");
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertB), spawnTime * 1.05f * spawnIntervalTimes, intervalTime, lerpTime, 4, -1, false, reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertB), stateAttr.spawnTime * 1.05f * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 4, -1, false, reSpawn);
         yield return new WaitForSeconds(.66f * spawnIntervalTimes);
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertA), spawnTime * 1.05f * spawnIntervalTimes, intervalTime, lerpTime, 4, -1, false, reSpawn);
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertC), spawnTime * 1.05f * spawnIntervalTimes, intervalTime, lerpTime, 4, -1, false, reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertA), stateAttr.spawnTime * 1.05f * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 4, -1, false, reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineVertC), stateAttr.spawnTime * 1.05f * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 4, -1, false, reSpawn);
     }
 }

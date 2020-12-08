@@ -5,7 +5,7 @@ using Gansol;
 
 public class BotAI
 {
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     private Dictionary<Transform, GameObject> buffer;
     private System.Random rnd;
     private float lastAITime, lastBossHitTime, lastSkillTime, skillStartOffset, hitIntervalTime, skillIntervalTime, _lastGameTime;

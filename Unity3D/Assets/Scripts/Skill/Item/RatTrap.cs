@@ -31,7 +31,7 @@ public class RatTrap : SkillItem {
 
     public override void Release()
     {
-        BattleManager.SetPropected(false);   //亂寫
+        BattleSystem.SetPropected(false);   //亂寫
         foreach (GameObject go in effects)
             GameObject.Destroy(go);
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
@@ -52,7 +52,7 @@ public class RatTrap : SkillItem {
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Green", -1, 0f);
 
-        BattleManager.SetPropected(true);   //亂寫
+        BattleSystem.SetPropected(true);   //亂寫
         m_StartTime = Time.time;
     }
 }
