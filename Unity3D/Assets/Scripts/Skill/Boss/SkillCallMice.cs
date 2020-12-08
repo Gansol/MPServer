@@ -5,10 +5,10 @@ using System.Linq;
 
 public class SkillCallMice : SkillBoss
 {
-    PoolManager poolManager = GameObject.FindGameObjectWithTag("GM").GetComponent<PoolManager>();
-    SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().GetSpawnAI();
-    Dictionary<Transform, GameObject> dictMice, buffer;
-    ObjectFactory objFactory;
+   // SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>().GetSpawnAI();
+   private readonly Dictionary<Transform, GameObject> dictMice;
+    private  Dictionary<Transform, GameObject>  buffer;
+
 
     private int _spawnCount;
     sbyte[] data;
@@ -18,7 +18,6 @@ public class SkillCallMice : SkillBoss
     {
         data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
         dictMice = new Dictionary<Transform, GameObject>();
-        objFactory = new ObjectFactory();
     }
 
     public override void Initialize()
@@ -43,10 +42,10 @@ public class SkillCallMice : SkillBoss
         dictMice.Clear();
         this.obj = obj;
 
-
+        List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetHole();
         for (int i = 0; i < spawnCount; i++)
         {
-            dictMice.Add(spawnAI.GetHole(i), objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawnAI.GetHole(rndHole[i]).gameObject, true));
+            dictMice.Add(hole[i].transform,  MPGFactory.GetObjFactory().InstantiateMice(System.Convert.ToInt16(obj.name), 3.5f, hole[rndHole[i]].gameObject, true));
         }
 
         buffer = new Dictionary<Transform, GameObject>(dictMice);

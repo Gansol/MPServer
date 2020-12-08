@@ -49,15 +49,62 @@ public class AssetBundleChecker : MonoBehaviour
     public void StartCheck() //開始檢查檔案
     {
         bundleChk = false;
+        StartCoroutine(DownloadList(Application.persistentDataPath + "/List/" + Global.MusicsFile, Global.serverListPath + Global.MusicsFile));
+        StartCoroutine(DownloadList(Application.persistentDataPath + "/List/" + Global.SoundsFile, Global.serverListPath + Global.SoundsFile));
         StartCoroutine(DownloadBundleVersion(Application.persistentDataPath + "/List/" + Global.bundleVersionFile, Global.serverListPath + Global.bundleVersionFile));
         StartCoroutine(CompareAssetBundle(Application.persistentDataPath + "/List/" + Global.itemListFile, Global.serverListPath + Global.itemListFile));
+    }
+
+    /// <summary>
+    /// 只有下載缺失檔案，不比對
+    /// </summary>
+    /// <param name="localPathFile"></param>
+    /// <param name="serverPathFile"></param>
+    /// <returns></returns>
+    private IEnumerator DownloadList(string localPathFile, string serverPathFile) 
+    {
+        Global.ReturnMessage = "開始檢查遊戲音樂列表...";
+        if (!File.Exists(localPathFile))
+        {
+        ReCheckFlag:
+            using (UnityWebRequest wwwList = UnityWebRequest.Get(serverPathFile))
+            { // 下載 伺服器 檔案列表
+                yield return wwwList.SendWebRequest();
+
+                if (wwwList.error != null && reConnTimes < Global.maxConnTimes)
+                {
+                    reConnTimes++;
+                    Global.ReturnMessage = "無法下載資源列表，嘗試重新下載(" + reConnTimes + "/" + Global.maxConnTimes + ")";
+                    Debug.Log("Download Vision List Error !   " + wwwList.error + "\n Wait for one second. Reconnecting to download(" + reConnTimes + ")");
+                    yield return new WaitForSeconds(1.0f);
+                    goto ReCheckFlag;
+                    //StartCoroutine(DownloadBundleVersion(localPathFile, serverPathFile));
+                }
+                else if (wwwList.isDone && wwwList.error == null)
+                {
+                    // 如果本機 版本列表檔案 不存在 建立空檔
+                    File.Create(localPathFile).Close();
+                    File.WriteAllText(localPathFile, wwwList.downloadHandler.text);
+
+                    Debug.Log("下載音樂列表完成!");
+                    Global.ReturnMessage = "下載音樂列表完成!";
+                    reConnTimes = 0;
+                }
+                else if (reConnTimes >= Global.maxConnTimes)
+                {
+                    Global.ReturnMessage = Global.ReturnMessage = "無法連線至伺服器，請檢查網路狀態!"; ;
+                    Debug.Log("Can't connecting to Server! Please check your network status.");
+                    wwwList.Dispose();
+                }
+            }
+        }
     }
 
     private IEnumerator DownloadBundleVersion(string localPathFile, string serverPathFile) //比對 檔案
     {
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
-   ReCheckFlag:
+    ReCheckFlag:
         using (UnityWebRequest wwwVersionList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表
             yield return wwwVersionList.SendWebRequest();
@@ -92,7 +139,7 @@ public class AssetBundleChecker : MonoBehaviour
     {
         Global.ReturnMessage = "開始檢查遊戲資產...";
         createJSON.AssetBundlesJSON(); //建立最新 檔案列表
-   ReCheckFlag:
+    ReCheckFlag:
 
         using (UnityWebRequest wwwItemList = UnityWebRequest.Get(serverPathFile))
         { // 下載 伺服器 檔案列表

@@ -133,7 +133,7 @@ public class VersionManager : MonoBehaviour
             //{
                 if (Global.connStatus)
                 {
-                    StartCoroutine(visionChecker.ReplaceVisionList());
+                    StartCoroutine(visionChecker.ReplaceList(Global.visionListFile));
                     syncLoad = gameObject.AddComponent<SyncLoad>();
                     syncLoad.OnLoadScene();
                 }

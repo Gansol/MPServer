@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Much : MiceBase
 {
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
     private AnimatorStateInfo animInfo;
     UICamera cam;
@@ -12,7 +12,7 @@ public class Much : MiceBase
 
     public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>();
+        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
        // if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;

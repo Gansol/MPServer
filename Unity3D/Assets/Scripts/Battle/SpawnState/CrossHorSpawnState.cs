@@ -7,18 +7,18 @@ public class CrossHorSpawnState : SpawnState
     {
     }
 
-    public override IEnumerator Spawn(SpawnAI spawner, short miceID, float spawnTime, float intervalTime, float lerpTime, int spawnCount, bool reSpawn)
+    public override IEnumerator Spawn(short miceID,BattleAIStateAttr stateAttr, bool reSpawn)
     {
         spawnIntervalTime = 6f * spawnIntervalTimes;
         yield return new WaitForSeconds(1f * spawnIntervalTimes);
         Debug.Log("Cross Hor State");
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorA), spawnTime * spawnIntervalTimes, intervalTime, lerpTime, 3, -1, false, reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorA), stateAttr.spawnTime * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 3, -1, false, reSpawn);
         yield return new WaitForSeconds(.2f * spawnIntervalTimes);
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorC), spawnTime * spawnIntervalTimes, intervalTime, lerpTime, 3, -1, false, reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorC), stateAttr.spawnTime * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 3, -1, false, reSpawn);
         yield return new WaitForSeconds(1.5f * spawnIntervalTimes);
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorB), spawnTime * spawnIntervalTimes, intervalTime, lerpTime, 3, -1, false, !reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorB), stateAttr.spawnTime * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 3, -1, false, !reSpawn);
         yield return new WaitForSeconds(.2f * spawnIntervalTimes);
-        spawner.SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorD), spawnTime * spawnIntervalTimes, intervalTime, lerpTime, 3, -1, false, !reSpawn);
+        MPGFactory.GetCreatureFactory().SpawnBy1D(miceID, (sbyte[])SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineHorD), stateAttr.spawnTime * spawnIntervalTimes, stateAttr.intervalTime, stateAttr.lerpTime, 3, -1, false, !reSpawn);
     
     }
 }

@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 public class ShadowAvatarSkill : SkillBoss
 {
-
-    PoolManager poolManager = GameObject.FindGameObjectWithTag("GM").GetComponent<PoolManager>();
-    SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleManager>().GetSpawnAI();
     ObjectFactory objFactory;
 
     Dictionary<Transform, GameObject> dictMice, buffer, buffer2;
@@ -48,11 +45,12 @@ public class ShadowAvatarSkill : SkillBoss
         skillFlag = true;
         this.obj = obj;
         int rnd = Random.Range(0, data.Length);
+        List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetHole();
 
         for (int i = 0; i < data.Length; i++)
         {
-            dictMice.Add(spawnAI.GetHole(data[i]).transform, objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, spawnAI.GetHole(data[i]).gameObject, true));
-            if (i == rnd) correctMice =spawnAI.GetHole(data[i]).transform;
+            dictMice.Add(hole[data[i]].transform,  MPGFactory.GetObjFactory().InstantiateMice(System.Convert.ToInt16(obj.name), 3.5f, hole[data[i]].gameObject, true));
+            if (i == rnd) correctMice = hole[data[i]].transform;
         }
 
         buffer = new Dictionary<Transform, GameObject>(dictMice);
@@ -101,7 +99,7 @@ public class ShadowAvatarSkill : SkillBoss
                             mice2.Value.GetComponent<MiceBase>().OnEffect("Shadow", null);
                     }
 
-                    dictMice[mice.Key] = objFactory.InstantiateMice(poolManager, System.Convert.ToInt16(obj.name), 3.5f, mice.Key.gameObject, false);
+                    dictMice[mice.Key] = objFactory.InstantiateMice( System.Convert.ToInt16(obj.name), 3.5f, mice.Key.gameObject, false);
 
                     buffer = dictMice;
                     break;

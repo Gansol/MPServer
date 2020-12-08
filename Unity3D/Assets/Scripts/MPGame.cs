@@ -10,9 +10,9 @@ public class MPGame
     // GameSystem
     private CreatureSystem m_CreatureSystem = null;
     private MessageManager m_MessageManager = null;
-    private readonly PoolManager m_PoolManager = null;
-    private BattleManager m_BattleSystem = null;
-
+    private AudioSystem m_AudioSystem = null;
+    private  PoolSystem m_PoolSystem = null;
+    private BattleSystem m_BattleSystem = null;
     // UserInterface
 
 
@@ -52,6 +52,7 @@ public class MPGame
         // Iint GameSystem
         m_CreatureSystem = new CreatureSystem(this);
         m_MessageManager = new MessageManager(this);
+        m_AudioSystem = new AudioSystem(this);
         m_AssetLoader = gameLoop.GetComponent<AssetLoader>();
 
         // Init GameUI
@@ -108,7 +109,8 @@ public class MPGame
         if (Global.LoginStatus)
         {
             string panelName = panel_btn.name.Replace("_Btn", "");//.Remove(panel_btn.name.Length - 4) ; // panelName =>  Player_Btn - 4 = Player
-
+            
+            m_AudioSystem.PlaySound("se_click001");
             switch (panelName)
             {
                 case "Player":
@@ -163,17 +165,17 @@ public class MPGame
     {
         switch (panelName.name)
         {
-
             case "menuui":
                 m_MenuUI = new MenuUI(this);
                 m_LoginUI = new LoginUI(this);
+                m_AudioSystem.Initinal();
                 m_MenuUI.Initinal();
                 m_LoginUI.Initinal();
                 break;
             case "gameui":
                 if (!_bLoadBattlelPanel)
                     m_BattleUI = new BattleUI(this);
-                m_BattleSystem = new BattleManager(this);
+                m_BattleSystem = new BattleSystem(this);
                 m_BattleUI.Initinal();
                 m_BattleSystem.Initinal();
                 _bLoadBattlelPanel = true;
@@ -247,6 +249,26 @@ public class MPGame
         if (m_AssetLoader == null)
             m_AssetLoader = m_StartCoroutine.GetComponent<AssetLoader>();
         return m_AssetLoader;
+    }
+
+    public AudioSystem GeAudioSystem()
+    {
+        if (m_AudioSystem == null)
+            m_AudioSystem = new AudioSystem(this);
+        return m_AudioSystem;
+    }
+
+    public BattleSystem GetBattleSystem()
+    {
+        if (m_BattleSystem == null)
+            m_BattleSystem = new BattleSystem(this);
+        return m_BattleSystem;
+    }
+    public PoolSystem GePoolSystem()
+    {
+        if (m_PoolSystem == null)
+            m_PoolSystem = new PoolSystem(this);
+        return m_PoolSystem;
     }
 
     public BattleUI GetBattleUI()

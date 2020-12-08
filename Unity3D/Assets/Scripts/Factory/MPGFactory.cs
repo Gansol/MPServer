@@ -7,6 +7,8 @@ public static class MPGFactory
     private static SkillFactory m_SkillFactory = null;
     private static AttrFactory m_AttrFactory = null;
     private static AnimFactory m_AnimFactory = null;
+    private static CreatureFactory m_CreatureFactory = null;
+    // private static SpawnAI m_C
 
     public static ObjectFactory GetObjFactory()
     {
@@ -34,5 +36,11 @@ public static class MPGFactory
         if (m_AnimFactory == null)
             m_AnimFactory = new AnimFactory();
         return m_AnimFactory;
+    }
+    public static CreatureFactory GetCreatureFactory()
+    {
+        if (m_CreatureFactory == null)
+            m_CreatureFactory = new CreatureFactory();
+        return m_CreatureFactory;
     }
 }

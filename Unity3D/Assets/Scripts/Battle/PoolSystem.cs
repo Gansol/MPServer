@@ -21,10 +21,9 @@ using System.Linq;
  * 173、技能使用量 錯誤 應由伺服器
  * ***************************************************************/
 
-public class PoolManager : MonoBehaviour
+public class PoolSystem : GameSystem
 {
     private AssetLoader assetLoader;
-    MPGame MPGame;
     //private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictMiceObject;
     private Dictionary<int, string> _dictSpecialObject;
@@ -73,15 +72,14 @@ public class PoolManager : MonoBehaviour
     private Vector3 bossScale = new Vector3(0.7f, 0.7f, 0.7f);
     private Vector3 skillScale = new Vector3(0.6f, 0.6f, 0.6f);
 
-    private void OnEnable()
+    public PoolSystem(MPGame MPGame) : base(MPGame)
     {
+        // OnEnable
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
     }
 
-
-    void Awake()
+    public override void Initinal()
     {
-
         Global.photonService.LoadPlayerItem(Global.Account);
 
         assetLoader = MPGame.Instance.GetAssetLoader();
@@ -98,14 +96,12 @@ public class PoolManager : MonoBehaviour
         _dictSpecialObject.Add(11003, "HeroMice");
         _dictSkillMice = new Dictionary<string, object>();
 
-    }
-
-    void Start()
-    {
+        // start 舊版位置 20201208
         MergeMice();
         LoadItemDataFromDict();
         LoadAssets();
     }
+
 
     /// <summary>
     /// 載入Battle所有必要資產
@@ -137,7 +133,7 @@ public class PoolManager : MonoBehaviour
     }
 
 
-    void Update()
+    public override void Update()
     {
         //if (!_poolingFlag && !string.IsNullOrEmpty(assetLoader.ReturnMessage))
         //    Debug.Log("Message:" + assetLoader.ReturnMessage /*+ "_loadedCount:" + assetLoader._loadedCount + "_objCount:" + assetLoader._objCount*/);
@@ -168,7 +164,7 @@ public class PoolManager : MonoBehaviour
                 {
                     for (int j = 0; j < ObjectPool.transform.GetChild(i).childCount - reserveCount; j++)    // 銷毀物件
                     {
-                        Destroy(ObjectPool.transform.GetChild(i).GetChild(j).gameObject);
+                        GameObject.Destroy(ObjectPool.transform.GetChild(i).GetChild(j).gameObject);
                     }
                 }
             }
@@ -203,7 +199,7 @@ public class PoolManager : MonoBehaviour
 
                 // instantiate skill btn
                 clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, item.Key, Vector3.zero, scale, Vector2.zero, 100);
-                Destroy(clone.GetComponent<BoxCollider2D>());
+                GameObject.Destroy(clone.GetComponent<BoxCollider2D>());
                 clone.transform.parent.gameObject.AddComponent<SkillBtn>();
                 clone.transform.parent.gameObject.GetComponent<SkillBtn>().init(Convert.ToInt16(item.Key), lerpSpeed * (i + 1), upDistance, i);
                 clone.transform.parent.gameObject.AddComponent<UIButton>();
@@ -359,7 +355,7 @@ public class PoolManager : MonoBehaviour
             mice.SetArribute(miceAttr);
             mice.Initialize(false, lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
 
-            clone.gameObject.SetActive(false);  
+            clone.gameObject.SetActive(false);
         }
     }
 
@@ -430,7 +426,7 @@ public class PoolManager : MonoBehaviour
         Debug.Log("OnLoadPlayerItem");
     }
 
-    private void OnDisable()
+    ~PoolSystem()
     {
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
     }

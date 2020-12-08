@@ -3,7 +3,7 @@ using System.Collections;
 
 public class NormalState : PlayerAIState {
 
-    public NormalState(BattleManager battleManager)
+    public NormalState(BattleSystem battleManager)
         : base(battleManager)
     {
 

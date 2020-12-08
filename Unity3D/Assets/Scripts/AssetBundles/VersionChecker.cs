@@ -129,7 +129,7 @@ public class VersionChecker : MonoBehaviour
     /// 更新完成後 取代版本列表(單純置換版本列表)
     /// </summary>
     /// <returns></returns>
-    public IEnumerator ReplaceVisionList()
+    public IEnumerator ReplaceList(string list)
     {
         File.WriteAllBytes(Application.persistentDataPath + "/List/" + Global.visionListFile, _bVisionFile); //WriteAllBytes(要寫入的路徑與檔案名稱!!!不能只寫路徑(關鍵),bytes檔案)
         Global.ReturnMessage = "遊戲版本檢查完成!";

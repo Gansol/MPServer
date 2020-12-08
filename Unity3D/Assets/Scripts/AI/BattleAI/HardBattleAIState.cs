@@ -6,56 +6,58 @@ public class HardBattleAIState : IBattleAIState
 {
     int carzyScore = 7500, carzyMaxScore = 10000, carzyCombo = 100, hardMaxScore = 5000, hardCombo = 75;
 
-    public HardBattleAIState()
+    public HardBattleAIState( BattleAttr battleAttr)
+        : base( battleAttr)
     {
         Debug.Log("Now State: HardBattleAIState");
-        battleAIState = ENUM_BattleAIState.HardMode;
-        normalSpawn = 50;
-        spawnCount = 12;
-        lerpTime = 0.06f;
-        spawnTime = 0.45f;
-        intervalTime = 3f;
-        minStatus = 1;
-        maxStatus = 3;
-        minMethod = System.Enum.GetNames(typeof(ENUM_SpawnMethod)).Length / 4;
-        maxMethod = System.Enum.GetNames(typeof(ENUM_SpawnMethod)).Length - 1;
-        minSpawnInterval = -1.5f;
-        maxSpawnInterval = 2;
-        spawnIntervalTime = 1.5f;
-        spawnSpeed = .95f;
-        wave = 0;
-        nextBali = 3; nextMuch = 15; nextHero = 45;
+        stateAttr = new BattleAIStateAttr();
+        stateAttr.battleAIState = ENUM_BattleAIState.HardMode;
+        stateAttr.normalSpawn = 50;
+        stateAttr.spawnCount = 12;
+        stateAttr.lerpTime = 0.06f;
+        stateAttr.spawnTime = 0.45f;
+        stateAttr.intervalTime = 3f;
+        stateAttr.minStatus = 1;
+        stateAttr.maxStatus = 3;
+        stateAttr.minMethod = System.Enum.GetNames(typeof(ENUM_SpawnMethod)).Length / 4;
+        stateAttr.maxMethod = System.Enum.GetNames(typeof(ENUM_SpawnMethod)).Length - 1;
+        stateAttr.minSpawnInterval = -1.5f;
+        stateAttr.maxSpawnInterval = 2;
+        stateAttr.spawnIntervalTime = 1.5f;
+        stateAttr.spawnSpeed = .95f;
+        stateAttr.wave = 0;
+        stateAttr.nextBali = 3; stateAttr.nextMuch = 15; stateAttr.nextHero = 45;
 
-        pervStateTime = Global.GameTime / 2;
-        nextStateTime = Global.GameTime - 30;
+        stateAttr.pervStateTime = Global.GameTime / 2;
+        stateAttr.nextStateTime = Global.GameTime - 30;
     }
 
     public override void UpdateState()
     {
 
-        if ((battleManager.score > carzyScore && battleManager.combo > carzyCombo) || (battleManager.score > carzyMaxScore && battleManager.combo > carzyCombo) || BattleManager.gameTime > nextStateTime)
+        if ((battleAttr.score > carzyScore && battleAttr.combo > carzyCombo) || (battleAttr.score > carzyMaxScore && battleAttr.combo > carzyCombo) || battleAttr.gameTime > stateAttr.nextStateTime)
         {
-            battleManager.SetSpawnState(new CrazyBattleAIState());
+            MPGame.Instance.GetBattleSystem().SetSpawnState(new CrazyBattleAIState( battleAttr));
         }
-        else if (battleManager.combo < hardCombo && battleManager.score < hardMaxScore && BattleManager.gameTime < pervStateTime)
+        else if (battleAttr.combo < hardCombo && battleAttr.score < hardMaxScore && battleAttr.gameTime < stateAttr.pervStateTime)
         {
-            battleManager.SetSpawnState(new NormalBattleAIState());
+            MPGame.Instance.GetBattleSystem().SetSpawnState(new NormalBattleAIState( battleAttr));
         }
-        else if (BattleManager.gameTime > lastTime + spawnOffset)
+        else if (battleAttr.gameTime > stateAttr.lastTime + stateAttr.spawnOffset)
         {
-            nowCombo += (battleManager.combo - nowCombo > 0) ? (short)(battleManager.combo - nowCombo) : (short)0;
+            stateAttr.nowCombo += (battleAttr.combo - stateAttr.nowCombo > 0) ? (short)(battleAttr.combo - stateAttr.nowCombo) : (short)0;
 
-            if (nowCombo < normalSpawn)
+            if (stateAttr.nowCombo < stateAttr.normalSpawn)
             {
                 // normal spawn
-                Spawn(defaultMice, spawnCount);   //錯誤
-                lastTime = BattleManager.gameTime + spawnIntervalTime * 2;
+                Spawn(stateAttr.defaultMice, stateAttr);   //錯誤
+                stateAttr.lastTime = battleAttr.gameTime + stateAttr.spawnIntervalTime * 2;
             }
             else
             {
                 // spceial spawn
-                SpawnSpecial(Random.Range(minMethod, maxMethod), defaultMice, spawnSpeed, spawnCount);    //錯誤
-                lastTime = BattleManager.gameTime + spawnState.GetIntervalTime();
+                SpawnSpecial( stateAttr.defaultMice, stateAttr);    //錯誤
+                stateAttr.lastTime = battleAttr.gameTime + stateAttr.spawnState.GetIntervalTime();
             }
 
             SetSpawnIntervalTime();

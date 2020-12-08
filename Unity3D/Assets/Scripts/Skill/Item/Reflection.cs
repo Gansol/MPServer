@@ -31,7 +31,7 @@ public class Reflection : SkillItem {
 
     public override void Release()
     {
-        BattleManager.SetRefelcetion(false);    // 錯誤
+        BattleSystem.SetRefelcetion(false);    // 錯誤
 
         foreach(GameObject go in effects)
             GameObject.Destroy(go);
@@ -53,7 +53,7 @@ public class Reflection : SkillItem {
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform,"effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Green", -1, 0f);
 
-        BattleManager.SetRefelcetion(true); // 錯誤
+        BattleSystem.SetRefelcetion(true); // 錯誤
         m_StartTime = Time.time;
     }
 }

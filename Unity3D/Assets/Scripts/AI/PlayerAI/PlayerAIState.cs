@@ -8,11 +8,11 @@ public class PlayerAIState
 {
 
     short State;
-    private BattleManager battleManager;
+    private BattleSystem battleManager;
     Dictionary<ENUM_PlayerState, SkillBase> _dictSkills = new Dictionary<ENUM_PlayerState, SkillBase>();
 
     // Use this for initialization
-    public PlayerAIState(BattleManager battleManager)
+    public PlayerAIState(BattleSystem battleManager)
     {
         this.battleManager = battleManager;
     }

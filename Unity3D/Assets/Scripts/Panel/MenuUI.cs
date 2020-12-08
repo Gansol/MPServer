@@ -26,6 +26,8 @@ public class MenuUI : IMPPanelUI
         UIEventListener.Get(UI.settingBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.battleBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.survivalBtn).onClick = m_MPGame.ShowPanel;
+
+        m_MPGame.GeAudioSystem().PlayMusic("bgm_001");
     }
 
     public override void Update()
