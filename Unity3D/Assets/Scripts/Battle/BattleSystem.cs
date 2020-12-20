@@ -29,11 +29,9 @@ public class BattleAttr
 
 public class BattleSystem : GameSystem
 {
-    public GameObject startAnim;
-    public UISprite gameMode;
     public int feverEnergy;           // FeverTime 能量
 
-    private MissionManager missionManager;  // 任務管理員
+    private MissionSystem missionSystem;  // 任務管理員
     private BattleUI battleHUD;            // HUD
     private BotAI BotAI;
 
@@ -80,7 +78,8 @@ public class BattleSystem : GameSystem
 
     public BattleSystem(MPGame MPGame) : base(MPGame)
     {
-         battleAttr = new BattleAttr();
+        Debug.Log("BattleSystem Create");
+        battleAttr = new BattleAttr();
          m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         
     }
@@ -88,13 +87,13 @@ public class BattleSystem : GameSystem
     // Use this for initialization
     public override void Initinal()
     {
-        Debug.Log("-------Battle Start-------");
+        Debug.Log("BattleSystem Init");
         EventMaskSwitch.Init();
         //FindHole();
         UI = m_RootUI.GetComponent<AttachBtn_BattleUI>();
         //hole = UI.hole;
-       // poolManager = m_RootUI.GetComponentInChildren<PoolManager>();
-        missionManager = m_RootUI.GetComponentInChildren<MissionManager>();
+        // poolManager = m_RootUI.GetComponentInChildren<PoolManager>();
+        missionSystem = m_MPGame.GetMissionSystem();
         battleHUD = m_MPGame.GetBattleUI();
 
         //spawnAI = new SpawnAI( poolManager, hole);
@@ -103,8 +102,6 @@ public class BattleSystem : GameSystem
         dictMiceUseCount = new Dictionary<string, Dictionary<string, object>>();
         dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
 
-        Global.dictBattleMiceRefs.Clear();
-
         Global.photonService.MissionCompleteEvent += OnMissionComplete;
         Global.photonService.ApplyMissionEvent += OnApplyMission;
         Global.photonService.UpdateScoreEvent += OnUpdateScore;
@@ -112,7 +109,7 @@ public class BattleSystem : GameSystem
         Global.photonService.UpdateLifeEvent += OnUpdateLife;
         Global.photonService.GetOpponentLifeEvent += OnGetOpponentLife;
         Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
-        Global.photonService.GameStartEvent += OnGameStart;
+
         Global.photonService.GameOverEvent += OnGameOver;
         Global.photonService.LoadSceneEvent += OnDestory;
         //Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
@@ -160,12 +157,12 @@ public class BattleSystem : GameSystem
             _lastTime = Time.time; // 沒作用
 
         // 同步開始遊戲
-        if (m_MPGame.GePoolSystem().PoolingFlag && isSyncStart)
+        if (m_MPGame.GetPoolSystem().PoolingFlag && isSyncStart)
         {
             Debug.Log("Pooling Completed Start SyncGame");
 
             if (Global.MemberType == MemberType.Bot)
-                BotAI = new BotAI(m_MPGame.GePoolSystem().GetPoolSkillMiceIDs());
+                BotAI = new BotAI(m_MPGame.GetPoolSystem().GetPoolSkillMiceIDs());
 
             if (feverEnergy == 100)
             {
@@ -239,7 +236,6 @@ public class BattleSystem : GameSystem
             MissionCombo++;
             _spawnCount++;
             _killMice++;
-            Global.MiceCount--;
             Global.photonService.UpdateScore(miceID,  battleAttr.combo, aliveTime);
         }
     }
@@ -263,7 +259,6 @@ public class BattleSystem : GameSystem
                     Global.photonService.UpdateScore(miceID,  battleAttr.combo, aliveTime);
                     _spawnCount++;
                     _lostMice++;
-                    Global.MiceCount--;
                 }
             }
         }
@@ -345,20 +340,20 @@ public class BattleSystem : GameSystem
         {
             Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
             // 如果再交換分數任務下，則不取得自己增加的分數
-            if (missionManager.missionMode == MissionMode.Opening)
+            if (missionSystem.MissionMode == MissionMode.Opening)
             {
-                if (missionManager.mission == Mission.Exchange && score > 0)
+                if (missionSystem.Mission == Mission.Exchange && score > 0)
                 {
                     _otherScore += _tmpScore;
                     if ( battleAttr.combo >= 5)
                         UpadateEnergy(_tmpEnergy);
                 }
 
-                if (missionManager.mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
+                if (missionSystem.Mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
                      battleAttr.score = (this.score + _tmpScore > 0) ? ( battleAttr.score += _tmpScore) : 0;
             }
 
-            if (missionManager.mission != Mission.Exchange)
+            if (missionSystem.Mission != Mission.Exchange)
             {
                  battleAttr.score = (this.score + _tmpScore < 0) ? 0 :  battleAttr.score += _tmpScore;
                 if (_tmpScore > 0) _gameScore += _tmpScore;
@@ -378,25 +373,25 @@ public class BattleSystem : GameSystem
         {
             Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
             // 如果再交換分數任務下，取得對方增加的分數
-            if (missionManager.missionMode == MissionMode.Opening)
+            if (missionSystem.MissionMode == MissionMode.Opening)
             {
-                if (missionManager.mission == Mission.Exchange && value > 0)
+                if (missionSystem.Mission == Mission.Exchange && value > 0)
                 {
                      battleAttr.score += _tmpScore;
                     _gameScore += _tmpScore;
                 }
 
-                if (missionManager.mission == Mission.Exchange && value < 0)
+                if (missionSystem.Mission == Mission.Exchange && value < 0)
                     _otherScore = (this.otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;
 
-                if (missionManager.mission == Mission.HarvestRate)
+                if (missionSystem.Mission == Mission.HarvestRate)
                 {
                     Int16 otherScore = (Int16)(value * _otherRate);
                     _otherScore = (this.otherScore + otherScore > 0) ? _otherScore += otherScore : 0;
                 }
             }
 
-            if (missionManager.mission != Mission.Exchange && missionManager.mission != Mission.HarvestRate)
+            if (missionSystem.Mission != Mission.Exchange && missionSystem.Mission != Mission.HarvestRate)
                 _otherScore = (this.otherScore + _tmpScore < 0) ? 0 : _otherScore += _tmpScore;
 
             _otherEnergy = Math.Min(energy, 100);
@@ -410,7 +405,7 @@ public class BattleSystem : GameSystem
         Debug.Log("On BattleManager missionReward: " + missionReward);
         if (Global.isGameStart)
         {
-            if (missionManager.mission == Mission.HarvestRate)
+            if (missionSystem.Mission == Mission.HarvestRate)
             {
                 _scoreRate = 1;
             }
@@ -419,7 +414,7 @@ public class BattleSystem : GameSystem
                  battleAttr.score = (this.score + missionReward < 0) ? 0 :  battleAttr.score += missionReward;
             }
 
-            if (missionManager.mission == Mission.DrivingMice)
+            if (missionSystem.Mission == Mission.DrivingMice)
             {
                 MissionCombo = 0;
             }
@@ -431,7 +426,7 @@ public class BattleSystem : GameSystem
     {
         if (Global.isGameStart)
         {
-            if (missionManager.mission == Mission.HarvestRate)
+            if (missionSystem.Mission == Mission.HarvestRate)
                 _scoreRate = 1;
             else
                 _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
@@ -490,7 +485,7 @@ public class BattleSystem : GameSystem
                 case Mission.WorldBoss:
                     {
                         // 如果要測試 可以把 value改成Boss的ID
-                        MPGFactory.GetObjFactory().SpawnBoss(UI.hole[4], value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
+                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
                         break;
                     }
             }
@@ -537,12 +532,7 @@ public class BattleSystem : GameSystem
         Global.photonService.LoadPlayerData(Global.Account);
     }
 
-    void OnGameStart()
-    {
-        Global.isGameStart = true;
-        startAnim.SetActive(true);
-        Debug.Log(" ----  Game Start!  ---- ");
-    }
+
 
     public void OnExitRoom()
     {
@@ -564,7 +554,6 @@ public class BattleSystem : GameSystem
         Global.photonService.UpdateLifeEvent -= OnUpdateLife;
         Global.photonService.GetOpponentLifeEvent -= OnGetOpponentLife;
         Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
-        Global.photonService.GameStartEvent -= OnGameStart;
         Global.photonService.GameOverEvent -= OnGameOver;
         Global.photonService.LoadSceneEvent -= OnDestory;
         //Global.photonService.ApplySkillMiceEvent -= OnApplySkillMice;

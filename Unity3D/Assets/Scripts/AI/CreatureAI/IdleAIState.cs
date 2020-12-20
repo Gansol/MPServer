@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class IdleAIState : AIState {
+public class IdleAIState : IAIState
+{
+    public IdleAIState()
+    {
+        Debug.Log( "Idle State");
+        m_CreatureAI.Set_ENUM_AIState(ICreature.ENUM_CreatureState.Idle);
+    }
 
-	// Use this for initialization
-	void Start () {
-        Debug.Log("Idle");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public override void Update()
+    {
+        Debug.Log("Idle Update");
+    }
 }

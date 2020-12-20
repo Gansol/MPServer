@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 public class ShadowAvatarSkill : SkillBoss
 {
-    ObjectFactory objFactory;
+    MPGame objFactory;
 
     Dictionary<Transform, GameObject> dictMice, buffer, buffer2;
     sbyte[] data;
@@ -29,14 +29,14 @@ public class ShadowAvatarSkill : SkillBoss
         foreach (KeyValuePair<Transform, GameObject> mice in buffer)
         {
             if (Global.dictBattleMiceRefs.ContainsKey(mice.Key))
-                dictMice[mice.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0);
+           /     dictMice[mice.Key].GetComponent<IMice>().SendMessage("OnDead", 0);
             dictMice.Remove(mice.Key);
         }
 
         dictMice = new Dictionary<Transform, GameObject>();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         Debug.Log("Ninja Mice Display");
 
@@ -49,7 +49,7 @@ public class ShadowAvatarSkill : SkillBoss
 
         for (int i = 0; i < data.Length; i++)
         {
-            dictMice.Add(hole[data[i]].transform,  MPGFactory.GetObjFactory().InstantiateMice(System.Convert.ToInt16(obj.name), 3.5f, hole[data[i]].gameObject, true));
+            dictMice.Add(hole[data[i]].transform, MPGame.Instance.GetPoolSystem().InstantiateMice(System.Convert.ToInt16(obj.name), 3.5f, hole[data[i]].gameObject, true));
             if (i == rnd) correctMice = hole[data[i]].transform;
         }
 
@@ -61,7 +61,7 @@ public class ShadowAvatarSkill : SkillBoss
         if (Time.time > m_LastTime + skillData.ColdDown && !skillFlag)
         {
             escapeTime = Time.time;
-            Display(obj, null, null);
+            Display(obj, null);
             
             Debug.Log("****RE RUN !");
         }
@@ -81,7 +81,7 @@ public class ShadowAvatarSkill : SkillBoss
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer2)
                     {
                         if (Global.dictBattleMiceRefs.ContainsKey(mice2.Key))
-                           dictMice[mice2.Key].GetComponent<MiceBase>().SendMessage("OnDead", 0.0f);
+                        錯誤   dictMice[mice2.Key].GetComponent<IMice>().SendMessage("OnDead", 0.0f);
                         dictMice.Remove(mice.Key);
                     }
 
@@ -96,7 +96,7 @@ public class ShadowAvatarSkill : SkillBoss
                     foreach (KeyValuePair<Transform, GameObject> mice2 in buffer)
                     {
                         if (mice2.Value != null)
-                            mice2.Value.GetComponent<MiceBase>().OnEffect("Shadow", null);
+                            mice2.Value.GetComponent<IMice>().OnEffect("Shadow", null);
                     }
 
                     dictMice[mice.Key] = objFactory.InstantiateMice( System.Convert.ToInt16(obj.name), 3.5f, mice.Key.gameObject, false);

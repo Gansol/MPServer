@@ -3,11 +3,21 @@ using System.Collections;
 
 public abstract class CreatureAttr : AttrBase
 {
-    private int hp = 1;
-    private int maxHp = 1;
-    private int shield = 0;
+    private int hp ;
+    private int maxHp ;
+    private int shield ;
 
-    public string name = "";
+    public string id ;
+    public string name ;
+
+    public CreatureAttr()
+    {
+        hp = 1;
+        maxHp = 1;
+        shield = 0;
+        id = "";
+        name = "";
+    }
 
     //public CreatureAttr(string name, int hp)
     //{
@@ -40,7 +50,7 @@ public abstract class CreatureAttr : AttrBase
     }
 
 
-    public virtual void SetHP(int value)
+    public virtual void SetHP(int value=1)
     {
         this.hp = Mathf.Min(value, maxHp);
     }

@@ -20,7 +20,7 @@ public class DontTouchMeSkill : SkillBoss
 
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         this.obj = obj;
         _spawnCount = skillData.Attr + Random.Range(0, skillData.AttrDice + 1);
@@ -32,7 +32,7 @@ public class DontTouchMeSkill : SkillBoss
     {
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
-            Display(obj, null, null);
+            Display(obj, null);
         }
         if ((Time.time - m_StartTime) > skillData.SkillTime)
             Release();

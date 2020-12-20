@@ -8,7 +8,6 @@ public class BattleUI : IMPPanelUI
 {
     private AttachBtn_BattleUI UI;
     private BattleSystem battleSystem;
-    private ObjectFactory objFactory;
 
     private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
@@ -17,22 +16,23 @@ public class BattleUI : IMPPanelUI
     private float _tmpLife, _tmpOhterLife;
     [Range(0.1f, 1.0f)]
     private float _beautyHP;                // 美化血條用
- //  private bool bLoadPrefab;
-//private double _energy;
+                                            //  private bool bLoadPrefab;
+                                            //private double _energy;
 
     public BattleUI(MPGame MPGame) : base(MPGame)
     {
-
+        Debug.Log("BattleUI Create");
     }
 
     public override void Initinal()
     {
+        Debug.Log("BattleUI Init");
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
         _beautyHP = 0.5f;
-        UI.WaitObject.transform.gameObject.SetActive(true);
+        //UI.WaitObject.transform.gameObject.SetActive(true); // 開始才顯示
         battleSystem = m_MPGame.GetBattleSystem();
         assetLoader = MPGame.Instance.GetAssetLoader();
-        objFactory = new ObjectFactory();
 
         assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
 
@@ -53,6 +53,7 @@ public class BattleUI : IMPPanelUI
 
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
         Global.photonService.LoadSceneEvent += OnLoadScene;
+        Global.photonService.GameStartEvent += OnGameStart;
     }
 
     public override void Update()
@@ -505,7 +506,7 @@ public class BattleUI : IMPPanelUI
         {
             if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
             {
-                GameObject obj = objFactory.Instantiate(assetLoader.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                GameObject obj = MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
                 dictItem.Add(item.Key, obj);    // 存入道具資料索引
                 pos.x += offset.x;
             }
@@ -532,7 +533,7 @@ public class BattleUI : IMPPanelUI
                 GameObject bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
 
                 if (bundle != null)
-                    bundle = objFactory.Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
+                    bundle = MPGFactory.GetObjFactory().Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
 
                 rewardPanel.GetChild(i).Find("text").GetComponent<UILabel>().text = itemCount;
                 i++;
@@ -600,6 +601,12 @@ public class BattleUI : IMPPanelUI
 
     }
 
+    void OnGameStart()
+    {
+        Global.isGameStart = true;
+        UI.StartObject.SetActive(true);
+        Debug.Log(" ----  Game Start!  ---- ");
+    }
 
 
     public override void OnClosed(GameObject obj)
@@ -632,5 +639,6 @@ public class BattleUI : IMPPanelUI
     {
         Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;
         Global.photonService.LoadSceneEvent -= OnLoadScene;
+        Global.photonService.GameStartEvent -= OnGameStart;
     }
 }

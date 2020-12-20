@@ -14,8 +14,9 @@ using System;
  * 
  */
 
-public class CreatureFactory :FactoryBase
+public class CreatureFactory :IFactory
 {
+    MPGame m_MPGame;
     [Range(2, 5)]
     private float miceSize;
     private List<GameObject> _hole;
@@ -42,17 +43,6 @@ public class CreatureFactory :FactoryBase
         Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
         Global.photonService.LoadSceneEvent += OnLoadScene;
     }
-
-
-    void Start()
-    {
-
-        //battleManager = GetComponent<BattleManager>();
-        //poolManager = GetComponent<PoolManager>();
-
-
-    }
-
 
     #region -- SpawnByRandom --
     /// <summary>
@@ -84,7 +74,7 @@ public class CreatureFactory :FactoryBase
         for (holePos = 0; count < spawnCount; holePos++)
         {
             holePos = SetStartPos(holeArray.Length, holePos, false);
-            MPGFactory.GetObjFactory().InstantiateMice( miceID, miceSize, _hole[rndHoleArray[holePos]], false);
+            m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[rndHoleArray[holePos]].transform, false);
             count++;
             yield return new WaitForSeconds(spawnTime);
         }
@@ -195,7 +185,7 @@ public class CreatureFactory :FactoryBase
             try
             {
                 // objFactory.TestMethod();
-                MPGFactory.GetObjFactory().InstantiateMice( miceID, miceSize, _hole[holeArray[holePos]], impose);
+                m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[holeArray[holePos]].transform, impose);
             }
             catch (Exception e)
             {
@@ -312,7 +302,7 @@ public class CreatureFactory :FactoryBase
 
             while (j >= 0 && j < holeArray.GetLength(1) && count < spawnCount)    // 2D陣列
             {
-                MPGFactory.GetObjFactory().InstantiateMice( miceID, miceSize, _hole[holeArray[i, j]], false);
+                m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[holeArray[i, j]].transform, false);
                 count++;
                 //Debug.Log("count:" + count + "  i:" + i + "  j:" + j);
                 j += (reSpawn) ? -1 : 1;

@@ -57,14 +57,14 @@ public class MiceAnimState : IAnimatorState
                 // 目前播放的動畫 "總"時間
                 if (_animTime >= _helloTime)   // 動畫撥放完畢時
                 {
-                    if (currentState.nameHash == Animator.StringToHash("Layer1.Hello") && animState != ENUM_AnimatorState.Die) anims.Play("Idle");   // 老鼠開始吃東西
+                    if (currentState.nameHash == Animator.StringToHash("Layer1.Hello") && animState != ENUM_AnimatorState.Died) anims.Play("Idle");   // 老鼠開始吃東西
                 }
             }
             else if (currentState.nameHash == Animator.StringToHash("Layer1.Die"))              // 如果 目前 動畫狀態 是 die
             {
                 _animTime = currentState.normalizedTime;                                         // 目前播放的動畫 "總"時間
                 _upFlag = false;
-                animState = ENUM_AnimatorState.Die;
+                animState = ENUM_AnimatorState.Died;
                 //Debug.Log("Die 1" + _bDead);
                 if (!_bDead)       // 限制執行一次
                 {
@@ -119,7 +119,7 @@ public class MiceAnimState : IAnimatorState
             case ENUM_AnimatorState.Idle:
                 anims.Play("Idle");
                 break;
-            case ENUM_AnimatorState.Die:
+            case ENUM_AnimatorState.Died:
                 anims.Play("Die");
                 break;
             case ENUM_AnimatorState.OnHit:
@@ -161,7 +161,8 @@ public class MiceAnimState : IAnimatorState
             _tmp = new Vector3(0, -_upDistance, 0);
             obj.transform.localPosition = _tmp;
             _upDistance = _tmpDistance;
-            obj.SendMessage("OnDead", _survivalTime);
+            animState = ENUM_AnimatorState.Byebye;
+         //  obj.SendMessage("OnDead", _survivalTime);
             //anims.StopPlayback();
             _isDisappear = false;
         }

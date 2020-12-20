@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Much : MiceBase
+public class Much : IMice
 {
     private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
@@ -38,7 +38,7 @@ public class Much : MiceBase
             m_AnimState.UpdateAnimation();
             animInfo = m_AnimState.GetAnimStateInfo();
 
-            if (animInfo.nameHash == Animator.StringToHash("Layer1.Eat") && animInfo.normalizedTime > 0.5f)
+            if (animInfo.fullPathHash == Animator.StringToHash("Layer1.Eat") && animInfo.normalizedTime > 0.5f)
                 GetComponent<BoxCollider2D>().enabled = false;
         }
         else
@@ -57,9 +57,9 @@ public class Much : MiceBase
                 pos.Add(0, transform.position);
                 if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key) && item.Value != gameObject)
                 {
-                    if (item.Value.GetComponent<MiceBase>() != null)
+                    if (item.Value.GetComponent<IMice>() != null)
                     {
-                        item.Value.GetComponent<MiceBase>().OnEffect("Much", pos);
+                        item.Value.GetComponent<IMice>().OnEffect("Much", pos);
                         item.Value.GetComponent<BoxCollider2D>().enabled = false;
                     }
                 }
@@ -76,11 +76,11 @@ public class Much : MiceBase
         
         if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
         {
-            hitSound.Play();
+            MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
         }
         else
         {

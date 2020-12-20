@@ -36,7 +36,7 @@ public class SugarAntsSkill : SkillBoss
     }
 
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         Debug.Log("SugerAnts Display!");
         this.obj = obj;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AnimFactory : FactoryBase
+public class AnimFactory : IFactory
 {
 
 	// Use this for initialization
