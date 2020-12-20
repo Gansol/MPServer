@@ -39,7 +39,7 @@ public class Snow : SkillItem
         foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMiceRefs)
         {
             if (mice.Value != null) 
-                mice.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, true);
+                mice.Value.GetComponent<IMice>().OnEffect(skillData.SkillName, true);
         }
 
         foreach (GameObject go in effects)
@@ -52,7 +52,7 @@ public class Snow : SkillItem
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         Display();
     }
@@ -73,7 +73,7 @@ public class Snow : SkillItem
             if (item.Value != null)
             {
                 //item.Value.GetComponent<MiceBase>().Play(AnimatorState.ENUM_AnimatorState.Frozen);
-                item.Value.GetComponent<MiceBase>().OnEffect(skillData.SkillName, false);
+                item.Value.GetComponent<IMice>().OnEffect(skillData.SkillName, false);
             }
         }
 

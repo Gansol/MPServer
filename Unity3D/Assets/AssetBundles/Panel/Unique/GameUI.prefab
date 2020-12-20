@@ -147,7 +147,6 @@ GameObject:
   - component: {fileID: 11401376}
   - component: {fileID: 11401374}
   - component: {fileID: 11401380}
-  - component: {fileID: 11443988}
   m_Layer: 0
   m_Name: BattleManager
   m_TagString: GM
@@ -229,7 +228,7 @@ MonoBehaviour:
   - {fileID: 113626}
   - {fileID: 113628}
   - {fileID: 113624}
-  messagePanel: {fileID: 0}
+  messagePanel: {fileID: 101762}
   hole:
   - {fileID: 101680}
   - {fileID: 101682}
@@ -256,22 +255,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a721a8bfffce7154ea7c942bec5797d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &11443988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 101316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioClip: {fileID: 8300000, guid: fa41fb5df9743cc49a55fff25df4a03b, type: 3}
-  trigger: 5
-  volume: 0.87
-  pitch: 1
 --- !u!1 &101318
 GameObject:
   m_ObjectHideFlags: 0

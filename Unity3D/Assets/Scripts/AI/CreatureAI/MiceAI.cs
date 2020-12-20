@@ -1,15 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MiceAI : ICreatureAI {
-
-    void Start()
+public class MiceAI : ICreatureAI
+{
+    public MiceAI(ICreature mice) : base(mice)
     {
-        State = new IdleAIState();
-    }
-
-    public override void UpdateAIState(AIState state)
-    {
-        base.UpdateAIState(state);
+        SetAIState(new IdleAIState());
     }
 }

@@ -26,7 +26,7 @@ public class SkillCallMice : SkillBoss
         dictMice.Clear();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
         Debug.Log("Call Mice Display");
@@ -60,7 +60,7 @@ public class SkillCallMice : SkillBoss
                 if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
             }
 
-            Display(obj, null, null);
+            Display(obj, null/*, null*/);
             m_LastTime = Time.time;
         }
 

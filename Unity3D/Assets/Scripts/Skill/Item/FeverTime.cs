@@ -41,7 +41,7 @@ public class FeverTime : SkillItem {
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         Display();
     }

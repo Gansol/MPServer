@@ -20,7 +20,7 @@ public abstract class SkillBase
 
     public interface ISkill
     {
-        void Display(GameObject obj, CreatureAttr arribute, AIState state);
+        void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/);
     }
 
     public abstract void Initialize();
@@ -32,7 +32,7 @@ public abstract class SkillBase
     /// <param name="obj"></param>
     /// <param name="arribute"></param>
     /// <param name="state"></param>
-    public virtual void Display(GameObject obj, CreatureAttr arribute, AIState state) { }
+    public virtual void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/) { }
 
     /// <summary>
     /// 使用道具技能

@@ -10,6 +10,6 @@ public class EggMiceBoss : MiceBossBase
         transform.localPosition = new Vector3(0, 0);
         GetComponent<BoxCollider2D>().enabled = true;
 
-        m_Skill.Display(gameObject, m_Arribute, m_AIState);
+        m_Skill.Display(gameObject, m_Arribute/*, m_AIState*/);
     }
 }

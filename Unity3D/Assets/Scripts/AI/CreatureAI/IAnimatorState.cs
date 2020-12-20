@@ -17,7 +17,8 @@ public abstract class IAnimatorState
         Hello = 0,
         Idle,
         Eat,
-        Die,
+        Byebye,
+        Died,
         OnHit,
         Frozen,
         Fire,
@@ -74,5 +75,9 @@ public abstract class IAnimatorState
     public AnimatorStateInfo GetAnimStateInfo()
     {
         return currentState;
+    }
+    public float GetSurvivalTime()
+    {
+        return _survivalTime;
     }
 }

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Gansol;
 
-public class AttrFactory : FactoryBase
+public class AttrFactory : IFactory
 {
     /*
     /// <summary>
@@ -32,6 +32,7 @@ public class AttrFactory : FactoryBase
         Global.miceProperty.TryGet<Dictionary<string, object>>(itemID, out data);
 
         // Get Type String因為 Dictionary > JSON 只剩下String型態了
+        attr.id = (string)data.Get<string>("MiceID");
         attr.name = (string)data.Get<string>("ItemName");
         attr.EatingRate = Convert.ToSingle(data.Get<string>("EatingRate"));
         attr.MiceSpeed = Convert.ToSingle(data.Get<string>("MiceSpeed"));

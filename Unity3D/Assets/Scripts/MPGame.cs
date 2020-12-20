@@ -13,6 +13,7 @@ public class MPGame
     private AudioSystem m_AudioSystem = null;
     private  PoolSystem m_PoolSystem = null;
     private BattleSystem m_BattleSystem = null;
+    private MissionSystem m_MissionSystem = null;
     // UserInterface
 
 
@@ -53,10 +54,13 @@ public class MPGame
         m_CreatureSystem = new CreatureSystem(this);
         m_MessageManager = new MessageManager(this);
         m_AudioSystem = new AudioSystem(this);
+        m_MissionSystem = new MissionSystem(this);
         m_AssetLoader = gameLoop.GetComponent<AssetLoader>();
 
         // Init GameUI
         m_MenuUI = new MenuUI(this);
+        m_LoginUI = new LoginUI(this);
+        m_BattleUI = new BattleUI(this);
 
         Debug.Log("MPGame Initinal.");
     }
@@ -90,9 +94,13 @@ public class MPGame
             m_TutorialUI.Update();
         if (_bLoadBattlelPanel)
         {
-            m_BattleUI.Update();
+          //  m_BattleUI.Update();
             m_BattleSystem.Update();
+            m_MissionSystem.Update();
+            m_PoolSystem.Update();
         }
+        if(Global.isGameStart)
+            m_BattleUI.Update();
     }
     public void FixedUpdate()
     {
@@ -166,18 +174,19 @@ public class MPGame
         switch (panelName.name)
         {
             case "menuui":
-                m_MenuUI = new MenuUI(this);
-                m_LoginUI = new LoginUI(this);
+                Debug.Log("Init Scene MenuUI");
                 m_AudioSystem.Initinal();
                 m_MenuUI.Initinal();
                 m_LoginUI.Initinal();
                 break;
+
             case "gameui":
-                if (!_bLoadBattlelPanel)
-                    m_BattleUI = new BattleUI(this);
+                Debug.Log("Init Scene GameUI");
                 m_BattleSystem = new BattleSystem(this);
+                m_PoolSystem = new PoolSystem(this);
                 m_BattleUI.Initinal();
                 m_BattleSystem.Initinal();
+                m_PoolSystem.Initinal();
                 _bLoadBattlelPanel = true;
                 break;
         }
@@ -264,12 +273,27 @@ public class MPGame
             m_BattleSystem = new BattleSystem(this);
         return m_BattleSystem;
     }
-    public PoolSystem GePoolSystem()
+    public MissionSystem GetMissionSystem()
+    {
+        if (m_MissionSystem == null)
+            m_MissionSystem = new MissionSystem(this);
+        return m_MissionSystem;
+    }
+
+    public PoolSystem GetPoolSystem()
     {
         if (m_PoolSystem == null)
             m_PoolSystem = new PoolSystem(this);
         return m_PoolSystem;
     }
+
+    public CreatureSystem GetCreatureSystem()
+    {
+        if (m_CreatureSystem == null)
+            m_CreatureSystem = new CreatureSystem(this);
+        return m_CreatureSystem;
+    }
+
 
     public BattleUI GetBattleUI()
     {

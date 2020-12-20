@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class HeroMice : MiceBase
+public class HeroMice : IMice
 {
 
     private BattleSystem battleManager;
@@ -40,7 +40,7 @@ public class HeroMice : MiceBase
             gameObject.SetActive(false);
         }
 
-        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Die && !bDead)
+        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Died && !bDead)
         {
             bDead = true;
             GetComponent<BoxCollider2D>().enabled = false;
@@ -54,8 +54,8 @@ public class HeroMice : MiceBase
                     pos.Add(0, transform.position);
                     if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key))
                     {
-                        if (item.Value.GetComponent<MiceBase>()!=null)
-                            item.Value.GetComponent<MiceBase>().OnEffect("HeroMice", pos);
+                        if (item.Value.GetComponent<IMice>()!=null)
+                            item.Value.GetComponent<IMice>().OnEffect("HeroMice", pos);
                     }
                 }
             }
@@ -68,7 +68,7 @@ public class HeroMice : MiceBase
         if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && GetComponent<BoxCollider2D>().enabled)
         {
             GetComponent<BoxCollider2D>().enabled = false;
-            hitSound.Play();
+            MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             //OnInjured(1, true);
             m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Eat);
         }

@@ -2,18 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Mice : MiceBase
+public class Mice : IMice
 {
-    private BattleSystem battleManager;
     MPGame m_MPGame;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
 
 
-    public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
 
-     //   if (hitSound==null) hitSound = battleManager.GetComponent<UIPlaySound>();
+        //   if (hitSound==null) hitSound = battleManager.GetComponent<UIPlaySound>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
@@ -29,15 +27,21 @@ public class Mice : MiceBase
     }
 
 
-    public void Update()
+    public override void  Update()
     {
         if (Global.isGameStart)
         {
+            base.Update();
             m_AnimState.UpdateAnimation();
         }
         else
         {
             gameObject.SetActive(false);
+        }
+
+        if(m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Died)
+        {
+            OnDead(m_AnimState.GetSurvivalTime());
         }
     }
 
@@ -47,15 +51,16 @@ public class Mice : MiceBase
     /// </summary>
     protected override void OnHit()
     {
-      //  gameObject.layer = cam.eventReceiverMask;
+        //  gameObject.layer = cam.eventReceiverMask;
         if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
         {
-            hitSound.Play();
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
-            Global.dictBattleMiceRefs.Remove(transform.parent);
+            m_AI.SetAIState(new DiedAIState());
+
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+            m_AI.SetAIState(new DiedAIState());
             m_MPGame.GeAudioSystem().PlaySound("Hit");
 
         }
@@ -75,11 +80,13 @@ public class Mice : MiceBase
         if (Global.isGameStart)
         {
             if (m_Arribute.GetHP() == 0)
-                battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
+                m_AI.SetAIState(new DiedAIState());
+                //ENUM_AIState = ENUM_CreatureState.Die;
+
+         //   battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
             else
                 battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
             Global.dictBattleMiceRefs.Remove(transform.parent);
-            Global.MiceCount--;
 
             gameObject.SetActive(false);
             this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
@@ -102,8 +109,8 @@ public class Mice : MiceBase
             m_AnimState.SetMotion(true);
             state.SetToPos(pos[0]);
             state.SetToScale(new Vector3(0.25f, 0.25f));
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
-        } 
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+        }
         // play("Shadow"
     }
 }

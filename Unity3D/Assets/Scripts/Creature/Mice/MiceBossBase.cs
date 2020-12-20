@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class MiceBossBase : Creature
+public abstract class MiceBossBase : ICreature
 {
     public static UICamera cam;
     public static BattleUI battleUI = null;
@@ -23,11 +23,12 @@ public abstract class MiceBossBase : Creature
 
     }
 
-    protected virtual void Update()
+    public override void Update()
     {
         // 遊戲開始時
         if (Global.isGameStart)
         {
+            m_AI.UpdateAIState();
             battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), false);    // 顯示血調
             m_AnimState.UpdateAnimation();
             if (Time.time < m_StartTime + m_Skill.GetSkillTime())
@@ -84,7 +85,7 @@ public abstract class MiceBossBase : Creature
         }
         else
         {
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
             if (Global.OpponentData.RoomPlace != "Host")
             {
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
@@ -128,12 +129,12 @@ public abstract class MiceBossBase : Creature
         this.m_Skill = skill;
     }
 
-    public override void SetState(AIState state)
-    {
-        if (this.m_AIState != null)
-            this.m_AIState = null;
-        this.m_AIState = state;
-    }
+    //public override void SetState(IAIState state)
+    //{
+    //    if (this.m_AIState != null)
+    //        this.m_AIState = null;
+    //    this.m_AIState = state;
+    //}
 
     public override void SetArribute(CreatureAttr arribute)
     {
@@ -147,5 +148,15 @@ public abstract class MiceBossBase : Creature
         if (this.m_AnimState != null)
             this.m_AnimState = null;
         this.m_AnimState = state;
+    }
+
+    public override  void SetAI(ICreatureAI ai)
+    {
+        m_AI = ai;
+    }
+
+    public override void SetGameObject(GameObject go)
+    {
+        m_go = go;
     }
 }

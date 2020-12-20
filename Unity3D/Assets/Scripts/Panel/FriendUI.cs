@@ -45,7 +45,7 @@ public class FriendUI : IMPPanelUI
 
     public override void Initinal()
     {
-        Debug.Log("Frined Init!");
+        Debug.Log("FrinedUI Init!");
         _bFirstLoad = true;
         _bLoadedPanel = false;
         itemPos = new Vector2(0, 0);

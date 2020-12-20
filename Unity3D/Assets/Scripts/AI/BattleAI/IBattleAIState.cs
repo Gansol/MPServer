@@ -28,8 +28,8 @@ public abstract class IBattleAIState
 {
     protected BattleAttr battleAttr;
     protected BattleAIStateAttr stateAttr;
-    public GameObject m_RootUI = null;
-    public Coroutine coroutine;
+    protected GameObject m_RootUI = null;
+    private Coroutine coroutine;
 
     public IBattleAIState(BattleAttr battleAttr)
     {
@@ -41,7 +41,7 @@ public abstract class IBattleAIState
 
     public abstract void UpdateState();
 
-    public SpawnStatus GetSpawnStatus()
+    public virtual SpawnStatus GetSpawnStatus()
     {
         return stateAttr.spawnStatus;
     }
@@ -115,11 +115,11 @@ public abstract class IBattleAIState
         stateAttr.totalSpawn += attr.spawnCount;
         SpawnNaturalMice(stateAttr.totalSpawn);
 
-
+        
         return coroutine;
     }
 
-    public void SetValue(float lerpTime, float spawnTime, float intervalTime, int spawnCount)
+    public virtual void SetValue(float lerpTime, float spawnTime, float intervalTime, int spawnCount)
     {
         if (lerpTime > 0) stateAttr.lerpTime = lerpTime;
         if (spawnTime > 0) stateAttr.spawnTime = spawnTime;
@@ -214,37 +214,37 @@ public abstract class IBattleAIState
         return stateAttr.spawnState;
     }
 
-    public float GetLerpTime()
+    public virtual float GetLerpTime()
     {
         return stateAttr.lerpTime;
     }
 
-    public float GetSpawnTime()
+    public virtual float GetSpawnTime()
     {
         return stateAttr.spawnTime;
     }
 
-    public float GetIntervalTime()
+    public virtual float GetIntervalTime()
     {
         return stateAttr.intervalTime;
     }
 
-    public int GetSpawnCount()
+    public virtual int GetSpawnCount()
     {
         return stateAttr.spawnCount;
     }
 
-    public float GetSpawnOffset()
+    public virtual float GetSpawnOffset()
     {
         return stateAttr.spawnOffset;
     }
 
-    public void SetSpeed(float speed)
+    public virtual void SetSpeed(float speed)
     {
         stateAttr.spawnSpeed = speed;
     }
 
-    public ENUM_BattleAIState GetState()
+    public virtual ENUM_BattleAIState GetState()
     {
         return stateAttr.battleAIState;
     }

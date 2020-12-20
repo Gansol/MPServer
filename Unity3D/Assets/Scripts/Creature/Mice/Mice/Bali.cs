@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Bali : MiceBase
+public class Bali : IMice
 {
     private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
@@ -10,7 +10,7 @@ public class Bali : MiceBase
 
     public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
-     //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
+        //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
@@ -48,11 +48,11 @@ public class Bali : MiceBase
     {
         if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
         {
-            hitSound.Play();
+            MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Die);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
         }
         else
         {

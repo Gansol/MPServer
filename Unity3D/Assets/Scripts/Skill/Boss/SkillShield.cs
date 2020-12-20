@@ -13,7 +13,7 @@ public class SkillShield : SkillBoss
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute, AIState state)
+    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
     {
         arribute.SetShield(skillData.Attr);
     }
