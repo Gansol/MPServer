@@ -33,7 +33,7 @@ public class StoreUI : IMPPanelUI
 {
     #region 欄位
     private AttachBtn_StoreUI UI;
- //assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
+    //assetFolder;// 1 miceicon 2 itemicon 3 itemicon 9 gashapon
 
     /// <summary>
     /// 偏移量
@@ -68,7 +68,7 @@ public class StoreUI : IMPPanelUI
 
     public StoreUI(MPGame MPGame) : base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().storePanel;
+        Debug.Log("--------------- StoreUI Created ----------------");
         _bFirstLoad = true;
         dictItemRefs = new Dictionary<string, GameObject>();
         buyingGoodsData = new Dictionary<string, string> {
@@ -88,8 +88,9 @@ public class StoreUI : IMPPanelUI
     }
 
 
-    public override void Initinal()
+    public override void Initialize()
     {
+        Debug.Log("--------------- StoreUI Initialize ----------------");
         _itemType = (int)StoreType.Mice;
         tablePageCount = 9;
         tableRowCount = 3;
@@ -110,8 +111,8 @@ public class StoreUI : IMPPanelUI
     {
         base.Update();
 
-        if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-            Debug.Log("訊息：" + assetLoader.ReturnMessage);
+        if (!string.IsNullOrEmpty(m_AssetLoaderSystem.ReturnMessage))
+            Debug.Log("訊息：" + m_AssetLoaderSystem.ReturnMessage);
 
 
         //// ins fisrt load panelScene : Gashapon
@@ -135,7 +136,7 @@ public class StoreUI : IMPPanelUI
         }
 
         // 載入道具完成後 實體化 道具
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset)
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset)
         {
             _bLoadedAsset = !_bLoadedAsset;
             InstantiateStoreItem();
@@ -147,10 +148,11 @@ public class StoreUI : IMPPanelUI
         }
 
         // 載入角色完成後 實體化 角色
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedActor)
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
-            _bLoadedActor = InstantiateActor(_lastItemBtn.GetComponentInChildren<UISprite>().name, UI.miceInfo_msgBox.transform.GetChild(0).Find("Image"), actorScale);
+            string actorName = _lastItemBtn.GetComponentInChildren<UISprite>().name;
+            InstantiateActor(actorName, UI.miceInfo_msgBox.transform.GetChild(0).Find("Image"), actorScale);
         }
     }
 
@@ -252,7 +254,7 @@ public class StoreUI : IMPPanelUI
             //   LoadGashaponAsset(assetFolder[0]);
             GetMustLoadAsset();
             LoadPlayerInfo();
-            EventMaskSwitch.lastPanel = m_RootUI.gameObject ;
+            EventMaskSwitch.lastPanel = m_RootUI.gameObject;
         }
         Global.isStoreLoaded = false;
     }
@@ -263,25 +265,25 @@ public class StoreUI : IMPPanelUI
     {
         Debug.Log("Rice: " + Global.Rice.ToString());
         Debug.Log("Gold: " + Global.Gold.ToString());
-       UI.level.text = Global.Rank.ToString();
-       UI.rice.text = Global.Rice.ToString();
-       UI.gold.text = Global.Gold.ToString();
+        UI.level.text = Global.Rank.ToString();
+        UI.rice.text = Global.Rice.ToString();
+        UI.gold.text = Global.Gold.ToString();
     }
     #endregion
 
     #region -- OnClick 按下事件 --
-    public void OnGashaponClick(GameObject obj)
+    public void OnGashaponClick(GameObject go)
     {
-        Debug.Log(obj.name);
+        Debug.Log(go.name);
     }
 
     /// <summary>
     /// 商品按鈕事件(顯示商品資訊)
     /// </summary>
-    /// <param name="obj">商品按鈕</param>
-    public void OnItemClick(GameObject obj)
+    /// <param name="go">商品按鈕</param>
+    public void OnItemClick(GameObject go)
     {
-        _lastItemBtn = obj;
+        _lastItemBtn = go;
 
         Dictionary<string, object> dictItemProperty = Global.storeItem[_lastItemBtn.name] as Dictionary<string, object>;
         Dictionary<string, object> playerItemData = new Dictionary<string, object>();
@@ -293,8 +295,8 @@ public class StoreUI : IMPPanelUI
         //GetStoreItemDataAndFolderPath(_itemType);
 
         // 因為子物件不能有不同的Layer強制改變
-     
-        
+
+
 
         // 載入選擇的資料
         switch (_itemType)
@@ -302,17 +304,17 @@ public class StoreUI : IMPPanelUI
             default:
             case (int)StoreType.Mice:
                 UI.miceInfo_msgBox.SetActive(true);
-               // UI.miceInfo_msgBox.layer = UI.miceInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+                // UI.miceInfo_msgBox.layer = UI.miceInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
                 _itemData = Global.miceProperty;
-                LoadMicePorperty(obj, UI.miceInfo_msgBox.transform, playerItemData, dictItemProperty);
+                LoadMicePorperty(go, UI.miceInfo_msgBox.transform, playerItemData, dictItemProperty);
                 EventMaskSwitch.Switch(UI.miceInfo_msgBox.gameObject);
                 break;
             case (int)StoreType.Item:
             case (int)StoreType.Armor:
                 UI.itemInfo_msgBox.SetActive(true);
-              // UI.itemInfo_msgBox.layer = UI.itemInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
+                // UI.itemInfo_msgBox.layer = UI.itemInfo_msgBox.transform.parent.gameObject.layer = LayerMask.NameToLayer("ItemInfo");
                 _itemData = Global.itemProperty;
-                LoadItemPorperty(obj, UI.itemInfo_msgBox.transform, playerItemData, dictItemProperty);
+                LoadItemPorperty(go, UI.itemInfo_msgBox.transform, playerItemData, dictItemProperty);
                 EventMaskSwitch.Switch(UI.itemInfo_msgBox.gameObject);
                 break;
         }
@@ -391,7 +393,7 @@ public class StoreUI : IMPPanelUI
     /// <param name="myPanel"></param>
     public void OnBuyClick(GameObject myPanel)
     {
-        Debug.Log("ItemType: " +_itemType);
+        Debug.Log("ItemType: " + _itemType);
         // 關閉 商品詳情視窗 並顯示 購買數量視窗
 
 
@@ -444,14 +446,14 @@ public class StoreUI : IMPPanelUI
     /// <summary>
     /// 改變道具數量時 計算總價格 數量
     /// </summary>
-    /// <param name="obj"></param>
-    public void OnQuantity(GameObject obj)
+    /// <param name="go"></param>
+    public void OnQuantity(GameObject go)
     {
         int price = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Price").GetComponent<UILabel>().text);
         int sum = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Sum").GetComponent<UILabel>().text);
         int count = int.Parse(UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text);
 
-        count += (obj.name == "Add") ? 1 : -1;
+        count += (go.name == "Add") ? 1 : -1;
         count = (count < 0) ? 0 : count;
         buyingGoodsData[StoreProperty.BuyCount.ToString()] = UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text = count.ToString();
         UI.checkout_msgBox.transform.GetChild(0).Find("Sum").GetComponent<UILabel>().text = (price * count).ToString();
@@ -461,28 +463,28 @@ public class StoreUI : IMPPanelUI
     /// 確認購買
     /// </summary>
     /// <param name="myPanel"></param>
-    public void OnComfirm(GameObject obj)
+    public void OnComfirm(GameObject go)
     {
         UI.checkout_msgBox.SetActive(false);
         Global.photonService.BuyItem(Global.Account, buyingGoodsData);
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
-        //GameObject root = obj.transform.parent.gameObject;
+        //GameObject root = go.transform.parent.gameObject;
         ShowPanel(m_RootUI.name);
-       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
         EventMaskSwitch.Resume();
     }
 
     /// <summary>
     /// 返回事件遮罩
     /// </summary>
-    /// <param name="obj"></param>
-    public void OnReturn(GameObject obj)
+    /// <param name="go"></param>
+    public void OnReturn(GameObject go)
     {
-        int level = int.Parse(obj.name); // 會回遮罩層級 1=上一層 2=上兩層
+        int level = int.Parse(go.name); // 會回遮罩層級 1=上一層 2=上兩層
         EventMaskSwitch.openedPanel.SetActive(false);
         EventMaskSwitch.Prev(level);
     }
@@ -490,13 +492,13 @@ public class StoreUI : IMPPanelUI
     /// <summary>
     /// 點選商品分頁時 載入商品
     /// </summary>
-    /// <param name="obj"></param>
-    public void OnTabClick(GameObject obj)
+    /// <param name="go"></param>
+    public void OnTabClick(GameObject go)
     {
-        _itemType = (obj == null) ? (int)StoreType.Mice : int.Parse(obj.name.Remove(0, 3));
-        Debug.Log("obj.name " + obj.name);
+        _itemType = (go == null) ? (int)StoreType.Mice : int.Parse(go.name.Remove(0, 3));
+        Debug.Log("go.name " + go.name);
         Debug.Log("_itemType " + _itemType);
-        Debug.Log("infoGroupsArea[(int)ENUM_Area.ItemPanel] " +UI.itemPanel.name);
+        Debug.Log("infoGroupsArea[(int)ENUM_Area.ItemPanel] " + UI.itemPanel.name);
 
 
         GetMustLoadAsset();
@@ -518,9 +520,9 @@ public class StoreUI : IMPPanelUI
         itemDetailData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(_itemData, _itemType);
 
         // 載入資產
-        if (!assetLoader.GetAsset(_folderString))
+        if (!m_AssetLoaderSystem.GetAsset(_folderString))
         {
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.StoreItemAssetName + Global.ext);  // 道具Slot
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.StoreItemAssetName + Global.ext);  // 道具Slot
             _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
         }
         else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
@@ -599,9 +601,9 @@ public class StoreUI : IMPPanelUI
             string bundleName = Global.IconSuffix + itemName.ToString();
 
             // 已載入資產時
-            if (assetLoader.GetAsset(bundleName) != null)
+            if (m_AssetLoaderSystem.GetAsset(bundleName) != null)
             {
-                GameObject bundle = assetLoader.GetAsset(bundleName);
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
                 Transform imageParent = myParent.GetChild(i).GetChild(0);
 
                 // 如果沒有ICON 實體化
@@ -629,7 +631,7 @@ public class StoreUI : IMPPanelUI
         switch ((StoreType)_itemType)
         {
             case StoreType.Mice:
-           //     _itemData = Global.storeItem;
+                //     _itemData = Global.storeItem;
                 _folderString = Global.MiceIconUniquePath;
                 break;
             case StoreType.Item:
@@ -638,7 +640,7 @@ public class StoreUI : IMPPanelUI
                 _folderString = Global.ItemIconUniquePath;
                 break;
             case StoreType.Gashapon:
-             //   _itemData = Global.storeItem;
+                //   _itemData = Global.storeItem;
                 _folderString = Global.GashaponUniquePath;
                 break;
         }
@@ -661,7 +663,7 @@ public class StoreUI : IMPPanelUI
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
 
         for (int i = 1; i <= 3; i++)
-            assetLoader.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
         //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
         _bLoadedGashapon = true; // 來用暫時停掉方便測試  並需要配合修改起始TAB頁面 
     }
@@ -702,9 +704,9 @@ public class StoreUI : IMPPanelUI
 
         foreach (KeyValuePair<string, object> gashapon in dictGashaponData)
         {
-            if (assetLoader.GetAsset(gashaponNameList[i]) != null)                  // 已載入資產時
+            if (m_AssetLoaderSystem.GetAsset(gashaponNameList[i]) != null)                  // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(gashaponNameList[i]);
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(gashaponNameList[i]);
                 Transform parent = myParent.Find("Promotions").GetChild(i);
 
                 Debug.Log("parent name: " + parent.name);
@@ -791,7 +793,11 @@ public class StoreUI : IMPPanelUI
         // show animation
         // skip
     }
-
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().storePanel;
+        base.ShowPanel(panelName);
+    }
     //#region -- LoadItemData 載入道具資訊 --
     //private void LoadItemData(Dictionary<string, object> itemData, Transform parent, int itemType)
     //{

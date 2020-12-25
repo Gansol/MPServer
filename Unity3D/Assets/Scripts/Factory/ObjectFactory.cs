@@ -85,7 +85,7 @@ public class ObjectFactory : IFactory
     /// <param name="sacle">縮放</param>
     /// <param name="depth">深度</param>
     /// <returns></returns>-
-    public GameObject InstantiateActor(GameObject bundle, Transform parent, string name, Vector3 sacle, int depth)
+    public GameObject InstantiateActor(GameObject bundle, Transform parent, string name, Vector3 sacle, int depth=500)      // 老鼠Depth是手動輸入的!! 錯誤
     {
         _clone = Instantiate(bundle, parent, name, Vector3.zero, sacle, Vector2.zero, -1);
         _clone.SetActive(false);
@@ -244,16 +244,13 @@ public class ObjectFactory : IFactory
     /// <returns></returns>
     public object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string objectID)
     {
-        object value;
-
-        if (dictionary.TryGetValue(objectID, out value))
+        if (dictionary.TryGetValue(objectID, out object value))
         {
             Dictionary<string, object> dictSkill = value as Dictionary<string, object>;
             if (dictSkill.TryGetValue(columns, out value))
                 return value;
         }
-
-        return -1;
+        return -1;    //回傳 NULL會導致錯誤
     }
 
     #region -- GetItemInfoFromType 取得特定(類別)道具詳細資料  --

@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class SyncLoad : MonoBehaviour
 {
-    AssetLoader assetLoader;
+    AssetLoaderSystem assetLoader;
     private bool _bLoadSceneAsset;
     private GameObject _scene;
     MPGame m_MPGame;
@@ -18,7 +18,7 @@ public class SyncLoad : MonoBehaviour
 
     void Start()
     {
-        assetLoader = MPGame.Instance.GetAssetLoader();
+        assetLoader = MPGame.Instance.GetAssetLoaderSystem();
         LoadAssetCheck();
     }
 
@@ -116,7 +116,6 @@ public class SyncLoad : MonoBehaviour
             _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
             _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
         }
-        MPGame.Instance.LoadedScene(SceneManager.GetActiveScene().name);
         MPGame.Instance.InitScene(_scene);
         // 儲存目前場景
         Global.prevScene = SceneManager.GetActiveScene().name;

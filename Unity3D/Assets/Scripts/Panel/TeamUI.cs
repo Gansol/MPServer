@@ -52,18 +52,19 @@ public class TeamUI : IMPPanelUI
 
     public TeamUI(MPGame MPGame) : base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().teamPanel;
+        Debug.Log("--------------- TeamUI Created ----------------");
         SwitchBtnMethod = new SwitchBtnComponent();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         _dictTeamData = new Dictionary<string, object>();
-        _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
+        _bFirstLoad = true; 
                             //_page = 0;
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
+        Debug.Log("--------------- TeamUI Initialize ----------------");
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _bLoadedPanel = false;
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
@@ -76,15 +77,15 @@ public class TeamUI : IMPPanelUI
         base.Update();
         // 除錯訊息
         if (_bLoadedActor || _bLoadedAsset)
-            if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-                Debug.Log("訊息：" + assetLoader.ReturnMessage);
+            if (!string.IsNullOrEmpty(m_AssetLoaderSystem.ReturnMessage))
+                Debug.Log("訊息：" + m_AssetLoaderSystem.ReturnMessage);
 
         // 資料庫資料載入完成時 載入Panel
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
             GetMustLoadAsset();
 
         // 載入資產完成後 實體化 物件
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
             _bLoadedAsset = !_bLoadedAsset;
             _bLoadedEffect = !_bLoadedEffect;
@@ -109,12 +110,12 @@ public class TeamUI : IMPPanelUI
         }
 
         // 按下圖示按鈕後 載入角色完成時 實體化角色
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedActor)
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedActor)
         {
             _bLoadedActor = !_bLoadedActor;
 
-            string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace(Global.IconSuffix, "");
-            InstantiateActor(bundleName, UI.miceImage.transform, actorScale);
+            string actorName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace(Global.IconSuffix, "");
+            InstantiateActor(actorName, UI.miceImage.transform, actorScale);
         }
     }
 
@@ -216,9 +217,9 @@ public class TeamUI : IMPPanelUI
         {
             string bundleName = Global.IconSuffix + item.Value.ToString();
 
-            if (assetLoader.GetAsset(bundleName) != null)                                   // 已載入資產時
+            if (m_AssetLoaderSystem.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(bundleName);
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
 
                 if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
@@ -261,7 +262,7 @@ public class TeamUI : IMPPanelUI
     {
         int skillID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "SkillID", objectID.ToString()));
         string bundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.dictSkills, "SkillName", objectID.ToString()).ToString();
-        GameObject bundle = assetLoader.GetAsset(bundleName);
+        GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
 
         if (bundle != null)                  // 已載入資產時
         {
@@ -370,11 +371,11 @@ public class TeamUI : IMPPanelUI
         }
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
         ShowPanel(m_RootUI.name);
-        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
         // EventMaskSwitch.Prev();
     }
 
@@ -397,6 +398,11 @@ public class TeamUI : IMPPanelUI
             UI.cost.text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
         else
             UI.cost.text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+    }
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().teamPanel;
+        base.ShowPanel(panelName);
     }
 
     void OnDisable()

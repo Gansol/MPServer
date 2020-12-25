@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DontTouchMeSkill : SkillBoss
 {
+    ICreature creature;
     bool _bClick;
     int _spawnCount;
     sbyte[] data;
@@ -20,11 +21,12 @@ public class DontTouchMeSkill : SkillBoss
 
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        this.obj = obj;
+        this.creature = creature;
+        go = creature.m_go;
         _spawnCount = skillData.Attr + Random.Range(0, skillData.AttrDice + 1);
-    MPGFactory.GetCreatureFactory().SpawnBy1D(System.Convert.ToInt16(obj.name), data, 0.1f, 0.1f, 0.1f, _spawnCount, Random.Range(0, data.Length), false, false); // 可能錯誤
+    MPGFactory.GetCreatureFactory().SpawnBy1D(System.Convert.ToInt16(go.name), data, 0.1f, 0.1f, 0.1f, _spawnCount, Random.Range(0, data.Length), false, false); // 可能錯誤
         m_LastTime = Time.time;
     }
 
@@ -32,7 +34,7 @@ public class DontTouchMeSkill : SkillBoss
     {
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
-            Display(obj, null);
+            Display(creature/*, null*/);
         }
         if ((Time.time - m_StartTime) > skillData.SkillTime)
             Release();

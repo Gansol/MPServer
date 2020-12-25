@@ -11,7 +11,7 @@ public class SugarAntsSkill : SkillBoss
         skillFlag = true;
     }
 
-    CreatureAttr arribute = null;
+    ICreatureAttr arribute = null;
 
     public override void Initialize()
     {
@@ -25,7 +25,7 @@ public class SugarAntsSkill : SkillBoss
         {
             if (arribute.GetHP() < arribute.GetHP() / 3 && skillFlag)
             {
-                obj.GetComponent<Animator>().Play("Effect1");
+                go.GetComponent<Animator>().Play("Effect1");
                 arribute.SetHP(arribute.GetHP() + skillData.Attr + Random.Range(0, skillData.AttrDice + 1));
                 skillFlag = false;
             }
@@ -36,10 +36,10 @@ public class SugarAntsSkill : SkillBoss
     }
 
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         Debug.Log("SugerAnts Display!");
-        this.obj = obj;
+        this.go = go;
         this.arribute = arribute;
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Low);
 

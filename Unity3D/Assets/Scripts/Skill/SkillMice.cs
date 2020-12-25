@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class SkillMice : SkillBase
+public abstract class SkillMice : ISkill
 {
     public SkillMice(SkillAttr skill)
         : base(skill)
@@ -23,8 +23,8 @@ public abstract class SkillMice : SkillBase
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
-    {
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
+    { 
         throw new System.NotImplementedException();
     }
 

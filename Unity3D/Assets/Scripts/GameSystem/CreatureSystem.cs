@@ -2,18 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 //預備改寫 遊戲系統
-public class CreatureSystem : GameSystem
+public class CreatureSystem : IGameSystem
 {
+    public delegate void OnEffectHandler(string name, object value);
+    public event OnEffectHandler OnEffect;
 
     Dictionary<string, Dictionary<string, ICreature>> dictBattleMice;
+    private Dictionary<Transform, ICreature> dictHoleMiceRefs;  // Hole老鼠索引
     Dictionary<string, ICreature> dictWaitingRemoveMice;
 
-    public CreatureSystem(MPGame MPGame) : base(MPGame) { }
-
-
-    public override void Initinal()
+    public CreatureSystem(MPGame MPGame) : base(MPGame)
     {
+        Debug.Log("--------------- CreatureSystem Created ----------------");
+        Initialize();
+    }
+
+
+    public override void Initialize()
+    {
+        Debug.Log("--------------- CreatureSystem Initialize ----------------");
         dictBattleMice = new Dictionary<string, Dictionary<string, ICreature>>();
+        dictHoleMiceRefs = new Dictionary<Transform, ICreature>();
         dictWaitingRemoveMice = new Dictionary<string, ICreature>();
     }
 
@@ -65,6 +74,7 @@ public class CreatureSystem : GameSystem
                 {
                     m_MPGame.GetBattleSystem().LostScore(short.Parse(miceClass.Key), mice.GetSurvivalTime());
                     dictWaitingRemoveMice.Add(creature.Key, creature.Value);
+                    m_MPGame.GetBattleSystem().BreakCombo();
                 }
             }
         }
@@ -82,13 +92,70 @@ public class CreatureSystem : GameSystem
         }
     }
 
-    public void AddMice(string miceID, string hashID, ICreature mice)
+    public void AddMiceRefs(Transform hole, string miceID, string hashID, ICreature mice)
     {
         if (!dictBattleMice.ContainsKey(miceID))
             dictBattleMice.Add(miceID, new Dictionary<string, ICreature>());
-
         dictBattleMice[miceID].Add(hashID, mice);
+
+        if (!dictHoleMiceRefs.ContainsKey(hole))
+            dictHoleMiceRefs.Add(hole, mice);
     }
+    /// <summary>
+    /// 移除老鼠索引
+    /// </summary>
+    /// <param name="hole"></param>
+    /// <param name="mice"></param>
+    /// <returns></returns>
+    public void RemoveHoleMiceRefs(Transform hole)
+    {
+        dictHoleMiceRefs.Remove(hole);
+    }
+
+    /// <summary>
+    /// 取得 老鼠 是否正在洞裡的
+    /// </summary>
+    /// <param name="hole"></param>
+    /// <returns></returns>
+    public bool GetbActiveHoleMice(Transform hole)
+    {
+        return dictHoleMiceRefs.ContainsKey(hole); ;
+    }
+
+    /// <summary>
+    /// 取得正在洞裡的老鼠
+    /// </summary>
+    /// <param name="hole"></param>
+    /// <returns></returns>
+    public ICreature GetActiveHoleMice(Transform hole)
+    {
+        if (GetbActiveHoleMice(hole))
+            return dictHoleMiceRefs[hole];
+        return null;
+    }
+
+
+    /// <summary>
+    /// 取得老鼠索引
+    /// </summary>
+    /// <param name="hole"></param>
+    /// <param name="mice"></param>
+    /// <returns>ICreature</returns>
+    public ICreature GetHoleMiceRefs(Transform hole)
+    {
+        dictHoleMiceRefs.TryGetValue(hole, out ICreature value);
+        return value;
+    }
+    ///// <summary>
+    ///// 存入老鼠索引
+    ///// </summary>
+    ///// <param name="hole"></param>
+    ///// <param name="mice"></param>
+    ///// <returns></returns>
+    //public void AddHoleMiceRefs(Transform hole, ICreature mice)
+    //{
+    //    dictHoleMiceRefs.Add(hole, mice);
+    //}
 
     public void RemoveMice(string miceID, string hashID)
     {
@@ -104,5 +171,38 @@ public class CreatureSystem : GameSystem
     {
         dictBattleMice[miceID].TryGetValue(hashID, out ICreature value);
         return value;
+    }
+
+    public ICreature GetMice(Transform hole)
+    {
+        dictHoleMiceRefs.TryGetValue(hole, out ICreature value);
+        return value;
+    }
+
+    public Dictionary<string, Dictionary<string, ICreature>> GetCreatures()
+    {
+        return dictBattleMice;
+    }
+
+    public bool HasMice(ICreature mice)
+    {
+        return dictBattleMice[mice.m_go.name].ContainsValue(mice);
+    }
+
+    public void SetEffect(string name, object vaule)
+    {
+        OnEffect(name, vaule);
+    }
+
+    public void SetEffect(string skillName, object vaule,Transform hole)
+    {
+       foreach(KeyValuePair<string,Dictionary<string,ICreature>> miceClass in dictBattleMice)
+        {
+            foreach (KeyValuePair<string, ICreature> mice in miceClass.Value)
+            {
+                if (mice.Value.m_go.transform.parent == hole)
+                    mice.Value.m_go.SendMessage("OnEffect", skillName);
+            }
+        }
     }
 }

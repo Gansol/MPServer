@@ -55,16 +55,16 @@ public static class EventMaskSwitch
     /// <summary>
     /// 改變UICamera事件觸發遮罩
     /// </summary>
-    /// <param name="obj">指定物件圖層</param>
+    /// <param name="go">指定物件圖層</param>
     /// /// <param name="nextPanel">是否開啟下一個階層</param>
-    public static void Switch(GameObject obj)
+    public static void Switch(GameObject go)
     {
         foreach (Camera c in Camera.allCameras)
         {
             prevLayerMask.Add(c.GetComponent<UICamera>().eventReceiverMask);
-            c.GetComponent<UICamera>().eventReceiverMask = 1 << obj.layer;
+            c.GetComponent<UICamera>().eventReceiverMask = 1 << go.layer;
         }
-        _openedPanel = obj;
+        _openedPanel = go;
     }
     #endregion
 

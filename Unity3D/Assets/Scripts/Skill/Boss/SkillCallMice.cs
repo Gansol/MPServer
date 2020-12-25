@@ -6,9 +6,9 @@ using System.Linq;
 public class SkillCallMice : SkillBoss
 {
    // SpawnAI spawnAI = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>().GetSpawnAI();
-   private readonly Dictionary<Transform, GameObject> dictMice;
-    private  Dictionary<Transform, GameObject>  buffer;
-
+   //private readonly Dictionary<Transform, IMice> dictMice;
+   // private  Dictionary<Transform, IMice>  buffer;
+    private IMice mice; 
 
     private int _spawnCount;
     sbyte[] data;
@@ -17,64 +17,65 @@ public class SkillCallMice : SkillBoss
         : base(skill)
     {
         data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
-        dictMice = new Dictionary<Transform, GameObject>();
+       // dictMice = new Dictionary<Transform, IMice>();
     }
 
     public override void Initialize()
     {
         m_StartTime = m_LastTime = Time.time;
-        dictMice.Clear();
+       // dictMice.Clear();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
         Debug.Log("Call Mice Display");
+
         int spawnCount = skillData.Attr + Random.Range(0, skillData.AttrDice + 1);
-        int[] rndHole = new int[spawnCount];
-        System.Random rnd = new System.Random();
+    //    int[] rndHole = new int[spawnCount];
+        //List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetHole();
+   //     System.Random rnd = new System.Random();
+
+      //  mice = (IMice) creature;
+        data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.LineL) as sbyte[];
         
-        for (int i = 0; i < spawnCount;i++ )
-            rndHole[i] = rnd.Next(data.Min(), data.Max());
+
+     
+        
+        //for (int i = 0; i < spawnCount;i++ )
+        //    rndHole[i] = rnd.Next(data.Min(), data.Max());
 
         m_LastTime = Time.time;
 
-        dictMice.Clear();
-        this.obj = obj;
+    //    dictMice.Clear();
+        //go = mice.m_go;
 
-        List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetHole();
-        for (int i = 0; i < spawnCount; i++)
-        {
-            dictMice.Add(hole[i].transform,  MPGFactory.GetObjFactory().InstantiateMice(System.Convert.ToInt16(obj.name), 3.5f, hole[rndHole[i]].gameObject, true));
-        }
-
-        buffer = new Dictionary<Transform, GameObject>(dictMice);
+   MPGFactory.GetCreatureFactory().SpawnByRandom(System.Convert.ToInt16(go.name), data,3.5f,.2f,.2f,spawnCount,true);
     }
 
     public override void UpdateEffect()
     {
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
-            foreach (KeyValuePair<Transform, GameObject> mice in buffer)
-            {
-                if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
-            }
+            //foreach (KeyValuePair<Transform, IMice> mice in buffer)
+            //{
+            //    if (!Global.dictBattleMiceRefs.ContainsValue(mice.Value)) dictMice.Remove(mice.Key);
+            //}
 
-            Display(obj, null/*, null*/);
+            Display(mice/*, null/*, null*/);
             m_LastTime = Time.time;
         }
 
         if ((Time.time - m_StartTime) > skillData.SkillTime)
             Release();
     }
-    public int GetMiceCount()
-    {
-        return dictMice.Count;
-    }
+    //public int GetMiceCount()
+    //{
+    //    return dictMice.Count;
+    //}
 
     public override void Release()
     {
-        dictMice.Clear();
+     //   dictMice.Clear();
        // playerAIState.Release(MPProtocol.ENUM_PlayerState.Boss);
     }
 

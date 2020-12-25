@@ -26,7 +26,6 @@ using MPProtocol;
  * 20171119 v2.1.0   修正載入順序
  * 20201027 v3.0.0  繼承重構
  * ****************************************************************/
-
 public class PlayerUI : IMPPanelUI
 {
     AttachBtn_PlayerUI UI;
@@ -38,15 +37,15 @@ public class PlayerUI : IMPPanelUI
     private int itemCount = 8, row = 2, iconDepth = 310, _itemType, _dataLoadedCount;
     private bool _bLoadedPlayerItem, _bLoadItem, _bLoadPlayerData, _bUpdatePlayerImage, _bLoadedCurrency, _bLoadedPanel, _bFirstLoad, _LoadedAsset, _bImgActive, _bInvActive, _bPanelFirstLoad, _bLoadedPlayerAvatarIcon, _bInsEquip;
     private Vector2 itemOffset, iconSize;
+    private static GameObject _lastEmptyItemGroup;
 
     public PlayerUI(MPGame MPGame) : base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().playerPanel;
         dictLoadedEquiped = new Dictionary<string, GameObject>();
         dictLoadedItem = new Dictionary<string, GameObject>();
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
         itemOffset = new Vector2(180, -180);
         iconSize = new Vector2(100, 100);
@@ -72,6 +71,8 @@ public class PlayerUI : IMPPanelUI
     public override void Update()
     {
         base.Update();
+
+
         // 資料庫資料載入完成時 載入Asset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
         {
@@ -80,32 +81,16 @@ public class PlayerUI : IMPPanelUI
         }
 
         // Asset載入完成時 載入玩家頭像、實體化裝備圖示
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _LoadedAsset)
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _LoadedAsset)
         {
             _LoadedAsset = false;
-            LoadPlayerAvatorIcon();
             InstantiateEquipIcon(Global.playerItem, UI.weaponEquip.transform, (int)StoreType.Armor);
-        }
-
-        // 裝備實體化完成 載入 資料
-        if (_bInsEquip)
-        {
-            //會發生還沒載入物件就載入資料
-            _bInsEquip = Global.isPlayerDataLoaded = Global.isPlayerItemLoaded = Global.isItemLoaded = false;
-
-            // 載入資料
+            LoadPlayerAvatorIcon();
             LoadPlayerInfo();
             LoadPlayerEquip();
             LoadPlayerRecord();
-
-            // 載入畫面焦點 復原 至Panel
-            ResumeToggleTarget();
+            ResumeToggleTarget();   // 載入畫面焦點 復原 至Panel
         }
-
-        // 重新載入玩家頭像
-        if (_bUpdatePlayerImage)
-            LoadPlayerAvatorIcon();
-
     }
 
     /// <summary>
@@ -152,7 +137,7 @@ public class PlayerUI : IMPPanelUI
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
             dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
@@ -173,8 +158,8 @@ public class PlayerUI : IMPPanelUI
 
         // 載入老鼠ICON
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
-            if (!assetLoader.GetAsset(item.Value.ToString()))
-                assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
+            if (!m_AssetLoaderSystem.GetAsset(item.Value.ToString()))
+                m_AssetLoaderSystem.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
 
         _dictItemData = Global.playerItem;
         _LoadedAsset = true;
@@ -191,7 +176,7 @@ public class PlayerUI : IMPPanelUI
         // Transform imageParent = playerInfoArea.transform.Find("Image");
 
         if (UI.playerImageBtn.transform.childCount == 0)
-            MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(Global.PlayerImage), UI.playerImageBtn.transform, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
+            MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(Global.PlayerImage), UI.playerImageBtn.transform, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
 
         UISprite playerImage = UI.playerImageBtn.transform.GetChild(0).GetComponent<UISprite>();
         playerImage.spriteName = Global.PlayerImage;
@@ -231,9 +216,9 @@ public class PlayerUI : IMPPanelUI
                 //bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
 
                 // 已載入資產時
-                if (assetLoader.GetAsset(bundleName) != null)
+                if (m_AssetLoaderSystem.GetAsset(bundleName) != null)
                 {
-                    GameObject bundle = assetLoader.GetAsset(bundleName);
+                    GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
                     Transform imageParent = itemPanel.GetChild(i).GetChild(0);
 
                     // 如果沒有ICON才實體化
@@ -308,7 +293,7 @@ public class PlayerUI : IMPPanelUI
                     //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
 
                     // 已載入資產時
-                    if (!string.IsNullOrEmpty(bundleName) && assetLoader.GetAsset(bundleName) != null)
+                    if (!string.IsNullOrEmpty(bundleName) && m_AssetLoaderSystem.GetAsset(bundleName) != null)
                     {
                         // 如果沒有ICON才實體化
                         if (imageParent.childCount == 0)
@@ -317,7 +302,7 @@ public class PlayerUI : IMPPanelUI
                             imageParent.parent.tag = "Equip";
 
                             UIEventListener.Get(imageParent.parent.gameObject).onClick += OnEquipClick;
-                            GameObject _clone, bundle = assetLoader.GetAsset(bundleName);
+                            GameObject _clone, bundle = m_AssetLoaderSystem.GetAsset(bundleName);
                             _clone = MPGFactory.GetObjFactory().Instantiate(bundle, imageParent, bundleName, Vector3.zero, Vector3.one, new Vector2(iconSize.x, iconSize.y), iconDepth);
                             _clone.GetComponentInParent<ButtonSwitcher>().enabled = true;
                             _clone.GetComponentInParent<ButtonSwitcher>().SendMessage("EnableBtn");
@@ -388,11 +373,11 @@ public class PlayerUI : IMPPanelUI
     #endregion
 
     // 當點擊 背包頭像時
-    public void OnPlayerImageClick(GameObject obj)
+    public void OnPlayerImageClick(GameObject go)
     {
         // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
         if (UI.playerEquipInvPanel.activeSelf)
-            OnEquipClick(obj);
+            OnEquipClick(go);
 
         _bImgActive = !_bImgActive;
         UI.playerImageInvPanel.SetActive(_bImgActive);
@@ -431,18 +416,18 @@ public class PlayerUI : IMPPanelUI
 
             foreach (KeyValuePair<string, object> item in itemData)
             {
-                if (assetLoader.GetAsset(invBtnItemName) != null)                  // 已載入按鈕資產時
+                if (m_AssetLoaderSystem.GetAsset(invBtnItemName) != null)                  // 已載入按鈕資產時
                 {
 
-                    GameObject invBtn = assetLoader.GetAsset(invBtnItemName);
-                    pos = sortItemPos(tableCount, rowCount, offset, pos, i);
+                    GameObject invBtn = m_AssetLoaderSystem.GetAsset(invBtnItemName);
+                    pos = SortItemPos(tableCount, rowCount, offset, pos, i);
                     invBtn = MPGFactory.GetObjFactory().Instantiate(invBtn, _lastEmptyItemGroup.transform, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
 
                     string iconName = Global.IconSuffix + item.Value;
                     //string iconName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + item.Value);
-                    if (assetLoader.GetAsset(iconName) != null)                  // 已載入ICON資產時
+                    if (m_AssetLoaderSystem.GetAsset(iconName) != null)                  // 已載入ICON資產時
                     {
-                        GameObject iconBundle = assetLoader.GetAsset(iconName);
+                        GameObject iconBundle = m_AssetLoaderSystem.GetAsset(iconName);
                         MPGFactory.GetObjFactory().Instantiate(iconBundle, invBtn.transform.Find("Image"), item.Key, Vector3.zero, Vector3.one, Vector2.zero, -1);
                         invBtn.tag = "InventoryICON";
                         GameObject.Destroy(invBtn.GetComponent<ButtonSwitcher>());
@@ -466,12 +451,12 @@ public class PlayerUI : IMPPanelUI
     /// <summary>
     /// 開啟裝備背包
     /// </summary>
-    /// <param name="obj">裝備部位按鈕</param>
-    public void OnEquipClick(GameObject obj)
+    /// <param name="go">裝備部位按鈕</param>
+    public void OnEquipClick(GameObject go)
     {
         // 如果裝備背包開啟中 則 關閉 (避免擋到頭像背包)
         if (UI.playerImageInvPanel.activeSelf)
-            OnPlayerImageClick(obj);
+            OnPlayerImageClick(go);
 
         _bInvActive = !_bInvActive;
         UI.playerEquipInvPanel.SetActive(_bInvActive);
@@ -480,17 +465,17 @@ public class PlayerUI : IMPPanelUI
         if (UI.playerEquipInvGrid.transform.childCount == 0)
         {
             //取得開啟的裝備類別(武器、衣服、道具等)
-            if (obj.GetComponentInChildren<UISprite>())
-                _itemType = System.Convert.ToInt32(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.playerItem, "ItemType", obj.name));
+            if (go.GetComponentInChildren<UISprite>())
+                _itemType = System.Convert.ToInt32(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.playerItem, "ItemType", go.name));
             else
-                _itemType = int.Parse(obj.transform.parent.name);
+                _itemType = int.Parse(go.transform.parent.name);
 
             //實體化道具格、圖示
             Dictionary<string, GameObject> bag = InstantiateBagItemBG(_dictItemData, Global.InvItemAssetName, _itemType, UI.playerEquipInvGrid.transform, itemOffset, itemCount, row);
             InstantiateBagItemIcon(_dictItemData, _lastEmptyItemGroup.transform, _itemType);
 
-            foreach (KeyValuePair<string, GameObject> go in bag)
-                UIEventListener.Get(go.Value).onClick += OnEquipInvBtnClick;
+            foreach (KeyValuePair<string, GameObject> item in bag)
+                UIEventListener.Get(item.Value).onClick += OnEquipInvBtnClick;
 
             // 開關防止Item按鈕失效
             UI.playerEquipInvGrid.SetActive(false);
@@ -498,24 +483,24 @@ public class PlayerUI : IMPPanelUI
         }
     }
 
-    private void OnPlayerImageInvBtnClick(GameObject obj)
+    private void OnPlayerImageInvBtnClick(GameObject go)
     {
-        string imageName = obj.transform.GetComponentInChildren<UISprite>().spriteName;
+        string imageName = go.transform.GetComponentInChildren<UISprite>().spriteName;
         UI.playerImageBtn.GetComponentInChildren<UISprite>().name = imageName;
         Global.photonService.UpdatePlayerData(imageName);
     }
 
     //暫時亂寫的 直接運GameObject名稱來更新資料庫 會導致嚴重錯誤
-    private void OnEquipInvBtnClick(GameObject obj)
+    private void OnEquipInvBtnClick(GameObject go)
     {
-        if (obj.name != UI.weaponBtn.name)
+        if (go.name != UI.weaponBtn.name)
         {
-            string imageName = obj.transform.GetComponentInChildren<UISprite>().spriteName;
+            string imageName = go.transform.GetComponentInChildren<UISprite>().spriteName;
 
-            Global.photonService.UpdatePlayerItem(short.Parse(obj.name), true);
+            Global.photonService.UpdatePlayerItem(short.Parse(go.name), true);
             Global.photonService.UpdatePlayerItem(short.Parse(UI.weaponBtn.name), false);
             UI.weaponBtn.GetComponentInChildren<UISprite>().spriteName = imageName;
-            UI.weaponBtn.name = obj.name;
+            UI.weaponBtn.name = go.name;
         }
     }
 
@@ -557,21 +542,27 @@ public class PlayerUI : IMPPanelUI
     void OnUpdatePlayerImage()
     {
         _bUpdatePlayerImage = true;
+        // 重新載入玩家頭像
+        LoadPlayerAvatorIcon();
     }
 
     /// <summary>
     /// 關閉Panel
     /// </summary>
-    /// <param name="obj">Panel</param>
-    public override void OnClosed(GameObject obj)
+    /// <param name="go">Panel</param>
+    public override void OnClosed(GameObject go)
     {
-     //   EventMaskSwitch.lastPanel = null;
+        //   EventMaskSwitch.lastPanel = null;
         ShowPanel(m_RootUI.name);
-        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
     }
 
 
-
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().playerPanel;
+        base.ShowPanel(panelName);
+    }
 
     protected override int GetMustLoadedDataCount()
     {
@@ -588,6 +579,5 @@ public class PlayerUI : IMPPanelUI
         Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.UpdatePlayerImageEvent -= OnUpdatePlayerImage;
-        Debug.Log("Player Release.");
     }
 }

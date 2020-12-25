@@ -36,11 +36,13 @@ public class Snow : SkillItem
     public override void Release()
     {
         // resume motion
-        foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMiceRefs)
-        {
-            if (mice.Value != null) 
-                mice.Value.GetComponent<IMice>().OnEffect(skillData.SkillName, true);
-        }
+
+        MPGame.Instance.GetCreatureSystem().SetEffect(skillData.SkillName, true);
+        //foreach (KeyValuePair<Transform, GameObject> mice in Global.dictBattleMiceRefs)
+        //{
+        //    if (mice.Value != null) 
+        //        mice.Value.GetComponent<IMice>().OnEffect();
+        //}
 
         foreach (GameObject go in effects)
         {
@@ -52,7 +54,7 @@ public class Snow : SkillItem
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         Display();
     }
@@ -60,7 +62,7 @@ public class Snow : SkillItem
     public override void Display()
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
+        AssetLoaderSystem assetLoader = MPGame.Instance.GetAssetLoaderSystem();
         GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         ObjectFactory objFactory = new ObjectFactory();
 
@@ -68,14 +70,15 @@ public class Snow : SkillItem
         effects[0].GetComponent<Animator>().Play("Layer1.Effect1", -1, 0f);
 
         // stop motion
-        foreach (KeyValuePair<Transform, GameObject> item in Global.dictBattleMiceRefs)
-        {
-            if (item.Value != null)
-            {
-                //item.Value.GetComponent<MiceBase>().Play(AnimatorState.ENUM_AnimatorState.Frozen);
-                item.Value.GetComponent<IMice>().OnEffect(skillData.SkillName, false);
-            }
-        }
+        MPGame.Instance.GetCreatureSystem().SetEffect(skillData.SkillName, false);
+        //foreach (KeyValuePair<Transform, GameObject> item in MPGame.Instance.GetCreatureSystem().ge)
+        //{
+        //    if (item.Value != null)
+        //    {
+        //        //item.Value.GetComponent<MiceBase>().Play(AnimatorState.ENUM_AnimatorState.Frozen);
+        //        item.Value.GetComponent<IMice>().OnEffect(skillData.SkillName, false);
+        //    }
+        //}
 
         m_StartTime = Time.time;
     }

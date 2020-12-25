@@ -14,7 +14,7 @@ using System;
  * 7.區域王出沒，先消滅者獲得XX糧食。(血量共用?? 會增加伺服器負擔)
  */
 
-public class MissionSystem : GameSystem
+public class MissionSystem : IGameSystem
 {
 
     #region variables
@@ -59,12 +59,12 @@ public class MissionSystem : GameSystem
 
     public MissionSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("MissionSystem Create");
+        Debug.Log("--------------- MissionSystem Created ----------------");
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("MissionSystem Init");
+        Debug.Log("--------------- MissionSystem Initialize ----------------");
         battleUI = m_MPGame.GetBattleUI();
         battleSystem = m_MPGame.GetBattleSystem();
         Global.photonService.ApplyMissionEvent += OnApplyMission;               // 加入 接受任務 監聽事件
@@ -339,5 +339,11 @@ public class MissionSystem : GameSystem
         Global.photonService.LoadSceneEvent -= OnLoadScene;                       // 移除 離開房間 監聽事件
     }
 
-
+    public override void Release()
+    {
+        Global.photonService.ApplyMissionEvent -= OnApplyMission;               // 移除 接受任務 監聽事件
+        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;  // 移除 顯示對方 完成任務 監聽事件
+        Global.photonService.MissionCompleteEvent -= OnMissionComplete;         // 移除 完成任務 監聽事件
+        Global.photonService.LoadSceneEvent -= OnLoadScene;                       // 移除 離開房間 監聽事件
+    }
 }

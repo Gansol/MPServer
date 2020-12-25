@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MiceAttr : CreatureAttr
+public class MiceAttr : ICreatureAttr
 {
 
     public float EatingRate;

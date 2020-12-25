@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class SkillPlayer : SkillBase
+public abstract class SkillPlayer : ISkill
 {
     protected int useTimes = 0;
 
@@ -25,7 +25,7 @@ public abstract class SkillPlayer : SkillBase
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         throw new System.NotImplementedException();
     }

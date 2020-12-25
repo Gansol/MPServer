@@ -27,7 +27,7 @@ public class BattleAttr
     public List<GameObject> hole;
 }
 
-public class BattleSystem : GameSystem
+public class BattleSystem : IGameSystem
 {
     public int feverEnergy;           // FeverTime 能量
 
@@ -78,16 +78,15 @@ public class BattleSystem : GameSystem
 
     public BattleSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("BattleSystem Create");
+        Debug.Log("--------------- BattleSystem Created ----------------");
         battleAttr = new BattleAttr();
          m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
-        
     }
 
     // Use this for initialization
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("BattleSystem Init");
+        Debug.Log("--------------- BattleSystem Initialize ----------------");
         EventMaskSwitch.Init();
         //FindHole();
         UI = m_RootUI.GetComponent<AttachBtn_BattleUI>();
@@ -232,6 +231,7 @@ public class BattleSystem : GameSystem
     {
         if (miceID != -1 && miceID > 10000 && miceID < 11000)
         {
+            Debug.Log("BattleSystem UpadateScore aliveTime:" + aliveTime);
             UpadateCombo();
             MissionCombo++;
             _spawnCount++;
@@ -248,6 +248,7 @@ public class BattleSystem : GameSystem
         {
             if (!_isInvincible)
             {
+                Debug.Log("BattleSystem LostScore aliveTime:" + aliveTime);
                 //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
                 if (miceID != -1 && miceID > 10000 && miceID < 11000)
                 {
@@ -485,7 +486,7 @@ public class BattleSystem : GameSystem
                 case Mission.WorldBoss:
                     {
                         // 如果要測試 可以把 value改成Boss的ID
-                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
+                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, X);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
                         break;
                     }
             }
@@ -596,7 +597,7 @@ public class BattleSystem : GameSystem
     {
         Debug.Log("SetPlayerState:" + skillID);
         // BattlePanel show skill image
-        SkillBase skill = MPGFactory.GetSkillFactory().GetSkill(Global.dictSkills, skillID);
+        ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.dictSkills, skillID);
         skill.SetAIController(playerAIState);
         playerAIState.SetPlayerAIState(skill.GetPlayerState(), skill);
         skill.Display();

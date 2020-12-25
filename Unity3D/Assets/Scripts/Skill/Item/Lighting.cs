@@ -35,17 +35,19 @@ public class Lighting : SkillItem
     {
         Debug.Log(skillData.SkillName + " Display");
 
-        ObjectFactory objFactory = new ObjectFactory();
-        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
+        AssetLoaderSystem assetLoader = MPGame.Instance.GetAssetLoaderSystem();
         GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         List<Transform> holeBuffer = new List<Transform>(); // not rnd hole
         List<Transform> rndHole = new List<Transform>(); // ok  rnd hole 
 
         int count = skillData.Attr + Random.Range(0, skillData.AttrDice);
-        
 
-        foreach (KeyValuePair<Transform, GameObject> go in Global.dictBattleMiceRefs)
-            holeBuffer.Add(go.Key);
+
+        //MPGame.Instance.GetCreatureSystem().SetEffect(skillData.SkillName, 0);
+
+        foreach (KeyValuePair<string, Dictionary<string, ICreature>>  miceClass in MPGame.Instance.GetCreatureSystem().GetCreatures())
+            foreach(KeyValuePair <string, ICreature> mice in miceClass.Value)
+            holeBuffer.Add(mice.Value.m_go.transform.parent);
 
         count = Mathf.Min(count, holeBuffer.Count);
 
@@ -63,7 +65,7 @@ public class Lighting : SkillItem
             // 如果在動上的老鼠已經消失 則不顯示技能
             if (rndHole[i] != null)
             {
-                effects.Add(objFactory.Instantiate(bundle, rndHole[i], "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
+                effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, rndHole[i], "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
                 effects[i].GetComponent<Animator>().Play("Layer1.Effect1", -1, 0f);
             }
         }

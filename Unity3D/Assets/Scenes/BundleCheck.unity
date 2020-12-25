@@ -192,7 +192,7 @@ MonoBehaviour:
   keepAspectRatio: 0
   aspectRatio: 7.095238
   keepCrispWhenShrunk: 1
-  mTrueTypeFont: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 0}
   mText: 
   mFontSize: 30
@@ -637,7 +637,6 @@ GameObject:
   m_Component:
   - component: {fileID: 758197204}
   - component: {fileID: 758197203}
-  - component: {fileID: 758197205}
   m_Layer: 0
   m_Name: GameLoop
   m_TagString: Untagged
@@ -671,19 +670,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &758197205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758197202}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c64599985f4b25e4d83b68b774f453b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bLoadedObj: 0
 --- !u!1 &1498867302
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,7 +1103,7 @@ MonoBehaviour:
   keepAspectRatio: 0
   aspectRatio: 3.93
   keepCrispWhenShrunk: 1
-  mTrueTypeFont: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 0}
   mText: "\u6AA2\u67E5\u66F4\u65B0\u8CC7\u6E90..."
   mFontSize: 60
@@ -1218,7 +1204,7 @@ MonoBehaviour:
   keepAspectRatio: 0
   aspectRatio: 1.1042655
   keepCrispWhenShrunk: 1
-  mTrueTypeFont: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 0}
   mText: 
   mFontSize: 30

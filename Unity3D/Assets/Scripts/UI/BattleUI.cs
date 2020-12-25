@@ -21,20 +21,20 @@ public class BattleUI : IMPPanelUI
 
     public BattleUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("BattleUI Create");
+        Debug.Log("--------------- BattleUI Created ----------------");
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("BattleUI Init");
+        Debug.Log("--------------- BattleUI Initialize ----------------");
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
         _beautyHP = 0.5f;
         //UI.WaitObject.transform.gameObject.SetActive(true); // 開始才顯示
         battleSystem = m_MPGame.GetBattleSystem();
-        assetLoader = MPGame.Instance.GetAssetLoader();
+        m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
 
-        assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
+        m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
 
         //_energy = 0d;
         _beautyEnergy = _beautyFever = 0f;
@@ -131,16 +131,19 @@ public class BattleUI : IMPPanelUI
     }
     public override void OnGUI()
     {
-        BattleState();
-        GUIVariables();
-        ScoreBarAnim();
+        if (Global.isGameStart)
+        {
+            BattleState();
+            GUIVariables();
+            ScoreBarAnim();
 
-        BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
-        BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
-        BeautyBar(UI.RedEnergyBar, battleSystem.otherEnergy / 100f, _beautyOtherEnergy);
-        BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
-        BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
-        BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
+            BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
+            BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
+            BeautyBar(UI.RedEnergyBar, battleSystem.otherEnergy / 100f, _beautyOtherEnergy);
+            BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
+            BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
+            BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
+        }
     }
 
     #region  BattleState 顯示目前遊戲狀態
@@ -486,8 +489,8 @@ public class BattleUI : IMPPanelUI
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                if (assetLoader.GetAsset(Global.IconSuffix + itemName) == null)
-                    assetLoader.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
+                if (m_AssetLoaderSystem.GetAsset(Global.IconSuffix + itemName) == null)
+                    m_AssetLoaderSystem.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
             }
             return false;
         }
@@ -504,10 +507,10 @@ public class BattleUI : IMPPanelUI
 
         foreach (KeyValuePair<string, object> item in itemData)
         {
-            if (assetLoader.GetAsset(itemName) != null)                  // 已載入資產時
+            if (m_AssetLoaderSystem.GetAsset(itemName) != null)                  // 已載入資產時
             {
-                GameObject obj = MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-                dictItem.Add(item.Key, obj);    // 存入道具資料索引
+                GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
+                dictItem.Add(item.Key, go);    // 存入道具資料索引
                 pos.x += offset.x;
             }
         }
@@ -530,7 +533,7 @@ public class BattleUI : IMPPanelUI
 
                 string itemCount = Convert.ToString(itemData[PlayerItem.ItemCount.ToString()]);
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
-                GameObject bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(Global.IconSuffix + itemName);
 
                 if (bundle != null)
                     bundle = MPGFactory.GetObjFactory().Instantiate(bundle, rewardPanel.GetChild(i).Find("Image"), itemName, Vector3.zero, Vector3.one, new Vector2(100, 100), 310);
@@ -540,33 +543,6 @@ public class BattleUI : IMPPanelUI
             }
         }
         //    bLoadPrefab = true;
-    }
-    #endregion
-
-    #region -- SortItemPos 排序道具位置  --
-    /// <summary>
-    /// 排序道具位置
-    /// </summary>
-    /// <param name="xCount">第一頁最大數量</param>
-    /// <param name="yCount">每行道具數量</param>
-    /// <param name="offset">目前物件位置</param>
-    /// <param name="pos">初始位置</param>
-    /// <param name="counter">計數</param>
-    /// <returns>物件位置</returns>
-    public Vector2 SortItemPos(int xCount, int yCount, Vector2 offset, Vector2 pos, int counter)
-    {
-        // 物件位置排序
-        if (counter % xCount == 0 && counter != 0) // 3 % 9 =0
-        {
-            pos.x = offset.x * 3;
-            pos.y = 0;
-        }
-        else if (counter % yCount == 0 && counter != 0)//3 3 =0
-        {
-            pos.y += offset.y;
-            pos.x = 0;
-        }
-        return pos;
     }
     #endregion
 
@@ -609,7 +585,7 @@ public class BattleUI : IMPPanelUI
     }
 
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         throw new System.NotImplementedException();
     }
@@ -628,13 +604,14 @@ public class BattleUI : IMPPanelUI
 
     protected override void OnLoading()
     {
-        UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
+        
     }
 
     protected override void OnLoadPanel()
     {
         throw new System.NotImplementedException();
     }
+
     public override void Release()
     {
         Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;

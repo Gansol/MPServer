@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class IAnimatorState
 {
-    protected GameObject obj;
+    protected GameObject go;
     protected Animator anims;
     protected AnimatorStateInfo currentState;
     protected ENUM_AnimatorState animState = ENUM_AnimatorState.None;
@@ -24,9 +24,9 @@ public abstract class IAnimatorState
         Fire,
     }
 
-    public abstract void Init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
+    public abstract void Init(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
 
-    public IAnimatorState(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public IAnimatorState(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         animState = ENUM_AnimatorState.None;
         _isBoss = isBoss;
@@ -35,7 +35,7 @@ public abstract class IAnimatorState
         _lifeTime = lifeTime;
 
         _lastTime = Time.time;
-        this.obj = obj;
+        this.go = go;
         _upFlag = true;
         _bMotion = true;
         _bDead = false;
@@ -44,14 +44,14 @@ public abstract class IAnimatorState
 
     }
 
-    public virtual void Initialize(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public virtual void Initialize(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         _isBoss = isBoss;
         _lerpSpeed = lerpSpeed;
         _tmpSpeed = _upSpeed = upSpeed;
         _tmpDistance = _upDistance = upDistance;
         _lifeTime = lifeTime;
-        this.obj = obj;
+        this.go = go;
 
         _upFlag = true;
         _bDead = false;

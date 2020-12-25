@@ -7,7 +7,7 @@ public class DiedAIState : IAIState
 
     public DiedAIState()
     {
-        Debug.Log("Idle State");
+        Debug.Log("Died State");
         m_CreatureAI.Set_ENUM_AIState(ICreature.ENUM_CreatureState.Die);
     }
 

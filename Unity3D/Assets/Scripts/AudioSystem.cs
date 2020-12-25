@@ -16,7 +16,7 @@ using UnityEngine;
  *                           ChangeLog       
  * 20201123 v1.0.0  未測試
  * ****************************************************************/
-public class AudioSystem : GameSystem
+public class AudioSystem : IGameSystem
 {
     static GameObject musics_root;//这个就是根节点
     Dictionary<string, AudioSource> musics;
@@ -26,13 +26,15 @@ public class AudioSystem : GameSystem
 
     public AudioSystem(MPGame mPGame) : base(mPGame)
     {
-
-    }
-
-    public override void Initinal()
-    {
+        Debug.Log("--------------- AudioSystem Created ----------------");
         musics = new Dictionary<string, AudioSource>();
         sounds = new Dictionary<string, AudioSource>();
+        Initialize();
+    }
+
+    public override void Initialize()
+    {
+        Debug.Log("--------------- AudioSystem Initialize ----------------");
         musics_root = new GameObject("music_root");         // 聲音物件
         GameObject.DontDestroyOnLoad(musics_root);    // 不刪除聲音
 
@@ -61,7 +63,7 @@ public class AudioSystem : GameSystem
         }
         else
         {
-            GameObject bundle = m_MPGame.GetAssetLoader().GetAsset(name);
+            GameObject bundle = m_MPGame.GetAssetLoaderSystem().GetAsset(name);
             GameObject music = MPGFactory.GetObjFactory().Instantiate(bundle, musics_root.transform, name, Vector3.zero, Vector3.zero, Vector2.zero, -1);
             audio_source = music.GetComponent<AudioSource>();
             musics.Add(name, audio_source);
@@ -100,7 +102,7 @@ public class AudioSystem : GameSystem
         }
         else
         {
-            GameObject bundle = m_MPGame.GetAssetLoader().GetAsset(name);
+            GameObject bundle = m_MPGame.GetAssetLoaderSystem().GetAsset(name);
             GameObject sound = MPGFactory.GetObjFactory().Instantiate(bundle, musics_root.transform, name, Vector3.zero, Vector3.zero, Vector2.zero, -1);
             audio_source = sound.GetComponent<AudioSource>();
             sounds.Add(name, audio_source);

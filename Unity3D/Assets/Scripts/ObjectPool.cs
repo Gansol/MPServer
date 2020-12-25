@@ -110,14 +110,14 @@ public class ObjectPool
 
         for (int i = 0; i < Pool.transform.Find(objectName).childCount; i++)
         {
-            GameObject obj;
+            GameObject go;
 
-            obj = Pool.transform.Find(objectName).GetChild(i).gameObject;
+            go = Pool.transform.Find(objectName).GetChild(i).gameObject;
 
-            if (obj.name == objectName && !obj.transform.gameObject.activeSelf)
+            if (go.name == objectName && !go.transform.gameObject.activeSelf)
             {
-                obj.transform.gameObject.SetActive(true);
-                return obj;
+                go.transform.gameObject.SetActive(true);
+                return go;
             }
         }
         return null;
@@ -143,14 +143,14 @@ public class ObjectPool
 
     //    for (int i = 0; i < Pool.transform.FindChild(objectName).childCount; i++)
     //    {
-    //        GameObject obj;
+    //        GameObject go;
 
-    //        obj = Pool.transform.FindChild(objectName).GetChild(i).gameObject;
+    //        go = Pool.transform.FindChild(objectName).GetChild(i).gameObject;
 
-    //        if (obj.name == objectName && !obj.transform.gameObject.activeSelf)
+    //        if (go.name == objectName && !go.transform.gameObject.activeSelf)
     //        {
-    //            obj.transform.gameObject.SetActive(true);
-    //            return obj;
+    //            go.transform.gameObject.SetActive(true);
+    //            return go;
     //        }
     //    }
     //    return null;

@@ -817,17 +817,17 @@ public class BtnSwitch : MonoBehaviour
 
     public GameObject GetLoadedMice(string miceID)
     {
-        GameObject obj;
-        if (_dictLoadedMiceBtnRefs.TryGetValue(miceID, out obj))
-            return obj;
+        GameObject go;
+        if (_dictLoadedMiceBtnRefs.TryGetValue(miceID, out go))
+            return go;
         return null;
     }
 
     public GameObject GetLoadedTeam(string miceID)
     {
-        GameObject obj;
-        if (_dictLoadedTeamBtnRefs.TryGetValue(miceID, out obj))
-            return obj;
+        GameObject go;
+        if (_dictLoadedTeamBtnRefs.TryGetValue(miceID, out go))
+            return go;
         return null;
     }
     #endregion

@@ -4,7 +4,7 @@ using System.Collections;
 public class EffectsFactory : IFactory
 {
 
-    private AssetLoader assetLoader;
+    private AssetLoaderSystem assetLoader;
 
     //public void LoadEffects(string bundleName)
     //{
@@ -14,7 +14,7 @@ public class EffectsFactory : IFactory
 
     public GameObject GetEffects(string bundleName)
     {
-        GameObject obj = assetLoader.GetAsset(bundleName);
-        return obj;
+        GameObject go = assetLoader.GetAsset(bundleName);
+        return go;
     }
 }

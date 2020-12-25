@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LesserHeal : SkillBoss
 {
-    CreatureAttr arribute;
+    ICreatureAttr arribute;
     public LesserHeal(SkillAttr skill)
         : base(skill)
     {
@@ -14,9 +14,9 @@ public class LesserHeal : SkillBoss
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        this.arribute = arribute;
+        arribute = creature.GetArribute();
     }
 
     public override void UpdateEffect()

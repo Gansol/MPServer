@@ -51,7 +51,7 @@ public class Taco : SkillItem
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         Display();
     }
@@ -60,7 +60,7 @@ public class Taco : SkillItem
     {
         _skillTime = skillData.Attr + Random.Range(0, skillData.AttrDice);
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
+        AssetLoaderSystem assetLoader = MPGame.Instance.GetAssetLoaderSystem();
         GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         ObjectFactory objFactory = new ObjectFactory();
 

@@ -16,7 +16,7 @@ using System;
 
 public class CreatureFactory :IFactory
 {
-    MPGame m_MPGame;
+    PoolSystem m_PoolSystem;
     [Range(2, 5)]
     private float miceSize;
     private List<GameObject> _hole;
@@ -32,7 +32,7 @@ public class CreatureFactory :IFactory
     //public MPFactory(MPGame MPGame)
     //    : base(MPGame)
     //{
-    //    Initinal();
+    //    Initialize();
     //}
 
     public CreatureFactory(/*PoolManager poolManager, List<GameObject> hole*/)
@@ -40,8 +40,21 @@ public class CreatureFactory :IFactory
         //  objFactory.TestMethod();
         miceSize = 3.5f;
         _hole = MPGame.Instance.GetBattleSystem().GetHole();
+        m_PoolSystem = MPGame.Instance.GetPoolSystem();
         Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
         Global.photonService.LoadSceneEvent += OnLoadScene;
+    }
+
+    /// <summary>
+    /// 只生產一個老鼠 (沒有間格時間)
+    /// </summary>
+    /// <param name="miceID"></param>
+    /// <param name="miceSize"></param>
+    /// <param name="hole"></param>
+    /// <param name="impose"></param>
+    public IMice SpawnByOne(short miceID, float miceSize, Transform hole, bool impose)
+    {
+       return  m_PoolSystem.InstantiateMice(miceID, miceSize, hole, impose);
     }
 
     #region -- SpawnByRandom --
@@ -74,7 +87,7 @@ public class CreatureFactory :IFactory
         for (holePos = 0; count < spawnCount; holePos++)
         {
             holePos = SetStartPos(holeArray.Length, holePos, false);
-            m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[rndHoleArray[holePos]].transform, false);
+            m_PoolSystem.InstantiateMice( miceID, miceSize, _hole[rndHoleArray[holePos]].transform, false);
             count++;
             yield return new WaitForSeconds(spawnTime);
         }
@@ -185,11 +198,11 @@ public class CreatureFactory :IFactory
             try
             {
                 // objFactory.TestMethod();
-                m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[holeArray[holePos]].transform, impose);
+                m_PoolSystem.InstantiateMice( miceID, miceSize, _hole[holeArray[holePos]].transform, impose);
             }
             catch (Exception e)
             {
-                Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount + "G:" + Global.dictBattleMiceRefs.Count);
+                Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount );
                 throw e;
             }
 
@@ -302,7 +315,7 @@ public class CreatureFactory :IFactory
 
             while (j >= 0 && j < holeArray.GetLength(1) && count < spawnCount)    // 2D陣列
             {
-                m_MPGame.GetPoolSystem().InstantiateMice( miceID, miceSize, _hole[holeArray[i, j]].transform, false);
+                m_PoolSystem.InstantiateMice( miceID, miceSize, _hole[holeArray[i, j]].transform, isSkill);
                 count++;
                 //Debug.Log("count:" + count + "  i:" + i + "  j:" + j);
                 j += (reSpawn) ? -1 : 1;

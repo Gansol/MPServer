@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class SkillBoss : SkillBase
+public abstract class SkillBoss : ISkill
 {
-    protected GameObject  obj;
+    protected GameObject  go;
 
     public SkillBoss(SkillAttr skill)
         : base(skill)

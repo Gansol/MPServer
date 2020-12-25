@@ -58,9 +58,9 @@ public class TestPanelScript : MonoBehaviour
     }
 
     // 現在無法調整了 spawnStatus 已由Spawner控制
-    public void OnStatus(GameObject obj)
+    public void OnStatus(GameObject go)
     {
-        if (obj.name == "+")
+        if (go.name == "+")
         {
             Debug.Log("已無法調整");
             // battleManager.spawnStatus = (SpawnStatus)((int)battleManager.GetBattleAIState().GetSpawnStatus() + 1);
@@ -74,9 +74,9 @@ public class TestPanelScript : MonoBehaviour
         // lb_status.text = battleManager.spawnStatus.ToString();
     }
 
-    public void OnSpawnLerp(GameObject obj)
+    public void OnSpawnLerp(GameObject go)
     {
-        if (obj.name == "+")
+        if (go.name == "+")
         {
             battleManager.SetValue(0, 0, battleManager.GetBattleAIState().GetIntervalTime() + 0.5f, 0);
         }
@@ -87,9 +87,9 @@ public class TestPanelScript : MonoBehaviour
         lb_spawnLerp.text = battleManager.GetBattleAIState().GetIntervalTime().ToString();
     }
 
-    public void OnMiceLerp(GameObject obj)
+    public void OnMiceLerp(GameObject go)
     {
-        if (obj.name == "+")
+        if (go.name == "+")
         {
             battleManager.GetBattleAIState().SetValue(battleManager.GetBattleAIState().GetLerpTime() + .05f, 0, 0, 0);
         }
@@ -100,9 +100,9 @@ public class TestPanelScript : MonoBehaviour
         lb_betweenLerp.text = battleManager.GetBattleAIState().GetLerpTime().ToString();
     }
 
-    public void OnCount(GameObject obj)
+    public void OnCount(GameObject go)
     {
-        if (obj.name == "+")
+        if (go.name == "+")
         {
             battleManager.GetBattleAIState().SetValue(0, 0, 0, battleManager.GetBattleAIState().GetSpawnCount() + 1);
         }
@@ -114,9 +114,9 @@ public class TestPanelScript : MonoBehaviour
         lb_spawnCount.text = battleManager.GetBattleAIState().GetSpawnCount().ToString();
     }
 
-    public void OnMiceSpawnTime(GameObject obj)
+    public void OnMiceSpawnTime(GameObject go)
     {
-        if (obj.name == "+")
+        if (go.name == "+")
         {
             battleManager.GetBattleAIState().SetValue(0, battleManager.GetBattleAIState().GetSpawnTime() + .05f, 0, 0);
         }

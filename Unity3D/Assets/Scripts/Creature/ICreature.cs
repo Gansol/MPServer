@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class ICreature : MonoBehaviour
+public abstract class ICreature 
 {
     public GameObject m_go = null;
-    protected SkillBase m_Skill = null;
+    protected ISkill m_Skill = null;
     //protected IAIState m_AIState = null;
     protected IAnimatorState m_AnimState = null;
-    protected CreatureAttr m_Arribute = null;
+    protected ICreatureAttr m_Arribute = null;
     protected ICreatureAI m_AI = null;
     protected ENUM_CreatureState ENUM_AIState = ENUM_CreatureState.None;
 
@@ -22,17 +22,20 @@ public abstract class ICreature : MonoBehaviour
         OnHit,
         Frozen,
         Fire,
+        Invincible,
     }
 
     public abstract void SetGameObject(GameObject go);
-    public abstract void SetSkill(SkillBase skill);
+    public abstract void SetSkill(ISkill skill);
     //public abstract void SetState(IAIState state);
     public abstract void SetAnimState(IAnimatorState state);
-    public abstract void SetArribute(CreatureAttr arribute);
+    public abstract void SetArribute(ICreatureAttr arribute);
     public abstract void SetAI(ICreatureAI ai);
 
     protected abstract void OnInjured(short damage, bool myAttack);
+    public abstract void Initialize();
     public abstract void Update();
+    public abstract void Release();
     /// <summary>
     /// 死亡
     /// </summary>
@@ -61,5 +64,10 @@ public abstract class ICreature : MonoBehaviour
     public ICreatureAI GetAIState()
     {
         return m_AI;
+    }
+
+    public ICreatureAttr GetArribute()
+    {
+        return m_Arribute;
     }
 }

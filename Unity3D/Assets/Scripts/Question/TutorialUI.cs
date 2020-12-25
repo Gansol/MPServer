@@ -23,7 +23,11 @@ public class TutorialUI : IMPPanelUI
 
     public TutorialUI(MPGame MPGame) : base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().tutorialPanel;
+        Debug.Log("--------------- TutorialUI Created ----------------");
+    }
+    public override void Initialize()
+    {
+        Debug.Log("--------------- TutorialUI Initialize ----------------");
     }
 
     // Update is called once per frame
@@ -32,12 +36,13 @@ public class TutorialUI : IMPPanelUI
         base.Update();
     }
 
-    public override void Initinal()
+
+
+    public override void ShowPanel(string panelName)
     {
-
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().tutorialPanel;
+        base.ShowPanel(panelName);
     }
-
-
 
     protected override void OnLoading()
     {
@@ -63,11 +68,11 @@ public class TutorialUI : IMPPanelUI
         throw new System.NotImplementedException();
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
         ShowPanel(m_RootUI.name);
-        //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
     }
     public override void Release()
     {

@@ -21,9 +21,10 @@ using System.Linq;
  * 173、技能使用量 錯誤 應由伺服器
  * ***************************************************************/
 
-public class PoolSystem : GameSystem
+public class PoolSystem : IGameSystem
 {
-    private AssetLoader assetLoader;
+    private CreatureSystem m_CreatureSystem;
+    private AssetLoaderSystem assetLoader;
     private GameObject m_RootUI;
 
     //private Dictionary<string, object> _tmpDict;
@@ -38,7 +39,7 @@ public class PoolSystem : GameSystem
 
     // 10001 guid ICreature  objectpool 
     private Dictionary<string, Dictionary<string, ICreature>> dictMicePool; // 物件池老鼠
-    private Dictionary<Transform, GameObject> dictHoleMiceRefs;  // Hole老鼠索引
+
 
     //private GameObject clone;
 
@@ -83,16 +84,16 @@ public class PoolSystem : GameSystem
 
     public PoolSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("PoolSystem Create");
-        // OnEnable
-        Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
+        Debug.Log("--------------- PoolSystem Created ----------------");
+        m_CreatureSystem = MPGame.GetCreatureSystem();
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("PoolSystem Init");
+        Debug.Log("--------------- PoolSystem Initialize ----------------");
+        Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.LoadPlayerItem(Global.Account);
-        assetLoader = m_MPGame.GetAssetLoader();
+        assetLoader = m_MPGame.GetAssetLoaderSystem();
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         Debug.Log(m_RootUI.name);
         objectPool = m_RootUI.transform.Find("Battle(Panel)").Find("ObjectPool").gameObject;
@@ -285,83 +286,85 @@ public class PoolSystem : GameSystem
         Debug.Log("InstantiateSkillMice Completed!");
     }
 
-    /// <summary>
-    /// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
-    /// </summary>
-    /// <param name="objectID">使用Name找Object</param>
-    /// <returns>回傳 ( GameObject / null )</returns>
-    public GameObject ActiveObject(string objectID)
-    {
-        //Debug.Log("_dictObject.Count:" + _dictObject.Count);
-        //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
+    ///// <summary>
+    ///// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
+    ///// </summary>
+    ///// <param name="objectID">使用Name找Object</param>
+    ///// <returns>回傳 ( GameObject / null )</returns>
+    //public GameObject ActiveObject(string objectID)
+    //{
+    //    //Debug.Log("_dictObject.Count:" + _dictObject.Count);
+    //    //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
 
-        if (!objectPool.transform.Find(objectID))
-        {
-            Debug.Log("Pooling can't find :" + objectID);
-        }
-        else if (objectPool.transform.Find(objectID).childCount == 0)
-        {
-            string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
-            Instantiate(objectID, assetLoader.GetAsset(bundleName));
-        }
-        else
-        {
-            for (int i = 0; i < objectPool.transform.Find(objectID).childCount; i++)
-            {
-                GameObject clone = objectPool.transform.Find(objectID).GetChild(i).gameObject;
-                IMice mice = clone.GetComponent(typeof(IMice)) as IMice;
-                MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
-                // ICreatureAI miceAI =
-                if (mice.enabled == false) mice.enabled = true;
+    //    if (!objectPool.transform.Find(objectID))
+    //    {
+    //        Debug.Log("Pooling can't find :" + objectID);
+    //    }
+    //    else if (objectPool.transform.Find(objectID).childCount == 0)
+    //    {
+    //        string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
+    //        Instantiate(objectID, assetLoader.GetAsset(bundleName));
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < objectPool.transform.Find(objectID).childCount; i++)
+    //        {
+    //            GameObject clone = objectPool.transform.Find(objectID).GetChild(i).gameObject;
+    //            IMice mice =   clone.GetComponent(typeof(IMice)) as IMice;
+    //            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
+    //            // ICreatureAI miceAI =
+    //            if (mice.enabled == false) mice.enabled = true;
 
-                if (clone.name == objectID && !clone.gameObject.activeSelf)
-                {
-                    clone.SetActive(true);
-                    miceAttr.SetHP(1);
-                    mice.SetArribute(miceAttr);
-                    mice.SetAI(new MiceAI(mice));
-                    mice.Initialize(false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime);
-                    clone.transform.GetChild(0).localScale = Vector3.one;
-                    clone.transform.GetChild(0).localRotation = Quaternion.identity;
-                    clone.transform.GetChild(0).localPosition = Vector3.zero;
+    //            if (clone.name == objectID && !clone.gameObject.activeSelf)
+    //            {
+    //                clone.SetActive(true);
+    //                miceAttr.SetHP(1);
+    //                mice.SetArribute(miceAttr);
+    //                mice.SetAI(new MiceAI(mice));
+    //                mice.Initialize();
+    //                clone.transform.GetChild(0).localScale = Vector3.one;
+    //                clone.transform.GetChild(0).localRotation = Quaternion.identity;
+    //                clone.transform.GetChild(0).localPosition = Vector3.zero;
 
-                    if (clone.GetComponent<BoxCollider2D>()) clone.GetComponent<BoxCollider2D>().enabled = true;
+    //                if (clone.GetComponent<BoxCollider2D>()) clone.GetComponent<BoxCollider2D>().enabled = true;
 
-                    clone.SetActive(false);
-                    clone.SetActive(true);
-
-
-
-                    return clone;
-                }
-            }
-        }
-        return null;
-    }
+    //                clone.SetActive(false);
+    //                clone.SetActive(true);
+    //                return clone;
+    //            }
+    //        }
+    //    }
+    //    return null;
+    //}
 
     public ICreature ActiveMice(string miceID, Transform hole)
     {
         string hashID = "";
-        ICreature creature =null;
+        ICreature creature = null;
         if (dictMicePool[miceID].Count > 0)
         {
             foreach (KeyValuePair<string, ICreature> mice in dictMicePool[miceID])
             {
                 hashID = mice.Key;
                 creature = mice.Value;
-                if (mice.Value.m_go.GetComponent<BoxCollider2D>()) mice.Value.m_go.GetComponent<BoxCollider2D>().enabled = true;
-                m_MPGame.GetCreatureSystem().AddMice(miceID, hashID, mice.Value);
-                AddHoleMiceRefs(hole, mice.Value.m_go);
+
+                if (mice.Value.m_go.GetComponent<BoxCollider2D>())
+                    mice.Value.m_go.GetComponent<BoxCollider2D>().enabled = true;
+
+                m_MPGame.GetCreatureSystem().AddMiceRefs(hole,miceID, hashID, mice.Value);
+           //     m_MPGame.GetCreatureSystem().AddHoleMiceRefs(hole, mice.Value);
+
                 break;
             }
             dictMicePool[miceID].Remove(hashID);
+            creature.Initialize();
             return creature;
         }
         else
         {
             string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", miceID.ToString());
             Instantiate(miceID, assetLoader.GetAsset(bundleName));
-            ActiveMice(miceID,hole); // 可能造成無線迴圈 會和下面一起造成產生了卻沒被使用的情況
+            ActiveMice(miceID, hole); // 可能造成無線迴圈 會和下面一起造成產生了卻沒被使用的情況
         }
         return null; // 錯誤 回傳空的
     }
@@ -377,7 +380,7 @@ public class PoolSystem : GameSystem
     /// <param name="hole"></param>
     /// <param name="impose">強制產生</param>
     /// <returns></returns>
-    public GameObject InstantiateMice(short miceID, float miceSize, Transform hole, bool impose)
+    public IMice InstantiateMice(short miceID, float miceSize, Transform hole, bool impose)
     {
         Vector3 _miceSize;
         IMice mice;
@@ -385,14 +388,14 @@ public class PoolSystem : GameSystem
         if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open || impose)
         {
             // 如果強制產生 且 老鼠在存活列表中 強制將老鼠死亡
-            if (impose && GetActiveHoleMice(hole.transform))
+            if (impose && m_CreatureSystem.GetActiveHoleMice(hole.transform)!=null)
             {
-                mice = (IMice)m_MPGame.GetCreatureSystem().GetMice(miceID.ToString(), GetActiveHoleMice(hole.transform).name);
+                mice = (IMice)m_MPGame.GetCreatureSystem().GetMice(miceID.ToString(), m_CreatureSystem.GetActiveHoleMice(hole.transform).m_go.name);
                 if (mice != null)
                 {
                     mice.Play(IAnimatorState.ENUM_AnimatorState.Died);
                     mice.GetAIState().SetAIState(new DiedAIState());
-                    RemoveHoleMiceRefs(hole);
+                    m_CreatureSystem.RemoveHoleMiceRefs(hole);
                 }
                 //GetHoleMiceRefs(hole.transform).GetComponentInChildren<IMice>().SendMessage("OnDead", 0.0f); //錯誤
             }
@@ -402,8 +405,8 @@ public class PoolSystem : GameSystem
             //    RemoveHoleMiceRefs(hole.transform); //錯誤
 
             // 取得物件池老鼠
-             mice = (IMice)ActiveMice(miceID.ToString(),hole);
-            
+            mice = (IMice)ActiveMice(miceID.ToString(), hole);
+
             // 如果物件池老鼠不是空的 產生老鼠
             if (mice.m_go != null)
             {
@@ -418,7 +421,7 @@ public class PoolSystem : GameSystem
 
                 mice.m_go.transform.gameObject.SetActive(false);
                 mice.m_go.transform.gameObject.SetActive(true);
-                return mice.m_go;
+                return mice;
             }
         }
         return null;
@@ -429,64 +432,47 @@ public class PoolSystem : GameSystem
     public void SpawnBoss(Transform hole, short miceID, float lerpSpeed, float lerpTime, float upSpeed, float upDistance)// 怪怪的 程式碼太長 錯誤
     {
         Debug.Log("------------------- Mice Boss ID:  " + miceID + " ------------------------");
-        
+
+        // new MiceBoss (default scale x 1.3)
+        // init mice go
+        // Composite go attr skill ai state anim
+        // if hole closed kill mice
+        // play hole anim
+        // spawn
+
         try
         {
-            IMice mice;
-            // 如果Hole上有Mice 移除Mice
             if (hole.GetComponent<HoleState>().holeState == HoleState.State.Closed)
             {
-                mice = (IMice)m_MPGame.GetCreatureSystem().GetMice(miceID.ToString(), GetActiveHoleMice(hole.transform).name);
-                if (mice != null)
+                ICreature creature = m_CreatureSystem.GetMice(hole);
+
+            if (creature != null)
                 {
-                    mice.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                    mice.GetAIState().SetAIState(new DiedAIState());
-                    RemoveHoleMiceRefs(hole);
+                    creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
+                    creature.GetAIState().SetAIState(new DiedAIState());
+                    m_CreatureSystem.RemoveHoleMiceRefs(hole);
                 }
             }
+
+            ICreature boss = new MiceBoss();
+            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
+            ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
+            MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
+            GameObject go = MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
 
             // 播放洞口動畫
             hole.GetComponent<Animator>().enabled = true;
             hole.GetComponent<Animator>().Play("Layer1.HoleScale", -1, 0f);
 
-            // 產生MicBoss 並移除Mice Component
-
-            mice =(IMice) ActiveMice(miceID.ToString(),hole);
-            // MiceBase mice = clone.GetComponent(typeof(MiceBase)) as MiceBase;
-            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
-
-            // if (mice.enabled) mice.enabled = false;
-            GameObject.Destroy(mice.m_go.GetComponent<IMice>());
-
-            mice.m_go.SetActive(false);
-            mice.m_go.transform.parent = hole.transform;
-             mice.m_go.transform.localScale = new Vector3(1.3f, 1.3f, 0f);
-            mice.m_go.transform.localPosition = new Vector3(0, 0, 0);
-            //   clone.AddComponent(clone, miceAttr.name + "Boss"); //需要改寫 新增BOSS PREFEB 初始就附加上去
-            Debug.Log("--------------------miceAttr.name" + miceAttr.name);
-            string titleUpcase = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(miceAttr.name.Replace("mice", "").ToLower()); // 第一個字母大寫
-            Type t = Type.GetType(titleUpcase + "MiceBoss");
-            mice.m_go.AddComponent(t);
-            MiceBossBase bossBase = mice.m_go.GetComponent(t) as MiceBossBase;
-            bossBase.enabled = true;
-
-            // 初始化 MiceBoss數值
-
-            MiceBossBase boss = mice.m_go.GetComponent(typeof(MiceBossBase)) as MiceBossBase;
-            SkillBase skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
-            MiceAnimState animState = new MiceAnimState(mice.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
-
+            miceAttr.SetHP(); // 沒有BOSS的血量
             boss.SetArribute(miceAttr);
+            boss.SetGameObject(go);
             boss.SetSkill(skill);
             boss.SetAnimState(animState);
-            boss.Initialize(0.1f, 6f, 60f, miceAttr.LifeTime);  // 錯誤 可能非必要
-            mice.m_go.SetActive(true);
+            boss.Initialize();  // 錯誤 可能非必要
+            boss.m_go.SetActive(true);
 
-            Debug.Log("Skill : " + MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID));
-
-            Debug.Log("----------------------------------------- " + mice.m_go.activeSelf + "----------------------------------------- ");
-            // 加入老鼠陣列
-            m_MPGame.GetPoolSystem().AddHoleMiceRefs(mice.m_go.transform.parent, mice.m_go);
+            m_CreatureSystem.AddMiceRefs(hole, miceID.ToString(), go.GetHashCode().ToString(), boss);
         }
         catch
         {
@@ -495,6 +481,11 @@ public class PoolSystem : GameSystem
     }
     #endregion
 
+    /// <summary>
+    /// 實體化老鼠、組裝 並放入物件池
+    /// </summary>
+    /// <param name="objectID"></param>
+    /// <param name="bundle"></param>
     void Instantiate(string objectID, GameObject bundle)
     {
         Transform objGroup = objectPool.transform.Find(objectID);
@@ -516,7 +507,7 @@ public class PoolSystem : GameSystem
         {
             clone = MPGFactory.GetObjFactory().Instantiate(bundle, objGroup, objectID, Vector3.zero, Vector3.one, Vector2.zero, -1);
 
-            IMice mice;
+            ICreature creature ;
             MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
             miceAttr.SetMaxHP(1);   // 錯誤 FUCK 生命應該在Server
 
@@ -524,34 +515,34 @@ public class PoolSystem : GameSystem
             if (objectID == "11001")
             {
                 // 附加 Mice 並初始化
-                mice = clone.GetComponent<IMice>();
-                mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+                creature = new Mice();
+                creature.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
             }
             else if (objectID == "11002")
             {
                 // 附加 Mice 並初始化
-                mice = clone.GetComponent<IMice>();
-                mice.SetAnimState(new MuchAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+                creature = new Much();
+                creature.SetAnimState(new MuchAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
             }
             else if (objectID == "11003")
             {            // 附加 Mice 並初始化
-                mice = clone.GetComponent<IMice>();
-                mice.SetAnimState(new HeroMiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+                creature = new HeroMice();
+                creature.SetAnimState(new HeroMiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
             }
             else
             {            // 附加 Mice 並初始化
-                mice = clone.AddMissingComponent<Mice>();
-                mice.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
+                creature = new Mice();
+                creature.SetAnimState(new MiceAnimState(clone, false, lerpSpeed, miceAttr.MiceSpeed, upDantance, miceAttr.LifeTime));
             }
 
             // 設定數值
-            mice.SetArribute(miceAttr);
-            mice.SetGameObject(clone);
-            mice.SetAI(new MiceAI(mice));
-            mice.Initialize(false, lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
+            creature.SetArribute(miceAttr);
+            creature.SetGameObject(clone);
+            creature.SetAI(new MiceAI(creature));
+            //creature.Initialize();
 
             // Add Mice Pool
-            dictMicePool[objectID].Add(clone.GetHashCode().ToString(), mice);
+            dictMicePool[objectID].Add(clone.GetHashCode().ToString(), creature);
 
             clone.gameObject.SetActive(false);
         }
@@ -610,7 +601,6 @@ public class PoolSystem : GameSystem
     }
 
 
-
     /// <summary>
     /// 將 戰鬥老鼠 初始化 並 放入物件池
     /// </summary>
@@ -620,11 +610,10 @@ public class PoolSystem : GameSystem
     public void AddMicePool(string miceID, string hashID, IMice mice)
     {
         MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID);
-
+        mice.Release();
         mice.SetArribute(miceAttr);
         mice.SetGameObject(mice.m_go);
         mice.SetAI(new MiceAI(mice));
-        mice.Initialize(false, lerpSpeed, upSpeed, upDantance, miceAttr.LifeTime);
         mice.m_go.transform.GetChild(0).localScale = Vector3.one;
         mice.m_go.transform.GetChild(0).localRotation = Quaternion.identity;
         mice.m_go.transform.GetChild(0).localPosition = Vector3.zero;
@@ -632,75 +621,6 @@ public class PoolSystem : GameSystem
         dictMicePool[miceID].Add(hashID, mice);
 
         System.GC.Collect();
-    }
-
-    /// <summary>
-    /// 取得物件池老鼠
-    /// </summary>
-    /// <param name="miceID"></param>
-    /// <param name="hashID"></param>
-    /// <returns></returns>
-    public GameObject GetMice(string miceID, string hashID)
-    {
-        dictMicePool[miceID].TryGetValue(hashID, out ICreature value);
-        return value.m_go;
-    }
-
-    /// <summary>
-    /// 存入老鼠索引
-    /// </summary>
-    /// <param name="hole"></param>
-    /// <param name="mice"></param>
-    /// <returns></returns>
-    public void AddHoleMiceRefs(Transform hole, GameObject mice)
-    {
-        dictHoleMiceRefs.Add(hole, mice);
-    }
-
-    /// <summary>
-    /// 移除老鼠索引
-    /// </summary>
-    /// <param name="hole"></param>
-    /// <param name="mice"></param>
-    /// <returns></returns>
-    public void RemoveHoleMiceRefs(Transform hole)
-    {
-        dictHoleMiceRefs.Remove(hole);
-    }
-
-    /// <summary>
-    /// 取得 老鼠 是否正在洞裡的
-    /// </summary>
-    /// <param name="hole"></param>
-    /// <returns></returns>
-    public bool GetbActiveHoleMice(Transform hole)
-    {
-        return dictHoleMiceRefs.ContainsKey(hole); ;
-    }
-
-    /// <summary>
-    /// 取得正在洞裡的老鼠
-    /// </summary>
-    /// <param name="hole"></param>
-    /// <returns></returns>
-    public GameObject GetActiveHoleMice(Transform hole)
-    {
-        if (GetbActiveHoleMice(hole))
-            return dictHoleMiceRefs[hole];
-        return null;
-    }
-
-
-    /// <summary>
-    /// 取得老鼠索引
-    /// </summary>
-    /// <param name="hole"></param>
-    /// <param name="mice"></param>
-    /// <returns></returns>
-    public GameObject GetHoleMiceRefs(Transform hole)
-    {
-        dictHoleMiceRefs.TryGetValue(hole, out GameObject value);
-        return value;
     }
 
     public List<int> GetPoolMiceIDs()
@@ -717,6 +637,11 @@ public class PoolSystem : GameSystem
     {
         IsloadPlayerItem = true;
         Debug.Log("OnLoadPlayerItem");
+    }
+
+    public override void Release()
+    {
+        Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
     }
 
     ~PoolSystem()

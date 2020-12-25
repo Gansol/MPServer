@@ -4,31 +4,30 @@ using System.Collections.Generic;
 
 public class Bali : IMice
 {
-    private BattleSystem battleManager;
+   // private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
-    UICamera cam;
+  //  UICamera cam;
 
     public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
-        cam = Camera.main.GetComponent<UICamera>();
+       // cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
-        transform.localPosition = new Vector3(0, 0);
-        GetComponent<BoxCollider2D>().enabled = true;
+        m_AnimState.Init(m_go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        m_go.transform.localPosition = new Vector3(0, 0);
+        m_go.GetComponent<BoxCollider2D>().enabled = true;
     }
 
     void OnEnable()
     {
-        GetComponent<BoxCollider2D>().enabled = true;
+        m_go.GetComponent<BoxCollider2D>().enabled = true;
         _lastTime = Time.fixedTime; // 出生時間
     }
 
 
-    public void Update()
+    public override void Update()
     {
         if (Global.isGameStart)
         {
@@ -36,7 +35,7 @@ public class Bali : IMice
         }
         else
         {
-            gameObject.SetActive(false);
+            m_go.SetActive(false);
         }
     }
 
@@ -46,7 +45,7 @@ public class Bali : IMice
     /// </summary>
     protected override void OnHit()
     {
-        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ ENUM_AIState != ENUM_CreatureState.Die && m_Arribute.GetHP() > 0)
         {
             MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
@@ -56,7 +55,7 @@ public class Bali : IMice
         }
         else
         {
-            Debug.Log("enabled: " + enabled + "   Collider: " + GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + ENUM_AIState + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
         }
     }
 
@@ -71,13 +70,11 @@ public class Bali : IMice
         {
             if (m_Arribute.GetHP() == 0)
             {
-                battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
-                battleManager.BreakCombo(); // 如果上面修正了 這裡要取消 錯誤
+                Debug.Log("lifeTime:" + lifeTime);
+                Play(IAnimatorState.ENUM_AnimatorState.Died);
+                GetAIState().SetAIState(new DiedAIState());
             }
-
-            Global.dictBattleMiceRefs.Remove(transform.parent);
-            gameObject.SetActive(false);
-            this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+            m_go.SetActive(false);
         }
     }
 

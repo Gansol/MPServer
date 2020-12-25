@@ -3,10 +3,13 @@ using System.Collections;
 
 public abstract class IMice : ICreature
 {
-    public IMice() { }
     protected static UIPlaySound hitSound;
+    public IMice() { }
 
-    public abstract void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime);
+    public override void Initialize()
+    {
+       m_go.GetComponent<BoxCollider2D>().enabled =true ;
+    }
 
 
     public override void Update()
@@ -35,7 +38,7 @@ public abstract class IMice : ICreature
         m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
     }
 
-    public override void SetSkill(SkillBase skill)
+    public override void SetSkill(ISkill skill)
     {
         if (this.m_Skill != null)
             this.m_Skill.Release();
@@ -69,7 +72,7 @@ public abstract class IMice : ICreature
         this.m_AnimState = state;
     }
 
-    public override void SetArribute(CreatureAttr arribute)
+    public override void SetArribute(ICreatureAttr arribute)
     {
         if (this.m_Arribute != null)
             this.m_Arribute = null;

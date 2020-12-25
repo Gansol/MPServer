@@ -32,7 +32,7 @@ public class SpawnAI
     ////public MPFactory(MPGame MPGame)
     ////    : base(MPGame)
     ////{
-    ////    Initinal();
+    ////    Initialize();
     ////}
 
     //public SpawnAI(PoolManager poolManager, List<GameObject> hole)
