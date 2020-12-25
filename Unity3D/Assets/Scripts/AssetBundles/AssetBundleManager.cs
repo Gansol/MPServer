@@ -56,7 +56,7 @@ public static class AssetBundleManager /*: GameSystem*/
         }
     }
 
-    public static void Init()
+    public static void Initialize()
     {
         Request = null;
         IsbLoadAtlas = false;

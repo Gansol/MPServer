@@ -6,7 +6,7 @@ using System;
 using Gansol;
 public class SkillFactory : IFactory
 {
-    static SkillBase skill = null;
+    static ISkill skill = null;
     static SkillAttr skillData = null;
 
     /// <summary>
@@ -15,7 +15,7 @@ public class SkillFactory : IFactory
     /// <param name="dictionary">技能所在字典</param>
     /// <param name="objectID">物件名稱</param>
     /// <returns></returns>
-    public SkillBase GetSkill(Dictionary<string, object> dictionary, short objectID)
+    public ISkill GetSkill(Dictionary<string, object> dictionary, short objectID)
     {
 
         short skillID = (short)System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(dictionary, "SkillID", objectID.ToString()));
@@ -92,9 +92,9 @@ public class SkillFactory : IFactory
         return skill;
     }
 
-    public List<SkillBase> GetSkillsByType(ENUM_SkillType skillType)
+    public List<ISkill> GetSkillsByType(ENUM_SkillType skillType)
     {
-        List<SkillBase> list = new List<SkillBase>();
+        List<ISkill> list = new List<ISkill>();
 
         foreach (KeyValuePair<string, object> skill in Global.dictSkills)
         {

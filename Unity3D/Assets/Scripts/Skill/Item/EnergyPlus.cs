@@ -30,7 +30,7 @@ public class EnergyPlus : SkillItem
         playerAIState.Release(playerState);    // 錯誤 這裡如果一次來兩個狀態就會BUG
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         Display();
     }
@@ -38,7 +38,7 @@ public class EnergyPlus : SkillItem
     public override void Display()
     {
         Debug.Log(skillData.SkillName + " Display: " + skillData.Attr);
-        AssetLoader assetLoader = MPGame.Instance.GetAssetLoader();
+        AssetLoaderSystem assetLoader = MPGame.Instance.GetAssetLoaderSystem();
         GameObject bundle = assetLoader.GetAsset("effect_"+skillData.SkillName );
        
         effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName , Vector3.zero, Vector3.one, Vector2.one, 1));

@@ -7,7 +7,7 @@ public class InsABTest : MonoBehaviour
 {
     // public static string sourcePath = Application.dataPath + "/Assetbundles";
     const string AssetBundlesOutputPath = "/_Assetbundles/Android/Panel";
-    GameObject obj;
+    GameObject go;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,9 +47,9 @@ public class InsABTest : MonoBehaviour
         GameObject loadedAsset = asset.asset as GameObject;
 
         //Do something with the loaded loadedAsset  object (Load to RawImage for example) 
-        obj = loadedAsset;
+        go = loadedAsset;
 
-        Instantiate(obj);
+        Instantiate(go);
     }
 
 }

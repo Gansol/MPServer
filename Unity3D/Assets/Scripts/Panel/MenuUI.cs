@@ -9,14 +9,15 @@ public class MenuUI : IMPPanelUI
     public MenuUI(MPGame MPGame)
         : base(MPGame)
     {
-       
+        Debug.Log("--------------- MenuUI Created ----------------");
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("MenUI Init!");
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString());
+        Debug.Log("--------------- MenuUI Initialize ----------------");
         EventMaskSwitch.Init();
+        m_MPGame.GeAudioSystem().PlayMusic("bgm_001");
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString());
         UI = m_RootUI.GetComponentInChildren<AttachBtn_MenuUI>();
         UIEventListener.Get(UI.playerBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.teamBtn).onClick = m_MPGame.ShowPanel;
@@ -26,8 +27,6 @@ public class MenuUI : IMPPanelUI
         UIEventListener.Get(UI.settingBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.battleBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.survivalBtn).onClick = m_MPGame.ShowPanel;
-
-        m_MPGame.GeAudioSystem().PlayMusic("bgm_001");
     }
 
     public override void Update()
@@ -59,10 +58,11 @@ public class MenuUI : IMPPanelUI
         throw new System.NotImplementedException();
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         throw new System.NotImplementedException();
     }
+
 
     public override void Release()
     {

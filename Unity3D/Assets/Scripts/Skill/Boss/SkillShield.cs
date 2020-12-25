@@ -13,9 +13,9 @@ public class SkillShield : SkillBoss
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        arribute.SetShield(skillData.Attr);
+        creature.GetArribute().SetShield(skillData.Attr);
     }
 
     public override void UpdateEffect()

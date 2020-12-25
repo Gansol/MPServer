@@ -13,7 +13,7 @@ using System.Data;
 using System.Text;
 using GooglePlayGames.BasicApi;
 using UnityEngine.Networking;
-
+using UnityEngine.SceneManagement;
 /// 
 /// 年齡驗證沒寫
 /// 
@@ -59,7 +59,11 @@ public class LoginUI : IMPPanelUI
 
     GameObject tmpPanel;
 
-    public LoginUI(MPGame MPGame) : base(MPGame) { }
+    public LoginUI(MPGame MPGame) : base(MPGame) {
+        Debug.Log("--------------- LoginUI Created ----------------");
+    }
+
+
 
     public void OnLicenseClickOn(GameObject panel)
     {
@@ -99,10 +103,10 @@ public class LoginUI : IMPPanelUI
 
     }
     // 在Start裡建立好Login的回應事件
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("LoginUI Init!");
-        assetLoader = MPGame.Instance.GetAssetLoader();
+        Debug.Log("--------------- LoginUI Initialize ----------------");
+        m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
         Global.photonService.LoginEvent += OnLogin;
         Global.photonService.JoinMemberEvent += OnJoinMember;
         Global.photonService.LoadSceneEvent += OnExitMainGame;
@@ -151,13 +155,14 @@ public class LoginUI : IMPPanelUI
     }
 
 
-    public override void Update()
+    public override void OnGUI()
     {
- //       ShowChkMsg();   // 原本在OnGUI
+        if(SceneManager.GetActiveScene().name == Global.Scene.MainGame)
+            ShowChkMsg(); 
     }
 
 
-    public void SwitchLoginType(GameObject obj)
+    public void SwitchLoginType(GameObject go)
     {
         UI.gansolLogin.gameObject.SetActive(!bSwitchLoginType);
         UI.snsLogin.gameObject.SetActive(bSwitchLoginType);
@@ -229,7 +234,7 @@ public class LoginUI : IMPPanelUI
         }
     }
 
-    public void Login(GameObject obj)
+    public void Login(GameObject go)
     {
         Global.ShowMessage("登入中...", Global.MessageBoxType.NonChk, 0);
         
@@ -243,27 +248,27 @@ public class LoginUI : IMPPanelUI
         UI.loginPanel.gameObject.SetActive(false);
     }
 
-    public void SwichLoginType(GameObject obj)
+    public void SwichLoginType(GameObject go)
     {
 
         UI.loginPanel.gameObject.SetActive(false);
         UI.joinPanel.gameObject.SetActive(true);
     }
 
-    public void ShowJoinPanel(GameObject obj)
+    public void ShowJoinPanel(GameObject go)
     {
         UI.loginPanel.gameObject.SetActive(false);
         UI.joinPanel.gameObject.SetActive(true);
     }
 
-    public void ShowLoginPanel(GameObject obj)
+    public void ShowLoginPanel(GameObject go)
     {
         UI.loginPanel.gameObject.SetActive(true);
         UI.joinPanel.gameObject.SetActive(false);
     }
 
     // public void JoinMember(UILabel email, UIInput password, UIInput confrimPassword, UILabel nickname, UILabel age, UILabel sex)
-    public void JoinMember(GameObject obj)
+    public void JoinMember(GameObject go)
     {
 
         int sex = -1, age = -1;
@@ -486,7 +491,7 @@ public class LoginUI : IMPPanelUI
 
     //20200527
     #region GoogleLogin
-    public void GoogleLogin(GameObject obj)
+    public void GoogleLogin(GameObject go)
     {
 
         if (!isLoginBtn)
@@ -748,7 +753,11 @@ public class LoginUI : IMPPanelUI
 
     public override void Release()
     {
-        throw new NotImplementedException();
+        Global.photonService.LoginEvent -= OnLogin;
+        Global.photonService.JoinMemberEvent -= OnJoinMember;
+        Global.photonService.LoadSceneEvent -= OnExitMainGame;
+        Global.photonService.ReLoginEvent -= OnReLogin;
+        Global.photonService.GetProfileEvent -= OnGetProfile;
     }
 
     protected override void OnLoading()
@@ -771,7 +780,7 @@ public class LoginUI : IMPPanelUI
         throw new NotImplementedException();
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         throw new NotImplementedException();
     }

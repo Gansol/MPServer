@@ -15,7 +15,7 @@ public class FreezeEnergy : SkillBoss
         skillFlag = false;
     }
 
-    public override void Display(GameObject ob, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         // Global.photonService.SendBossSkill(MPProtocol.ENUM_Skill.StealHarvest, true);
     }

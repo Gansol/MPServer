@@ -9,7 +9,7 @@ public class PlayerAIState
 
     short State;
     private BattleSystem battleManager;
-    Dictionary<ENUM_PlayerState, SkillBase> _dictSkills = new Dictionary<ENUM_PlayerState, SkillBase>();
+    Dictionary<ENUM_PlayerState, ISkill> _dictSkills = new Dictionary<ENUM_PlayerState, ISkill>();
 
     // Use this for initialization
     public PlayerAIState(BattleSystem battleManager)
@@ -60,7 +60,7 @@ public class PlayerAIState
 
     //}
 
-    public void SetPlayerAIState(ENUM_PlayerState state, SkillBase skill)
+    public void SetPlayerAIState(ENUM_PlayerState state, ISkill skill)
     {
         // show image
         //ShowICON(skill.GetID());
@@ -69,7 +69,7 @@ public class PlayerAIState
         // 如果已有舊的狀態 移除 後 覆蓋
         if ((this.State & (short)state) > 0)
         {
-            SkillBase oldSkill;
+            ISkill oldSkill;
             _dictSkills.TryGetValue(state, out oldSkill);   // 找出重複且已存在技能 (舊的技能)
             oldSkill.Release();
             Release(state);

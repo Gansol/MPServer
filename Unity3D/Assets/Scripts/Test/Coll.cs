@@ -17,7 +17,7 @@ public class Coll : MonoBehaviour
         Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("icon_eggmice"));
         //System.GC.Collect();
         //Resources.UnloadUnusedAssets();
-        AssetLoader loader = MPGame.Instance.GetAssetLoader();
+        AssetLoaderSystem loader = MPGame.Instance.GetAssetLoaderSystem();
 
         Instantiate(loader.GetAsset("icon_eggmice"));
     }

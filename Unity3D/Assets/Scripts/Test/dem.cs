@@ -6,10 +6,10 @@ public class dem : MonoBehaviour
     public GameObject coll;
     public GameObject coll2;
     public UIAtlas atlas;
-    AssetLoader loader;
+    AssetLoaderSystem loader;
     void Start()
     {
-        loader = MPGame.Instance.GetAssetLoader();
+        loader = MPGame.Instance.GetAssetLoaderSystem();
         //loader.LoadAsset("miceicon/", "miceicon");
         //loader.LoadPrefab("miceicon/", "icon_Eggmice");
 

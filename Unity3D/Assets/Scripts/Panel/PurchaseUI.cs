@@ -38,7 +38,7 @@ public class PurchaseUI : IMPPanelUI
 
     public PurchaseUI(MPGame MPGame) : base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().purchasePanel;
+        Debug.Log("--------------- PurchaseUI Created ----------------");
         objFactory = new ObjectFactory();
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
@@ -48,8 +48,9 @@ public class PurchaseUI : IMPPanelUI
         //_iap.getProducts();
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
+        Debug.Log("--------------- PurchaseUI Initialize ----------------");
         _bLoadPanel = false;
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
@@ -74,7 +75,7 @@ public class PurchaseUI : IMPPanelUI
         }
 
         // Panel載入完成後 實體化道具 載入屬性
-        if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadAsset && _bLoadPanel)
+        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadAsset && _bLoadPanel)
         {
             _bLoadAsset = !_bLoadAsset;
             InstantiateItem();
@@ -105,7 +106,7 @@ public class PurchaseUI : IMPPanelUI
     /// </summary>
     private void InstantiateItem()
     {
-        GameObject bundle = m_MPGame.GetAssetLoader().GetAsset(Global.PurchaseItemAssetName);
+        GameObject bundle = m_MPGame.GetAssetLoaderSystem().GetAsset(Global.PurchaseItemAssetName);
         Transform itemSlot = null;
         object value, promotionsTime;
         bool reload = false;
@@ -330,10 +331,16 @@ public class PurchaseUI : IMPPanelUI
             if (_bFirstLoad)
             {
                 _bFirstLoad = false;
-                m_MPGame.GetAssetLoader().LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
+                m_MPGame.GetAssetLoaderSystem().LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
             }
             _bLoadAsset = true;
         }
+    }
+
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().purchasePanel;
+        base.ShowPanel(panelName);
     }
 
     private void OnLoadCurrency()
@@ -367,7 +374,7 @@ public class PurchaseUI : IMPPanelUI
         _bIABInit = status;
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
         ShowPanel(m_RootUI.name);

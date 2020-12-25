@@ -5,8 +5,8 @@ public class GameLoop : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-        GameObject.DontDestroyOnLoad(this.gameObject);
-        MPGame.Instance.Initinal(this);
+        DontDestroyOnLoad(this.gameObject);
+        MPGame.Instance.Initialize(this);
 	}
 
     private void OnGUI()

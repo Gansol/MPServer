@@ -3,9 +3,9 @@ using System.Collections;
 
 public class SceneAnimsManager : MonoBehaviour {
 
-    public void PlayHole(GameObject obj)
+    public void PlayHole(GameObject go)
     {
-        obj.GetComponent<Animation>().Play();
+        go.GetComponent<Animation>().Play();
     }
 
 }

@@ -37,10 +37,10 @@ public class Question : MonoBehaviour {
     }
 
 
-    public void OnClosed(GameObject obj)
+    public void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
-        //GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        //GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
         i = 0;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using MPProtocol;
 using System.Collections.Generic;
-public abstract class SkillItem : SkillBase
+public abstract class SkillItem : ISkill
 {
     protected List<GameObject> effects;
 

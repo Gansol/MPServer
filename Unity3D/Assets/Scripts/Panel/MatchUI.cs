@@ -52,18 +52,18 @@ public class MatchUI : IMPPanelUI
 
     public MatchUI(MPGame MPGame) : base(MPGame)
     {
+        Debug.Log("--------------- MatchUI Created ----------------");
         SwitchBtnMethod = new SwitchBtnComponent();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         _dictTeamData = new Dictionary<string, object>();
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
     }
 
 
-    public override void Initinal()
+    public override void Initialize()
     {
-       
+        Debug.Log("--------------- MatchUI Initialize ----------------");
         actorScale = new Vector3(0.8f, 0.8f, 1);
 
         _checkTime = 0;
@@ -114,7 +114,7 @@ public class MatchUI : IMPPanelUI
             }
 
             // 載入資產完成後 實體化 物件
-            if (m_MPGame.GetAssetLoader().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
             {
                 _bLoadedAsset = !_bLoadedAsset;
                 _bLoadedEffect = !_bLoadedEffect;
@@ -224,9 +224,9 @@ public class MatchUI : IMPPanelUI
         {
             string bundleName = Global.IconSuffix + item.Value.ToString();
 
-            if (assetLoader.GetAsset(bundleName) != null)                                   // 已載入資產時
+            if (m_AssetLoaderSystem.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
-                GameObject bundle = assetLoader.GetAsset(bundleName);
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
                 Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
 
                 if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
@@ -384,16 +384,20 @@ public class MatchUI : IMPPanelUI
         }
     }
 
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
+        base.ShowPanel(panelName);
+    }
 
-
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
         UI.beforeMatchPanel.SetActive(true);
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
         ShowPanel(m_RootUI.transform.GetChild(0).name);
-        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
         UI.matchingPanel.SetActive(false);
         // EventMaskSwitch.Prev();
     }

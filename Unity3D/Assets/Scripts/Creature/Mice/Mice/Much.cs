@@ -4,34 +4,26 @@ using System.Collections.Generic;
 
 public class Much : IMice
 {
-    private BattleSystem battleManager;
+    //private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
     private AnimatorStateInfo animInfo;
     UICamera cam;
     private bool _bEat;
 
-    public override void Initialize(bool isBoss,float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Initialize()
     {
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
+        //battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
        // if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
         cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.Init(gameObject, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
-        transform.localPosition = new Vector3(0, 0);
-        GetComponent<BoxCollider2D>().enabled = true;
         _bEat = false;
-    }
-
-    void OnEnable()
-    {
-        GetComponent<BoxCollider2D>().enabled = true;
         _lastTime = Time.fixedTime; // 出生時間
     }
 
 
-    public void Update()
+    public override void Update()
     {
         if (Global.isGameStart)
         {
@@ -39,31 +31,39 @@ public class Much : IMice
             animInfo = m_AnimState.GetAnimStateInfo();
 
             if (animInfo.fullPathHash == Animator.StringToHash("Layer1.Eat") && animInfo.normalizedTime > 0.5f)
-                GetComponent<BoxCollider2D>().enabled = false;
+                m_go.GetComponent<BoxCollider2D>().enabled = false;
         }
         else
         {
-            gameObject.SetActive(false);
+            m_go.SetActive(false);
         }
 
         if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Eat && !_bEat)
         {
             _bEat = true;
-            
-            Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
-            foreach (KeyValuePair<Transform, GameObject> item in buffer)
-            {
-                Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
-                pos.Add(0, transform.position);
-                if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key) && item.Value != gameObject)
-                {
-                    if (item.Value.GetComponent<IMice>() != null)
-                    {
-                        item.Value.GetComponent<IMice>().OnEffect("Much", pos);
-                        item.Value.GetComponent<BoxCollider2D>().enabled = false;
-                    }
-                }
-            }
+
+           // Play(IAnimatorState.ENUM_AnimatorState.Eat);
+
+            CreatureSystem m_CreatureSystem = MPGame.Instance.GetCreatureSystem();
+            Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
+            pos.Add(0, m_go.transform.position);
+
+            m_CreatureSystem.SetEffect(this.m_Arribute.name, pos);
+
+            //Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
+            //foreach (KeyValuePair<Transform, GameObject> item in buffer)
+            //{
+            //    Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
+            //    pos.Add(0, transform.position);
+            //    if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key) && item.Value != gameObject)
+            //    {
+            //        if (item.Value.GetComponent<IMice>() != null)
+            //        {
+            //            item.Value.GetComponent<IMice>().OnEffect("Much", pos);
+            //            item.Value.GetComponent<BoxCollider2D>().enabled = false;
+            //        }
+            //    }
+            //}
         }
     }
 
@@ -74,7 +74,7 @@ public class Much : IMice
     protected override void OnHit()
     {
         
-        if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ enabled && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && */ m_Arribute.GetHP() > 0)
         {
             MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
@@ -84,7 +84,7 @@ public class Much : IMice
         }
         else
         {
-            Debug.Log("enabled: " + enabled + "   Collider: " + GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + ENUM_AIState.ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
         }
     }
 
@@ -95,17 +95,27 @@ public class Much : IMice
     /// <param name="lifeTime">存活時間上限</param>
     protected override void OnDead(float lifeTime)
     {
+        //if (Global.isGameStart)
+        //{
+        //    if (m_Arribute.GetHP() == 0)
+        //        battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+        //    else
+        //        battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+        //    Global.dictBattleMiceRefs.Remove(transform.parent);
+
+        //    gameObject.SetActive(false);
+        //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+        //}
+
         if (Global.isGameStart)
         {
             if (m_Arribute.GetHP() == 0)
-                battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+                m_AI.SetAIState(new DiedAIState());
             else
-                battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
-            Global.dictBattleMiceRefs.Remove(transform.parent);
-            Global.MiceCount--;
+                m_AI.SetAIState(new ByeByeAIState());
 
-            gameObject.SetActive(false);
-            this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+            Play(IAnimatorState.ENUM_AnimatorState.Died);
+            m_go.SetActive(false);
         }
     }
 
@@ -127,5 +137,10 @@ public class Much : IMice
         }
 
         // play("Shadow"
+    }
+
+    public override void Release()
+    {
+        
     }
 }

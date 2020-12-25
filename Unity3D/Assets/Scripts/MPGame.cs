@@ -3,35 +3,36 @@ using System.Collections;
 //預備改寫仲介者模式
 public class MPGame
 {
-
     private static MPGame _instance = null;
-    public static bool _loginStatus, _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
+    private static bool _loginStatus, _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
 
     // GameSystem
+    private AssetLoaderSystem m_AssetLoaderSystem = null;
     private CreatureSystem m_CreatureSystem = null;
-    private MessageManager m_MessageManager = null;
-    private AudioSystem m_AudioSystem = null;
-    private  PoolSystem m_PoolSystem = null;
-    private BattleSystem m_BattleSystem = null;
+    private MessageSystem m_MessageSystem = null;
     private MissionSystem m_MissionSystem = null;
-    // UserInterface
+    private BattleSystem m_BattleSystem = null;
+    private AudioSystem m_AudioSystem = null;
+    private PoolSystem m_PoolSystem = null;
 
+    // GameUI
+    private LoginUI m_LoginUI = null;
+    private TeamUI m_TeamUI = null;
+    private StoreUI m_StoreUI = null;
+    private MenuUI m_MenuUI = null;
+    private BattleUI m_BattleUI = null;
+    private PlayerUI m_PlayerUI = null;
+    private MatchUI m_MatchUI = null;
+    private FriendUI m_FriendUI = null;
+    private TutorialUI m_TutorialUI = null;
+    private PurchaseUI m_PurchaseUI = null;
 
-    private static AssetLoader m_AssetLoader = null;
     private GameLoop m_StartCoroutine = null;
 
 
-    private LoginUI m_LoginUI = null;
-    private MenuUI m_MenuUI = null;
-    private PlayerUI m_PlayerUI = null;
-    private TeamUI m_TeamUI = null;
-    private StoreUI m_StoreUI = null;
-    private MatchUI m_MatchUI = null;
-    private PurchaseUI m_PurchaseUI = null;
-    private FriendUI m_FriendUI = null;
-    private TutorialUI m_TutorialUI = null;
-    private BattleUI m_BattleUI = null;
-
+    /// <summary>
+    /// 單例+仲介者模式 主系統
+    /// </summary>
     public static MPGame Instance
     {
         get
@@ -42,7 +43,7 @@ public class MPGame
         }
     }
 
-    public void Initinal(GameLoop gameLoop)
+    public void Initialize(GameLoop gameLoop)
     {
         // Init Event
         Global.photonService.LoginEvent += OnLogin;
@@ -51,33 +52,39 @@ public class MPGame
         m_StartCoroutine = gameLoop;
 
         // Iint GameSystem
+        m_AssetLoaderSystem = new AssetLoaderSystem(this);
         m_CreatureSystem = new CreatureSystem(this);
-        m_MessageManager = new MessageManager(this);
-        m_AudioSystem = new AudioSystem(this);
+        m_MessageSystem = new MessageSystem(this);
         m_MissionSystem = new MissionSystem(this);
-        m_AssetLoader = gameLoop.GetComponent<AssetLoader>();
+        m_AudioSystem = new AudioSystem(this);
 
         // Init GameUI
         m_MenuUI = new MenuUI(this);
         m_LoginUI = new LoginUI(this);
         m_BattleUI = new BattleUI(this);
-
-        Debug.Log("MPGame Initinal.");
+        m_PlayerUI = new PlayerUI(this);
+        m_TeamUI = new TeamUI(this);
+        m_StoreUI = new StoreUI(this);
+        m_MatchUI = new MatchUI(this);
+        m_FriendUI = new FriendUI(this);
+        m_TutorialUI = new TutorialUI(this);
+        m_PurchaseUI = new PurchaseUI(this);
+        Debug.Log("MPGame Initialize.");
     }
     public void OnGUI()
     {
+        if (_bloadMainScene)
+            m_LoginUI.OnGUI();
         if (_bLoadBattlelPanel)
             m_BattleUI.OnGUI();
     }
 
     public void Update()
     {
+        m_AssetLoaderSystem.Update();
+
         if (_bloadMainScene)
-        {
-            m_LoginUI.Update();
             m_MenuUI.Update();
-            //   m_TutorialManager.Update();
-        }
         if (_bLoadPlayerPanel)
             m_PlayerUI.Update();
         if (_bLoadTeamPanel)
@@ -92,74 +99,56 @@ public class MPGame
             m_FriendUI.Update();
         if (_bLoadTutorialPanel)
             m_TutorialUI.Update();
+
         if (_bLoadBattlelPanel)
         {
-          //  m_BattleUI.Update();
             m_BattleSystem.Update();
-            m_MissionSystem.Update();
             m_PoolSystem.Update();
-        }
-        if(Global.isGameStart)
+            m_MissionSystem.Update();
             m_BattleUI.Update();
+        }
     }
     public void FixedUpdate()
     {
 
     }
 
-    public void Release()
-    {
-        m_CreatureSystem.Release();
-    }
 
     public void ShowPanel(GameObject panel_btn)
     {
+        m_AudioSystem.PlaySound("se_click001");
+
         if (Global.LoginStatus)
         {
             string panelName = panel_btn.name.Replace("_Btn", "");//.Remove(panel_btn.name.Length - 4) ; // panelName =>  Player_Btn - 4 = Player
-            
-            m_AudioSystem.PlaySound("se_click001");
+
             switch (panelName)
             {
                 case "Player":
-                    if (!_bLoadPlayerPanel)
-                        m_PlayerUI = new PlayerUI(this);
                     m_PlayerUI.ShowPanel(panelName);
                     _bLoadPlayerPanel = true;
                     break;
                 case "Team":
-                    if (!_bLoadTeamPanel)
-                        m_TeamUI = new TeamUI(this);
                     m_TeamUI.ShowPanel(panelName);
                     _bLoadTeamPanel = true;
                     break;
                 case "Store":
-                    if (!_bLoadStorePanel)
-                        m_StoreUI = new StoreUI(this);
                     m_StoreUI.ShowPanel(panelName);
                     _bLoadStorePanel = true;
                     break;
                 case "Purchase":
-                    if (!_bLoadPurchasePanel)
-                        m_PurchaseUI = new PurchaseUI(this);
                     m_PurchaseUI.ShowPanel(panelName);
                     _bLoadPurchasePanel = true;
                     break;
                 case "Friend":
-                    if (!_bLoadFriendPanel)
-                        m_FriendUI = new FriendUI(this);
                     m_FriendUI.ShowPanel(panelName);
                     _bLoadFriendPanel = true;
                     break;
                 case "Match":
-                    if (!_bLoadMatchPanel)
-                        m_MatchUI = new MatchUI(this);
                     m_MatchUI.ShowPanel(panelName);
                     _bLoadMatchPanel = true;
                     break;
                 case "Tutorial":
-                    if (!_bLoadTutorialPanel)
-                        m_TutorialUI = new TutorialUI(this);
                     m_TutorialUI.ShowPanel(panelName);
                     _bLoadTutorialPanel = true;
                     break;
@@ -174,90 +163,34 @@ public class MPGame
         switch (panelName.name)
         {
             case "menuui":
-                Debug.Log("Init Scene MenuUI");
-                m_AudioSystem.Initinal();
-                m_MenuUI.Initinal();
-                m_LoginUI.Initinal();
+                m_MenuUI.Initialize();
+                m_LoginUI.Initialize();
+                _bloadMainScene = true;
                 break;
 
             case "gameui":
-                Debug.Log("Init Scene GameUI");
                 m_BattleSystem = new BattleSystem(this);
                 m_PoolSystem = new PoolSystem(this);
-                m_BattleUI.Initinal();
-                m_BattleSystem.Initinal();
-                m_PoolSystem.Initinal();
+                m_BattleUI.Initialize();
+                m_BattleSystem.Initialize();
+                m_PoolSystem.Initialize();
                 _bLoadBattlelPanel = true;
                 break;
         }
     }
 
-    //public void InitScene(string panelName)
-    //{
-    //    //  Debug.Log("panelName" + panelName);
-    //    switch (panelName)
-    //    {
-    //        case "menuui":
-
-    //            break;
-    //        case "battle":
-    //            //battleUI.Initinal();
-    //            break;
-    //        case "Player":
-    //            // m_StoreManager.ShowPanel(panelName);
-    //            break;
-    //        case "Team":
-    //            //  m_StoreManager.ShowPanel(panelName);
-    //            break;
-    //        case "Store":
-    //            //  m_StoreManager.ShowPanel(panelName);
-    //            break;
-    //        case "Purchase":
-    //            //  m_PurchaseManager.ShowPanel(panelName);
-    //            break;
-    //        case "Friend":
-    //            //   m_FriendManager.ShowPanel(panelName);
-    //            break;
-    //        case "Match":
-    //            //m_MatchManager.ShowPanel(panelName);
-    //            //if (!_bLoadMatchPanel)
-    //            //    m_MatchManager = new MatchManager(this);
-    //            //_bLoadMatchPanel = true;
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //}
-
-    public void LoadedScene(string sceneName)
+    public MessageSystem GetMessageSystem()
     {
-        switch (sceneName)
-        {
-            case (string)Global.Scene.MainGame:
-                _bloadMainScene = true;
-                break;
-        }
+        if (m_MessageSystem == null)
+            m_MessageSystem = new MessageSystem(this);
+        return m_MessageSystem;
     }
 
-    public MessageManager GetMessageManager()
+    public AssetLoaderSystem GetAssetLoaderSystem()
     {
-        if (m_MessageManager == null)
-            m_MessageManager = new MessageManager(this);
-        return m_MessageManager;
-    }
-
-    //public MessageManager GetAssetBundleManager()
-    //{
-    //    if (m_AssetBundleManager == null)
-    //        m_AssetBundleManager = new AssetBundleManager(this);
-    //    return m_MessageManager;
-    //}
-
-    public AssetLoader GetAssetLoader()
-    {
-        if (m_AssetLoader == null)
-            m_AssetLoader = m_StartCoroutine.GetComponent<AssetLoader>();
-        return m_AssetLoader;
+        if (m_AssetLoaderSystem == null)
+            m_AssetLoaderSystem = new AssetLoaderSystem(this);
+        return m_AssetLoaderSystem;
     }
 
     public AudioSystem GeAudioSystem()
@@ -294,17 +227,12 @@ public class MPGame
         return m_CreatureSystem;
     }
 
-
     public BattleUI GetBattleUI()
     {
         if (m_BattleUI == null)
-        {
             m_BattleUI = new BattleUI(this);
-            m_BattleUI.Initinal();
-        }
         return m_BattleUI;
     }
-
 
     public Coroutine StartCoroutine(IEnumerator IEnumerator)
     {
@@ -321,8 +249,29 @@ public class MPGame
         return _loginStatus;
     }
 
+    public void Release()
+    {
+        m_AssetLoaderSystem.Release();
+        m_CreatureSystem.Release();
+        m_MessageSystem.Release();
+        m_MissionSystem.Release();
+        m_AudioSystem.Release();
+
+        m_LoginUI.Release();
+        m_MenuUI.Release();
+        m_BattleUI.Release();
+        m_PlayerUI.Release();
+        m_TeamUI.Release();
+        m_StoreUI.Release();
+        m_MatchUI.Release();
+        m_FriendUI.Release();
+        m_TutorialUI.Release();
+        m_PurchaseUI.Release();
+    }
+
     ~MPGame()
     {
+        Release();
         Global.photonService.LoginEvent -= OnLogin;
     }
 }

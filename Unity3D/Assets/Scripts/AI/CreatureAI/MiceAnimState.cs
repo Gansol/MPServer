@@ -6,10 +6,10 @@ public class MiceAnimState : IAnimatorState
     private bool _toFlag, _toScale;
     private Vector3 _toWorldPos, _scale;
 
-    public MiceAnimState(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
-        : base(obj, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
+    public MiceAnimState(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+        : base(go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
     {
-        anims = obj.GetComponentInChildren<Animator>();
+        anims = go.GetComponentInChildren<Animator>();
         if (anims != null)
             currentState = anims.GetCurrentAnimatorStateInfo(0);
         _tmpSpeed = _upSpeed = upSpeed / 10;
@@ -31,18 +31,18 @@ public class MiceAnimState : IAnimatorState
 
     public override void UpdateAnimation()
     {
-        //anims = obj.GetComponentInChildren<Animator>();
+        //anims = go.GetComponentInChildren<Animator>();
         _survivalTime = Time.time - _lastTime;
-        if (_bMotion && !_toFlag && (_upFlag && obj.transform.localPosition.y < _upDistance))        // AnimationUp
+        if (_bMotion && !_toFlag && (_upFlag && go.transform.localPosition.y < _upDistance))        // AnimationUp
             AnimationUp();
 
-        if (_bMotion && !_toFlag && (_isDisappear && obj.transform.localPosition.y > -_upDistance)) // AnimationDown
+        if (_bMotion && !_toFlag && (_isDisappear && go.transform.localPosition.y > -_upDistance)) // AnimationDown
             AnimationDown();
 
-        if (_bMotion && _toFlag && (Vector3.Distance(obj.transform.position, _toWorldPos) > 0)) // AnimationTo
+        if (_bMotion && _toFlag && (Vector3.Distance(go.transform.position, _toWorldPos) > 0)) // AnimationTo
             AnimationTo();
 
-        if (_bMotion && _toScale && (Vector3.Distance(obj.transform.position, _toWorldPos) > 0)) // AnimationScale
+        if (_bMotion && _toScale && (Vector3.Distance(go.transform.position, _toWorldPos) > 0)) // AnimationScale
             AnimationScale();
 
         if (anims != null)
@@ -109,7 +109,7 @@ public class MiceAnimState : IAnimatorState
     public override void Play(ENUM_AnimatorState animState)
     {
         this.animState = animState;
-        anims = obj.GetComponentInChildren<Animator>();
+        anims = go.GetComponentInChildren<Animator>();
 
         switch (animState)
         {
@@ -134,20 +134,20 @@ public class MiceAnimState : IAnimatorState
 
     private void AnimationUp()
     {
-        //_upDistance = _isBoss ? obj.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
-        //float moveTo = obj.transform.localPosition.y + _upDistance;
-        //iTween.MoveTo(obj, iTween.Hash("y", moveTo.ToString(), "time", "1", "easyType", "easeOutCirc"));
-        _upDistance = _isBoss ? obj.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
+        //_upDistance = _isBoss ? go.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
+        //float moveTo = go.transform.localPosition.y + _upDistance;
+        //iTween.MoveTo(go, iTween.Hash("y", moveTo.ToString(), "time", "1", "easyType", "easeOutCirc"));
+        _upDistance = _isBoss ? go.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
         _tmpSpeed = Mathf.Lerp(_tmpSpeed, 1, _lerpSpeed);
 
-        if (obj.transform.localPosition.y + _tmpSpeed >= _upDistance)
+        if (go.transform.localPosition.y + _tmpSpeed >= _upDistance)
         {
-            obj.transform.localPosition = new Vector3(0, _upDistance, 0);
+            go.transform.localPosition = new Vector3(0, _upDistance, 0);
             _upFlag = false;
         }
         else
         {
-            obj.transform.localPosition += new Vector3(0, _tmpSpeed, 0);
+            go.transform.localPosition += new Vector3(0, _tmpSpeed, 0);
         }
     }
 
@@ -155,20 +155,20 @@ public class MiceAnimState : IAnimatorState
     {
         _tmpSpeed = Mathf.Lerp(_tmpSpeed, 20, _lerpSpeed);
 
-        if (obj.transform.localPosition.y - 20 <= -_upDistance)
+        if (go.transform.localPosition.y - 20 <= -_upDistance)
         {
             Vector3 _tmp;
             _tmp = new Vector3(0, -_upDistance, 0);
-            obj.transform.localPosition = _tmp;
+            go.transform.localPosition = _tmp;
             _upDistance = _tmpDistance;
             animState = ENUM_AnimatorState.Byebye;
-         //  obj.SendMessage("OnDead", _survivalTime);
+         //  go.SendMessage("OnDead", _survivalTime);
             //anims.StopPlayback();
             _isDisappear = false;
         }
         else
         {
-            obj.transform.localPosition -= new Vector3(0, _tmpSpeed, 0);
+            go.transform.localPosition -= new Vector3(0, _tmpSpeed, 0);
             //transform.localPosition = Vector3.Slerp(transform.localPosition, new Vector3(0, -_upDistance * 2, 0), Time.deltaTime * 5);
         }
     }
@@ -176,28 +176,28 @@ public class MiceAnimState : IAnimatorState
     private void AnimationTo()
     {
         // _tmpSpeed = Mathf.Lerp(_tmpSpeed, 1, _lerpSpeed);
-        float distance = Vector3.Distance(obj.transform.GetChild(0).transform.position, _toWorldPos);
+        float distance = Vector3.Distance(go.transform.GetChild(0).transform.position, _toWorldPos);
         if (distance >= 0 && distance <= 0.05f)
         {
-            obj.transform.GetChild(0).transform.position = _toWorldPos;
+            go.transform.GetChild(0).transform.position = _toWorldPos;
             _toFlag = false;
         }
         else
         {
-            /* if (obj.name != "10001")*/
-            //Debug.Log(obj.transform.parent.name + "\nPos:" + obj.transform.GetChild(0).transform.position+"\nLerp:" + Vector3.Lerp(obj.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed));
-            obj.transform.GetChild(0).transform.position = Vector3.Lerp(obj.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed);
+            /* if (go.name != "10001")*/
+            //Debug.Log(go.transform.parent.name + "\nPos:" + go.transform.GetChild(0).transform.position+"\nLerp:" + Vector3.Lerp(go.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed));
+            go.transform.GetChild(0).transform.position = Vector3.Lerp(go.transform.GetChild(0).transform.position, _toWorldPos, _lerpSpeed);
         }
     }
 
     private void AnimationScale()
     {
-        if (obj.transform.localScale == _scale)
+        if (go.transform.localScale == _scale)
             _toScale = false;
-        obj.transform.localScale = Vector3.Lerp(obj.transform.localScale, _scale, 0.1f);
+        go.transform.localScale = Vector3.Lerp(go.transform.localScale, _scale, 0.1f);
 
     }
-    public override void Init(GameObject obj, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Init(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
     {
         animState = ENUM_AnimatorState.None;
         _isBoss = isBoss;
@@ -206,7 +206,7 @@ public class MiceAnimState : IAnimatorState
         _lifeTime = lifeTime;
 
         _lastTime = Time.time;
-        this.obj = obj;
+        this.go = go;
         _upFlag = true;
         _bMotion = true;
         _bDead = false;

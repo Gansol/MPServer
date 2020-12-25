@@ -40,12 +40,12 @@ public class FriendUI : IMPPanelUI
 
     public FriendUI(MPGame MPGame): base(MPGame)
     {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().friendPanel;
+        Debug.Log("--------------- FriendUI Created ----------------");
     }
 
-    public override void Initinal()
+    public override void Initialize()
     {
-        Debug.Log("FrinedUI Init!");
+        Debug.Log("--------------- FriendUI Initialize ----------------");
         _bFirstLoad = true;
         _bLoadedPanel = false;
         itemPos = new Vector2(0, 0);
@@ -67,7 +67,7 @@ public class FriendUI : IMPPanelUI
             OnLoadPanel();
 
         // Asset載入完成時 實體化道具
-        if (assetLoader.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
+        if (m_AssetLoaderSystem.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
         {
             _bLoadedIcon = true;
             _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
@@ -134,7 +134,7 @@ public class FriendUI : IMPPanelUI
                 dictMice.Add(item.Key, itemName);
             }
             _clientFriendsList = new List<string>(Global.dictFriends);  // 新朋友名單存入client暫存朋友列表
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + UI.slotItemName + Global.ext);  // 載入好友列表背景資產
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + UI.slotItemName + Global.ext);  // 載入好友列表背景資產
             _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
 
             _bFirstLoad = false;
@@ -232,7 +232,7 @@ public class FriendUI : IMPPanelUI
     /// <returns></returns>
     private GameObject InstantiateItem(Vector2 offset)
     {
-        GameObject bundle = assetLoader.GetAsset(UI.slotItemName);
+        GameObject bundle = m_AssetLoaderSystem.GetAsset(UI.slotItemName);
         GameObject item = MPGFactory.GetObjFactory().Instantiate(bundle, UI.itemPanel, UI.slotItemName, offset, Vector2.one, Vector2.zero, -1);
         UIEventListener.Get(item).onClick = SelectPlayer;
         return item;
@@ -241,7 +241,7 @@ public class FriendUI : IMPPanelUI
     private void InstantiateICON(string imageName, Transform friendItemSlot)
     {
        // Debug.Log("InstantiateICON: " + imageName);
-        GameObject bundle = assetLoader.GetAsset(imageName.ToString());
+        GameObject bundle = m_AssetLoaderSystem.GetAsset(imageName.ToString());
         MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
     }
 
@@ -369,17 +369,23 @@ public class FriendUI : IMPPanelUI
         FriendSlotChk();
     }
 
-    public override void OnClosed(GameObject obj)
+    public override void OnClosed(GameObject go)
     {
         EventMaskSwitch.lastPanel = null;
         ShowPanel(m_RootUI.name);
-       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(obj.transform.parent.gameObject);
+       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
     }
 
-    public void OnPrev(GameObject obj)
+    public void OnPrev(GameObject go)
     {
         _lastMsgPanel.SetActive(false);
         EventMaskSwitch.Prev(1);
+    }
+
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().friendPanel;
+        base.ShowPanel(panelName);
     }
 
     /// <summary>

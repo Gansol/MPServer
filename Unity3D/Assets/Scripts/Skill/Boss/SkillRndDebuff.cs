@@ -13,7 +13,7 @@ public class RndDebuffSkill : SkillBoss
         throw new System.NotImplementedException();
     }
 
-    public override void Display(GameObject obj, CreatureAttr arribute/*, IAIState state*/)
+    public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         throw new System.NotImplementedException();
     }
