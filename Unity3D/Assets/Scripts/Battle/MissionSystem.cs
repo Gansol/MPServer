@@ -59,7 +59,7 @@ public class MissionSystem : IGameSystem
 
     public MissionSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- MissionSystem Created ----------------");
+        Debug.Log("--------------- MissionSystem Create ----------------");
     }
 
     public override void Initialize()

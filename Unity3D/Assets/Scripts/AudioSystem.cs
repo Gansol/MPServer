@@ -26,7 +26,7 @@ public class AudioSystem : IGameSystem
 
     public AudioSystem(MPGame mPGame) : base(mPGame)
     {
-        Debug.Log("--------------- AudioSystem Created ----------------");
+        Debug.Log("--------------- AudioSystem Create ----------------");
         musics = new Dictionary<string, AudioSource>();
         sounds = new Dictionary<string, AudioSource>();
         Initialize();

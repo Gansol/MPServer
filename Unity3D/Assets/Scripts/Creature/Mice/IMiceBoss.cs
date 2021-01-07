@@ -18,7 +18,7 @@ public abstract class IMiceBoss : ICreature
     public override void Initialize()
     {
         m_go.GetComponent<BoxCollider2D>().enabled = true;
-        m_go.transform.localPosition =  Vector3.zero;
+        m_go.transform.localPosition = Vector3.zero;
         battleUI = MPGame.Instance.GetBattleUI();
         cam = Camera.main.GetComponent<UICamera>();
 
@@ -34,12 +34,13 @@ public abstract class IMiceBoss : ICreature
         // 遊戲開始時
         if (Global.isGameStart)
         {
-            m_AI.UpdateAIState();
+            m_AI.UpdateAI();
             battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), false);    // 顯示血調
             m_AnimState.UpdateAnimation();
             if (Time.time < m_StartTime + m_Skill.GetSkillTime())
                 m_Skill.UpdateEffect();
-            if (m_Arribute.GetHP() == 0) OnDead(0);
+            if (m_Arribute.GetHP() == 0)
+                m_AI.SetAIState(new DiedAIState());
         }
         //else
         //    m_go.SetActive(false);
@@ -50,7 +51,7 @@ public abstract class IMiceBoss : ICreature
     /// <summary>
     /// On Touch / On Click
     /// </summary>
-    protected virtual void OnHit()
+    public override void OnHit()
     {
         Debug.Log("HP:" + m_Arribute.GetHP() + "SHIELD:" + m_Arribute.GetShield());
         if (Global.isGameStart /*&& enabled */&& m_Arribute.GetHP() > 0)
@@ -59,7 +60,7 @@ public abstract class IMiceBoss : ICreature
 
             if (m_Arribute.GetHP() - 1 == 0) m_go.GetComponent<BoxCollider2D>().enabled = false;
 
-            if (m_Arribute.GetShield() == 0 && ENUM_AIState!=ENUM_CreatureState.Invincible)
+            if (m_Arribute.GetShield() == 0 && GetAIState() != ENUM_CreatureAIState.Invincible)
                 Global.photonService.BossDamage(1);  // 傷害1是錯誤的 需要由Server判定、技能等級
             else
                 m_Arribute.SetShield(m_Arribute.GetShield() - 1);
@@ -85,13 +86,17 @@ public abstract class IMiceBoss : ICreature
             m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
         }
 
-        if (m_Arribute.GetHP() != 0)
+        if (m_Arribute.GetHP() > 0)
         {
-            int haha = myAttack ? myHits++ : otherHits++;
+            if (!myAttack)
+                otherHits++;
+            else
+                myHits++;
         }
         else
         {
             m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+            battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
             if (Global.OpponentData.RoomPlace != "Host")
             {
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
@@ -102,22 +107,23 @@ public abstract class IMiceBoss : ICreature
         }
     }
 
-    /// <summary>
-    /// 死亡時
-    /// </summary>
-    /// <param name="lifeTime">存活時間</param>
-    protected override void OnDead(float lifeTime)
-    {
-        if (Global.isGameStart)
-        {
-            // 關閉血調顯示
-            battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
-            Release();
-            Play(IAnimatorState.ENUM_AnimatorState.Died);
-            m_AI.SetAIState(new DiedAIState());
-            // Destroy(gameObject);
-        }
-    }
+    ///// <summary>
+    ///// 死亡時
+    ///// </summary>
+    ///// <param name="lifeTime">存活時間</param>
+    //protected override void OnDead(float lifeTime)
+    //{
+    //    if (Global.isGameStart)
+    //    {
+    //        // 關閉血調顯示
+    //        battleUI.ShowBossHPBar(m_Arribute.GetHPPrecent(), true);
+    //        Release();
+    //        Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //      //  m_AI.SetAIState(new DiedAIState(m_AI));
+    //        SetAIState(ENUM_CreatureAIState.Died);
+    //        // Destroy(gameObject);
+    //    }
+    //}
 
     public override void SetSkill(ISkill skill)
     {

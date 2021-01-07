@@ -46,7 +46,7 @@ public class SkillBtn : MonoBehaviour
     void Start()
     {
         label = GetComponentInChildren<UILabel>();
-        battleManager = GameObject.FindGameObjectWithTag("GM").GetComponent<BattleSystem>();
+        battleManager = MPGame.Instance.GetBattleSystem();
         label.text = _useTimes.ToString() + " / " + _skillTimes.ToString();
 
 //        Debug.Log("**************************Item Name*************************:" + transform.GetChild(2).gameObject.name);

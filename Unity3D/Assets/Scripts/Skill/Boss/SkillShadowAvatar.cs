@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 public class ShadowAvatarSkill : SkillBoss
 {
-    ObjectFactory objFactory;
     CreatureSystem m_CreatureSystem;
     PoolSystem m_PoolSystem;
     Dictionary<Transform, ICreature> dictMice, buffer, buffer2;
     sbyte[] data;
-    float escapeTime;
     bool skillFlag;
     Transform correctMice;
 
@@ -16,7 +14,6 @@ public class ShadowAvatarSkill : SkillBoss
         : base(skill)
     {
         skillFlag = false;
-        objFactory = new ObjectFactory();
         data = SpawnData.GetSpawnData(MPProtocol.SpawnStatus.FourPoint) as sbyte[];
       //  dictMice = new Dictionary<Transform, GameObject>();
         m_CreatureSystem = MPGame.Instance.GetCreatureSystem();
@@ -33,8 +30,10 @@ public class ShadowAvatarSkill : SkillBoss
         {
             if (m_CreatureSystem.HasMice(mice.Value)) // 初始化時有老鼠 移除老鼠
             {
+              //  mice.Value.SetAIState(new DiedAIState
                 mice.Value.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                mice.Value.GetAIState().SetAIState(new DiedAIState());
+           //     mice.Value.GetAI().SetAIState(new DiedAIState(m_Creature.GetAI()));
+                //mice.Value.SetAIState(ICreature.ENUM_CreatureAIState.Died);
             }
             dictMice.Remove(mice.Key);
         }
@@ -45,7 +44,8 @@ public class ShadowAvatarSkill : SkillBoss
     public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
         base.Display();
-        m_Creature.SetState(ICreature.ENUM_CreatureState.Invincible);
+        m_Creature.GetAI().SetAIState(new InvincibleAIState());
+        //m_Creature.SetAIState(ICreature.ENUM_CreatureAIState.Invincible);
         Debug.Log("Ninja Mice Display");
         Initialize();
         go = creature.m_go;
@@ -69,23 +69,20 @@ public class ShadowAvatarSkill : SkillBoss
 
     public override void UpdateEffect()
     {
+        // 重新分身時間間格
         if (Time.time > m_LastTime + skillData.ColdDown && !skillFlag)
-        {
-            escapeTime = Time.time;
-            Display(m_Creature/*, m_Arribute, m_AIState*/);
-
-            Debug.Log("****RE RUN !");
-        }
+            Display(m_Creature);
 
 
         if ((Time.time - m_StartTime) < skillData.SkillTime && skillFlag)
         {
             foreach (KeyValuePair<Transform, ICreature> mice in buffer)
             {
-                // 如果 打到正確老鼠 
-                if (!m_CreatureSystem.GetbActiveHoleMice(mice.Key)   && mice.Key == correctMice && skillFlag)
+                // 如果 打到正確老鼠 老鼠恢復正常狀態
+                if (!m_CreatureSystem.GetHoleMice_bActive(mice.Key)   && mice.Key == correctMice && skillFlag)
                 {
-                    m_Creature.SetState(ICreature.ENUM_CreatureState.Idle);
+                   // m_Creature.SetAIState(ICreature.ENUM_CreatureAIState.Idle);
+                    m_Creature.GetAI().SetAIState(new IdleAIState());
                     Debug.Log("****Correct!");
                     dictMice.Remove(mice.Key);
                     buffer2 = new Dictionary<Transform, ICreature>(dictMice);
@@ -94,8 +91,10 @@ public class ShadowAvatarSkill : SkillBoss
                     {
                         if (m_CreatureSystem.HasMice(mice.Value)) // 初始化時有老鼠 移除老鼠
                         {
-                            mice.Value.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                            mice.Value.GetAIState().SetAIState(new DiedAIState());
+                            m_Creature.GetAI().SetAIState(new DiedAIState());
+                            //mice.Value.Play(IAnimatorState.ENUM_AnimatorState.Died);
+                            //mice.Value.GetAI().SetAIState(new DiedAIState(m_Creature.GetAI()));
+                          //  mice.Value.SetAIState(ICreature.ENUM_CreatureAIState.Died);
                         }
                         dictMice.Remove(mice.Key);
                     }
@@ -118,10 +117,10 @@ public class ShadowAvatarSkill : SkillBoss
                     buffer = dictMice;
                     break;
                 }
-
             }
         }
 
+        // 技能時間超過 關閉技能
         if ((Time.time - m_StartTime) > skillData.SkillTime)
             Release();
     }

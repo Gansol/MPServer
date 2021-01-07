@@ -3,10 +3,10 @@ using System.Collections;
 
 public class IdleAIState : IAIState
 {
-    public IdleAIState()
+    public IdleAIState(/*ICreatureAI creatureAI) : base(creatureAI*/)
     {
-        Debug.Log( "Idle State");
-        m_CreatureAI.Set_ENUM_AIState(ICreature.ENUM_CreatureState.Idle);
+        Debug.Log("Idle State");
+        creatureAIState = ICreature.ENUM_CreatureAIState.Idle;
     }
 
     public override void Update()

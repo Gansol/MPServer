@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class ICreature 
+public abstract class ICreature
 {
     public GameObject m_go = null;
     protected ISkill m_Skill = null;
@@ -9,19 +9,12 @@ public abstract class ICreature
     protected IAnimatorState m_AnimState = null;
     protected ICreatureAttr m_Arribute = null;
     protected ICreatureAI m_AI = null;
-    protected ENUM_CreatureState ENUM_AIState = ENUM_CreatureState.None;
 
-    public enum ENUM_CreatureState
+    public enum ENUM_CreatureAIState
     {
         None = -1,
-        Hello = 0,
-        Idle,
-        Eat,
-        ByeBye,
-        Die,
-        OnHit,
-        Frozen,
-        Fire,
+        Idle = 0,
+        Died,
         Invincible,
     }
 
@@ -37,31 +30,31 @@ public abstract class ICreature
     public abstract void Update();
     public abstract void Release();
     /// <summary>
-    /// 死亡
+    /// 受到攻擊
     /// </summary>
-    /// <param name="lifeTime">存活時間</param>
-    protected abstract void OnDead(float lifeTime);
+    public abstract void OnHit();
 
     public virtual void Play(IAnimatorState.ENUM_AnimatorState state)
     {
-        if (m_AnimState!=null)
+        if (m_AnimState != null)
             m_AnimState.Play(state);
     }
-    public virtual void SetState(ENUM_CreatureState state = ENUM_CreatureState.None)
+
+    public IAnimatorState GetAminState()
     {
-        ENUM_AIState = state;
+        return m_AnimState;
     }
 
-    public ENUM_CreatureState GetState()
+    public ENUM_CreatureAIState GetAIState()
     {
-        return ENUM_AIState;
+        return (ENUM_CreatureAIState)m_AI.GetAIState();
     }
 
     public float GetSurvivalTime()
     {
         return m_AnimState.GetSurvivalTime();
     }
-    public ICreatureAI GetAIState()
+    public ICreatureAI GetAI()
     {
         return m_AI;
     }

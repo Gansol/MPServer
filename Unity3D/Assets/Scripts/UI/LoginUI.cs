@@ -60,7 +60,7 @@ public class LoginUI : IMPPanelUI
     GameObject tmpPanel;
 
     public LoginUI(MPGame MPGame) : base(MPGame) {
-        Debug.Log("--------------- LoginUI Created ----------------");
+        Debug.Log("--------------- LoginUI Create ----------------");
     }
 
 
@@ -331,7 +331,7 @@ public class LoginUI : IMPPanelUI
     private void SaveLoginInfo(bool memAccount, bool memPD)
     {
         bool bChange = false;
-        m_MPGame.StartCoroutine(LoadFile(Global.dataPath + "data.json"));
+        MPGame.Instance.StartCoroutine(LoadFile(Global.dataPath + "data.json"));
 
         Dictionary<string, object> data = Json.Deserialize(jString) as Dictionary<string, object>;
 

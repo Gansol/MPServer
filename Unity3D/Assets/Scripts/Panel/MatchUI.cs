@@ -52,7 +52,7 @@ public class MatchUI : IMPPanelUI
 
     public MatchUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- MatchUI Created ----------------");
+        Debug.Log("--------------- MatchUI Create ----------------");
         SwitchBtnMethod = new SwitchBtnComponent();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
@@ -114,10 +114,11 @@ public class MatchUI : IMPPanelUI
             }
 
             // 載入資產完成後 實體化 物件
-            if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
             {
-                _bLoadedAsset = !_bLoadedAsset;
-                _bLoadedEffect = !_bLoadedEffect;
+                m_AssetLoaderSystem.Initialize();
+                _bLoadedAsset = false;
+                _bLoadedEffect =false;
 
                 // 實體化按鈕
                 InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
@@ -342,12 +343,13 @@ public class MatchUI : IMPPanelUI
     {
         if (m_RootUI.activeSelf)     // 如果Panel是啟動狀態 接收Event
         {
-            Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+            List<string> notLoadedAssetList = new List<string>();
 
             // 如果是第一次載入 載入全部資產 否則 載入必要資產
             if (_bFirstLoad)
             {
-                dictNotLoadedAsset = _dictMiceData = Global.dictMiceAll;
+                notLoadedAssetList = GetDontNotLoadAssetName(Global.dictMiceAll);
+                _dictMiceData = Global.dictMiceAll;
                 _dictTeamData = Global.dictTeam;
             }
             else
@@ -361,17 +363,17 @@ public class MatchUI : IMPPanelUI
                 // Where 找不存在的KEY 再轉換為Dictionary
                 newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-                dictNotLoadedAsset = GetDontNotLoadAsset(newAssetData);
+                notLoadedAssetList = GetDontNotLoadAssetName(newAssetData);
 
                 ResumeToggleTarget();
             }
 
-            if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
+            if (notLoadedAssetList.Count != 0)  // 如果 有未載入物件 載入AB
             {
 
                 //assetLoader.LoadAsset(iconPath + "/", iconPath);
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-                _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
+                _bLoadedAsset = LoadIconObjectsAssetByName(notLoadedAssetList, Global.MiceIconUniquePath);
             }                                   // 已載入物件 實體化
             else
             {

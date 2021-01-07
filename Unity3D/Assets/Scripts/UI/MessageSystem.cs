@@ -31,7 +31,7 @@ public class MessageSystem: IGameSystem
     public MessageSystem(MPGame MPGame)
         : base(MPGame)
     {
-        Debug.Log("--------------- MessageSystem Created ----------------");
+        Debug.Log("--------------- MessageSystem Create ----------------");
         Initialize();
         _dictMsgBox = new Dictionary<string, GameObject>();
     }
@@ -53,7 +53,7 @@ public class MessageSystem: IGameSystem
     /// <param name="MessageBoxType">訊息視窗型態</param>
     void OnMessage(string message, string MessageBoxType, int prevMask)
     {
-        m_MPGame.GetAssetLoaderSystem().Initialize();  
+      //  m_MPGame.GetAssetLoaderSystem().Initialize();  
         try
         {
             _prevMask = prevMask;

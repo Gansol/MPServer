@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class MenuUI : IMPPanelUI
 {
+    private MPGame m_MPGame;
     private AttachBtn_MenuUI UI;
 
     public MenuUI(MPGame MPGame)
         : base(MPGame)
     {
-        Debug.Log("--------------- MenuUI Created ----------------");
+        Debug.Log("--------------- MenuUI Create ----------------");
+        m_MPGame = MPGame;
     }
 
     public override void Initialize()

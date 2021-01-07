@@ -3564,7 +3564,6 @@ GameObject:
   m_Component:
   - component: {fileID: 496980}
   - component: {fileID: 9572092}
-  - component: {fileID: 9544272}
   m_Layer: 8
   m_Name: anims
   m_TagString: Untagged
@@ -3611,25 +3610,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!95 &9544272
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 196980}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1bfae593d6fc69e4a9cea1c3a2ff77ce, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 1
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &196982
 GameObject:
   m_ObjectHideFlags: 0
@@ -3641,7 +3621,7 @@ GameObject:
   - component: {fileID: 496982}
   - component: {fileID: 6107174}
   m_Layer: 8
-  m_Name: BlackMice
+  m_Name: blackmice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

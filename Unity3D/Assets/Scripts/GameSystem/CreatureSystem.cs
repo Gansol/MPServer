@@ -13,7 +13,7 @@ public class CreatureSystem : IGameSystem
 
     public CreatureSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- CreatureSystem Created ----------------");
+        Debug.Log("--------------- CreatureSystem Create ----------------");
         Initialize();
     }
 
@@ -55,26 +55,28 @@ public class CreatureSystem : IGameSystem
         // change state = pooling
         // init mice
 
-
+        // 逐步檢查每個老鼠的狀態
         foreach (KeyValuePair<string, Dictionary<string, ICreature>> miceClass in dictBattleMice)
         {
             foreach (KeyValuePair<string, ICreature> creature in miceClass.Value)
             {
                 IMice mice = (IMice)creature.Value;
 
-                // 如果老鼠狀態 = 死亡。 計算分數、加入等待移除列表
-                if (mice.GetState() == ICreature.ENUM_CreatureState.Die)
+                // 如果老鼠狀態 = 死亡。 
+                if (creature.Value.GetArribute().GetHP() < 1 && mice.GetAIState() == ICreature.ENUM_CreatureAIState.Died)
                 {
+                    // 計算分數、加入等待移除列表
                     m_MPGame.GetBattleSystem().UpadateScore(short.Parse(miceClass.Key), mice.GetSurvivalTime());
                     dictWaitingRemoveMice.Add(creature.Key, creature.Value);
                 }
 
-                // 如果老鼠狀態 = 逃跑。 損失分數、加入等待移除列表
-                if (mice.GetState() == ICreature.ENUM_CreatureState.ByeBye)
+                // 如果老鼠HP>0 且逃離動畫播放完畢( 錯誤 應使用時間判斷) = 老鼠逃跑 
+                if (creature.Value.GetArribute().GetHP() > 0 && mice.GetAminState().GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.MiceRunAway)
                 {
+                    //斷COMBO、損失分數、加入等待移除列表
+                    m_MPGame.GetBattleSystem().BreakCombo();
                     m_MPGame.GetBattleSystem().LostScore(short.Parse(miceClass.Key), mice.GetSurvivalTime());
                     dictWaitingRemoveMice.Add(creature.Key, creature.Value);
-                    m_MPGame.GetBattleSystem().BreakCombo();
                 }
             }
         }
@@ -86,9 +88,14 @@ public class CreatureSystem : IGameSystem
             // 使用miceID尋找老鼠類別，並刪除指定hashID老鼠、重新加入Pooling
             foreach (KeyValuePair<string, ICreature> mice in dictWaitingRemoveMice)
             {
-                dictBattleMice[mice.Value.m_go.name].Remove(mice.Key);
-                m_MPGame.GetPoolSystem().AddMicePool(mice.Value.m_go.name, mice.Key, (IMice)mice.Value);
+                // 如果死亡動畫播放完畢 回到 Pool
+                if (mice.Value.GetAminState().GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.MiceRunAway)
+                {
+                    dictBattleMice[mice.Value.m_go.name].Remove(mice.Key);
+                    m_MPGame.GetPoolSystem().AddMicePool(mice.Value.m_go.name, mice.Key, (IMice)mice.Value);
+                }
             }
+            dictWaitingRemoveMice.Clear();
         }
     }
 
@@ -101,6 +108,7 @@ public class CreatureSystem : IGameSystem
         if (!dictHoleMiceRefs.ContainsKey(hole))
             dictHoleMiceRefs.Add(hole, mice);
     }
+
     /// <summary>
     /// 移除老鼠索引
     /// </summary>
@@ -117,7 +125,7 @@ public class CreatureSystem : IGameSystem
     /// </summary>
     /// <param name="hole"></param>
     /// <returns></returns>
-    public bool GetbActiveHoleMice(Transform hole)
+    public bool GetHoleMice_bActive(Transform hole)
     {
         return dictHoleMiceRefs.ContainsKey(hole); ;
     }
@@ -129,7 +137,7 @@ public class CreatureSystem : IGameSystem
     /// <returns></returns>
     public ICreature GetActiveHoleMice(Transform hole)
     {
-        if (GetbActiveHoleMice(hole))
+        if (GetHoleMice_bActive(hole))
             return dictHoleMiceRefs[hole];
         return null;
     }
@@ -194,9 +202,9 @@ public class CreatureSystem : IGameSystem
         OnEffect(name, vaule);
     }
 
-    public void SetEffect(string skillName, object vaule,Transform hole)
+    public void SetEffect(string skillName, object vaule, Transform hole)
     {
-       foreach(KeyValuePair<string,Dictionary<string,ICreature>> miceClass in dictBattleMice)
+        foreach (KeyValuePair<string, Dictionary<string, ICreature>> miceClass in dictBattleMice)
         {
             foreach (KeyValuePair<string, ICreature> mice in miceClass.Value)
             {

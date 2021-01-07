@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
+
+/// <summary>
+/// 滑鼠點兩下的程式碼 沒作用
+/// </summary>
 public class Coll : MonoBehaviour
 {
     public float delayBetween2Clicks = 2f;
@@ -12,14 +16,7 @@ public class Coll : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("icon_eggmice"));
-        //AssetBundleManager.dictAssetBundleRefs.Remove("EggMiceICON");
-        Debug.Log(AssetBundleManager.dictAssetBundleRefs.ContainsKey("icon_eggmice"));
-        //System.GC.Collect();
-        //Resources.UnloadUnusedAssets();
-        AssetLoaderSystem loader = MPGame.Instance.GetAssetLoaderSystem();
 
-        Instantiate(loader.GetAsset("icon_eggmice"));
     }
 
 

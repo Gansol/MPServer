@@ -8,24 +8,16 @@ public class Bali : IMice
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
   //  UICamera cam;
 
-    public override void Initialize(bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
+    public override void Initialize()
     {
         //   if (hitSound == null) hitSound = battleManager.GetComponent<UIPlaySound>();
-       // cam = Camera.main.GetComponent<UICamera>();
+        // cam = Camera.main.GetComponent<UICamera>();
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-        m_AnimState.Init(m_go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         m_go.transform.localPosition = new Vector3(0, 0);
-        m_go.GetComponent<BoxCollider2D>().enabled = true;
-    }
-
-    void OnEnable()
-    {
-        m_go.GetComponent<BoxCollider2D>().enabled = true;
         _lastTime = Time.fixedTime; // 出生時間
     }
-
 
     public override void Update()
     {
@@ -43,9 +35,9 @@ public class Bali : IMice
     /// <summary>
     /// 擊中時
     /// </summary>
-    protected override void OnHit()
+    public override void OnHit()
     {
-        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ ENUM_AIState != ENUM_CreatureState.Die && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ GetAIState() != ENUM_CreatureAIState.Died && m_Arribute.GetHP() > 0)
         {
             MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
@@ -55,28 +47,29 @@ public class Bali : IMice
         }
         else
         {
-            Debug.Log("ENUM_AIState: " + ENUM_AIState + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
         }
     }
 
 
-    /// <summary>
-    /// 死亡時
-    /// </summary>
-    /// <param name="lifeTime">存活時間上限</param>
-    protected override void OnDead(float lifeTime)
-    {
-        if (Global.isGameStart)
-        {
-            if (m_Arribute.GetHP() == 0)
-            {
-                Debug.Log("lifeTime:" + lifeTime);
-                Play(IAnimatorState.ENUM_AnimatorState.Died);
-                GetAIState().SetAIState(new DiedAIState());
-            }
-            m_go.SetActive(false);
-        }
-    }
+    ///// <summary>
+    ///// 死亡時
+    ///// </summary>
+    ///// <param name="lifeTime">存活時間上限</param>
+    //protected override void OnDead(float lifeTime)
+    //{
+    //    if (Global.isGameStart)
+    //    {
+    //        if (m_Arribute.GetHP() == 0)
+    //        {
+    //            Debug.Log("lifeTime:" + lifeTime);
+    //            Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //           // GetAI().SetAIState(new DiedAIState(m_AI));
+    //            SetAIState(ENUM_CreatureAIState.Died);
+    //        }
+    //        m_go.SetActive(false);
+    //    }
+    //}
 
     public override void OnEffect(string name, object value)
     {
@@ -87,4 +80,10 @@ public class Bali : IMice
         if (name == "Shadow")
             Debug.Log("Play Shadow");
     }
+
+public override void Release()
+{
+
+
+}
 }

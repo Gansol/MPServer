@@ -15,8 +15,8 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 7abe289ad45aa3a469c40f10484322fa, type: 2}
   mSprites:
   - name: Arrow
-    x: 879
-    y: 739
+    x: 932
+    y: 919
     width: 49
     height: 26
     borderLeft: 0
@@ -41,8 +41,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: BlueBar
-    x: 620
-    y: 696
+    x: 631
+    y: 528
     width: 42
     height: 42
     borderLeft: 20
@@ -54,8 +54,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: BlueCircle
-    x: 783
-    y: 828
+    x: 0
+    y: 117
     width: 202
     height: 196
     borderLeft: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Bubble1
-    x: 398
-    y: 266
+    x: 364
+    y: 377
     width: 50
     height: 75
     borderLeft: 0
@@ -80,8 +80,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Bubble2
-    x: 897
-    y: 542
+    x: 341
+    y: 5
     width: 62
     height: 114
     borderLeft: 0
@@ -93,8 +93,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Bubble3
-    x: 960
-    y: 602
+    x: 708
+    y: 559
     width: 55
     height: 84
     borderLeft: 0
@@ -106,8 +106,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: CarzyMode
-    x: 840
-    y: 334
+    x: 764
+    y: 543
     width: 79
     height: 49
     borderLeft: 0
@@ -119,8 +119,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Easy Mode
-    x: 691
-    y: 834
+    x: 952
+    y: 674
     width: 70
     height: 51
     borderLeft: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: EndMode
-    x: 620
-    y: 834
+    x: 857
+    y: 592
     width: 70
     height: 51
     borderLeft: 0
@@ -145,8 +145,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Exchange
-    x: 745
-    y: 601
+    x: 928
+    y: 533
     width: 55
     height: 55
     borderLeft: 0
@@ -158,8 +158,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Exit
-    x: 879
-    y: 766
+    x: 897
+    y: 759
     width: 123
     height: 61
     borderLeft: 0
@@ -171,8 +171,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Facebook
-    x: 927
-    y: 387
+    x: 557
+    y: 566
     width: 73
     height: 77
     borderLeft: 0
@@ -184,8 +184,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: FeverTimeICON
-    x: 0
-    y: 342
+    x: 419
+    y: 914
     width: 512
     height: 110
     borderLeft: 0
@@ -197,8 +197,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Google
-    x: 931
-    y: 687
+    x: 932
+    y: 946
     width: 76
     height: 78
     borderLeft: 10
@@ -210,8 +210,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: HardMode
-    x: 674
-    y: 607
+    x: 857
+    y: 542
     width: 70
     height: 49
     borderLeft: 0
@@ -223,8 +223,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Heart
-    x: 801
-    y: 608
+    x: 105
+    y: 0
     width: 59
     height: 48
     borderLeft: 0
@@ -236,8 +236,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Hole_All
-    x: 419
-    y: 504
+    x: 658
+    y: 726
     width: 238
     height: 94
     borderLeft: 0
@@ -249,8 +249,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Hole_Down
-    x: 658
-    y: 504
+    x: 419
+    y: 726
     width: 238
     height: 94
     borderLeft: 0
@@ -262,8 +262,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: HPBar
-    x: 651
-    y: 391
+    x: 0
+    y: 6
     width: 104
     height: 42
     borderLeft: 25
@@ -275,8 +275,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Line
-    x: 0
-    y: 331
+    x: 419
+    y: 494
     width: 397
     height: 10
     borderLeft: 0
@@ -288,8 +288,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Lose
-    x: 620
-    y: 739
+    x: 674
+    y: 825
     width: 258
     height: 88
     borderLeft: 0
@@ -301,8 +301,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: LoseMice
-    x: 789
-    y: 384
+    x: 203
+    y: 0
     width: 137
     height: 119
     borderLeft: 0
@@ -314,8 +314,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Mission
-    x: 513
-    y: 434
+    x: 676
+    y: 656
     width: 275
     height: 69
     borderLeft: 0
@@ -327,8 +327,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: NormalMode
-    x: 419
-    y: 453
+    x: 764
+    y: 593
     width: 92
     height: 50
     borderLeft: 0
@@ -340,8 +340,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Rain
-    x: 960
-    y: 547
+    x: 928
+    y: 589
     width: 59
     height: 54
     borderLeft: 0
@@ -353,8 +353,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: RainBow
-    x: 419
-    y: 886
+    x: 0
+    y: 314
     width: 363
     height: 138
     borderLeft: 0
@@ -366,8 +366,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: RankBar
-    x: 931
-    y: 673
+    x: 165
+    y: 35
     width: 23
     height: 13
     borderLeft: 10
@@ -379,8 +379,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: RankEnergy
-    x: 651
-    y: 296
+    x: 419
+    y: 505
     width: 228
     height: 19
     borderLeft: 0
@@ -392,8 +392,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: RedBar
-    x: 948
-    y: 271
+    x: 419
+    y: 451
     width: 42
     height: 42
     borderLeft: 2
@@ -405,8 +405,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: RedCircle
-    x: 419
-    y: 692
+    x: 203
+    y: 120
     width: 200
     height: 193
     borderLeft: 0
@@ -418,8 +418,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Replay
-    x: 651
-    y: 316
+    x: 0
+    y: 49
     width: 188
     height: 67
     borderLeft: 0
@@ -431,8 +431,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: SkillBoard
-    x: 674
-    y: 657
+    x: 419
+    y: 644
     width: 256
     height: 81
     borderLeft: 0
@@ -444,8 +444,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Star
-    x: 927
-    y: 314
+    x: 631
+    y: 571
     width: 76
     height: 72
     borderLeft: 0
@@ -457,8 +457,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: StarLine
-    x: 880
-    y: 275
+    x: 557
+    y: 527
     width: 67
     height: 38
     borderLeft: 0
@@ -470,8 +470,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Sun
-    x: 449
-    y: 286
+    x: 364
+    y: 321
     width: 50
     height: 55
     borderLeft: 0
@@ -483,8 +483,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Twitter
-    x: 927
-    y: 465
+    x: 933
+    y: 837
     width: 76
     height: 76
     borderLeft: 0
@@ -497,7 +497,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Win
     x: 419
-    y: 599
+    y: 821
     width: 254
     height: 92
     borderLeft: 0
@@ -509,8 +509,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: WinMice
-    x: 513
-    y: 315
+    x: 419
+    y: 525
     width: 137
     height: 118
     borderLeft: 0

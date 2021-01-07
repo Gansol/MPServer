@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.SceneManagement;
 public class LoadSceneDestroyTest : MonoBehaviour {
     static int i = 0;
     public int c = 100;
@@ -24,7 +24,7 @@ public class LoadSceneDestroyTest : MonoBehaviour {
     {
         if (GUI.Button(new Rect(50, 50, 100, 100), "Load"))
         {
-            Application.LoadLevel(5);
+            SceneManager.LoadScene(5);
         }
     }
 }

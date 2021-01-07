@@ -24,8 +24,9 @@ using System.Linq;
 public class PoolSystem : IGameSystem
 {
     private CreatureSystem m_CreatureSystem;
-    private AssetLoaderSystem assetLoader;
+    private AssetLoaderSystem m_AssetLoaderSystem;
     private GameObject m_RootUI;
+    private AttachBtn_BattleUI UI;
 
     //private Dictionary<string, object> _tmpDict;
     private Dictionary<int, string> _dictMiceObject; // 老鼠資源列表
@@ -54,8 +55,8 @@ public class PoolSystem : IGameSystem
     private GameObject objectPool;
 
 
-    [Tooltip("技能位置")]
-    public GameObject skillArea;
+    //  [Tooltip("技能位置")]
+    //  public GameObject skillArea;
 
     [Tooltip("產生數量")]
     [Range(3, 12)]
@@ -82,9 +83,11 @@ public class PoolSystem : IGameSystem
     private Vector3 bossScale = new Vector3(0.7f, 0.7f, 0.7f);
     private Vector3 skillScale = new Vector3(0.6f, 0.6f, 0.6f);
 
+    private bool _bLoadedAsset;
+
     public PoolSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- PoolSystem Created ----------------");
+        Debug.Log("--------------- PoolSystem Create ----------------");
         m_CreatureSystem = MPGame.GetCreatureSystem();
     }
 
@@ -93,8 +96,9 @@ public class PoolSystem : IGameSystem
         Debug.Log("--------------- PoolSystem Initialize ----------------");
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.LoadPlayerItem(Global.Account);
-        assetLoader = m_MPGame.GetAssetLoaderSystem();
+        m_AssetLoaderSystem = m_MPGame.GetAssetLoaderSystem();
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
         Debug.Log(m_RootUI.name);
         objectPool = m_RootUI.transform.Find("Battle(Panel)").Find("ObjectPool").gameObject;
         Debug.Log(objectPool);
@@ -102,6 +106,7 @@ public class PoolSystem : IGameSystem
         _currentTime = 0;
         clearTime = 10;
         PoolingFlag = false;      // 初始化物件池
+        _bLoadedAsset = false;
         _dictMiceObject = new Dictionary<int, string>();
         _dictSpecialObject = new Dictionary<int, string>();
         _dictSkillObject = new Dictionary<int, string>();
@@ -125,17 +130,19 @@ public class PoolSystem : IGameSystem
     /// </summary>
     private void LoadAssets()
     {
+      //  m_AssetLoaderSystem.Initialize();
+
         // 載入 老鼠資產
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
-            assetLoader.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.MicePath + item.Value + "/unique/" + item.Value + Global.ext);
 
         // 載入 特殊老鼠
         foreach (KeyValuePair<int, string> item in _dictSpecialObject)
-            assetLoader.LoadAssetFormManifest(Global.CreaturePath + item.Value + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.CreaturePath + item.Value + Global.ext);
 
         // 載入 道具資產
         foreach (KeyValuePair<int, string> item in _dictSkillObject)
-            assetLoader.LoadAssetFormManifest(Global.ItemIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.ItemIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
 
         // 載入 特效資產
         foreach (KeyValuePair<int, string> item in _dictMiceObject)
@@ -144,9 +151,10 @@ public class PoolSystem : IGameSystem
             string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
             Debug.Log("Item Name:  " + itemName);
             //if(item.Key!=10001)
-            assetLoader.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + itemName + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.EffectsUniquePath + Global.EffectSuffix + itemName + Global.ext);
         }
-
+        m_AssetLoaderSystem.SetLoadAllAseetCompleted();
+        _bLoadedAsset = true;
     }
 
 
@@ -165,8 +173,10 @@ public class PoolSystem : IGameSystem
     /// </summary>
     private void InitPool()
     {
-        if (assetLoader.bLoadedObj && IsloadPlayerItem && MergeFlag && !PoolingFlag)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted /*&& _bLoadedAsset*/ && IsloadPlayerItem && MergeFlag && !PoolingFlag)
         {
+            m_AssetLoaderSystem.IsLoadAllAseetCompleted = false;
+            // _bLoadedAsset = false;
             _dictSkillMice = Global.dictTeam;
 
             InstantiateObjects(_dictMiceObject);
@@ -204,9 +214,8 @@ public class PoolSystem : IGameSystem
 
     void InstantiateObjects(Dictionary<int, string> objectData)
     {
-
         foreach (KeyValuePair<int, string> item in objectData)
-            Instantiate(item.Key.ToString(), assetLoader.GetAsset(item.Value));
+            Instantiate(item.Key.ToString(), m_AssetLoaderSystem.GetAsset(item.Value));
     }
 
     void InstantiateSkillMice(Dictionary<string, object> objectData)
@@ -219,11 +228,11 @@ public class PoolSystem : IGameSystem
 
         foreach (KeyValuePair<string, object> item in objectData)
         {
-            if (assetLoader.GetAsset(item.Value.ToString().ToLower()) != null)
+            if (m_AssetLoaderSystem.GetAsset(item.Value.ToString().ToLower()) != null)
             {
-                GameObject bundle = assetLoader.GetAsset(item.Value.ToString().ToLower());
+                GameObject bundle = m_AssetLoaderSystem.GetAsset(item.Value.ToString().ToLower());
                 Vector3 scale = Vector3.zero;
-                Transform parent = skillArea.transform.GetChild(i);
+                Transform parent = UI.SkillArea.transform.GetChild(i);
                 clone = new GameObject();
 
                 scale = (i == 4) ? bossScale : skillScale;
@@ -248,9 +257,9 @@ public class PoolSystem : IGameSystem
 
                 if (!string.IsNullOrEmpty(itemName))
                 {
-                    if (assetLoader.GetAsset(Global.IconSuffix + itemName) != null)
+                    if (m_AssetLoaderSystem.GetAsset(Global.IconSuffix + itemName) != null)
                     {
-                        bundle = assetLoader.GetAsset(Global.IconSuffix + itemName);
+                        bundle = m_AssetLoaderSystem.GetAsset(Global.IconSuffix + itemName);
                         clone = MPGFactory.GetObjFactory().Instantiate(bundle, parent, itemName.ToString(), Vector3.zero, Vector3.one, new Vector2(180, 180), 100);
                         clone.SetActive(false);
                         //EventDelegate.Set(clone.GetComponent<UIButton>().onClick, clone.GetComponent<ItemBtn>().OnClick);
@@ -286,57 +295,6 @@ public class PoolSystem : IGameSystem
         Debug.Log("InstantiateSkillMice Completed!");
     }
 
-    ///// <summary>
-    ///// 每一次顯示一個GameObject。如果GameObject不足，Spawn一個物件並顯示。
-    ///// </summary>
-    ///// <param name="objectID">使用Name找Object</param>
-    ///// <returns>回傳 ( GameObject / null )</returns>
-    //public GameObject ActiveObject(string objectID)
-    //{
-    //    //Debug.Log("_dictObject.Count:" + _dictObject.Count);
-    //    //int objectID = _dictObject.FirstOrDefault(x => x.Value == objectName).Key;       // 找Key
-
-    //    if (!objectPool.transform.Find(objectID))
-    //    {
-    //        Debug.Log("Pooling can't find :" + objectID);
-    //    }
-    //    else if (objectPool.transform.Find(objectID).childCount == 0)
-    //    {
-    //        string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", objectID.ToString());
-    //        Instantiate(objectID, assetLoader.GetAsset(bundleName));
-    //    }
-    //    else
-    //    {
-    //        for (int i = 0; i < objectPool.transform.Find(objectID).childCount; i++)
-    //        {
-    //            GameObject clone = objectPool.transform.Find(objectID).GetChild(i).gameObject;
-    //            IMice mice =   clone.GetComponent(typeof(IMice)) as IMice;
-    //            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
-    //            // ICreatureAI miceAI =
-    //            if (mice.enabled == false) mice.enabled = true;
-
-    //            if (clone.name == objectID && !clone.gameObject.activeSelf)
-    //            {
-    //                clone.SetActive(true);
-    //                miceAttr.SetHP(1);
-    //                mice.SetArribute(miceAttr);
-    //                mice.SetAI(new MiceAI(mice));
-    //                mice.Initialize();
-    //                clone.transform.GetChild(0).localScale = Vector3.one;
-    //                clone.transform.GetChild(0).localRotation = Quaternion.identity;
-    //                clone.transform.GetChild(0).localPosition = Vector3.zero;
-
-    //                if (clone.GetComponent<BoxCollider2D>()) clone.GetComponent<BoxCollider2D>().enabled = true;
-
-    //                clone.SetActive(false);
-    //                clone.SetActive(true);
-    //                return clone;
-    //            }
-    //        }
-    //    }
-    //    return null;
-    //}
-
     public ICreature ActiveMice(string miceID, Transform hole)
     {
         string hashID = "";
@@ -351,8 +309,8 @@ public class PoolSystem : IGameSystem
                 if (mice.Value.m_go.GetComponent<BoxCollider2D>())
                     mice.Value.m_go.GetComponent<BoxCollider2D>().enabled = true;
 
-                m_MPGame.GetCreatureSystem().AddMiceRefs(hole,miceID, hashID, mice.Value);
-           //     m_MPGame.GetCreatureSystem().AddHoleMiceRefs(hole, mice.Value);
+                m_MPGame.GetCreatureSystem().AddMiceRefs(hole, miceID, hashID, mice.Value);
+                //     m_MPGame.GetCreatureSystem().AddHoleMiceRefs(hole, mice.Value);
 
                 break;
             }
@@ -363,8 +321,8 @@ public class PoolSystem : IGameSystem
         else
         {
             string bundleName = (string)MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", miceID.ToString());
-            Instantiate(miceID, assetLoader.GetAsset(bundleName));
-            ActiveMice(miceID, hole); // 可能造成無線迴圈 會和下面一起造成產生了卻沒被使用的情況
+            Instantiate(miceID, m_AssetLoaderSystem.GetAsset(bundleName));
+            //ActiveMice(miceID, hole); // 可能造成無線迴圈 會和下面一起造成產生了卻沒被使用的情況
         }
         return null; // 錯誤 回傳空的
     }
@@ -380,21 +338,23 @@ public class PoolSystem : IGameSystem
     /// <param name="hole"></param>
     /// <param name="impose">強制產生</param>
     /// <returns></returns>
-    public IMice InstantiateMice(short miceID, float miceSize, Transform hole, bool impose)
+    public ICreature InstantiateMice(short miceID, float miceSize, Transform hole, bool impose)
     {
+      // Debug.Log("InstantiateMice: Hole:" + hole + "  miceID: " + miceID);
         Vector3 _miceSize;
-        IMice mice;
+        ICreature creature;
         // 如果老鼠洞是打開的 或 強制產生
         if (hole.GetComponent<HoleState>().holeState == HoleState.State.Open || impose)
         {
             // 如果強制產生 且 老鼠在存活列表中 強制將老鼠死亡
-            if (impose && m_CreatureSystem.GetActiveHoleMice(hole.transform)!=null)
+            if (impose && m_CreatureSystem.GetActiveHoleMice(hole.transform) != null)
             {
-                mice = (IMice)m_MPGame.GetCreatureSystem().GetMice(miceID.ToString(), m_CreatureSystem.GetActiveHoleMice(hole.transform).m_go.name);
-                if (mice != null)
+                creature = m_MPGame.GetCreatureSystem().GetMice(miceID.ToString(), m_CreatureSystem.GetActiveHoleMice(hole.transform).m_go.name);
+                if (creature != null)
                 {
-                    mice.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                    mice.GetAIState().SetAIState(new DiedAIState());
+                    creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
+                    //creature.OnHit();  // 錯誤  應該+0分
+                    //  creature.GetAI().SetAIState(new DiedAIState(creature.GetAI()));
                     m_CreatureSystem.RemoveHoleMiceRefs(hole);
                 }
                 //GetHoleMiceRefs(hole.transform).GetComponentInChildren<IMice>().SendMessage("OnDead", 0.0f); //錯誤
@@ -405,25 +365,30 @@ public class PoolSystem : IGameSystem
             //    RemoveHoleMiceRefs(hole.transform); //錯誤
 
             // 取得物件池老鼠
-            mice = (IMice)ActiveMice(miceID.ToString(), hole);
+            creature = ActiveMice(miceID.ToString(), hole);
+            if (creature == null)
+                creature = ActiveMice(miceID.ToString(), hole);
 
             // 如果物件池老鼠不是空的 產生老鼠
-            if (mice.m_go != null)
+            if (creature.m_go != null)
             {
+                //Debug.Log(creature.m_go.name);
                 hole.GetComponent<HoleState>().holeState = HoleState.State.Closed;
                 _miceSize = hole.transform.Find("ScaleValue").localScale / 10 * miceSize;   // Scale 版本
-                mice.m_go.transform.parent = hole;              // hole[-1]是因為起始值是0 
-                mice.m_go.layer = hole.gameObject.layer;
-                mice.m_go.transform.localPosition = Vector2.zero;
-                mice.m_go.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
-                                                                                                     //clone.GetComponent<BoxCollider2D>().enabled = true;
-                mice.Play(IAnimatorState.ENUM_AnimatorState.Hello);
-
-                mice.m_go.transform.gameObject.SetActive(false);
-                mice.m_go.transform.gameObject.SetActive(true);
-                return mice;
+                creature.m_go.transform.parent = hole;              // hole[-1]是因為起始值是0 
+                creature.m_go.layer = hole.gameObject.layer;
+                creature.m_go.transform.localPosition = Vector2.zero;
+                creature.m_go.transform.localScale = hole.transform.GetChild(0).localScale - _miceSize;  // 公式 原始大小分為10等份 10等份在減掉 要縮小的等份*乘洞的倍率(1.4~0.9) => 1.0整份-0.2份*1(洞口倍率)=0.8份 
+                                                                                                         //clone.GetComponent<BoxCollider2D>().enabled = true;
+                
+                creature.m_go.transform.gameObject.SetActive(false);
+                creature.m_go.transform.gameObject.SetActive(true);
+                creature.GetAminState().Initialize();
+                creature.Play(IAnimatorState.ENUM_AnimatorState.Hello);
+                return creature;
             }
         }
+        Debug.Log("NULL Creature!!!!");
         return null;
     }
     #endregion
@@ -446,10 +411,9 @@ public class PoolSystem : IGameSystem
             {
                 ICreature creature = m_CreatureSystem.GetMice(hole);
 
-            if (creature != null)
+                if (creature != null)
                 {
                     creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                    creature.GetAIState().SetAIState(new DiedAIState());
                     m_CreatureSystem.RemoveHoleMiceRefs(hole);
                 }
             }
@@ -458,7 +422,7 @@ public class PoolSystem : IGameSystem
             MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
             ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
             MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
-            GameObject go = MPGFactory.GetObjFactory().Instantiate(assetLoader.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
+            GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
 
             // 播放洞口動畫
             hole.GetComponent<Animator>().enabled = true;
@@ -500,6 +464,7 @@ public class PoolSystem : IGameSystem
             clone.transform.localScale = Vector3.one;
             objGroup = clone.transform;
             dictMicePool.Add(objectID, new Dictionary<string, ICreature>());
+
         }
 
         // 預先實體化老鼠
@@ -507,7 +472,7 @@ public class PoolSystem : IGameSystem
         {
             clone = MPGFactory.GetObjFactory().Instantiate(bundle, objGroup, objectID, Vector3.zero, Vector3.one, Vector2.zero, -1);
 
-            ICreature creature ;
+            ICreature creature;
             MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(objectID);
             miceAttr.SetMaxHP(1);   // 錯誤 FUCK 生命應該在Server
 
@@ -543,7 +508,7 @@ public class PoolSystem : IGameSystem
 
             // Add Mice Pool
             dictMicePool[objectID].Add(clone.GetHashCode().ToString(), creature);
-
+      //      Debug.Log("Pooling : MiceID:" + objectID + "   HashID:" + clone.GetHashCode() + "   Creature:" + creature.GetArribute().name);
             clone.gameObject.SetActive(false);
         }
     }
@@ -614,12 +579,14 @@ public class PoolSystem : IGameSystem
         mice.SetArribute(miceAttr);
         mice.SetGameObject(mice.m_go);
         mice.SetAI(new MiceAI(mice));
+        mice.m_go.transform.parent = objectPool.transform.Find(miceID);
         mice.m_go.transform.GetChild(0).localScale = Vector3.one;
         mice.m_go.transform.GetChild(0).localRotation = Quaternion.identity;
         mice.m_go.transform.GetChild(0).localPosition = Vector3.zero;
-
-        dictMicePool[miceID].Add(hashID, mice);
-
+        mice.m_go.GetComponent<BoxCollider2D>().enabled = true;
+        mice.m_go.SetActive(false);
+       dictMicePool[miceID].Add(hashID, mice); // 錯誤 應該給新的Hash
+        Debug.Log("Return Pooling MiceID: " + miceID);
         System.GC.Collect();
     }
 

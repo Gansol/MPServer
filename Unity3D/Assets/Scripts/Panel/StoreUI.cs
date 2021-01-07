@@ -68,7 +68,7 @@ public class StoreUI : IMPPanelUI
 
     public StoreUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- StoreUI Created ----------------");
+        Debug.Log("--------------- StoreUI Create ----------------");
         _bFirstLoad = true;
         dictItemRefs = new Dictionary<string, GameObject>();
         buyingGoodsData = new Dictionary<string, string> {
@@ -111,8 +111,8 @@ public class StoreUI : IMPPanelUI
     {
         base.Update();
 
-        if (!string.IsNullOrEmpty(m_AssetLoaderSystem.ReturnMessage))
-            Debug.Log("訊息：" + m_AssetLoaderSystem.ReturnMessage);
+        //if (!string.IsNullOrEmpty(m_AssetLoaderSystem.ReturnMessage))
+        //    Debug.Log("訊息：" + m_AssetLoaderSystem.ReturnMessage);
 
 
         //// ins fisrt load panelScene : Gashapon
@@ -136,21 +136,23 @@ public class StoreUI : IMPPanelUI
         }
 
         // 載入道具完成後 實體化 道具
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset)
         {
-            _bLoadedAsset = !_bLoadedAsset;
+            m_AssetLoaderSystem.Initialize();
+            _bLoadedAsset = false;
             InstantiateStoreItem();
             LoadPrice(_itemData, _itemType);
-            switchInStorePanel(UI.itemPanel.transform.Find(_itemType.ToString()).gameObject);
+            SwitchInStorePanel(UI.itemPanel.transform.Find(_itemType.ToString()).gameObject);
             ResumeToggleTarget();
             // switchTab(infoGroupsArea[(int)ENUM_Area.Tab].transform.GetChild(0).gameObject);
             // assetLoader.init();
         }
 
         // 載入角色完成後 實體化 角色
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedActor)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedActor)
         {
-            _bLoadedActor = !_bLoadedActor;
+            m_AssetLoaderSystem.Initialize();
+            _bLoadedActor = false;
             string actorName = _lastItemBtn.GetComponentInChildren<UISprite>().name;
             InstantiateActor(actorName, UI.miceInfo_msgBox.transform.GetChild(0).Find("Image"), actorScale);
         }
@@ -246,13 +248,15 @@ public class StoreUI : IMPPanelUI
     {
         if (m_RootUI.activeSelf)
         {
-            if (_bFirstLoad)
+            if (_bFirstLoad) {
+
+            
                 _bFirstLoad = false;
-
-            _itemData = Global.storeItem;
-
             //   LoadGashaponAsset(assetFolder[0]);
             GetMustLoadAsset();
+            }
+
+            _itemData = Global.storeItem;
             LoadPlayerInfo();
             EventMaskSwitch.lastPanel = m_RootUI.gameObject;
         }
@@ -523,11 +527,11 @@ public class StoreUI : IMPPanelUI
         if (!m_AssetLoaderSystem.GetAsset(_folderString))
         {
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.StoreItemAssetName + Global.ext);  // 道具Slot
-            _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
+            _bLoadedAsset = LoadIconObjectsAssetByName(GetItemNameList(itemDetailData), _folderString);
         }
-        else if (GetDontNotLoadAsset(itemDetailData).Count > 0)
+        else if (GetDontNotLoadAssetName(itemDetailData).Count > 0)
         {
-            _bLoadedAsset = LoadIconObjects(GetItemNameData(itemDetailData), _folderString);
+            _bLoadedAsset = LoadIconObjectsAssetByName(GetItemNameList(itemDetailData), _folderString);
         }
     }
 
@@ -564,16 +568,15 @@ public class StoreUI : IMPPanelUI
     /// </summary>
     /// <param name="itemData">物件陣列</param>
     /// <returns>Dictionary(ItemName,ItemName)</returns>
-    private Dictionary<string, object> GetItemNameData(Dictionary<string, object> itemData)    // 載入遊戲物件
+    private List<string> GetItemNameList(Dictionary<string, object> itemData)    // 載入遊戲物件
     {
-        Dictionary<string, object> data = new Dictionary<string, object>();
+        List<string>  data = new List<string>();
 
         foreach (KeyValuePair<string, object> item in itemData)
         {
             var nestedData = item.Value as Dictionary<string, object>;
-            object itemName;
-            nestedData.TryGetValue("ItemName", out itemName);
-            data.Add(itemName.ToString(), itemName);
+            nestedData.TryGetValue("ItemName", out object itemName);
+            data.Add(itemName.ToString());
         }
 
         return data;
@@ -661,10 +664,10 @@ public class StoreUI : IMPPanelUI
     private void LoadGashaponAsset()
     {
         GetStoreItemDataAndFolderPath((int)StoreType.Gashapon);
-
+      //  m_AssetLoaderSystem.Initialize();
         for (int i = 1; i <= 3; i++)
             m_AssetLoaderSystem.LoadAssetFormManifest("gashapon/unique/gashapon" + i.ToString() + Global.ext);
-        //    assetLoader.LoadAssetFormManifest(_folderString + "/unique" + _folderString + i.ToString() + Global.ext);
+        m_AssetLoaderSystem.SetLoadAllAseetCompleted();
         _bLoadedGashapon = true; // 來用暫時停掉方便測試  並需要配合修改起始TAB頁面 
     }
     #endregion
@@ -847,7 +850,7 @@ public class StoreUI : IMPPanelUI
     /// 關閉前一個Panel 並儲存目前Panel等待下次關閉
     /// </summary>
     /// <param name="tab"></param>
-    private void switchInStorePanel(GameObject tab)
+    private void SwitchInStorePanel(GameObject tab)
     {
         if (_lastPanel != null && _lastPanel != tab)
             _lastPanel.SetActive(false);

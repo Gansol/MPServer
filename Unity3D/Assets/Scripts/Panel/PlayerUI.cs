@@ -81,8 +81,9 @@ public class PlayerUI : IMPPanelUI
         }
 
         // Asset載入完成時 載入玩家頭像、實體化裝備圖示
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _LoadedAsset)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _LoadedAsset)
         {
+            m_AssetLoaderSystem.Initialize();
             _LoadedAsset = false;
             InstantiateEquipIcon(Global.playerItem, UI.weaponEquip.transform, (int)StoreType.Armor);
             LoadPlayerAvatorIcon();
@@ -132,13 +133,14 @@ public class PlayerUI : IMPPanelUI
     /// </summary>
     protected override void GetMustLoadAsset()
     {
-        Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+        List<string> notLoadedAssetNameList = new List<string>();
 
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
+            //   m_AssetLoaderSystem.Initialize();
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
-            dictNotLoadedAsset = GetDontNotLoadAsset(Global.playerItem, Global.itemProperty);
+            notLoadedAssetNameList = GetDontNotLoadAssetName(Global.playerItem, Global.itemProperty);
             _bFirstLoad = false;
         }
         else
@@ -149,21 +151,26 @@ public class PlayerUI : IMPPanelUI
             // Where 找不存在的KEY 再轉換為Dictionary
             _dictItemData = Global.playerItem.Where(kvp => !_dictItemData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            dictNotLoadedAsset = GetDontNotLoadAsset(_dictItemData, Global.itemProperty);
+            notLoadedAssetNameList = GetDontNotLoadAssetName(_dictItemData, Global.itemProperty);
         }
 
         // 如果 有未載入物件 載入AB
-        if (dictNotLoadedAsset.Count != 0)
-            LoadIconObjects(dictNotLoadedAsset, Global.ItemIconUniquePath); // 載入道具ICON物件
+        if (notLoadedAssetNameList.Count != 0)
+            LoadIconObjectsAssetByName(notLoadedAssetNameList, Global.ItemIconUniquePath); // 載入道具ICON物件
+
 
         // 載入老鼠ICON
+        //  m_AssetLoaderSystem.Initialize();
+
         foreach (KeyValuePair<string, object> item in Global.dictMiceAll)
+        {
             if (!m_AssetLoaderSystem.GetAsset(item.Value.ToString()))
                 m_AssetLoaderSystem.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + item.Value + Global.ext);
-
+        }
+        m_AssetLoaderSystem.SetLoadAllAseetCompleted();
         _dictItemData = Global.playerItem;
         _LoadedAsset = true;
-        AssetBundleManager.LoadedAllAsset();
+
         ResumeToggleTarget();
     }
 

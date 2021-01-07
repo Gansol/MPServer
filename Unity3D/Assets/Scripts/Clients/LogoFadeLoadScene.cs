@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 public class LogoFadeLoadScene : MonoBehaviour
 {
     InternetChecker check;
@@ -46,9 +47,7 @@ public class LogoFadeLoadScene : MonoBehaviour
         if (time > seconds && !flag)
         {
             flag = !flag;
-
-            Application.LoadLevel("BundleCheck");
-
+            SceneManager.LoadScene("BundleCheck");
         }
     }
 }

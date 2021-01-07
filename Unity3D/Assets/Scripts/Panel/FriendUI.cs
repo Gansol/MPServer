@@ -40,14 +40,17 @@ public class FriendUI : IMPPanelUI
 
     public FriendUI(MPGame MPGame): base(MPGame)
     {
-        Debug.Log("--------------- FriendUI Created ----------------");
+        Debug.Log("--------------- FriendUI Create ----------------");
+        _bFirstLoad = true;
+       
     }
 
     public override void Initialize()
     {
         Debug.Log("--------------- FriendUI Initialize ----------------");
-        _bFirstLoad = true;
+        
         _bLoadedPanel = false;
+        _bLoadedIcon = false;
         itemPos = new Vector2(0, 0);
         offset = new Vector2(0, -150);
         _clickInterval = 3;
@@ -57,6 +60,7 @@ public class FriendUI : IMPPanelUI
         Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
         Global.photonService.ApplyInviteFriendEvent += OnApplyInviteFriend;
         Global.photonService.RemoveFriendEvent += OnRemoveFriend;
+
     }
 
     public override  void  Update()
@@ -67,10 +71,11 @@ public class FriendUI : IMPPanelUI
             OnLoadPanel();
 
         // Asset載入完成時 實體化道具
-        if (m_AssetLoaderSystem.bLoadedObj && _bLoadedIcon && _bLoadActoOnlinerState)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedIcon && _bLoadActoOnlinerState)
         {
+            m_AssetLoaderSystem.Initialize();
             _bLoadedIcon = true;
-            _bLoadActoOnlinerState = !_bLoadActoOnlinerState;
+            _bLoadActoOnlinerState = false;
 
             // 實體化 朋友資訊列
             foreach (KeyValuePair<string, object> friend in Global.dictOnlineFriendsDetail)
@@ -123,20 +128,23 @@ public class FriendUI : IMPPanelUI
     /// 取得必須載入的Asset
     /// </summary>
     protected override void GetMustLoadAsset()
-    {
+    {//m_AssetLoaderSystem.Initialize();
         if (_bFirstLoad)
         {
-            Dictionary<string, object> dictMice = new Dictionary<string, object>();
+            List<string> miceNameList = new List<string>();
+
+            // 取得道具資產名稱
             foreach (KeyValuePair<string, object> item in Global.miceProperty)
             {
                 Dictionary<string, object> prop = item.Value as Dictionary<string, object>;
                 prop.TryGetValue("ItemName", out object itemName);
-                dictMice.Add(item.Key, itemName);
+                miceNameList.Add(itemName.ToString());
             }
+
             _clientFriendsList = new List<string>(Global.dictFriends);  // 新朋友名單存入client暫存朋友列表
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + UI.slotItemName + Global.ext);  // 載入好友列表背景資產
-            _bLoadedIcon = LoadIconObjects(dictMice, Global.MiceIconUniquePath);
-
+            _bLoadedIcon = LoadIconObjectsAssetByName(miceNameList, Global.MiceIconUniquePath);
+            m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             _bFirstLoad = false;
         }
     }
@@ -317,10 +325,9 @@ public class FriendUI : IMPPanelUI
     {
         Dictionary<string, object> details = detail as Dictionary<string, object>;
 
-        object rank, nickname, actorImage;
-        details.TryGetValue("Rank", out rank);
-        details.TryGetValue("Nickname", out nickname);
-        details.TryGetValue("Image", out actorImage);
+        details.TryGetValue("Rank", out object rank);
+        details.TryGetValue("Nickname", out object nickname);
+        details.TryGetValue("Image", out object actorImage);
         GameObject friendItemSlot = InstantiateItem(itemPos);
         InstantiateICON(actorImage.ToString().ToLower(), friendItemSlot.transform);
         LoadFriendData(account, rank.ToString(), nickname.ToString(), actorImage.ToString(), friendItemSlot.transform);

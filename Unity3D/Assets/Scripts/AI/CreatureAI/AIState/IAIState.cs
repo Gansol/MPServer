@@ -5,8 +5,13 @@ public abstract class IAIState
 {
 
     protected ICreatureAI m_CreatureAI = null;
+    protected ICreature.ENUM_CreatureAIState creatureAIState = ICreature.ENUM_CreatureAIState.None;
 
-    public IAIState() { }
+
+    public IAIState(/*ICreatureAI creatureAI*/)
+    {
+      // m_CreatureAI = creatureAI;
+    }
     public abstract void Update();
 
     // 設定CharacterAI的對像
@@ -23,5 +28,10 @@ public abstract class IAIState
     public virtual void Release()
     {
         m_CreatureAI = null;
+    }
+
+    public int GetAIState()
+    {
+        return (int)creatureAIState;
     }
 }
