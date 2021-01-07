@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using UnityEngine.Networking;
 
 public class Database
 {
@@ -48,10 +49,12 @@ public class Database
         connectString = "URI=file:" + Application.persistentDataPath + "/";
         if (!File.Exists(Application.persistentDataPath + "/" + databaseName))
         {
-            WWW loadDB = new WWW("jar:file://" + Application.dataPath + "!/assets/" + databaseName);
-            while (!loadDB.isDone)
-            {}
-            File.WriteAllBytes(Application.persistentDataPath + "/" + databaseName, loadDB.bytes);
+            using (UnityWebRequest loadDB = new UnityWebRequest("jar:file://" + Application.dataPath + "!/assets/" + databaseName))
+            {
+                while (!loadDB.isDone) { }
+
+            File.WriteAllBytes(Application.persistentDataPath + "/" + databaseName, System.Text.Encoding.UTF8.GetBytes(loadDB.downloadHandler.text));
+        }
         }
         
 #elif UNITY_IPHONE

@@ -1,10 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
-//預備改寫仲介者模式
+/* ***************************************************************
+ * ------------  Copyright © 2021 Gansol Studio.  All Rights Reserved.  ------------
+ * ----------------                                CC BY-NC-SA 4.0                                ----------------
+ * ----------------                @Website:  EasyUnity@blogspot.com      ----------------
+ * ----------------                @Email:    GansolTW@gmail.com               ----------------
+ * ----------------                @Author:   Krola.                                             ----------------
+ * ***************************************************************
+ *                                                       Description
+ * ***************************************************************
+ *                                                          主系統
+ *   1.單例、仲介者模式
+ * ***************************************************************
+ *                                                       ChangeLog
+ *  20210107 v 1.0.0 完成
+ * ****************************************************************/
 public class MPGame
 {
-    private static MPGame _instance = null;
-    private static bool _loginStatus, _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
+    // Panel開啟狀態
+    private static bool  _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
+    private static bool _loginStatus;                    // 登入狀態
+    private static MPGame _instance = null;     // 單例實體化
 
     // GameSystem
     private AssetLoaderSystem m_AssetLoaderSystem = null;
@@ -54,6 +70,8 @@ public class MPGame
         // Iint GameSystem
         m_AssetLoaderSystem = new AssetLoaderSystem(this);
         m_CreatureSystem = new CreatureSystem(this);
+        m_BattleSystem = new BattleSystem(this);
+        m_PoolSystem = new PoolSystem(this);
         m_MessageSystem = new MessageSystem(this);
         m_MissionSystem = new MissionSystem(this);
         m_AudioSystem = new AudioSystem(this);
@@ -71,6 +89,7 @@ public class MPGame
         m_PurchaseUI = new PurchaseUI(this);
         Debug.Log("MPGame Initialize.");
     }
+
     public void OnGUI()
     {
         if (_bloadMainScene)
@@ -104,13 +123,17 @@ public class MPGame
         {
             m_BattleSystem.Update();
             m_PoolSystem.Update();
+            m_CreatureSystem.Update();
             m_MissionSystem.Update();
             m_BattleUI.Update();
         }
     }
     public void FixedUpdate()
     {
-
+        if (_bLoadBattlelPanel)
+        {
+            m_BattleSystem.FixedUpdate();
+        }
     }
 
 
@@ -169,11 +192,10 @@ public class MPGame
                 break;
 
             case "gameui":
-                m_BattleSystem = new BattleSystem(this);
-                m_PoolSystem = new PoolSystem(this);
                 m_BattleUI.Initialize();
                 m_BattleSystem.Initialize();
                 m_PoolSystem.Initialize();
+                m_MissionSystem.Initialize();
                 _bLoadBattlelPanel = true;
                 break;
         }

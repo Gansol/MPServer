@@ -24,7 +24,6 @@ using MPProtocol;
 // 可以把PurchaseHandlder寫到這裡
 public class PurchaseUI : IMPPanelUI
 {
-    ObjectFactory objFactory;
     private AttachBtn_PurchaseUI UI;
     private int offset = 275;
 
@@ -38,11 +37,11 @@ public class PurchaseUI : IMPPanelUI
 
     public PurchaseUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- PurchaseUI Created ----------------");
-        objFactory = new ObjectFactory();
+        Debug.Log("--------------- PurchaseUI Create ----------------");
         _dictitemSlot = new Dictionary<string, GameObject>();
         _dictProductsFitCurrency = new Dictionary<string, object>();
         _bFirstLoad = true;
+
         //_iap = FindObjectOfType<Sdkbox.IAP>();
         //  _bLoadProduct = true;
         //_iap.getProducts();
@@ -51,7 +50,13 @@ public class PurchaseUI : IMPPanelUI
     public override void Initialize()
     {
         Debug.Log("--------------- PurchaseUI Initialize ----------------");
+
+        _dataLoadedCount = 0;
+        _slotPosY = 0;
+
         _bLoadPanel = false;
+        _bLoadAsset = false;
+
         Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
         Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
         Global.photonService.UpdateCurrencyEvent += OnUpdateCurrency;
@@ -67,17 +72,18 @@ public class PurchaseUI : IMPPanelUI
         // 資料載入完成後 載入Panel
         if (_dataLoadedCount == GetMustLoadedDataCount() /*&& _bLoadProduct */&& !_bLoadPanel)
         {
-            if (!_bFirstLoad)
-                ResumeToggleTarget();
-
             _bLoadPanel = true;
             OnLoadPanel();
+
+            //   if (!_bFirstLoad)
+         //   ResumeToggleTarget();
         }
 
         // Panel載入完成後 實體化道具 載入屬性
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadAsset && _bLoadPanel)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadAsset &&_bLoadPanel)
         {
-            _bLoadAsset = !_bLoadAsset;
+            _bLoadAsset = false;
+            m_AssetLoaderSystem.Initialize();
             InstantiateItem();
             LoadPurchaseProperty();
             ResumeToggleTarget();
@@ -106,7 +112,7 @@ public class PurchaseUI : IMPPanelUI
     /// </summary>
     private void InstantiateItem()
     {
-        GameObject bundle = m_MPGame.GetAssetLoaderSystem().GetAsset(Global.PurchaseItemAssetName);
+        GameObject bundle = m_AssetLoaderSystem.GetAsset(Global.PurchaseItemAssetName);
         Transform itemSlot = null;
         object value, promotionsTime;
         bool reload = false;
@@ -129,7 +135,7 @@ public class PurchaseUI : IMPPanelUI
                 {
                     values.TryGetValue(PurchaseProperty.ItemName, out value);
 
-                    itemSlot = objFactory.Instantiate(bundle,UI.itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
+                    itemSlot = MPGFactory.GetObjFactory().Instantiate(bundle,UI.itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
                     UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
                     Add2Refs(item.Key, itemSlot.gameObject);
                     _slotPosY += offset;
@@ -331,7 +337,8 @@ public class PurchaseUI : IMPPanelUI
             if (_bFirstLoad)
             {
                 _bFirstLoad = false;
-                m_MPGame.GetAssetLoaderSystem().LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
+                m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.PurchaseItemAssetName + Global.ext);
+                m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             }
             _bLoadAsset = true;
         }

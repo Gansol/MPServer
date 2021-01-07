@@ -19,7 +19,7 @@ using UnityEngine.Networking;
  *                           ChangeLog
  * 20160714 v1.0.1  修正部分問題                                       
  * ****************************************************************/
-public class VersionChecker : MonoBehaviour
+public class VersionChecker  
 {
     //    AssetBundlesHash bundleHash; //hash文件用
     private static byte[] _bVisionFile; //暫存 伺服器版本列表

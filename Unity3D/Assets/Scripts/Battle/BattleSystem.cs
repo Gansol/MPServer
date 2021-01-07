@@ -78,9 +78,8 @@ public class BattleSystem : IGameSystem
 
     public BattleSystem(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- BattleSystem Created ----------------");
-        battleAttr = new BattleAttr();
-         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
+        Debug.Log("--------------- BattleSystem Create ----------------");
+
     }
 
     // Use this for initialization
@@ -89,7 +88,12 @@ public class BattleSystem : IGameSystem
         Debug.Log("--------------- BattleSystem Initialize ----------------");
         EventMaskSwitch.Init();
         //FindHole();
-        UI = m_RootUI.GetComponent<AttachBtn_BattleUI>();
+        battleAttr = new BattleAttr();
+        m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
+        UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
+        Debug.Log("m_RootUI:" + m_RootUI);
+        Debug.Log("UI:" + UI);
+        Debug.Log("UI:" + UI.hole);
         //hole = UI.hole;
         // poolManager = m_RootUI.GetComponentInChildren<PoolManager>();
         missionSystem = m_MPGame.GetMissionSystem();
@@ -486,7 +490,7 @@ public class BattleSystem : IGameSystem
                 case Mission.WorldBoss:
                     {
                         // 如果要測試 可以把 value改成Boss的ID
-                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, X);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
+                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
                         break;
                     }
             }
@@ -729,7 +733,25 @@ public class BattleSystem : IGameSystem
         return UI.hole;
     }
     //---亂寫區域 ---
+    public override void Release()
+    {
+        base.Release();
+        Global.photonService.MissionCompleteEvent -= OnMissionComplete;
+        Global.photonService.ApplyMissionEvent -= OnApplyMission;
+        Global.photonService.UpdateScoreEvent -= OnUpdateScore;
+        Global.photonService.OtherScoreEvent -= OnOtherScore;
+        Global.photonService.UpdateLifeEvent -= OnUpdateLife;
+        Global.photonService.GetOpponentLifeEvent -= OnGetOpponentLife;
+        Global.photonService.OtherMissionScoreEvent -= OnOtherMissionComplete;
 
+        Global.photonService.GameOverEvent -= OnGameOver;
+        Global.photonService.LoadSceneEvent -= OnDestory;
+        //Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
+        Global.photonService.ApplySkillItemEvent -= OnApplySkillItem;
+        Global.photonService.LoadSceneEvent -= OnLoadScene;
+        Global.photonService.BossSkillEvent -= OnBossSkill;
+        Global.photonService.ReLoginEvent -= OnReLogin;
+    }
 
 
     // 外部取用 戰鬥資料

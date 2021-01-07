@@ -7,7 +7,7 @@ using UnityEngine;
 public class BattleUI : IMPPanelUI
 {
     private AttachBtn_BattleUI UI;
-    private BattleSystem battleSystem;
+    private BattleSystem m_BattleSystem;
 
     private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
@@ -21,7 +21,8 @@ public class BattleUI : IMPPanelUI
 
     public BattleUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- BattleUI Created ----------------");
+        Debug.Log("--------------- BattleUI Create ----------------");
+        m_BattleSystem = MPGame.GetBattleSystem();
     }
 
     public override void Initialize()
@@ -31,10 +32,11 @@ public class BattleUI : IMPPanelUI
         UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
         _beautyHP = 0.5f;
         //UI.WaitObject.transform.gameObject.SetActive(true); // 開始才顯示
-        battleSystem = m_MPGame.GetBattleSystem();
+       
         m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
-
+       //m_AssetLoaderSystem.Initialize();
         m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
+        m_AssetLoaderSystem.SetLoadAllAseetCompleted();
 
         //_energy = 0d;
         _beautyEnergy = _beautyFever = 0f;
@@ -45,8 +47,8 @@ public class BattleUI : IMPPanelUI
         UI.avatarImage.spriteName = Global.PlayerImage;
         UI.otherAvatarImage.spriteName = Global.OpponentData.Image;
 
-        _tmpLife = battleSystem.life;
-        _tmpOhterLife = battleSystem.OtherLife;
+        _tmpLife = m_BattleSystem.life;
+        _tmpOhterLife = m_BattleSystem.OtherLife;
 
         _blueLifeColor = UI.BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = UI.RedLifeBar.GetComponent<UISprite>().color;
@@ -59,75 +61,77 @@ public class BattleUI : IMPPanelUI
     public override void Update()
     {
         base.Update();
-
-        #region 動畫類判斷 DisActive
-        if (UI.WaitObject.activeSelf)
+        if (Global.isGameStart)
         {
-            Debug.Log("Waiting ....................");
-            if (Global.isGameStart)
-                UI.WaitObject.GetComponent<Animator>().Play("Layer1.Wait");
+            #region 動畫類判斷 DisActive
+            if (UI.WaitObject.activeSelf)
+            {
+                Debug.Log("Waiting ....................");
+                if (Global.isGameStart)
+                    UI.WaitObject.GetComponent<Animator>().Play("Layer1.Wait");
 
-            Animator waitAnims = UI.WaitObject.GetComponent("Animator") as Animator;
-            AnimatorStateInfo waitState = waitAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+                Animator waitAnims = UI.WaitObject.GetComponent("Animator") as Animator;
+                AnimatorStateInfo waitState = waitAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
-            if (waitState.fullPathHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
-                if (waitState.normalizedTime > .1f)
-                {
-                    UI.WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-                    UI.StartObject.SetActive(true);
-                }
+                if (waitState.fullPathHash == Animator.StringToHash("Layer1.Wait"))                  // 如果 目前 動化狀態 是 Waiting
+                    if (waitState.normalizedTime > .1f)
+                    {
+                        UI.WaitObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                        UI.StartObject.SetActive(true);
+                    }
 
+            }
+
+            if (UI.StartObject.activeSelf && !UI.WaitObject.activeSelf && Global.isGameStart)
+            {
+              //  Debug.Log("Start 321................");
+                Animator startAnims = UI.StartObject.GetComponent<Animator>();
+                AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+
+                if (startState.fullPathHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
+                    if (startState.normalizedTime > .9f) UI.StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+            }
+
+            if (UI.MissionObject.activeSelf)
+            {
+                Animator missionAnims = UI.MissionObject.GetComponent<Animator>();
+                AnimatorStateInfo missionState = missionAnims.GetCurrentAnimatorStateInfo(0);          // 取得目前動畫狀態 (0) = Layer1
+
+                if (missionState.fullPathHash == Animator.StringToHash("Layer1.FadeIn"))                   // 如果 目前 動化狀態 是 FadeIn
+                    if (missionState.normalizedTime > 2.0f)
+                    {
+                        UI.MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                        Debug.Log(" --------------FadeIn  UI.MissionObject.SetActive(false)------------");
+
+                    }
+
+                if (missionState.fullPathHash == Animator.StringToHash("Layer1.Completed"))                // 如果 目前 動化狀態 是 Completed
+                    if (missionState.normalizedTime > 2.0f)
+                    {
+                        UI.MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+                        Debug.Log(" --------------Completed  UI.MissionObject.SetActive(false)------------");
+                    }
+            }
+
+            if (UI.ScorePlusObject.activeSelf)
+            {
+                Animator scoreAnims = UI.ScorePlusObject.GetComponent<Animator>();
+                AnimatorStateInfo scoreState = scoreAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+
+                if (scoreState.fullPathHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
+                    if (scoreState.normalizedTime > 1.0f) UI.ScorePlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+            }
+
+            if (UI.OtherPlusObject.activeSelf)
+            {
+                Animator otherAnims = UI.OtherPlusObject.GetComponent<Animator>();
+                AnimatorStateInfo otherState = otherAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
+
+                if (otherState.shortNameHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
+                    if (otherState.normalizedTime > 1.0f) UI.OtherPlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
+            }
+            #endregion
         }
-
-        if (UI.StartObject.activeSelf && !UI.WaitObject.activeSelf && Global.isGameStart)
-        {
-            Debug.Log("Start 321................");
-            Animator startAnims = UI.StartObject.GetComponent<Animator>();
-            AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
-
-            if (startState.fullPathHash == Animator.StringToHash("Layer1.Start"))                  // 如果 目前 動化狀態 是 Start
-                if (startState.normalizedTime > .9f) UI.StartObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-        }
-
-        if (UI.MissionObject.activeSelf)
-        {
-            Animator missionAnims = UI.MissionObject.GetComponent<Animator>();
-            AnimatorStateInfo missionState = missionAnims.GetCurrentAnimatorStateInfo(0);          // 取得目前動畫狀態 (0) = Layer1
-
-            if (missionState.fullPathHash == Animator.StringToHash("Layer1.FadeIn"))                   // 如果 目前 動化狀態 是 FadeIn
-                if (missionState.normalizedTime > 2.0f)
-                {
-                    UI.MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-                    Debug.Log(" --------------FadeIn  UI.MissionObject.SetActive(false)------------");
-
-                }
-
-            if (missionState.fullPathHash == Animator.StringToHash("Layer1.Completed"))                // 如果 目前 動化狀態 是 Completed
-                if (missionState.normalizedTime > 2.0f)
-                {
-                    UI.MissionObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-                    Debug.Log(" --------------Completed  UI.MissionObject.SetActive(false)------------");
-                }
-        }
-
-        if (UI.ScorePlusObject.activeSelf)
-        {
-            Animator scoreAnims = UI.ScorePlusObject.GetComponent<Animator>();
-            AnimatorStateInfo scoreState = scoreAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
-
-            if (scoreState.fullPathHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
-                if (scoreState.normalizedTime > 1.0f) UI.ScorePlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-        }
-
-        if (UI.OtherPlusObject.activeSelf)
-        {
-            Animator otherAnims = UI.OtherPlusObject.GetComponent<Animator>();
-            AnimatorStateInfo otherState = otherAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
-
-            if (otherState.shortNameHash == Animator.StringToHash("Layer1.ScorePlus"))                  // 如果 目前 動化狀態 是 Waiting
-                if (otherState.normalizedTime > 1.0f) UI.OtherPlusObject.SetActive(false);               // 目前播放的動畫 "總"時間 = 動畫撥放完畢時
-        }
-        #endregion
     }
     public override void OnGUI()
     {
@@ -139,7 +143,7 @@ public class BattleUI : IMPPanelUI
 
             BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
             BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
-            BeautyBar(UI.RedEnergyBar, battleSystem.otherEnergy / 100f, _beautyOtherEnergy);
+            BeautyBar(UI.RedEnergyBar, m_BattleSystem.otherEnergy / 100f, _beautyOtherEnergy);
             BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
             BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
             BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
@@ -150,7 +154,7 @@ public class BattleUI : IMPPanelUI
     // 顯示目前BattleState ICON
     private void BattleState()
     {
-        switch (battleSystem.GetBattleState())
+        switch (m_BattleSystem.GetBattleState())
         {
             case ENUM_BattleAIState.EasyMode:
                 UI.gameMode.spriteName = "Easy Mode";
@@ -175,18 +179,18 @@ public class BattleUI : IMPPanelUI
     // GUI 顯示數值
     private void GUIVariables()
     {
-        energy = m_MPGame.GetBattleSystem().GetEnergy() / 100f;
-        feverEnergy = battleSystem.feverEnergy / 100f;
-        blueLife = battleSystem.life / _tmpLife;
-        redLife = battleSystem.OtherLife / _tmpOhterLife;
+        energy = m_BattleSystem.GetEnergy() / 100f;
+        feverEnergy = m_BattleSystem.feverEnergy / 100f;
+        blueLife = m_BattleSystem.life / _tmpLife;
+        redLife = m_BattleSystem.OtherLife / _tmpOhterLife;
         tmpBlueLifeBar = UI.BlueLifeBar.value;
         tmpRedLifeBar = UI.RedLifeBar.value;
-        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_MPGame.GetBattleSystem().gameTime))).ToString();
-        UI.BlueScoreLabel.text = battleSystem.score.ToString();         // 畫出分數值
-        UI.RedScoreLabel.text = battleSystem.otherScore.ToString();     // 畫出分數值
-        UI.BlueLifeText.text = battleSystem.life.ToString();
-        UI.RedLifeText.text = battleSystem.OtherLife.ToString();
-        UI.ComboLabel.text = battleSystem.combo.ToString();        // 畫出 UI.Combo值
+        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_BattleSystem.gameTime))).ToString();
+        UI.BlueScoreLabel.text = m_BattleSystem.score.ToString();         // 畫出分數值
+        UI.RedScoreLabel.text = m_BattleSystem.otherScore.ToString();     // 畫出分數值
+        UI.BlueLifeText.text = m_BattleSystem.life.ToString();
+        UI.RedLifeText.text = m_BattleSystem.OtherLife.ToString();
+        UI.ComboLabel.text = m_BattleSystem.combo.ToString();        // 畫出 UI.Combo值
 
         //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
         //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
@@ -198,7 +202,7 @@ public class BattleUI : IMPPanelUI
     #region ScoreBarAnim 分數條動畫
     private void ScoreBarAnim()
     {
-        float value = battleSystem.score / (battleSystem.score + battleSystem.otherScore);                      // 得分百分比 兩邊都是0會 NaN
+        float value = m_BattleSystem.score / (m_BattleSystem.score + m_BattleSystem.otherScore);                      // 得分百分比 兩邊都是0會 NaN
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
@@ -218,7 +222,7 @@ public class BattleUI : IMPPanelUI
             if (_beautyHP <= value)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (battleSystem.score == 0 && battleSystem.otherScore == 0)
+        else if (m_BattleSystem.score == 0 && m_BattleSystem.otherScore == 0)
         {
             UI.HPBar.value = _beautyHP;
             if (_beautyHP <= UI.HPBar.value && UI.HPBar.value > 0.5f)
@@ -235,7 +239,7 @@ public class BattleUI : IMPPanelUI
     #region EnergyTextAnim 能量數值(數字) 動畫 ***還沒寫***
     private void EnergyTextAnim()
     {
-        UI.energyLabel.text = battleSystem.GetEnergy().ToString();
+        UI.energyLabel.text = m_BattleSystem.GetEnergy().ToString();
     }
     #endregion
 
@@ -469,15 +473,15 @@ public class BattleUI : IMPPanelUI
         Debug.Log("Exp Percent:" + value + " _exp:" + _exp);
 
         // 顯示對戰結束 資訊
+        UI.GGObject.SetActive(true);
         UI.GGObject.transform.Find(result == true ? "Win" : "Lose").gameObject.SetActive(true);
         UI.GGObject.transform.Find("Result").Find("Score").GetComponent<UILabel>().text = score.ToString();
-        UI.GGObject.transform.Find("Result").Find(" UI.Combo").GetComponent<UILabel>().text = combo.ToString();
+        UI.GGObject.transform.Find("Result").Find("Combo").GetComponent<UILabel>().text = combo.ToString();
         UI.GGObject.transform.Find("Result").Find("Kill").GetComponent<UILabel>().text = killMice.ToString();
         UI.GGObject.transform.Find("Result").Find("Lost").GetComponent<UILabel>().text = lostMice.ToString();
         UI.GGObject.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
         UI.GGObject.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
         UI.GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
-        UI.GGObject.SetActive(true);
     }
     #endregion
 
@@ -486,12 +490,14 @@ public class BattleUI : IMPPanelUI
     {
         if (_dictItemReward.Count != 0)
         {
+         //   m_AssetLoaderSystem.Initialize();
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
                 if (m_AssetLoaderSystem.GetAsset(Global.IconSuffix + itemName) == null)
                     m_AssetLoaderSystem.LoadAssetFormManifest(Global.MiceIconUniquePath + Global.IconSuffix + itemName + Global.ext);
             }
+            m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             return false;
         }
         return true;    // 已載入 不須再載入
@@ -604,7 +610,7 @@ public class BattleUI : IMPPanelUI
 
     protected override void OnLoading()
     {
-        
+
     }
 
     protected override void OnLoadPanel()

@@ -68,7 +68,7 @@ public class BotAI
             // HitAI(); 錯誤 暫時影藏
             SkillAI();
 
-            Debug.Log("Time: " + Time.fixedTime + "  Last AI Time:" + lastAITime);
+       //     Debug.Log("Time: " + Time.fixedTime + "  Last AI Time:" + lastAITime);
         }
         if (!Global.isGameStart)
         {
@@ -123,43 +123,43 @@ public class BotAI
     // 錯誤
     private void SkillAI()
     {
-        short id, value;
-        Dictionary<string, object> prop;
-        if (Time.time > _lastGameTime + skillStartOffset)
-        {
+        //short id, value;
+        //Dictionary<string, object> prop;
+        //if (Time.time > _lastGameTime + skillStartOffset)
+        //{
 
-            if (lastSkillTime % 20 == 0)
-            {
-                lastSkillTime += skillIntervalTime;
-                id = System.Convert.ToInt16(rnd.Next(0, _skillMiceIDs.Count + 1));
-                id = System.Convert.ToInt16(_skillMiceIDs[id].ToString());
-                if (Global.miceProperty.ContainsKey(id.ToString()))
-                {
-                    prop = Global.miceProperty[id.ToString()] as Dictionary<string, object>;
-                    prop.TryGet("MiceCost", out value);
-                    Global.photonService.SendSkillMice(id, value);
+        //    if (lastSkillTime % 20 == 0)
+        //    {
+        //        lastSkillTime += skillIntervalTime;
+        //        id = System.Convert.ToInt16(rnd.Next(0, _skillMiceIDs.Count + 1));
+        //        id = System.Convert.ToInt16(_skillMiceIDs[id].ToString());
+        //        if (Global.miceProperty.ContainsKey(id.ToString()))
+        //        {
+        //            prop = Global.miceProperty[id.ToString()] as Dictionary<string, object>;
+        //            prop.TryGet("MiceCost", out value);
+        //            Global.photonService.SendSkillMice(id, value);
 
-                    Debug.Log("ID:" + id + "  MiceCost:" + value);
-                }
+        //            Debug.Log("ID:" + id + "  MiceCost:" + value);
+        //        }
 
-            }
+        //    }
 
-            if (lastSkillTime % 20 == 0 && lastSkillTime != 0)
-            {
-                lastSkillTime += skillIntervalTime;
+        //    if (lastSkillTime % 20 == 0 && lastSkillTime != 0)
+        //    {
+        //        lastSkillTime += skillIntervalTime;
 
-                id = System.Convert.ToInt16(rnd.Next(0, _skillItemIDs.Count + 1));
-                id = System.Convert.ToInt16(_skillItemIDs[id].ToString());
-                id = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "SkillID", id.ToString()));
-                prop = Global.dictSkills[id.ToString()] as Dictionary<string, object>;
-                prop.TryGet("SkillType", out value);
+        //        id = System.Convert.ToInt16(rnd.Next(0, _skillItemIDs.Count + 1));
+        //        id = System.Convert.ToInt16(_skillItemIDs[id].ToString());
+        //        id = System.Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "SkillID", id.ToString()));
+        //        prop = Global.dictSkills[id.ToString()] as Dictionary<string, object>;
+        //        prop.TryGet("SkillType", out value);
 
-                Global.photonService.SendSkillItem(id, value);
-                Debug.Log("ID:" + id + "  SkillType:" + value);
-            }
+        //        Global.photonService.SendSkillItem(id, value);
+        //        Debug.Log("ID:" + id + "  SkillType:" + value);
+        //    }
 
-            _lastGameTime += skillStartOffset;
+        //    _lastGameTime += skillStartOffset;
 
-        }
+        //}
     }
 }

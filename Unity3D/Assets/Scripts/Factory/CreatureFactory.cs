@@ -52,7 +52,7 @@ public class CreatureFactory :IFactory
     /// <param name="miceSize"></param>
     /// <param name="hole"></param>
     /// <param name="impose"></param>
-    public IMice SpawnByOne(short miceID, float miceSize, Transform hole, bool impose)
+    public ICreature SpawnByOne(short miceID, float miceSize, Transform hole, bool impose)
     {
        return  m_PoolSystem.InstantiateMice(miceID, miceSize, hole, impose);
     }
@@ -195,16 +195,16 @@ public class CreatureFactory :IFactory
 
         while (count < spawnCount)
         {
-            try
-            {
+            //try
+            //{
                 // objFactory.TestMethod();
                 m_PoolSystem.InstantiateMice( miceID, miceSize, _hole[holeArray[holePos]].transform, impose);
-            }
-            catch (Exception e)
-            {
-                Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount );
-                throw e;
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    Debug.Log("【IESpawnBy1D Error】   randomPos: " + randomPos + " reSpawn: " + reSpawn + " holePos:" + holePos + " count:" + count + " spawnCount:" + spawnCount );
+            //    throw e;
+            //}
 
             holePos += (reSpawn) ? -1 : 1;
             holePos = SetStartPos(holeArray.Length, holePos, reSpawn);  // 重設起始位置

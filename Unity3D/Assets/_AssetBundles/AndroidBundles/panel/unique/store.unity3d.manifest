@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1272753270
+CRC: 1991165441
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3b9605054055ad0ef92074660d4d1635
+    Hash: f83d1793f060aeff377e8d1e187b3caf
   TypeTreeHash:
     serializedVersion: 2
     Hash: e01da8c486264b98811594ab6aec28b3
@@ -42,7 +42,6 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/panel/unique/Store.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/atlas_gashapon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d

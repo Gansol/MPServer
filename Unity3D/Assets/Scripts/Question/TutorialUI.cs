@@ -23,7 +23,7 @@ public class TutorialUI : IMPPanelUI
 
     public TutorialUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- TutorialUI Created ----------------");
+        Debug.Log("--------------- TutorialUI Create ----------------");
     }
     public override void Initialize()
     {

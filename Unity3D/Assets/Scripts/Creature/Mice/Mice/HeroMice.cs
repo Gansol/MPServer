@@ -30,7 +30,7 @@ public class HeroMice : IMice
             m_go.SetActive(false);
         }
 
-        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Died && !bDead)
+        if (m_AnimState.GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.Died && !bDead)
         {
             bDead = true;
             m_go.GetComponent<BoxCollider2D>().enabled = false;
@@ -59,9 +59,9 @@ public class HeroMice : IMice
         }
     }
 
-    protected override void OnHit()
+    public override void OnHit()
     {
-        Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + m_go.layer + " ENUM_AIState:" + ENUM_AIState.ToString() + " m_Arribute.GetHP():" + m_Arribute.GetHP());
+      //  Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + m_go.layer + " ENUM_AIState:" + creatureAIState.ToString() + " m_Arribute.GetHP():" + m_Arribute.GetHP());
         if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled &&*/ m_go.GetComponent<BoxCollider2D>().enabled)
         {
             m_go.GetComponent<BoxCollider2D>().enabled = false;
@@ -71,27 +71,29 @@ public class HeroMice : IMice
         }
     }
 
-    protected override void OnDead(float lifeTime)
-    {
-        //if (Global.isGameStart)
-        //{
-        //    Global.dictBattleMiceRefs.Remove(transform.parent);
-        //    gameObject.SetActive(false);
-        //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
-        //}
+    //protected override void OnDead(float lifeTime)
+    //{
+    //    //if (Global.isGameStart)
+    //    //{
+    //    //    Global.dictBattleMiceRefs.Remove(transform.parent);
+    //    //    gameObject.SetActive(false);
+    //    //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+    //    //}
 
-        if (Global.isGameStart)
-        {
-            if (m_Arribute.GetHP() == 0)
-                m_AI.SetAIState(new DiedAIState());
-            else
-                m_AI.SetAIState(new ByeByeAIState());
+    //    if (Global.isGameStart)
+    //    {
+    //        if (m_Arribute.GetHP() == 0)
+    //            SetAIState(ENUM_CreatureAIState.Died);
+    //           // m_AI.SetAIState(new DiedAIState(m_AI));
+    //        else
+    //            SetAIState(ENUM_CreatureAIState.ByeBye);
+    //        //m_AI.SetAIState(new ByeByeAIState(m_AI));
 
-            Play(IAnimatorState.ENUM_AnimatorState.Died);
-            m_go.SetActive(false);
-        }
+    //        Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //        m_go.SetActive(false);
+    //    }
 
-    }
+    //}
 
     public override void OnEffect(string name, object value)
     {

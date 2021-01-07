@@ -4,14 +4,16 @@ using MPProtocol;
 
 public class PlayerInput : MonoBehaviour
 {
-    RaycastHit2D hit;
-    Vector3 pos;
+    MPGame m_MPGame;
+    ICreature creature;
+    RaycastHit2D raycast2D;
+    Vector3 worldPos;
+    Vector3 mousePos;
     //    float i = 0;
 
-    // Use this for initialization
-    void Start()
+    private void Start()
     {
-        
+        m_MPGame = MPGame.Instance;
     }
 
     // Update is called once per frame
@@ -25,32 +27,37 @@ public class PlayerInput : MonoBehaviour
 
 #if UNITY_EDITOR || UNITY_STANDALONE
 
-        Vector3 perPos;
-        perPos = Input.mousePosition;
-        perPos.z = 0.67f;
-        pos = (Camera.main.orthographic) ? UICamera.mainCamera.ScreenToWorldPoint(Input.mousePosition) : UICamera.mainCamera.ScreenToWorldPoint(perPos);
-        hit = (Camera.main.orthographic) ? Physics2D.Raycast(pos, Vector2.zero) : Physics2D.Raycast(pos, Vector2.zero);
+        mousePos = Input.mousePosition;
+        mousePos.z = 0.67f;
+
+        worldPos = (Camera.main.orthographic) ? UICamera.mainCamera.ScreenToWorldPoint(Input.mousePosition) : UICamera.mainCamera.ScreenToWorldPoint(mousePos);
+        raycast2D = (Camera.main.orthographic) ? Physics2D.Raycast(worldPos, Vector2.zero) : Physics2D.Raycast(worldPos, Vector2.zero);
         //        Debug.Log("pos:" + pos + "XX" + Input.mousePosition);
-        if (hit && hit.collider != null)
+
+        if (raycast2D && raycast2D.collider != null)
         {
-            //Debug.Log(hit.transform.name);
             if (Input.GetMouseButtonDown(0))
             {
-                //                Debug.Log("Hit" + hit.transform.name);
+                // Debug.Log("Hit" + hit.transform.name);
 
-                if (hit.transform.childCount != 0)
+                // 如果 敲到老鼠
+                if (raycast2D.transform.childCount != 0)
                 {
-                    if (hit.transform.GetChild(0).name == "anims") 
-                        hit.transform.SendMessage("OnHit");
-                    if (hit.transform.name == "anims") 
-                        hit.transform.parent.SendMessage("OnHit");
+                    if (raycast2D.transform.GetChild(0).name == "anims" || raycast2D.transform.name == "anims")
+                    {
+                        // 取得老鼠 觸發 死亡動畫
+                        creature = m_MPGame.GetCreatureSystem().GetActiveHoleMice(raycast2D.transform.parent);
+                        creature.OnHit();
+                    }
                 }
-                if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
-                    hit.transform.SendMessage("OnHit");
 
-                if (hit.transform.name == "Exit_Btn")
+                // 如果按下 技能按扭 觸發技能
+                if (raycast2D.transform.parent.name == "Skill1" || raycast2D.transform.name == "Skill2" || raycast2D.transform.name == "Skill3" || raycast2D.transform.name == "Skill4" || raycast2D.transform.name == "Skill5")
+                    raycast2D.transform.SendMessage("OnHit");
+
+                // 如果按下 離開按扭 離開遊戲
+                if (raycast2D.transform.name == "Exit_Btn")
                     Global.photonService.ExitRoom();
-
             }
         }
 
@@ -60,23 +67,29 @@ public class PlayerInput : MonoBehaviour
 
         if (Input.touchCount > 0)
         {
-
             for (int i = 0; i < Input.touchCount && i <= 2; i++)
             {
                 if (Input.GetTouch(i).phase == TouchPhase.Ended)
                 {    // GetTouch(i) 越多 觸控點越多
-                    pos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
-                    hit = Physics2D.Raycast(pos, Vector2.zero);
+                    worldPos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
+                    raycast2D = Physics2D.Raycast(worldPos, Vector2.zero);
 
-                    if (hit && hit.collider != null)
+                    if (raycast2D && raycast2D.collider != null)
                     {
-                        if (hit.transform.childCount != 0)
-                            if (hit.transform.GetChild(0).name == "anims") hit.transform.SendMessage("OnHit");
+                        if (raycast2D.transform.childCount != 0)
+                        {
+                            if (raycast2D.transform.GetChild(0).name == "anims" || raycast2D.transform.name == "anims")
+                            {
+                                creature = m_MPGame.GetCreatureSystem().GetActiveHoleMice(raycast2D.transform.parent);
+                                creature.OnHit();
+                                //raycast2D.transform.SendMessage("OnHit");
+                            }
+                          }
 
-                        if (hit.transform.name == "Skill1" || hit.transform.name == "Skill2" || hit.transform.name == "Skill3" || hit.transform.name == "Skill4" || hit.transform.name == "Skill5")
-                            hit.transform.SendMessage("OnHit");
+                        if (raycast2D.transform.name == "Skill1" || raycast2D.transform.name == "Skill2" || raycast2D.transform.name == "Skill3" || raycast2D.transform.name == "Skill4" || raycast2D.transform.name == "Skill5")
+                            raycast2D.transform.SendMessage("OnHit");
 
-                        if (hit.transform.name == "Exit_Btn")
+                        if (raycast2D.transform.name == "Exit_Btn")
                             Global.photonService.ExitRoom();
                     }
                 }

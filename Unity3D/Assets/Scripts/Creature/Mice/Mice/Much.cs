@@ -38,7 +38,7 @@ public class Much : IMice
             m_go.SetActive(false);
         }
 
-        if (m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Eat && !_bEat)
+        if (m_AnimState.GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.Eat && !_bEat)
         {
             _bEat = true;
 
@@ -71,7 +71,7 @@ public class Much : IMice
     /// <summary>
     /// 擊中時
     /// </summary>
-    protected override void OnHit()
+    public override void OnHit()
     {
         
         if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && */ m_Arribute.GetHP() > 0)
@@ -84,40 +84,41 @@ public class Much : IMice
         }
         else
         {
-            Debug.Log("ENUM_AIState: " + ENUM_AIState.ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
         }
     }
 
 
-    /// <summary>
-    /// 死亡時
-    /// </summary>
-    /// <param name="lifeTime">存活時間上限</param>
-    protected override void OnDead(float lifeTime)
-    {
-        //if (Global.isGameStart)
-        //{
-        //    if (m_Arribute.GetHP() == 0)
-        //        battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
-        //    else
-        //        battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
-        //    Global.dictBattleMiceRefs.Remove(transform.parent);
+    ///// <summary>
+    ///// 死亡時
+    ///// </summary>
+    ///// <param name="lifeTime">存活時間上限</param>
+    //protected override void OnDead(float lifeTime)
+    //{
+    //    //if (Global.isGameStart)
+    //    //{
+    //    //    if (m_Arribute.GetHP() == 0)
+    //    //        battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+    //    //    else
+    //    //        battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數
+    //    //    Global.dictBattleMiceRefs.Remove(transform.parent);
 
-        //    gameObject.SetActive(false);
-        //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
-        //}
+    //    //    gameObject.SetActive(false);
+    //    //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+    //    //}
 
-        if (Global.isGameStart)
-        {
-            if (m_Arribute.GetHP() == 0)
-                m_AI.SetAIState(new DiedAIState());
-            else
-                m_AI.SetAIState(new ByeByeAIState());
+    //    if (Global.isGameStart)
+    //    {
+    //        if (m_Arribute.GetHP() == 0)
+    //            this.SetAIState(ENUM_CreatureAIState.Died);
+    //          //  m_AI.SetAIState(new DiedAIState(m_AI));
+    //        else
+    //            this.SetAIState(ENUM_CreatureAIState.ByeBye);
 
-            Play(IAnimatorState.ENUM_AnimatorState.Died);
-            m_go.SetActive(false);
-        }
-    }
+    //        Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //        m_go.SetActive(false);
+    //    }
+    //}
 
     public override void OnEffect(string name, object value)
     {
@@ -131,8 +132,8 @@ public class Much : IMice
         {
             Dictionary<int, Vector3> pos = value as Dictionary<int, Vector3>;
             MiceAnimState state = m_AnimState as MiceAnimState;
-            state.SetToPos(pos[0]);
-            state.SetToScale(new Vector3(0.25f, 0.25f));
+            state.SetAminationPosTo(pos[0]);
+            state.SetAminationScaleTo(new Vector3(0.25f, 0.25f));
             OnHit();
         }
 

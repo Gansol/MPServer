@@ -33,7 +33,7 @@ using System;
 public class TeamUI : IMPPanelUI
 {
     AttachBtn_TeamUI UI;
-    SwitchBtnComponent SwitchBtnMethod;
+    SwitchBtnComponent switchBtnMethod;
 
     #region 欄位
 
@@ -52,8 +52,9 @@ public class TeamUI : IMPPanelUI
 
     public TeamUI(MPGame MPGame) : base(MPGame)
     {
-        Debug.Log("--------------- TeamUI Created ----------------");
-        SwitchBtnMethod = new SwitchBtnComponent();
+        Debug.Log("--------------- TeamUI Create ----------------");
+
+        switchBtnMethod = new SwitchBtnComponent();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
@@ -65,6 +66,7 @@ public class TeamUI : IMPPanelUI
     public override void Initialize()
     {
         Debug.Log("--------------- TeamUI Initialize ----------------");
+
         actorScale = new Vector3(0.8f, 0.8f, 1);
         _bLoadedPanel = false;
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
@@ -82,13 +84,17 @@ public class TeamUI : IMPPanelUI
 
         // 資料庫資料載入完成時 載入Panel
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
+        {
+            _bLoadedPanel = true;
             GetMustLoadAsset();
+        }
 
         // 載入資產完成後 實體化 物件
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted&& _bLoadedAsset /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         {
-            _bLoadedAsset = !_bLoadedAsset;
-            _bLoadedEffect = !_bLoadedEffect;
+             m_AssetLoaderSystem.Initialize();
+            _bLoadedAsset = false;
+            _bLoadedEffect =false;
 
             OnLoadPanel();
             OnCostCheck();
@@ -99,7 +105,6 @@ public class TeamUI : IMPPanelUI
 
             // 載入道具數量資訊
             LoadItemCount(Global.playerItem, UI.miceGroup.transform);
-            // LoadItemCount(Global.playerItem, infoGroupsArea[2].transform);
 
             //// Enable按鈕
             //SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
@@ -110,9 +115,10 @@ public class TeamUI : IMPPanelUI
         }
 
         // 按下圖示按鈕後 載入角色完成時 實體化角色
-        if (m_MPGame.GetAssetLoaderSystem().bLoadedObj && _bLoadedActor)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedActor)
         {
-            _bLoadedActor = !_bLoadedActor;
+            m_AssetLoaderSystem.Initialize();
+            _bLoadedActor = false;
 
             string actorName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace(Global.IconSuffix, "");
             InstantiateActor(actorName, UI.miceImage.transform, actorScale);
@@ -125,7 +131,7 @@ public class TeamUI : IMPPanelUI
         if (Time.time - _lastClickTime < delayBetween2Clicks && _doubleClickChk == btn_mice)    // Double Click
             btn_mice.SendMessage("Mice2Click");
         else
-            m_MPGame.StartCoroutine(OnClickActorCoroutine(btn_mice));
+            MPGame.Instance.StartCoroutine(OnClickActorCoroutine(btn_mice));
 
         _lastClickTime = Time.time;
         _doubleClickChk = btn_mice;
@@ -236,7 +242,7 @@ public class TeamUI : IMPPanelUI
                 UIEventListener.Get(miceBtn.gameObject).onClick = OnMiceClick;
                 //Debug.Log("Btn: " + miceBtn.parent.parent.parent.name + "   " + miceBtn.parent.parent.parent.parent.name);
 
-                SwitchBtnMethod.Add2Refs(loadedBtnRefs, _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs, i, item.Key, miceBtn.gameObject);                   // 加入物件參考
+                switchBtnMethod.Add2Refs(loadedBtnRefs, _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs, i, item.Key, miceBtn.gameObject);                   // 加入物件參考
                 i++;
             }
             else
@@ -310,14 +316,14 @@ public class TeamUI : IMPPanelUI
         _bLoadedPanel = true;
 
         // 實體化按鈕  如果第一載入，不檢查隊伍變動
-        if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.miceGroup) || _bFirstLoad)
+        if (!switchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.miceGroup) || _bFirstLoad)
             InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.miceGroup);
 
-        if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.teamGroup) || _bFirstLoad)
+        if (!switchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.teamGroup) || _bFirstLoad)
             InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.teamGroup);
 
-        SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);                                                     // Enable按鈕
-        m_MPGame.StartCoroutine(OnClickActorCoroutine(UI.startShowActor));          // 顯示老鼠角色 Actor
+        switchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);                                                     // Enable按鈕
+        MPGame.Instance.StartCoroutine(OnClickActorCoroutine(UI.startShowActor));          // 顯示老鼠角色 Actor
 
         _bFirstLoad = false;
         _dictMiceData = Global.dictMiceAll;
@@ -330,12 +336,13 @@ public class TeamUI : IMPPanelUI
     {
         if (m_RootUI.activeSelf)     // 如果Panel是啟動狀態 接收Event
         {
-            Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+            List<string> dictNotLoadedAsset = new List<string>();
 
             // 如果是第一次載入 載入全部資產 否則 載入必要資產
             if (_bFirstLoad)
             {
-                dictNotLoadedAsset = _dictMiceData = Global.dictMiceAll;
+                dictNotLoadedAsset = GetDontNotLoadAssetName(Global.dictMiceAll);
+                _dictMiceData = Global.dictMiceAll;
                 _dictTeamData = Global.dictTeam;
             }
             else
@@ -347,18 +354,15 @@ public class TeamUI : IMPPanelUI
                 LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
                 // Where 找不存在的KEY 再轉換為Dictionary
                 newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                dictNotLoadedAsset = GetDontNotLoadAsset(newAssetData);
+                dictNotLoadedAsset = GetDontNotLoadAssetName(newAssetData);
 
                 //    ResumeToggleTarget();
             }
 
             if (dictNotLoadedAsset.Count != 0)  // 如果 有未載入物件 載入AB
             {
-
-                //assetLoader.LoadAsset(iconPath + "/", "miceicon");
                 // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-                _bLoadedAsset = LoadIconObjects(dictNotLoadedAsset, Global.MiceIconUniquePath);
+                _bLoadedAsset = LoadIconObjectsAssetByName(dictNotLoadedAsset, Global.MiceIconUniquePath);
             }                                   // 已載入物件 實體化
             else
             {

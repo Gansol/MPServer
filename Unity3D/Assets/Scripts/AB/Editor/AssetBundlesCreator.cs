@@ -106,7 +106,7 @@ public class AssetBundlesCreator : EditorWindow
 
     static string fileExtension = ".unity3d";
 
-    static BuildTarget buildTarget = BuildTarget.Android;
+ //   static BuildTarget buildTarget = BuildTarget.Android;
     static BuildAssetBundleOptions deterministicAssetBundle;
 
     //static Dictionary<string, object> files = new Dictionary<string, object>();
@@ -118,7 +118,7 @@ public class AssetBundlesCreator : EditorWindow
     Rect hashWindowsRect = new Rect(10, 200, 450, 50);
 
     static bool _uncompressed, _dependent, _otherPlatform, _bPublish, _bFullPackage, _bPublishAssetBundle,
-                _bPrefab, _bMat, _bPng, _bJpge, _bMp3, _bWav, _bOgg, _bAnim, _bController;
+                _bPrefab, _bMat, _bPng, _bJpge, _bMp3, /*_bWav, *//*_bOgg,/* _bAnim,*/ _bController;
     static int _hashIndex;
     static string _hash;
     // static string _targetDir = Application.dataPath + exportFolder; // 建置目錄
@@ -317,19 +317,19 @@ public class AssetBundlesCreator : EditorWindow
 
     }
 
-    private static void BundleTypeSelect()  // 選擇要打包的副檔名
-    {
-        Debug.Log(_bPrefab);
-        if (_bPrefab) ext.Add(".prefab"); else ext.Remove(".prefab");
-        if (_bMat) ext.Add(".mat"); else ext.Remove(".mat");
-        if (_bPng) ext.Add(".png"); else ext.Remove(".png");
-        if (_bJpge) ext.Add(".jpg"); else ext.Remove(".jpg");
-        if (_bMp3) ext.Add(".mp3"); else ext.Remove(".mp3");
-        if (_bWav) ext.Add(".wav"); else ext.Remove(".wav");
-        if (_bOgg) ext.Add(".ogg"); else ext.Remove(".ogg");
-        if (_bAnim) ext.Add(".anim"); else ext.Remove(".anim");
-        if (_bController) ext.Add(".controller"); else ext.Remove(".controller");
-    }
+    //private static void BundleTypeSelect()  // 選擇要打包的副檔名
+    //{
+    //    Debug.Log(_bPrefab);
+    //    if (_bPrefab) ext.Add(".prefab"); else ext.Remove(".prefab");
+    //    if (_bMat) ext.Add(".mat"); else ext.Remove(".mat");
+    //    if (_bPng) ext.Add(".png"); else ext.Remove(".png");
+    //    if (_bJpge) ext.Add(".jpg"); else ext.Remove(".jpg");
+    //    if (_bMp3) ext.Add(".mp3"); else ext.Remove(".mp3");
+    //    if (_bWav) ext.Add(".wav"); else ext.Remove(".wav");
+    //    if (_bOgg) ext.Add(".ogg"); else ext.Remove(".ogg");
+    //    if (_bAnim) ext.Add(".anim"); else ext.Remove(".anim");
+    //    if (_bController) ext.Add(".controller"); else ext.Remove(".controller");
+    //}
 
 
 

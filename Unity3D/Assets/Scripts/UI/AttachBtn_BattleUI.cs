@@ -27,6 +27,7 @@ public class AttachBtn_BattleUI : MonoBehaviour
     public GameObject ScorePlusObject;
     public GameObject OtherPlusObject;
     public GameObject GGObject;
+    public GameObject SkillArea;
     public UISlider BossHPBar;
     public UILabel GameTime;
     public UILabel energyLabel;
@@ -36,4 +37,10 @@ public class AttachBtn_BattleUI : MonoBehaviour
 
   [Range(0.1f, 1.0f)]
     public float _beautyHP;                // 美化血條用
+
+    void Start()
+    {
+        Debug.Log("Hole:"+hole.Count);
+        Debug.Log(hole[0].name);
+    }
 }

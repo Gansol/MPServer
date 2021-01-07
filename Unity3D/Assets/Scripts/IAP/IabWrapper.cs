@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class IabWrapper : MonoBehaviour
+public class IabWrapper 
 {
     public delegate void cbFunc(object[] retarr);
     cbFunc iabSetupCB = null;

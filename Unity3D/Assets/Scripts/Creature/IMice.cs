@@ -14,13 +14,13 @@ public abstract class IMice : ICreature
 
     public override void Update()
     {
-        m_AI.UpdateAIState();
+        m_AI.UpdateAI();
     }
 
-    /// <summary>
-    /// On Touch / On Click
-    /// </summary>
-    protected abstract void OnHit();
+    ///// <summary>
+    ///// On Touch / On Click
+    ///// </summary>
+    //protected abstract void OnHit();
 
     /// <summary>
     /// 接收效果
@@ -78,4 +78,6 @@ public abstract class IMice : ICreature
             this.m_Arribute = null;
         this.m_Arribute = arribute;
     }
+
+
 }

@@ -3,22 +3,17 @@ using UnityEngine.SceneManagement;
 
 public class SyncLoad : MonoBehaviour
 {
-    AssetLoaderSystem assetLoader;
-    private bool _bLoadSceneAsset;
+    AssetLoaderSystem m_AssetLoaderSystem;
+    private bool _bLoadScene;
     private GameObject _scene;
     MPGame m_MPGame;
 
-    void Awake()
-    {
-       
-        Global.photonService.LoadSceneEvent += OnLoadScene;
-        AssetBundleManager.UnloadUnusedAssets();
-        System.GC.Collect();
-    }
-
     void Start()
     {
-        assetLoader = MPGame.Instance.GetAssetLoaderSystem();
+        Global.photonService.LoadSceneEvent += OnLoadScene;
+        m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
+        m_AssetLoaderSystem.UnloadUnusedAssets();
+
         LoadAssetCheck();
     }
 
@@ -28,8 +23,11 @@ public class SyncLoad : MonoBehaviour
         //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
         // 如果場景資產已經載入 實體化場景物件
-        if (assetLoader.bLoadedObj && _bLoadSceneAsset)
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadScene)
+        {
+            m_AssetLoaderSystem.Initialize();
             InstantiateScene();
+        }
     }
 
     public void OnLoadScene()       // LoadScene
@@ -43,23 +41,27 @@ public class SyncLoad : MonoBehaviour
     /// </summary>
     private void LoadAssetCheck()
     {
-        if (SceneManager.GetActiveScene().name == Global.Scene.BundleCheck)
-        {
-            _bLoadSceneAsset = true;
-        }
+        //if (SceneManager.GetActiveScene().name == Global.Scene.BundleCheck)
+        //{
+        //    _bLoadSceneAsset = true;
+        //}
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.MainGameAsset + Global.ext);
-            assetLoader.LoadAssetFormManifest(Global.MusicsPath + "bgm_001" + Global.ext);
-            assetLoader.LoadAssetFormManifest(Global.SoundsPath + "se_click001" + Global.ext);
-            _bLoadSceneAsset = true;
+           // m_AssetLoaderSystem.Initialize();
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.MainGameAsset + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.MusicsPath + "bgm_001" + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.SoundsPath + "se_click001" + Global.ext);
+            m_AssetLoaderSystem.SetLoadAllAseetCompleted();
+            _bLoadScene = true;
         }
 
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
-            assetLoader.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
-            _bLoadSceneAsset = true;
+            //m_AssetLoaderSystem.Initialize();
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
+            m_AssetLoaderSystem.SetLoadAllAseetCompleted();
+            _bLoadScene = true;
         }
     }
 
@@ -69,7 +71,7 @@ public class SyncLoad : MonoBehaviour
     private void InstantiateScene()
     {
         string sceneAssetName = null;
-        _bLoadSceneAsset = !_bLoadSceneAsset;
+        _bLoadScene = false;
 
         // 選擇場景對應資產
         switch (SceneManager.GetActiveScene().name)
@@ -90,9 +92,9 @@ public class SyncLoad : MonoBehaviour
             Global.dictLoadedScene.TryGetValue(sceneAssetName, out _scene);
 
         // 如果場景資產已經載入 且 尚未實體化
-        if (AssetBundleManager.GetLoadedAssetbundle(AssetBundleManager.GetAssetBundleNamePath(sceneAssetName)) && _scene == null)
+        if (m_AssetLoaderSystem.GetIsLoadedAssetbundle(m_AssetLoaderSystem.GetAssetBundleNamePath(sceneAssetName)) && _scene == null)
         {
-            _scene = Instantiate(assetLoader.GetAsset(sceneAssetName)) as GameObject;
+            _scene = Instantiate(m_AssetLoaderSystem.GetAsset(sceneAssetName)) as GameObject;
             _scene.name = sceneAssetName;
 
             // 是否存在場景索引

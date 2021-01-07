@@ -28,8 +28,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Hole_All
-    x: 927
-    y: 281
+    x: 924
+    y: 282
     width: 80
     height: 205
     borderLeft: 0
@@ -41,8 +41,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Hole_Down
-    x: 927
-    y: 74
+    x: 924
+    y: 76
     width: 80
     height: 205
     borderLeft: 0
@@ -54,8 +54,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Mask1
-    x: 615
-    y: 61
+    x: 614
+    y: 62
     width: 114
     height: 383
     borderLeft: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Mask2
-    x: 791
-    y: 32
+    x: 789
+    y: 33
     width: 134
     height: 454
     borderLeft: 0
@@ -80,7 +80,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Mask3
-    x: 791
+    x: 789
     y: 488
     width: 159
     height: 536
@@ -93,7 +93,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Mask4
-    x: 615
+    x: 614
     y: 446
     width: 174
     height: 578

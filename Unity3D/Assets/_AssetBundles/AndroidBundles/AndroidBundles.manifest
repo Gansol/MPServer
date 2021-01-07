@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 2864732384
+CRC: 2960144898
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -372,11 +372,10 @@ AssetBundleManifest:
     Info_96:
       Name: panel/unique/store.unity3d
       Dependencies:
-        Dependency_0: gashapon/share/atlas_gashapon.unity3d
-        Dependency_1: itemicon/share/atlas_itemicon.unity3d
-        Dependency_2: panel/share/comic.unity3d
-        Dependency_3: panel/share/liheipro.unity3d
-        Dependency_4: panel/share/panelui.unity3d
+        Dependency_0: itemicon/share/atlas_itemicon.unity3d
+        Dependency_1: panel/share/comic.unity3d
+        Dependency_2: panel/share/liheipro.unity3d
+        Dependency_3: panel/share/panelui.unity3d
     Info_97:
       Name: panel/unique/team.unity3d
       Dependencies:

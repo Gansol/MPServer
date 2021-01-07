@@ -5,10 +5,10 @@ using UnityEngine;
 public class DiedAIState : IAIState
 {
 
-    public DiedAIState()
+    public DiedAIState(/*ICreatureAI creatureAI) : base(creatureAI*/)
     {
         Debug.Log("Died State");
-        m_CreatureAI.Set_ENUM_AIState(ICreature.ENUM_CreatureState.Die);
+        creatureAIState = ICreature.ENUM_CreatureAIState.Died;
     }
 
 

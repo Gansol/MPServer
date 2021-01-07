@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class Mice : IMice
 {
-    MPGame m_MPGame;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
 
 
@@ -18,13 +17,13 @@ public class Mice : IMice
        // m_AnimState.Init(m_go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         m_go.transform.localPosition = new Vector3(0, 0);
         _lastTime = Time.fixedTime; // 出生時間
-        m_MPGame.GetCreatureSystem().OnEffect += OnEffect;
+        MPGame.Instance.GetCreatureSystem().OnEffect += OnEffect;
     }
 
 
     public override void  Update()
     {
-        if (Global.isGameStart)
+        if (Global.isGameStart && m_go.activeSelf)
         {
             base.Update();
             m_AnimState.UpdateAnimation();
@@ -33,76 +32,73 @@ public class Mice : IMice
         {
             m_go.SetActive(false);
         }
-
-        if(m_AnimState.GetAnimState() == IAnimatorState.ENUM_AnimatorState.Died)
-        {
-            OnDead(m_AnimState.GetSurvivalTime());
-        }
     }
 
 
-    /// <summary>
-    /// 擊中時
-    /// </summary>
-    protected override void OnHit()
-    {
-        //  gameObject.layer = cam.eventReceiverMask;
-        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*//* enabled && */m_Arribute.GetHP() > 0)
-        {
-            m_AnimState.SetMotion(true);
-            OnInjured(1, true);
-            m_AI.SetAIState(new DiedAIState());
+    ///// <summary>
+    ///// 擊中時
+    ///// </summary>
+    //protected override void OnHit()
+    //{
+    //    //  gameObject.layer = cam.eventReceiverMask;
+    //    if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*//* enabled && */m_Arribute.GetHP() > 0)
+    //    {
+    //        m_AnimState.SetMotion(true);
+    //        OnInjured(1, true);
+    //      //  m_AI.SetAIState(new DiedAIState(m_AI));
 
-            _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
-            m_AI.SetAIState(new DiedAIState());
-            m_MPGame.GeAudioSystem().PlaySound("Hit");
+    //        _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
+    //        m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //        //  m_AI.SetAIState(new DiedAIState(m_AI));
+    //        SetAIState(ENUM_CreatureAIState.Die);
+    //        MPGame.Instance.GeAudioSystem().PlaySound("Hit");
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("ENUM_AIState: " + creatureAIState + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+    //    }
+    //}
 
-        }
-        else
-        {
-            Debug.Log("ENUM_AIState: " + ENUM_AIState + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
-        }
-    }
 
+    ///// <summary>
+    ///// 死亡時
+    ///// </summary>
+    ///// <param name="lifeTime">存活時間上限</param>
+    //protected override void OnDead(float lifeTime)
+    //{
+    //    //if (Global.isGameStart)
+    //    //{
+    //    //    if (m_Arribute.GetHP() == 0)
+    //    //        m_AI.SetAIState(new DiedAIState());
+    //    //        //ENUM_AIState = ENUM_CreatureState.Die;
 
-    /// <summary>
-    /// 死亡時
-    /// </summary>
-    /// <param name="lifeTime">存活時間上限</param>
-    protected override void OnDead(float lifeTime)
-    {
-        //if (Global.isGameStart)
-        //{
-        //    if (m_Arribute.GetHP() == 0)
-        //        m_AI.SetAIState(new DiedAIState());
-        //        //ENUM_AIState = ENUM_CreatureState.Die;
+    //    // //   battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
+    //    //    else
+    //    //        battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
+    //    //    Global.dictBattleMiceRefs.Remove(transform.parent);
 
-        // //   battleManager.UpadateScore(System.Convert.ToInt16(name), lifeTime);  // 增加分數 錯誤 lifeTime應為存活時間
-        //    else
-        //        battleManager.LostScore(System.Convert.ToInt16(name), lifeTime);  // 失去分數
-        //    Global.dictBattleMiceRefs.Remove(transform.parent);
+    //    //    gameObject.SetActive(false);
+    //    //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
+    //    //}
 
-        //    gameObject.SetActive(false);
-        //    this.transform.parent = GameObject.Find("ObjectPool/" + name).transform;
-        //}
+    //    if (Global.isGameStart)
+    //    {
+    //        if (m_Arribute.GetHP() == 0)
+    //            //m_AI.SetAIState(new DiedAIState(m_AI));
+    //            m_AI.SetAIState(new DiedAIState());
+    //        else
+    //            //m_AI.SetAIState(new ByeByeAIState(m_AI));
+    //        SetAIState(ENUM_CreatureAIState.ByeBye);
 
-        if (Global.isGameStart)
-        {
-            if (m_Arribute.GetHP() == 0)
-                m_AI.SetAIState(new DiedAIState());
-            else
-                m_AI.SetAIState(new ByeByeAIState());
-
-            Play(IAnimatorState.ENUM_AnimatorState.Died);
-            m_go.SetActive(false);
-        }
-    }
+    //        Play(IAnimatorState.ENUM_AnimatorState.Died);
+    //        m_go.SetActive(false);
+    //    }
+    //}
 
     public override void OnEffect(string name, object value)
     {
-        if (name == "Scorched" || name == "HeroMice" )
-            OnHit();
+        if (name == "Scorched" || name == "HeroMice")
+            OnInjured(1, true);
         if (name == "Snow")
             m_AnimState.SetMotion((bool)value);
         if (name == "Shadow")
@@ -113,8 +109,8 @@ public class Mice : IMice
             Dictionary<int, Vector3> pos = value as Dictionary<int, Vector3>;
             MiceAnimState state = m_AnimState as MiceAnimState;
             m_AnimState.SetMotion(true);
-            state.SetToPos(pos[0]);
-            state.SetToScale(new Vector3(0.25f, 0.25f));
+            state.SetAminationPosTo(pos[0]);
+            state.SetAminationScaleTo(new Vector3(0.25f, 0.25f));
             m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
         }
         // play("Shadow"
@@ -122,6 +118,17 @@ public class Mice : IMice
 
     public override void Release()
     {
-        m_MPGame.GetCreatureSystem().OnEffect -= OnEffect;
+        SetAI(null);
+        MPGame.Instance.GetCreatureSystem().OnEffect -= OnEffect;
+    }
+
+    public override void OnHit()
+    {
+        if (m_AI.GetAIState() != (int)ENUM_CreatureAIState.Invincible)
+        {
+            Debug.Log("OnHit");
+            Play(IAnimatorState.ENUM_AnimatorState.Died);
+            OnInjured(1, true); // 錯誤 要由Player Item Hammer Attack value輸入 m_attr.hammerAtk
+        }
     }
 }
