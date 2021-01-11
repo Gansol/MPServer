@@ -72,7 +72,7 @@ public class ButtonSwitcher : MPButton
                 Move2Clone();
                 if (tag == "Inventory")
                 {
-                    PlayerUI.dictLoadedItem[_clone.name] = _clone;
+                    PlayerUI.dictLoadedItemRefs[_clone.name] = _clone;
                     gameObject.GetComponent<UIDragScrollView>().enabled = false;
 
                     gameObject.transform.GetComponentInParent<UIPanel>().clipping = UIDrawCall.Clipping.None;
@@ -80,7 +80,7 @@ public class ButtonSwitcher : MPButton
                 }
                 else
                 {
-                    PlayerUI.dictLoadedEquiped[_clone.name] = _clone;
+                    PlayerUI.dictLoadedEquipedRefs[_clone.name] = _clone;
                 }
                 //  if (transform.Find("Image").childCount != 0)
                 _pressingIcon = gameObject.GetComponentInChildren<UISprite>().gameObject;
@@ -193,9 +193,9 @@ public class ButtonSwitcher : MPButton
                 _clone.name = "Item";
                 EnDisableBtn(_clone, false);
 
-                if (PlayerUI.dictLoadedItem.ContainsKey(itemID))
+                if (PlayerUI.dictLoadedItemRefs.ContainsKey(itemID))
                 {
-                    GameObject invButton = PlayerUI.dictLoadedItem[itemID];
+                    GameObject invButton = PlayerUI.dictLoadedItemRefs[itemID];
                     //if (invButton.transform.parent.name != PanelManager._lastEmptyItemGroup.name)
                     //{
                     //    invButton.transform.parent.gameObject.SetActive(true);  // 白癡寫法 FUCK 錯誤
@@ -208,7 +208,7 @@ public class ButtonSwitcher : MPButton
                     //}
                 }
 
-                PlayerUI.dictLoadedEquiped.Remove(itemID);
+                PlayerUI.dictLoadedEquipedRefs.Remove(itemID);
 
                 Global.photonService.UpdatePlayerItem(short.Parse(itemID), false);
 
@@ -254,18 +254,18 @@ public class ButtonSwitcher : MPButton
                     EnDisableBtn(_other, true);
                     EnDisableBtn(_clone, false);
 
-                    PlayerUI.dictLoadedEquiped.Add(itemID, _other);   // 在A>B時 改變索引至Clone 、 B>A空倉庫時，加入道具索引
+                    PlayerUI.dictLoadedEquipedRefs.Add(itemID, _other);   // 在A>B時 改變索引至Clone 、 B>A空倉庫時，加入道具索引
                     _other.GetComponentInChildren<UISprite>().depth -= Global.MenuObjetDepth;
                     Global.photonService.UpdatePlayerItem(short.Parse(itemID), true);
                 }// A>B B has object > switch
                 else if (_other.transform.GetChild(0).childCount != 0)
                 {
                     _other.name = itemID;
-                    PlayerUI.dictLoadedEquiped.Remove(otherItemID); PlayerUI.dictLoadedEquiped.Add(itemID, _other);
+                    PlayerUI.dictLoadedEquipedRefs.Remove(otherItemID); PlayerUI.dictLoadedEquipedRefs.Add(itemID, _other);
                     UISprite sprite = _other.GetComponentInChildren<UISprite>();
                     sprite.gameObject.name = sprite.spriteName = gameObject.GetComponentInChildren<UISprite>().spriteName;
-                    if (PlayerUI.dictLoadedItem[otherItemID].activeSelf)
-                        PlayerUI.dictLoadedItem[otherItemID].SendMessage("EnableBtn");
+                    if (PlayerUI.dictLoadedItemRefs[otherItemID].activeSelf)
+                        PlayerUI.dictLoadedItemRefs[otherItemID].SendMessage("EnableBtn");
                     Destroy(gameObject);
                     EnDisableBtn(_clone, false);
 
@@ -292,9 +292,9 @@ public class ButtonSwitcher : MPButton
                 Global.RenameKey(playerItem, "x", otherName);
 
                 // 交換載入物件位置(鍵)
-                Global.RenameKey(PlayerUI.dictLoadedItem, itemID, "x");
-                Global.RenameKey(PlayerUI.dictLoadedItem, otherName, itemID);
-                Global.RenameKey(PlayerUI.dictLoadedItem, "x", otherName);
+                Global.RenameKey(PlayerUI.dictLoadedItemRefs, itemID, "x");
+                Global.RenameKey(PlayerUI.dictLoadedItemRefs, otherName, itemID);
+                Global.RenameKey(PlayerUI.dictLoadedItemRefs, "x", otherName);
 
                 // other name = my name
                 _other.name = itemID;

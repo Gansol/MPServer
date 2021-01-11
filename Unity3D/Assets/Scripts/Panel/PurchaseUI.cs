@@ -24,71 +24,22 @@ using MPProtocol;
 // 可以把PurchaseHandlder寫到這裡
 public class PurchaseUI : IMPPanelUI
 {
+    #region Variables 變數
     private AttachBtn_PurchaseUI UI;
-    private int offset = 275;
+    private Dictionary<string, GameObject> _dictitemSlot;               // 已實體化的商品
+    private Dictionary<string, object> _dictProductsFitCurrency;    // 法幣道具價格
+    private string _currencyCode;     // 貨幣代號
+    private int _offsetY;                         // 道具Y軸偏移量
+    private int _slotPosY;                      // 道具Y軸位置
+    private int _dataLoadedCount;   //  資料載入量                                       
+    private bool _bFirstLoad;              // 是否第一次載入
+    private bool _bLoadPanel;             // 是否載入Panel
+    private bool _bLoadAsset;            // 是否載入資產
 
+    // private bool  _bIABInit /*,_bLoadProduct */;
     //private Sdkbox.IAP _iap;                                        // IAP資料
     //private Sdkbox.Product[] _product;                              // 商品資料
-    private Dictionary<string, GameObject> _dictitemSlot;           // 已實體化的商品
-    private Dictionary<string, object> _dictProductsFitCurrency;    // 法幣道具價格
-    private bool _bLoadAsset, _bFirstLoad, _bLoadPanel, _bIABInit /*,_bLoadProduct */;
-    private string _currencyCode = "TWD";                           // 貨幣代號
-    private int _dataLoadedCount, _slotPosY;                                          // 道具位子偏移量
-
-    public PurchaseUI(MPGame MPGame) : base(MPGame)
-    {
-        Debug.Log("--------------- PurchaseUI Create ----------------");
-        _dictitemSlot = new Dictionary<string, GameObject>();
-        _dictProductsFitCurrency = new Dictionary<string, object>();
-        _bFirstLoad = true;
-
-        //_iap = FindObjectOfType<Sdkbox.IAP>();
-        //  _bLoadProduct = true;
-        //_iap.getProducts();
-    }
-
-    public override void Initialize()
-    {
-        Debug.Log("--------------- PurchaseUI Initialize ----------------");
-
-        _dataLoadedCount = 0;
-        _slotPosY = 0;
-
-        _bLoadPanel = false;
-        _bLoadAsset = false;
-
-        Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
-        Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
-        Global.photonService.UpdateCurrencyEvent += OnUpdateCurrency;
-    }
-
-    // Update is called once per frame
-    public override void Update()
-    {
-        base.Update();
-        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
-        //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
-
-        // 資料載入完成後 載入Panel
-        if (_dataLoadedCount == GetMustLoadedDataCount() /*&& _bLoadProduct */&& !_bLoadPanel)
-        {
-            _bLoadPanel = true;
-            OnLoadPanel();
-
-            //   if (!_bFirstLoad)
-         //   ResumeToggleTarget();
-        }
-
-        // Panel載入完成後 實體化道具 載入屬性
-        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadAsset &&_bLoadPanel)
-        {
-            _bLoadAsset = false;
-            m_AssetLoaderSystem.Initialize();
-            InstantiateItem();
-            LoadPurchaseProperty();
-            ResumeToggleTarget();
-        }
-    }
+    #endregion
 
     public class PurchaseProperty
     {
@@ -106,107 +57,160 @@ public class PurchaseUI : IMPPanelUI
         public const string OnSell = "OnSell";
     }
 
-    // 目前沒寫 數量變少時的刪除物件處理(伺服器道具不會刪除 只會下架)
+    public PurchaseUI(MPGame MPGame) : base(MPGame)
+    {
+        Debug.Log("--------------- PurchaseUI Create ----------------");
+        _dictitemSlot = new Dictionary<string, GameObject>();
+        _dictProductsFitCurrency = new Dictionary<string, object>();
+        _bFirstLoad = true;
+        _currencyCode = "TWD";
+        _offsetY = 275;
+
+        //_iap = FindObjectOfType<Sdkbox.IAP>();
+        //  _bLoadProduct = true;
+        //_iap.getProducts();
+    }
+
+    public override void Initialize()
+    {
+        Debug.Log("--------------- PurchaseUI Initialize ----------------");
+
+        _slotPosY = 0;
+        _dataLoadedCount = 0;
+
+        _bLoadPanel = false;
+        _bLoadAsset = false;
+
+        Global.photonService.LoadCurrencyEvent += OnLoadCurrency;
+        Global.photonService.LoadPurchaseEvent += OnLoadPurchase;
+        Global.photonService.UpdateCurrencyEvent += OnUpdateCurrency;
+    }
+
+    // Update is called once per frame
+    public override void Update()
+    {
+        base.Update();
+        //if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
+        //    Debug.Log("訊息：" + assetLoader.ReturnMessage);
+
+        #region // 資料載入完成後 載入Panel
+        if (_dataLoadedCount == GetMustLoadedDataCount() /*&& _bLoadProduct */&& !_bLoadPanel)
+        {
+            _bLoadPanel = true;
+            OnLoadPanel();
+        }
+        #endregion
+
+        #region   // Panel載入完成後 實體化道具 載入屬性
+        if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadAsset && _bLoadPanel)
+        {
+            _bLoadAsset = false;
+            m_AssetLoaderSystem.Initialize();
+            InstantiateItem();
+            LoadPurchaseProperty();
+            ResumeToggleTarget();
+        }
+        #endregion
+    }
+
+
+    #region -- InstantiateItem 實體化 物品欄位 --
     /// <summary>
     /// 實體化 物品欄位
+    ///   (伺服器道具不會刪除 只會下架)
     /// </summary>
     private void InstantiateItem()
     {
         GameObject bundle = m_AssetLoaderSystem.GetAsset(Global.PurchaseItemAssetName);
-        Transform itemSlot = null;
-        object value, promotionsTime;
-        bool reload = false;
-
-        var newData = Global.purchaseItem.Where(kvp => !_dictitemSlot.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         List<string> serverPurchasekeys = Global.purchaseItem.Keys.ToList();
+        var newPurchaseData = Global.purchaseItem.Where(kvp => !_dictitemSlot.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        int i = 0;
 
         // 如果有新的道具資料
-        if (newData.Count > 0 && Global.purchaseItem.Count > _dictitemSlot.Count)
+        if (newPurchaseData.Count > 0 && Global.purchaseItem.Count > _dictitemSlot.Count)
         {
             // 實體化道具欄位
-            foreach (KeyValuePair<string, object> item in newData)
+            foreach (KeyValuePair<string, object> item in newPurchaseData)
             {
                 Dictionary<string, object> values = item.Value as Dictionary<string, object>;
-                values.TryGetValue(PurchaseProperty.OnSell, out value);
-                values.TryGetValue(PurchaseProperty.PromotionsTime, out promotionsTime);
+                values.TryGetValue(PurchaseProperty.OnSell, out object value);
+                values.TryGetValue(PurchaseProperty.PromotionsTime, out object promotionsTime);
 
                 // 如果商品在銷售期間內中才實體化
                 if (bool.Parse(value.ToString()) && Convert.ToDateTime(promotionsTime.ToString()) > System.DateTime.Now)
                 {
                     values.TryGetValue(PurchaseProperty.ItemName, out value);
 
-                    itemSlot = MPGFactory.GetObjFactory().Instantiate(bundle,UI.itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
+                    Transform itemSlot = MPGFactory.GetObjFactory().Instantiate(bundle, UI.itemPanel.transform, value.ToString(), new Vector3(0, -_slotPosY, 0), Vector3.one, Vector2.zero, 100).transform;
                     UIEventListener.Get(itemSlot.gameObject).onClick = OnPurchase;
-                    Add2Refs(item.Key, itemSlot.gameObject);
-                    _slotPosY += offset;
+                    AddPurchaseItemRefs(item.Key, itemSlot.gameObject);
+                    _slotPosY += _offsetY;
                 }
             }
-            reload = true;
         }
         else if (Global.purchaseItem.Count < _dictitemSlot.Count)
         {
-            string lastKey = _dictitemSlot.Keys.Last();
-            _dictitemSlot.Remove(lastKey);
-            reload = true;
+            // 移除多餘的 Slot
+            while ((Global.purchaseItem.Count < _dictitemSlot.Count) && Global.purchaseItem.Count > 0)
+            {
+                string lastKey = _dictitemSlot.Keys.Last();
+                _dictitemSlot.Remove(lastKey);
+            }
         }
 
-        int i = 0;
-
-        if (reload)
-            foreach (var item in _dictitemSlot)
-            {
-                if (i < serverPurchasekeys.Count)
-                    item.Value.name = serverPurchasekeys[i];
-                i++;
-            }
+        // 重新命名物件名稱
+        foreach (var item in _dictitemSlot)
+        {
+            if (i < serverPurchasekeys.Count)
+                item.Value.name = serverPurchasekeys[i];
+            i++;
+        }
     }
+    #endregion
 
+    #region -- LoadPurchaseProperty  載入道具資料 --
     /// <summary>
     /// 載入道具資料
     /// </summary>
     private void LoadPurchaseProperty()
     {
-        object bSell, price, promotionsTime, newArrivalsTime, promotionsCount, buyCount, limitCount;
         List<string> keys = _dictitemSlot.Keys.ToList();
 
         // 載入屬性
         foreach (KeyValuePair<string, object> item in Global.purchaseItem)
         {
-            // 如果舊的數量較多
+            // 取出新物件值，並賦值目前物件值 
             if (keys.Contains(item.Key))
             {
                 Dictionary<string, object> values = item.Value as Dictionary<string, object>;
 
                 // 取值
-                values.TryGetValue(PurchaseProperty.OnSell, out bSell);
-                values.TryGetValue(PurchaseProperty.Price, out price);
-                values.TryGetValue(PurchaseProperty.LimitCount, out limitCount);
-                values.TryGetValue(PurchaseProperty.NewArrivalsTime, out newArrivalsTime);
-                values.TryGetValue(PurchaseProperty.PromotionsTime, out promotionsTime);
-                values.TryGetValue(PurchaseProperty.BuyCount, out buyCount);
-                values.TryGetValue(PurchaseProperty.PromotionsCount, out promotionsCount);
+                values.TryGetValue(PurchaseProperty.OnSell, out object bSell);
+                values.TryGetValue(PurchaseProperty.Price, out object price);
+                values.TryGetValue(PurchaseProperty.LimitCount, out object limitCount);
+                values.TryGetValue(PurchaseProperty.NewArrivalsTime, out object newArrivalsTime);
+                values.TryGetValue(PurchaseProperty.PromotionsTime, out object promotionsTime);
+                values.TryGetValue(PurchaseProperty.BuyCount, out object buyCount);
+                values.TryGetValue(PurchaseProperty.PromotionsCount, out object promotionsCount);
 
                 // 價格
                 _dictitemSlot[item.Key].transform.Find("Info").transform.Find(PurchaseProperty.Price).GetComponent<UILabel>().text = "x" + price.ToString();
-
                 // 法幣價格
                 //   _dictitemSlot[item.Key].transform.Find("Info").Find(PurchaseProperty.FitCurrency).GetComponent<UILabel>().text = _currencyCode +" "+ _dictProductsFitCurrency[item.Key].ToString();
-
                 // 上市日期 檢查 附值
                 NewArrivalsTime_LabelChk(item.Key, Convert.ToDateTime(newArrivalsTime));
-
                 // 促銷日期 檢查 附值
                 PromotionsTime_LabelChk(item.Key, Convert.ToDateTime(promotionsTime));
-
                 // 促銷數量 檢查 附值
                 PromotionsCount_LabelChk(item.Key, int.Parse(promotionsCount.ToString()));
-
                 // 限制數量 檢查 附值
                 LimitCount_LabelChk(item.Key, int.Parse(limitCount.ToString()), buyCount.ToString());
             }
         }
     }
+    #endregion
 
+    #region -- PromotionsTime_LabelChk 促銷時間檢查 --
     /// <summary>
     /// 促銷時間 改變道具欄位Active狀態
     /// </summary>
@@ -228,7 +232,9 @@ public class PurchaseUI : IMPPanelUI
             _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.NewArrivalsTime).GetComponent<UILabel>().text = "overtime";
         }
     }
+    #endregion
 
+    #region -- NewArrivalsTime_LabelChk 開始販售檢查 --
     /// <summary>
     /// 是否開始販售中 改變道具欄位Active狀態
     /// </summary>
@@ -249,7 +255,9 @@ public class PurchaseUI : IMPPanelUI
             _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Coming Soon..";
         }
     }
+    #endregion
 
+    #region -- PromotionsCount_LabelChk 促銷數量檢查 --
     /// <summary>
     /// 顯示數量限制
     /// </summary>
@@ -268,7 +276,9 @@ public class PurchaseUI : IMPPanelUI
             _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.PromotionsImage).gameObject.SetActive(false);
         }
     }
+    #endregion
 
+    #region -- LimitCount_LabelChk 購買數量限制檢查 --
     /// <summary>
     /// 顯示數量限制
     /// </summary>
@@ -284,6 +294,7 @@ public class PurchaseUI : IMPPanelUI
 
         bool bSoldOut = (int.Parse(limitCount.ToString()) == -1 || purcahseRemainingCount > 0) ? false : true;
 
+        // 如果 商品有庫存 顯示物品按扭
         if (purcahseRemainingCount > 0)
         {
             _dictitemSlot[key].transform.Find("Info").Find(PurchaseProperty.LimitCount).GetComponent<UILabel>().text = "Limit:" + buyCount + "/" + limitCount.ToString();
@@ -296,26 +307,34 @@ public class PurchaseUI : IMPPanelUI
             UIEventListener.Get(_dictitemSlot[key]).onClick = null;
         }
     }
+    #endregion
 
-    private void Add2Refs(string id, GameObject go)
+    #region -- AddPurchaseItemRefs 加入購物索引 --
+    private void AddPurchaseItemRefs(string id, GameObject go)
     {
         if (_dictitemSlot.ContainsKey(id))
             _dictitemSlot[id] = go;
         _dictitemSlot.Add(id, go);
     }
+    #endregion
 
+    #region -- OnPurchase 當按下夠買  --
     private void OnPurchase(GameObject go)
     {
         Debug.Log("OnPurchase Need New version Scripts!");
         //GetComponentInParent<PurchaseHandler>().Purchase(go.name);
     }
+    #endregion
 
+    #region -- OnLoad   --
+    /// <summary>
+    /// 當載入Panel時，載入資料
+    /// </summary>
     protected override void OnLoading()
     {
         UI = m_RootUI.GetComponentInChildren<AttachBtn_PurchaseUI>();
-        _dataLoadedCount = (int)ENUM_Data.None;
         UIEventListener.Get(UI.closeCollider).onClick = OnClosed;
-
+        _dataLoadedCount = (int)ENUM_Data.None;
 
         if (Global.isMatching)
             Global.photonService.ExitWaitingRoom();
@@ -324,12 +343,16 @@ public class PurchaseUI : IMPPanelUI
         Global.photonService.LoadPurchase();
     }
 
+    /// <summary>
+    /// 當Panel載入完成時
+    /// </summary>
     protected override void OnLoadPanel()
     {
         GetMustLoadAsset();
-        EventMaskSwitch.lastPanel = m_RootUI.gameObject;
     }
+    #endregion
 
+    #region -- GetMustLoadAsset 載入幣要資產 --
     protected override void GetMustLoadAsset()
     {
         if (m_RootUI.activeSelf && !Global.isGameStart)
@@ -343,13 +366,17 @@ public class PurchaseUI : IMPPanelUI
             _bLoadAsset = true;
         }
     }
+    #endregion
 
+    #region -- ShowPanel  --
     public override void ShowPanel(string panelName)
     {
         m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().purchasePanel;
         base.ShowPanel(panelName);
     }
+    #endregion
 
+    #region -- OnLoadData 載入資料區  --
     private void OnLoadCurrency()
     {
         _dataLoadedCount *= (int)ENUM_Data.CurrencyData;
@@ -359,6 +386,41 @@ public class PurchaseUI : IMPPanelUI
     {
         _dataLoadedCount *= (int)ENUM_Data.Purchase;
     }
+    protected override int GetMustLoadedDataCount()
+    {
+        return (int)ENUM_Data.Purchase * (int)ENUM_Data.CurrencyData; ;
+    }
+    #endregion
+
+    #region -- OnUpdateCurrency 當收到更新貨幣時 --
+    /// <summary>
+    /// 當收到更新貨幣時
+    /// </summary>
+    private void OnUpdateCurrency()
+    {
+        Debug.Log("NOT ME!!!");
+        throw new NotImplementedException();
+    }
+    #endregion
+
+    #region -- OnClosed  --
+    public override void OnClosed(GameObject go)
+    {
+        ShowPanel(m_RootUI.name);
+    }
+    #endregion
+
+    #region -- Release --
+    public override void Release()
+    {
+        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
+        Global.photonService.LoadPurchaseEvent -= OnLoadPurchase;
+        Global.photonService.UpdateCurrencyEvent -= OnUpdateCurrency;
+    }
+    #endregion
+
+
+
 
     //public void OnProductRequest(Dictionary<string, object> dictProducts, Product[] product, string currencyCode)
     //{
@@ -369,34 +431,8 @@ public class PurchaseUI : IMPPanelUI
     //    Debug.Log("Manager OnProductRequest");
     //}
 
-    private void OnUpdateCurrency()
-    {
-        Debug.Log("NOT ME!!!");
-        throw new NotImplementedException();
-    }
-
-
-    public void OnIABInit(bool status)
-    {
-        _bIABInit = status;
-    }
-
-    public override void OnClosed(GameObject go)
-    {
-        EventMaskSwitch.lastPanel = null;
-        ShowPanel(m_RootUI.name);
-    }
-
-    protected override int GetMustLoadedDataCount()
-    {
-        return (int)ENUM_Data.Purchase * (int)ENUM_Data.CurrencyData; ;
-    }
-
-
-    public override void Release()
-    {
-        Global.photonService.LoadCurrencyEvent -= OnLoadCurrency;
-        Global.photonService.LoadPurchaseEvent -= OnLoadPurchase;
-        Global.photonService.UpdateCurrencyEvent -= OnUpdateCurrency;
-    }
+    //public void OnIABInit(bool status)
+    //{
+    //    _bIABInit = status;
+    //}
 }

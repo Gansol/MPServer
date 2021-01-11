@@ -57,7 +57,7 @@ public class BtnSwitch : MonoBehaviour
         Change, // 改變老鼠
     }
 
-    public void Init(ref Dictionary<string, GameObject> dictLoadedMiceBtnRefs, ref   Dictionary<string, GameObject> dictLoadedTeamBtnRefs, ref Transform parentArea)
+    public void Initialize(ref Dictionary<string, GameObject> dictLoadedMiceBtnRefs, ref   Dictionary<string, GameObject> dictLoadedTeamBtnRefs, ref Transform parentArea)
     {
         _parent = parentArea;
         _dictLoadedMiceBtnRefs = dictLoadedMiceBtnRefs;

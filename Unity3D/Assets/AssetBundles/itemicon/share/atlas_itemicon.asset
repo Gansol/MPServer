@@ -15,8 +15,8 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: ac35c65a8121291478c186da699cb9fb, type: 2}
   mSprites:
   - name: icon_energyplus
-    x: 214
-    y: 304
+    x: 215
+    y: 329
     width: 137
     height: 187
     borderLeft: 0
@@ -41,8 +41,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_firebow
-    x: 214
-    y: 154
+    x: 0
+    y: 227
     width: 116
     height: 149
     borderLeft: 0
@@ -54,8 +54,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_goldhammer
-    x: 394
-    y: 721
+    x: 193
+    y: 517
     width: 184
     height: 192
     borderLeft: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_iceglasses
-    x: 214
-    y: 492
+    x: 568
+    y: 599
     width: 146
     height: 219
     borderLeft: 0
@@ -80,8 +80,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_invincible
-    x: 214
-    y: 712
+    x: 388
+    y: 617
     width: 179
     height: 201
     borderLeft: 0
@@ -92,9 +92,9 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
-  - name: icon_iornhammer
-    x: 0
-    y: 496
+  - name: icon_ironhammer
+    x: 727
+    y: 813
     width: 203
     height: 211
     borderLeft: 0
@@ -106,8 +106,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_lighting
-    x: 214
-    y: 0
+    x: 117
+    y: 223
     width: 96
     height: 153
     borderLeft: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: icon_rattrap
     x: 0
-    y: 282
+    y: 700
     width: 192
     height: 213
     borderLeft: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_reflection
-    x: 579
-    y: 751
+    x: 378
+    y: 454
     width: 189
     height: 162
     borderLeft: 0
@@ -145,8 +145,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_scoreplus
-    x: 0
-    y: 708
+    x: 513
+    y: 819
     width: 213
     height: 205
     borderLeft: 0
@@ -158,8 +158,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_snow
-    x: 769
-    y: 745
+    x: 0
+    y: 531
     width: 181
     height: 168
     borderLeft: 0
@@ -171,8 +171,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_taco
-    x: 361
-    y: 572
+    x: 0
+    y: 377
     width: 214
     height: 139
     borderLeft: 0
@@ -184,8 +184,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: icon_woodhammer
-    x: 0
-    y: 78
+    x: 193
+    y: 710
     width: 194
     height: 203
     borderLeft: 0

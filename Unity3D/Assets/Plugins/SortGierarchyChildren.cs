@@ -11,7 +11,6 @@ public static class SortChildren
     /// <param name="length">名稱長度(不含編號)</param>
     public static void SortChildrenByID(GameObject parent, int length)
     {
-
         List<Transform> children = new List<Transform>();
         for (int i = parent.transform.childCount - 1; i >= 0; i--)
         {
