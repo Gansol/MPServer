@@ -12,10 +12,14 @@ public class BattleUI : IMPPanelUI
     private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
     private Color _blueLifeColor, _redLifeColor;
+    private int _dataLoadedCount;
     private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife, energy, feverEnergy, blueLife, redLife, tmpBlueLifeBar, tmpRedLifeBar;
     private float _tmpLife, _tmpOhterLife;
     [Range(0.1f, 1.0f)]
     private float _beautyHP;                // 美化血條用
+    //private bool _bLoadedPanel;
+    //private bool _bLoadedAsset;
+
                                             //  private bool bLoadPrefab;
                                             //private double _energy;
 
@@ -135,7 +139,24 @@ public class BattleUI : IMPPanelUI
     }
     public override void OnGUI()
     {
-        if (Global.isGameStart)
+        // load data
+        // load asset initialize
+        // instantiate
+        // game start
+
+        //if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
+        //{
+        //    _bLoadedPanel = true;
+        //    GetMustLoadAsset();
+        //}
+
+        //// 載入資產完成後 實體化 物件
+        //if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+        //{
+
+        //}
+
+            if (Global.isGameStart)
         {
             BattleState();
             GUIVariables();
@@ -582,6 +603,14 @@ public class BattleUI : IMPPanelUI
     {
 
     }
+    //void OnLoadPlayerData()
+    //{
+    //    _dataLoadedCount *= (int)ENUM_Data.PlayerData;
+    //}
+    //void OnLoadPlayerItem()
+    //{
+    //    _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
+    //}
 
     void OnGameStart()
     {

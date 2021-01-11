@@ -86,7 +86,7 @@ public class BattleSystem : IGameSystem
     public override void Initialize()
     {
         Debug.Log("--------------- BattleSystem Initialize ----------------");
-        EventMaskSwitch.Init();
+        EventMaskSwitch.Initialize();
         //FindHole();
         battleAttr = new BattleAttr();
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());

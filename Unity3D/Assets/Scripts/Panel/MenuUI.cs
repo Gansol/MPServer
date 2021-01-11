@@ -17,7 +17,7 @@ public class MenuUI : IMPPanelUI
     public override void Initialize()
     {
         Debug.Log("--------------- MenuUI Initialize ----------------");
-        EventMaskSwitch.Init();
+        EventMaskSwitch.Initialize();
         m_MPGame.GeAudioSystem().PlayMusic("bgm_001");
         m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString());
         UI = m_RootUI.GetComponentInChildren<AttachBtn_MenuUI>();

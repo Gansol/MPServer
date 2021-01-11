@@ -22,37 +22,41 @@ using MPProtocol;
  * ****************************************************************/
 public class FriendUI : IMPPanelUI
 {
+    #region Variables 變數
     private AttachBtn_FriendUI UI;
-    /// <summary>
-    /// slot偏移量(間距)
-    /// </summary>
-    public Vector2 offset;
+    private static List<string> _clientFriendsList; // 本機的朋友列表
+    private GameObject _lastMsgPanel;                // 上個訊息視窗
+    private Vector2 _slotOffset;                                // slot偏移量
+    private Vector2 _itemPos;                                   // 朋友SLOT位子
 
-    private Vector2 itemPos;                                           // 朋友SLOT位子
-    private GameObject _lastMsgPanel;                                  // 上個訊息視窗
-    private static List<string> _clientFriendsList;                     // 本機的朋友列表
+    private string _inviteYouNameOfFriend;  // 邀請你的朋友名稱
+    private string _selectPlayerNickname;      // 選取得朋友名稱
+    private int _dataLoadedCount;                   // 資料載入數量
+    private float _lastClickTime;                       // 上次點擊時間 點擊間格
+    private float _clickInterval;                         // 上次點擊時間 點擊間格
 
-    //          初次載入    是否載入ICON    是否載入玩家資料    是否取得線上玩家狀態  是否載入朋友資料    是否載入Panel   是否按下
-    private bool _bFirstLoad, _bLoadedIcon, _bLoadPlayerData, _bLoadActoOnlinerState, _bLoadFriendsData, _bLoadedPanel, _bClick;
-    private string _selectPlayerNickname, _inviteYouNameOfFriend;       // 選取得朋友名稱 邀請你的朋友名稱
-    private int _dataLoadedCount;
-    private float _lastClickTime, _clickInterval;                      // 上次點擊時間 點擊間格
+    private bool _bClick;                                      // 是否按下 
+    private bool _bFirstLoad;                            // 是否初次載入     
+    private bool _bLoadedIcon;                        // 是否載入ICON  
+    private bool _bLoadedPanel;                     // 是否載入Panel   
+    private bool _bLoadActoOnlinerState;    // 是否取得線上玩家狀態   
+    #endregion
 
-    public FriendUI(MPGame MPGame): base(MPGame)
+    public FriendUI(MPGame MPGame) : base(MPGame)
     {
         Debug.Log("--------------- FriendUI Create ----------------");
         _bFirstLoad = true;
-       
+
     }
 
     public override void Initialize()
     {
         Debug.Log("--------------- FriendUI Initialize ----------------");
-        
+
         _bLoadedPanel = false;
         _bLoadedIcon = false;
-        itemPos = new Vector2(0, 0);
-        offset = new Vector2(0, -150);
+        _itemPos = new Vector2(0, 0);
+        _slotOffset = new Vector2(0, -150);
         _clickInterval = 3;
 
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
@@ -60,16 +64,17 @@ public class FriendUI : IMPPanelUI
         Global.photonService.GetOnlineActorStateEvent += OnGetOnlineActorState;
         Global.photonService.ApplyInviteFriendEvent += OnApplyInviteFriend;
         Global.photonService.RemoveFriendEvent += OnRemoveFriend;
-
     }
 
-    public override  void  Update()
+    public override void Update()
     {
         base.Update();
         // 資料載入完成時 載入PanelAsset
         if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
+        {
+            _bLoadedPanel = true;
             OnLoadPanel();
-
+        }
         // Asset載入完成時 實體化道具
         if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedIcon && _bLoadActoOnlinerState)
         {
@@ -77,17 +82,10 @@ public class FriendUI : IMPPanelUI
             _bLoadedIcon = true;
             _bLoadActoOnlinerState = false;
 
-            // 實體化 朋友資訊列
-            foreach (KeyValuePair<string, object> friend in Global.dictOnlineFriendsDetail)
-                InstantiateFriend(friend.Value as Dictionary<string, object>, friend.Key);
-
-            //載入朋友狀態
-            LoadFriendOnlineState();
-
-            //改變事件遮罩
-            ResumeToggleTarget();
+            InstantiateFriend();                                 // 實體化 朋友資訊列
+            LoadFriendOnlineState();                       // 載入朋友狀態
+            ResumeToggleTarget();                           // 改變事件遮罩
         }
-
         // 配對間隔
         if (Time.time > _lastClickTime + _clickInterval && _bClick)
         {
@@ -118,17 +116,14 @@ public class FriendUI : IMPPanelUI
 
     protected override void OnLoadPanel()
     {
-        _bLoadedPanel = true;
         GetMustLoadAsset();
-        ResumeToggleTarget();
-
     }
 
     /// <summary>
     /// 取得必須載入的Asset
     /// </summary>
     protected override void GetMustLoadAsset()
-    {//m_AssetLoaderSystem.Initialize();
+    {
         if (_bFirstLoad)
         {
             List<string> miceNameList = new List<string>();
@@ -187,12 +182,11 @@ public class FriendUI : IMPPanelUI
             details.TryGetValue("Nickname", out object nickname);
             details.TryGetValue("Image", out object actorImage);
 
-            if ( UI.itemPanel.childCount != 0)
+            if (UI.itemPanel.childCount != 0)
             {
                 UI.itemPanel.GetChild(i).name = friend.Key;
                 LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), actorImage.ToString(), UI.itemPanel.Find(friend.Key));
             }
-
             i++;
         }
     }
@@ -203,13 +197,12 @@ public class FriendUI : IMPPanelUI
     private void AddFriendSlot()
     {
         Debug.Log("AddFriendSlot AddFriendSlot");
-        List<string> addFriendsList = new List<string>();
 
-        addFriendsList = Global.dictFriends.Except(_clientFriendsList).ToList();
+        List<string> addFriendsList = Global.dictFriends.Except(_clientFriendsList).ToList();
 
         foreach (string friend in addFriendsList)
             if (!_clientFriendsList.Contains(friend))
-                InstantiateFriend(Global.dictOnlineFriendsDetail[friend], friend);
+                InstantiateFriend();
     }
 
     /// <summary>
@@ -217,9 +210,7 @@ public class FriendUI : IMPPanelUI
     /// </summary>
     private void RemoveFriendSlot()
     {
-        List<string> removeFriendsList = new List<string>();
-
-        removeFriendsList = _clientFriendsList.Except(Global.dictFriends).ToList();
+        List<string> removeFriendsList = _clientFriendsList.Except(Global.dictFriends).ToList();
 
         foreach (string removeName in removeFriendsList)
         {
@@ -228,7 +219,7 @@ public class FriendUI : IMPPanelUI
                 NGUITools.Destroy(UI.itemPanel.GetChild(UI.itemPanel.childCount - 1));
                 Global.dictOnlineFriendsDetail.Remove(removeName);
                 _clientFriendsList.Remove(removeName);
-                itemPos.y -= offset.y;
+                _itemPos.y -= _slotOffset.y;
             }
         }
     }
@@ -248,7 +239,7 @@ public class FriendUI : IMPPanelUI
 
     private void InstantiateICON(string imageName, Transform friendItemSlot)
     {
-       // Debug.Log("InstantiateICON: " + imageName);
+        // Debug.Log("InstantiateICON: " + imageName);
         GameObject bundle = m_AssetLoaderSystem.GetAsset(imageName.ToString());
         MPGFactory.GetObjFactory().Instantiate(bundle, friendItemSlot.Find("Image"), imageName, Vector2.zero, Vector2.one, Vector2.zero, 10);
     }
@@ -321,17 +312,21 @@ public class FriendUI : IMPPanelUI
     /// </summary>
     /// <param name="detail">詳細資料</param>
     /// <param name="account">詳細資料</param>
-    public void InstantiateFriend(object detail, string account)
+    public void InstantiateFriend()
     {
-        Dictionary<string, object> details = detail as Dictionary<string, object>;
+        foreach (KeyValuePair<string, object> friend in Global.dictOnlineFriendsDetail)
+        {
+            //   var friend. as Dictionary<string, object>();
+            Dictionary<string, object> details = friend.Value as Dictionary<string, object>;
 
-        details.TryGetValue("Rank", out object rank);
-        details.TryGetValue("Nickname", out object nickname);
-        details.TryGetValue("Image", out object actorImage);
-        GameObject friendItemSlot = InstantiateItem(itemPos);
-        InstantiateICON(actorImage.ToString().ToLower(), friendItemSlot.transform);
-        LoadFriendData(account, rank.ToString(), nickname.ToString(), actorImage.ToString(), friendItemSlot.transform);
-        itemPos.y += offset.y;
+            details.TryGetValue("Rank", out object rank);
+            details.TryGetValue("Nickname", out object nickname);
+            details.TryGetValue("Image", out object actorImage);
+            GameObject friendItemSlot = InstantiateItem(_itemPos);
+            InstantiateICON(actorImage.ToString().ToLower(), friendItemSlot.transform);
+            LoadFriendData(friend.Key, rank.ToString(), nickname.ToString(), actorImage.ToString(), friendItemSlot.transform);
+            _itemPos.y += _slotOffset.y;
+        }
     }
 
     /// <summary>
@@ -378,9 +373,9 @@ public class FriendUI : IMPPanelUI
 
     public override void OnClosed(GameObject go)
     {
-        EventMaskSwitch.lastPanel = null;
+        EventMaskSwitch.LastPanel = null;
         ShowPanel(m_RootUI.name);
-       // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
+        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
     }
 
     public void OnPrev(GameObject go)
@@ -429,7 +424,7 @@ public class FriendUI : IMPPanelUI
             if (!Global.dictFriends.Contains(friendName))
             {
                 Global.photonService.InviteFriend(friendName);
-             UI.messagePanel.SetActive(false);
+                UI.messagePanel.SetActive(false);
                 return;
             }
             Global.ShowMessage("已新增為好友！", Global.MessageBoxType.Yes, 0);

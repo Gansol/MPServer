@@ -1,8 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using MiniJSON;
-using MPProtocol;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /* ***************************************************************
  * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
@@ -13,9 +10,10 @@ using MPProtocol;
  * ***************************************************************
  *                          Description
  * ***************************************************************
- * MPPanel 為Panel Base類
+ * IMPPanelUI 為Panel Base類
  * ***************************************************************
  *                           ChangeLog
+*  20210109 v1.0.3  修正錯誤
  * 20200926 v1.0.2  scrollView未啟用停止滑動
  * 20161102 v1.0.0  建立    MPPanel  Base類 
  * 20171016 v1.0.1  加入    MPGame
@@ -49,15 +47,9 @@ public abstract class IMPPanelUI
             _dictPanelRefs = new Dictionary<string, PanelState>();
             _dictActorRefs = new Dictionary<string, GameObject>();
         }
-
         m_AssetLoaderSystem = MPGame.GetAssetLoaderSystem();
-
         //scrollView = GameObject.FindGameObjectWithTag("GM").GetComponent<ScrollView>();
     }
-
-    public abstract void Initialize();
-
-    public virtual void OnGUI() { }
 
     public virtual void Update()
     {
@@ -66,7 +58,7 @@ public abstract class IMPPanelUI
         {
             _loadedPanel = false;
             InstantiatePanel();                             // 實體化Panel
-            PanelSwitch(_activePanelName);    // 切換至目前Panel
+            PanelSwitch(_activePanelName);  // 切換至目前Panel
         }
     }
 
@@ -90,7 +82,6 @@ public abstract class IMPPanelUI
             m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             return true;
         }
-
         // 如果已經載入老鼠角色了 直接顯示 
         ActiveLoadedActor(GetLoadedActor(assetName), parent, actorScale);
         return false;
@@ -130,18 +121,20 @@ public abstract class IMPPanelUI
     /// <param name="itemType">道具類別</param>
     public virtual Dictionary<string, GameObject> InstantiateBagItemBG(Dictionary<string, object> itemData, string itemName, int itemType, Transform itemPanel, Vector2 offset, int tableCount, int rowCount)
     {
+        // 取得對應道具類別資料
         if (itemType != -1)
-            itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, itemType);     // 取得對應道具類別資料
+            itemData = MPGFactory.GetObjFactory().GetItemDetailsInfoFromType(itemData, itemType);
 
-        if (itemPanel.transform.childCount == 0)                                                             // 如果還沒建立道具
+        // 如果還沒建立道具 實體化
+        if (itemPanel.transform.childCount == 0)                                                            
         {
             _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
             return InstantiateItemBGSub(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
         }
         else
-        {// 已建立道具時
-
-            if (itemPanel.Find(itemType.ToString()))                                                            // 如果有對應道具類別
+        {
+            // 已建立道具時 如果有對應道具類別
+            if (itemPanel.Find(itemType.ToString())) 
             {
                 _lastEmptyItemGroup.SetActive(false);
                 _lastEmptyItemGroup = itemPanel.Find(itemType.ToString()).gameObject;
@@ -262,15 +255,14 @@ public abstract class IMPPanelUI
     /// <summary>
     /// 取得未載入Asset
     /// </summary>
-    /// <param name="ServerDict"></param>
-    /// <param name="itemNameData">name Data</param>
+    /// <param name="dictAssetData"></param>
     /// <returns></returns>
-    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> ServerDict)
+    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictAssetData)
     {
         List<string> notLoadedAssetNameList = new List<string>();
 
         // 取得未載入物件
-        foreach (KeyValuePair<string, object> item in ServerDict)
+        foreach (KeyValuePair<string, object> item in dictAssetData)
         {
             string serverBundleName = item.Value.ToString();
             if (!string.IsNullOrEmpty(serverBundleName) && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
@@ -282,60 +274,35 @@ public abstract class IMPPanelUI
     /// <summary>
     /// 取得未載入Asset (nestedDict)
     /// </summary>
-    /// <param name="ServerDict"></param>
+    /// <param name="dictServer"></param>
     /// <param name="itemNameData">name Data</param>
     /// <returns></returns>
-    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> ServerDict, Dictionary<string, object> itemNameData)
+    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictServer, Dictionary<string, object> itemNameData)
     {
-        List<string> listNotLoadedAssetName = new List<string>();
-
-        foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
+        List<string> notLoadedAssetNameList = new List<string>();
+        // 取得未載入物件
+        foreach (KeyValuePair<string, object> item in dictServer)
         {
             string serverBundleName = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString());
 
             if (!string.IsNullOrEmpty(serverBundleName) && serverBundleName != "-1" && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
-                listNotLoadedAssetName.Add( serverBundleName);
+                notLoadedAssetNameList.Add(serverBundleName);
         }
-        return listNotLoadedAssetName;
+        return notLoadedAssetNameList;
     }
     #endregion
 
-    ///// <summary>
-    ///// 取得未載入Asset (nestedDict)
-    ///// </summary>
-    ///// <param name="ServerDict"></param>
-    ///// <param name="itemNameData">name Data</param>
-    ///// <returns></returns>
-    //public Dictionary<string, object> GetDontNotLoadAsset(Dictionary<string, object> ServerDict, Dictionary<string, object> itemNameData)
-    //{
-    //    Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
-
-    //    foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
-    //    {
-    //        string serverBundleName = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString());
-
-    //        if (!string.IsNullOrEmpty(serverBundleName) && serverBundleName != "-1" && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
-    //            dictNotLoadedAsset.Add(item.Key.ToString(), serverBundleName);
-    //    }
-    //    return dictNotLoadedAsset;
-    //}
-
-
-    #region -- ResumeToggleTarget --
+    #region -- ResumeToggleTarget 復原視窗焦點 --
     /// <summary>
     /// 復原視窗焦點
     /// </summary>
     protected void ResumeToggleTarget()
     {
         EventMaskSwitch.Resume();
-        //  UI.loadingPanel.SetActive(false);
         m_RootUI.transform.parent.GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel.SetActive(false);
 
-        //  m_RootUI.transform.Find("Loading(Panel)").gameObject.SetActive(false);
-        //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().Panel[5].SetActive(false);
         EventMaskSwitch.Switch(m_RootUI);
-        EventMaskSwitch.lastPanel = m_RootUI;
-        //   assetLoader.init();  // 錯誤 有可以會導致部分載入還沒完成就重製
+        EventMaskSwitch.LastPanel = m_RootUI;
     }
     #endregion
 
@@ -348,25 +315,25 @@ public abstract class IMPPanelUI
     public virtual void ShowPanel(string panelName)
     {
         panelName = panelName.Replace("(Panel)", "");
-        this._activePanelName = panelName;
+        _activePanelName = panelName;
 
         // 開啟LoadingPanel
         GameObject loadingPanel = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel;
         loadingPanel.SetActive(true);
         EventMaskSwitch.Switch(loadingPanel);
-        EventMaskSwitch.lastPanel = loadingPanel;
+        EventMaskSwitch.LastPanel = loadingPanel;
         //_lastPanel = loadingPanel;
 
-        if (!_dictPanelRefs.ContainsKey(panelName))         // 如果還沒載入Panel AB 載入AB
+        // 如果還沒載入Panel AB 載入AB
+        if (!_dictPanelRefs.ContainsKey(panelName))
         {
-            //   m_AssetLoaderSystem.Initialize();
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + panelName.ToLower() + Global.ext);
             m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             _loadedPanel = true;
         }
         else
         {
-            PanelSwitch(panelName);// 已載入AB 顯示Panel
+            PanelSwitch(panelName);     // 已載入AB 顯示Panel
         }
     }
     #endregion
@@ -382,28 +349,30 @@ public abstract class IMPPanelUI
 
         if (panelState.go != null && (MPGame.Instance.GetLoginStatus() || !Global.connStatus))
         {
-            if (!panelState.go.activeSelf)                     // 如果Panel是關閉狀態
+            // 如果Panel是關閉狀態 開啟Panel
+            if (!panelState.go.activeSelf)
             {
                 Initialize();
-                Debug.Log("Open Panel : " + panelName);
+                // Debug.Log("Open Panel : " + panelName);
                 //scrollView.scroll = false;
-                if (EventMaskSwitch.lastPanel != null)
-                    EventMaskSwitch.lastPanel.SetActive(false);
+                if (EventMaskSwitch.LastPanel != null)
+                    EventMaskSwitch.LastPanel.SetActive(false);
 
                 panelState.go.SetActive(true);
                 OnLoading();
                 panelState.onOff = true; ;
                 // _lastPanel = panelState.go;
                 EventMaskSwitch.Switch(panelState.go);
-                EventMaskSwitch.lastPanel = panelState.go;
+                EventMaskSwitch.LastPanel = panelState.go;
 
                 return panelState.go;
-            }                                                   // 如果Panel已開啟
+            }
             else
             {
+                // 如果Panel已開啟 關閉Panel並Realse
                 Release();
                 //  scrollView.scroll = true;
-                EventMaskSwitch.lastPanel.SetActive(false);
+                EventMaskSwitch.LastPanel.SetActive(false);
                 EventMaskSwitch.Resume();
                 panelState.go.SetActive(false);
                 //_lastPanel = panelState.go;
@@ -416,13 +385,15 @@ public abstract class IMPPanelUI
         {
             Debug.LogError("PanelNo unknow or not login !");
             return null;
-
         }
     }
     #endregion
 
     #region -- InstantiatePanel 實體化Panel--
-    protected virtual void InstantiatePanel() //實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    /// <summary>
+    /// 實體化Panel現在是正確的，有時間可以重新啟用 很多用編輯器拉進去的Panel都要修改到陣列
+    /// </summary>
+    protected virtual void InstantiatePanel()
     {
         GameObject bundle = m_AssetLoaderSystem.GetAsset(_activePanelName.ToLower());
         PanelState panelState = new PanelState();
@@ -431,18 +402,20 @@ public abstract class IMPPanelUI
         panelState.go = panelState.go.transform.parent.gameObject;
         panelState.go.layer = m_RootUI.layer;
 
+        // 加入Panel索引
         if (!IsLoadedPanel(_activePanelName))
             _dictPanelRefs.Add(_activePanelName, panelState);
     }
     #endregion
 
-    #region -- 是否載入Panel --
+    #region -- IsLoadedPanel是否載入Panel --
     protected bool IsLoadedPanel(string panelName)
     {
         return _dictPanelRefs.ContainsKey(panelName) ? true : false;
     }
     #endregion
 
+    #region  -- ActiveLoadedActor 顯示已載入的老鼠角色 -- 
     /// <summary>
     /// 顯示 已載入的老鼠角色
     /// </summary>
@@ -465,7 +438,9 @@ public abstract class IMPPanelUI
         _activeActor = actor;
         _activeActor.SetActive(true);
     }
+    #endregion
 
+    #region   --  AddLoadedActorRefs加入 已載入的角色索引 --
     /// <summary>
     /// 加入 已載入的角色索引
     /// </summary>
@@ -475,9 +450,11 @@ public abstract class IMPPanelUI
         if (!_dictActorRefs.ContainsKey(actor.name))
             _dictActorRefs.Add(actor.name, actor);
     }
+    #endregion
 
+    #region   --   GetLoadedActor  取得載入的角色 -- 
     /// <summary>
-    /// 取的載入的角色
+    /// 取得載入的角色
     /// </summary>
     /// <param name="actorName"></param>
     /// <returns></returns>
@@ -488,7 +465,9 @@ public abstract class IMPPanelUI
             _dictActorRefs.TryGetValue(actorName, out actor);
         return actor;
     }
+    #endregion
 
+    #region   --   IsLoadedActor 是否載入 老鼠角色 --
     /// <summary>
     /// 是否載入 老鼠角色
     /// </summary>
@@ -500,18 +479,42 @@ public abstract class IMPPanelUI
             return true;
         return false;
     }
+    #endregion
 
+    #region      -- GetPanelState取得Panel狀態 --
     protected PanelState GetPanelState(GameObject m_RootUI)
     {
         string panelName = m_RootUI.name.Replace("(Panel)", "");
         return _dictPanelRefs[panelName];
     }
+    #endregion
 
-
+    public abstract void Initialize();
+    public virtual void OnGUI() { }
     protected abstract void OnLoading();
     protected abstract void OnLoadPanel();
     protected abstract void GetMustLoadAsset();
     protected abstract int GetMustLoadedDataCount();    // 取得需要載入的資料總和
     public abstract void OnClosed(GameObject go);
     public abstract void Release();
+
+    ///// <summary>
+    ///// 取得未載入Asset (nestedDict)
+    ///// </summary>
+    ///// <param name="ServerDict"></param>
+    ///// <param name="itemNameData">name Data</param>
+    ///// <returns></returns>
+    //public Dictionary<string, object> GetDontNotLoadAsset(Dictionary<string, object> ServerDict, Dictionary<string, object> itemNameData)
+    //{
+    //    Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
+
+    //    foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
+    //    {
+    //        string serverBundleName = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString());
+
+    //        if (!string.IsNullOrEmpty(serverBundleName) && serverBundleName != "-1" && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
+    //            dictNotLoadedAsset.Add(item.Key.ToString(), serverBundleName);
+    //    }
+    //    return dictNotLoadedAsset;
+    //}
 }

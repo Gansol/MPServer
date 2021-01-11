@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+// 有問題的怪東西
 public class SwitchBtnComponent
 {
 
@@ -138,7 +139,7 @@ public class SwitchBtnComponent
                     {
                         Global.RenameKey(loadedBtnRefs, keys[position], itemID);
                         loadedBtnRefs[itemID] = myParent;
-                        loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Init(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
+                        loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Initialize(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
                     }
                     else
                     {
@@ -149,7 +150,7 @@ public class SwitchBtnComponent
                 {
                     // 重新索引按鈕對應位置
                     loadedBtnRefs[itemID] = myParent;
-                    loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Init(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
+                    loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Initialize(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
                 }
             }
             else
@@ -157,7 +158,7 @@ public class SwitchBtnComponent
                 // 如果小於 載入按鈕的索引長度 直接修改索引
                 Global.RenameKey(loadedBtnRefs, keys[position], itemID);
                 loadedBtnRefs[itemID] = myParent;
-                loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Init(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
+                loadedBtnRefs[itemID].GetComponent<BtnSwitch>().Initialize(ref dictLoadedMiceBtnRefs, ref dictLoadedTeamBtnRefs, ref btnArea);
             }
         }
         else

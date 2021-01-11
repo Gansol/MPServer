@@ -53,7 +53,6 @@ public class MessageSystem: IGameSystem
     /// <param name="MessageBoxType">訊息視窗型態</param>
     void OnMessage(string message, string MessageBoxType, int prevMask)
     {
-      //  m_MPGame.GetAssetLoaderSystem().Initialize();  
         try
         {
             _prevMask = prevMask;
@@ -61,7 +60,8 @@ public class MessageSystem: IGameSystem
             if ((!Global.isGameStart && !Global.isMatching) || Global.MessageBoxType.SystemCrash == MessageBoxType)
             {
                 // 如果存在舊的訊息視窗 關閉
-                if (_lastMsgBox != null) _lastMsgBox.SetActive(false);
+                if (_lastMsgBox != null)
+                    _lastMsgBox.SetActive(false);
 
                 // 獲取messagePanel並開啟
                 if (messagePanel == null)

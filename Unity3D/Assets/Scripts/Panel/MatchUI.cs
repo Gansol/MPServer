@@ -6,11 +6,11 @@ using System.Linq;
 using MPProtocol;
 using System;
 /* ***************************************************************
- * -----Copyright © 2015 Gansol Studio.  All Rights Reserved.-----
- * -----------            CC BY-NC-SA 4.0            -------------
- * -----------  @Website:  EasyUnity@blogspot.com    -------------
- * -----------  @Email:    GansolTW@gmail.com        -------------
- * -----------  @Author:   Krola.                    -------------
+ * ------------  Copyright © 2021 Gansol Studio.  All Rights Reserved.  ------------
+ * ----------------                                CC BY-NC-SA 4.0                                ----------------
+ * ----------------                @Website:  EasyUnity@blogspot.com      ----------------
+ * ----------------                @Email:    GansolTW@gmail.com               ----------------
+ * ----------------                @Author:   Krola.                                             ----------------
  * ***************************************************************
  *                          Description
  * ***************************************************************
@@ -30,44 +30,54 @@ using System;
 
 public class MatchUI : IMPPanelUI
 {
-    private SwitchBtnComponent SwitchBtnMethod;
-    private AttachBtn_MatchUI UI;
     #region 欄位
-    //public GameObject[] Panel;
-    //public GameObject[] infoGroupsArea;                                             // 物件群組位置
-    // public UILabel matchText, timeText;
-    public GameObject ok_btn;
+    SwitchBtnComponent SwitchBtnMethod;
+    AttachBtn_MatchUI UI;
 
+    private static Dictionary<string, object> _dictMiceData;                        // Json全部老鼠資料
+    private static Dictionary<string, object> _dictTeamData;                       // Json老鼠隊伍資料
+
+    private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs;   // 已載入的按鈕(全部老鼠)
+    private Dictionary<string, GameObject> _dictLoadedTeamBtnRefs;  // 已載入的按鈕(隊伍老鼠)
+
+    private GameObject _btnClick;                   // 按下按鈕
+    private GameObject _doubleClickChk;     // 雙擊檢查
+
+    private int _page;                                            // 翻頁值(翻一頁+10)
+    private int _miceCost;                                   // 隊伍老鼠Cost
+    private int _dataLoadedCount;                   // 資料載入數量
     [Range(0.2f, 0.4f)]
-    private float delayBetween2Clicks = 0.3f;                                        // 雙擊間隔時間
-    private Vector3 actorScale;                                                      // 角色縮放
+    private float _delayBetween2Clicks;         // 雙擊間隔時間
+    private float _lastTime;                                 // 儲存起始配對時間
+    private float _escapeTime;                          // 配對等待經過時間
+    private float _lastClickTime;                        // 點擊間距時間
 
-    private static Dictionary<string, object> _dictMiceData, _dictTeamData;         // Json老鼠、隊伍資料
-    private Dictionary<string, GameObject> _dictLoadedMiceBtnRefs, _dictLoadedTeamBtnRefs;             // 已載入的按鈕(全部、隊伍)
-    private GameObject _actorParent, _btnClick, _doubleClickChk;                    // 角色、按下按鈕、雙擊檢查
-    private bool _bFirstLoad, _bLoadedAsset, _bLoadedActor, _bLoadedEffect, _bLoadedPlayerData, _bLoadedPlayerItem, _bLoadedPanel, _checkFlag; // 是否 第一次載入 載入圖片、是否載入角色
-    private int _miceCost, _dataLoadedCount, _page;   // 翻頁值(翻一頁+10)
-    private float _time, _lastTime, _escapeTime, _checkTime, _lastClickTime;    // 點擊間距時間
+    private bool _bFirstLoad;                             // 是否 第一次載入
+    private bool _bLoadedPanel;                      // 是否載入Panel
+    private bool _bLoadedAsset;                      // 是否載入資產
+    private bool _bLoadedActor;                      // 是否載入角色資產
+    private bool _bLoadedEffect;                      // 是否載入特效資產
+    private bool _bMatchingCheckFlag;         // 是否在配對等待
+
+    //private GameObject _actorParent;            // 角色
     #endregion
 
     public MatchUI(MPGame MPGame) : base(MPGame)
     {
         Debug.Log("--------------- MatchUI Create ----------------");
         SwitchBtnMethod = new SwitchBtnComponent();
-        _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
-        _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _dictMiceData = new Dictionary<string, object>();
         _dictTeamData = new Dictionary<string, object>();
-    }
+        _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
+        _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
 
+        _delayBetween2Clicks = 0.3f;
+        _bFirstLoad = true;
+    }
 
     public override void Initialize()
     {
         Debug.Log("--------------- MatchUI Initialize ----------------");
-        actorScale = new Vector3(0.8f, 0.8f, 1);
-
-        _checkTime = 0;
-        _bFirstLoad = true; // dontDestroyOnLoad 所以才使用非靜態
 
         //_page = 0;
         //_actorParent = UI.info_group.transform.GetChild(0).gameObject;    // 方便程式辨認用 UI.info_group.transform.GetChild(0).gameObject = image
@@ -79,11 +89,6 @@ public class MatchUI : IMPPanelUI
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
 
-    //UI.mice_group.transform = mice
-    //UI.info_group.transform = info
-    //UI.team_group.transform = team
-
-
     public override void Update()
     {
         base.Update();
@@ -94,49 +99,39 @@ public class MatchUI : IMPPanelUI
             //    if (!string.IsNullOrEmpty(assetLoader.ReturnMessage))
             //        Debug.Log("訊息：" + assetLoader.ReturnMessage);
 
-            // 顯示 配對等待時間文字
+            #region //  顯示 配對等待時間文字
             if (Global.isMatching && Time.time > _lastTime + 1)
             {
                 _escapeTime++;
-                MatchScrollText();
                 _lastTime = Time.time;
+                MatchScrollText();
                 MatchStatusChk();
             }
+            #endregion
 
-            // 資料庫資料載入完成時 載入Panel
+            #region // 資料庫資料載入完成時 載入Panel
             if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
             {
-                if (!_bFirstLoad)
-                    ResumeToggleTarget();
-
                 _bLoadedPanel = true;
-                OnLoadPanel();
+                GetMustLoadAsset();
             }
+            #endregion
 
-            // 載入資產完成後 實體化 物件
+            #region // 載入資產完成後 實體化 物件
             if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset  /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
             {
                 m_AssetLoaderSystem.Initialize();
                 _bLoadedAsset = false;
-                _bLoadedEffect =false;
+                _bLoadedEffect = false;
 
-                // 實體化按鈕
-                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
-                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
-
-                // 載入道具數量資訊
+                OnLoadPanel();
+                OnCostCheck();
                 LoadItemCount(Global.playerItem, UI.mice_group.transform);
-                // LoadItemCount(Global.playerItem, UI.team_group.transform);
-
-                // Enable按鈕
-                SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
-                // 顯示老鼠角色 Actor
-                // StartCoroutine(OnClickCoroutine(UI.mice_group.transform.GetChild(0).gameObject));
-
                 ResumeToggleTarget();
             }
+            #endregion
 
-            //// 按下圖示按鈕後 載入角色完成時 實體化角色
+            #region  // 按下圖示按鈕後 載入角色完成時 實體化角色
             //if (assetLoader.loadedObj && _bLoadedActor)
             //{
             //    _bLoadedActor = !_bLoadedActor;
@@ -144,21 +139,11 @@ public class MatchUI : IMPPanelUI
             //    string bundleName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Remove(_btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Length - Global.extIconLength);
             //    InstantiateActor(bundleName, _actorParent.transform, actorScale);
             //}
+            #endregion
         }
     }
 
-    #region -- OnMiceClick 當按下老鼠時 --
-    public void OnMiceClick(GameObject btn_mice)
-    {
-        if (Time.time - _lastClickTime < delayBetween2Clicks && _doubleClickChk == btn_mice)    // Double Click
-            btn_mice.SendMessage("Mice2Click");
-
-        _lastClickTime = Time.time;
-        _doubleClickChk = btn_mice;
-    }
-    #endregion
-
-    #region LoadItemCount
+    #region -- LoadItemCount 載入道具數量 --
     /// <summary>
     /// 載入道具數量
     /// </summary>
@@ -166,14 +151,13 @@ public class MatchUI : IMPPanelUI
     /// <param name="parent">物件</param>
     private void LoadItemCount(Dictionary<string, object> data, Transform parent)
     {
-        object miceData;
-
+        // 排序Gameobject
         SortChildren.SortChildrenByID(parent.gameObject, Global.extIconLength);
 
         for (int i = 0; i < parent.childCount; i++)
         {
             if (parent.GetChild(i).GetComponentInChildren<UISprite>() != null)
-                if (data.TryGetValue(parent.GetChild(i).GetComponentInChildren<UISprite>().name, out miceData))
+                if (data.TryGetValue(parent.GetChild(i).GetComponentInChildren<UISprite>().name, out object miceData))
                 {
                     Dictionary<string, object> miceProp = miceData as Dictionary<string, object>;
                     parent.parent.Find("ItemCount").GetChild(i).GetComponentInChildren<UILabel>().text = miceProp["ItemCount"].ToString();
@@ -182,29 +166,25 @@ public class MatchUI : IMPPanelUI
     }
     #endregion
 
-    #region LoadPlayerMiceProp
+    #region -- LoadPlayerMiceProp 載入老鼠資料 --
     /// <summary>
     /// 載入老鼠資料
     /// </summary>
     /// <param name="miceBtn">老鼠按鈕</param>
     private void LoadPlayerMiceProp(GameObject miceBtn)
     {
-        object rank, exp, data;
-        float miceMaxExp;
-
-        Global.playerItem.TryGetValue(miceBtn.name, out data);
+        Global.playerItem.TryGetValue(miceBtn.name, out object data);
 
         Dictionary<string, object> miceProp = data as Dictionary<string, object>;
-        miceProp.TryGetValue(PlayerItem.Rank.ToString(), out rank);
-        miceProp.TryGetValue(PlayerItem.Exp.ToString(), out exp);
-        miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
+        miceProp.TryGetValue(PlayerItem.Rank.ToString(), out object rank);
+        miceProp.TryGetValue(PlayerItem.Exp.ToString(), out object exp);
+        float miceMaxExp = Clac.ClacMiceExp(Convert.ToInt32(rank) + 1);
 
         UI.info_group.transform.Find("Rank").GetComponentInChildren<UILabel>().text = rank.ToString();
         UI.info_group.transform.Find("Exp").GetComponentInChildren<UISlider>().value = Convert.ToSingle(exp) / miceMaxExp;
         UI.info_group.transform.Find("Exp").GetComponentInChildren<UILabel>().text = exp.ToString() + " / " + miceMaxExp.ToString();
     }
     #endregion
-
 
     #region -- InstantiateIcon 實體化老鼠物件--
     /// <summary>
@@ -233,7 +213,7 @@ public class MatchUI : IMPPanelUI
                 if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
                 {
                     MPGFactory.GetObjFactory().Instantiate(bundle, miceBtn, item.Key, Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-                    miceBtn.gameObject.AddMissingComponent<BtnSwitch>().Init(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
+                    miceBtn.gameObject.AddMissingComponent<BtnSwitch>().Initialize(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
                     miceBtn.GetComponent<BtnSwitch>().SendMessage("EnableBtn");          // 開啟按鈕功能
                 }
                 else if (item.Key.ToString() != keys[i])                                    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
@@ -256,42 +236,130 @@ public class MatchUI : IMPPanelUI
     }
     #endregion
 
-    //#region -- InstantiateItem 實體化道具(按鈕) --
-    ///// <summary>
-    ///// 實體化道具(按鈕)
-    ///// </summary>
-    ///// <param name="parent">物件位置</param>
-    ///// <param name="objectID">ID</param>
-    //private void InstantiateItem(Transform parent, string objectID)
-    //{
-    //    int itemID = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", objectID.ToString()));
-    //    string bundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString() + Global.IconSuffix;
-    //    GameObject bundle = assetLoader.GetAsset(bundleName);
+    #region -- GetMustLoadAsset 載入必要資產 --
+    /// <summary>
+    /// 載入必要資產
+    /// </summary>
+    protected override void GetMustLoadAsset()
+    {
+        List<string> notLoadedAssetList;
 
-    //    // 已載入資產時
-    //    if (bundle != null)
-    //    {
-    //        if (parent.childCount == 0)
-    //        {
-    //            MPGFactory.GetObjFactory().Instantiate(bundle, parent, objectID.ToString(), Vector3.zero, Vector3.one, new Vector2(65, 65), -1);
-    //        }
-    //        else
-    //        {
-    //            parent.GetComponentInChildren<UISprite>().gameObject.name = objectID.ToString();
-    //            parent.GetComponentInChildren<UISprite>().spriteName = bundleName;
-    //        }
-    //    }
-    //}
-    //#endregion
+        // 如果是第一次載入 載入全部資產 否則 載入必要資產
+        if (_bFirstLoad)
+        {
+            notLoadedAssetList = GetDontNotLoadAssetName(Global.dictMiceAll);
+        }
+        else
+        {
+            LoadItemCount(Global.playerItem, UI.mice_group.transform);
+            LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
+            LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
 
-    #region -- OnLoadPanel 載入面板--
+            // Where 找不存在的KEY 再轉換為Dictionary
+            Dictionary<string, object> newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            notLoadedAssetList = GetDontNotLoadAssetName(newAssetData);
+        }
+
+        // 如果 有未載入物件 載入AB
+        if (notLoadedAssetList.Count > 0)
+        {
+            // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
+            _bLoadedAsset = LoadIconObjectsAssetByName(notLoadedAssetList, Global.MiceIconUniquePath);
+        }
+        else
+        {
+            _bLoadedAsset = true;
+        }
+
+        _dictMiceData = Global.dictMiceAll;
+        _dictTeamData = Global.dictTeam;
+    }
+    #endregion
+
+    #region -- MatchStatusChk 檢查配對狀態 --
+    /// <summary>
+    /// 檢查配對狀態
+    /// </summary>
+    private void MatchStatusChk()
+    {
+        if (Global.isMatching)
+        {
+            int waitTime = Global.WaitTime;
+            if (Global.isFriendMatching) waitTime = Global.WaitTime * 2;
+
+            if ((_escapeTime > waitTime) && _bMatchingCheckFlag)
+            {
+                // 如果朋友不再配對中 配對BOT  (Global.isFriendMatching 錯誤)
+                if (!Global.isFriendMatching)
+                {
+                    Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam);
+                }
+                else
+                {
+                    // 離開等待房間
+                    Global.photonService.ExitWaitingRoom();
+                    Global.isFriendMatching = false;
+                }
+                _bMatchingCheckFlag = false;
+            }
+            else
+            {
+                _bMatchingCheckFlag = true;
+            }
+        }
+    }
+    #endregion
+
+    #region -- MatchScrollText 等待文字動畫 --
+    /// <summary>
+    /// 還沒寫完 簡易文字 錯誤
+    /// </summary>
+    /// <returns></returns>
+    private void MatchScrollText()
+    {
+            UI.time_label.text = "(" + _escapeTime.ToString() + ")";
+    }
+    #endregion
+
+    #region -- TeamCountChk 判斷隊伍數量 --
+    /// <summary>
+    /// 還沒寫完 簡易判斷 錯誤
+    /// </summary>
+    /// <returns></returns>
+    private bool TeamCountChk()
+    {
+        return (Global.dictTeam.Count > 0 && Global.dictTeam.Count <= 5) ? true : false;
+    }
+    #endregion
+
+    #region -- MatchGameFriend 與好友對戰 --
+    /// <summary>
+    /// 與好友對戰
+    /// </summary>
+    /// <param name="go">對戰按扭</param>
+    private void OnMatchGameFriend(GameObject go)
+    {
+        if (!Global.isMatching && Global.LoginStatus && OnCostCheck())
+        {
+            UI.matching_label.text = "等待好友同意...";
+            _escapeTime = 0;
+            Global.isMatching = true;
+            UIEventListener.Get(UI.okBtn).onClick = OnMatchGame;
+            UI.matchingPanel.SetActive(true);
+            UI.beforeMatchPanel.SetActive(false);
+            UI.time_label = UI.matching_label.transform.GetChild(0).GetComponent<UILabel>();
+            Global.isFriendMatching = true;
+            Global.photonService.MatchGameFriend();
+        }
+    }
+    #endregion
+
+    #region -- OnLoadPanel 載入面板 --
     protected override void OnLoading()
     {
         _bLoadedPanel = false;
-        _checkTime = 0;
         _dataLoadedCount = (int)ENUM_Data.None;
 
-       
         UI = m_RootUI.GetComponentInChildren<AttachBtn_MatchUI>();
 
         UIEventListener.Get(UI.okBtn).onClick = OnMatchGame;
@@ -302,196 +370,109 @@ public class MatchUI : IMPPanelUI
         Global.photonService.LoadPlayerItem(Global.Account);
     }
 
+    /// <summary>
+    /// 當載入Panel完成時
+    /// </summary>
+    protected override void OnLoadPanel()
+    {
+        if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.mice_group.transform) || _bFirstLoad)
+            InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
+
+        if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.team_group.transform) || _bFirstLoad)
+            InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
+
+        SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
+
+        _bFirstLoad = false;
+        _dictMiceData = Global.dictMiceAll;
+        _dictTeamData = Global.dictTeam;
+
+    }
+    #endregion
+
+    #region -- OnLoadData 當收到伺服器資料時 --
+    /// <summary>
+    /// 當收到伺服器玩家資料時，累計資料數量
+    /// </summary>
     void OnLoadPlayerData()
     {
         _dataLoadedCount *= (int)ENUM_Data.PlayerData;
     }
 
+    /// <summary>
+    /// 當收到伺服器玩家道具時，累計資料數量
+    /// </summary>
     void OnLoadPlayerItem()
     {
         _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
     }
 
-    protected override void OnLoadPanel()
+    protected override int GetMustLoadedDataCount()
     {
-        GetMustLoadAsset();
-
-        if (!_bFirstLoad)
-        {
-            if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.mice_group.transform))
-                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
-
-            if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.team_group.transform))
-                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
-
-            SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
-        }
-        else
-        {
-            _bFirstLoad = false;
-        }
-
-        _dictMiceData = Global.dictMiceAll;
-        _dictTeamData = Global.dictTeam;
-        EventMaskSwitch.lastPanel = m_RootUI.transform.GetChild(0).gameObject;
-        OnCostCheck();
+        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem;
     }
     #endregion
 
-    // 載入必要資產
-    protected override void GetMustLoadAsset()
-    {
-        if (m_RootUI.activeSelf)     // 如果Panel是啟動狀態 接收Event
-        {
-            List<string> notLoadedAssetList = new List<string>();
-
-            // 如果是第一次載入 載入全部資產 否則 載入必要資產
-            if (_bFirstLoad)
-            {
-                notLoadedAssetList = GetDontNotLoadAssetName(Global.dictMiceAll);
-                _dictMiceData = Global.dictMiceAll;
-                _dictTeamData = Global.dictTeam;
-            }
-            else
-            {
-                Dictionary<string, object> newAssetData;
-
-                LoadItemCount(Global.playerItem, UI.mice_group.transform);
-                LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
-                LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
-
-                // Where 找不存在的KEY 再轉換為Dictionary
-                newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                notLoadedAssetList = GetDontNotLoadAssetName(newAssetData);
-
-                ResumeToggleTarget();
-            }
-
-            if (notLoadedAssetList.Count != 0)  // 如果 有未載入物件 載入AB
-            {
-
-                //assetLoader.LoadAsset(iconPath + "/", iconPath);
-                // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-                _bLoadedAsset = LoadIconObjectsAssetByName(notLoadedAssetList, Global.MiceIconUniquePath);
-            }                                   // 已載入物件 實體化
-            else
-            {
-                _bLoadedAsset = true;
-            }
-
-            Global.isPlayerDataLoaded = false;
-
-            // OnCostCheck();
-        }
-    }
-
-    public override void ShowPanel(string panelName)
-    {
-        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
-        base.ShowPanel(panelName);
-    }
-
-    public override void OnClosed(GameObject go)
-    {
-        EventMaskSwitch.lastPanel = null;
-        UI.beforeMatchPanel.SetActive(true);
-        if (Global.isMatching)
-            Global.photonService.ExitWaitingRoom();
-        ShowPanel(m_RootUI.transform.GetChild(0).name);
-        //  GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
-        UI.matchingPanel.SetActive(false);
-        // EventMaskSwitch.Prev();
-    }
-
+    #region  -- OnUpdateMice  當隊伍更新時 --
+    /// <summary>
+    /// 當隊伍更新變動時 檢查老鼠費用
+    /// </summary>
     private void OnUpdateMice()
     {
         OnCostCheck();
     }
+    #endregion
 
+    #region -- OnCostCheck 檢查老鼠Cost --
+    /// <summary>
+    /// 檢查老鼠Cost
+    /// </summary>
+    /// <returns></returns>
     private bool OnCostCheck()
     {
-        object value;
         int maxCost = Clac.ClacCost(Global.Rank);
         _miceCost = 0;
-        Dictionary<string, object> data;
+
+        // 加總Cost
         foreach (KeyValuePair<string, object> mice in Global.dictTeam)
         {
-            data = Global.miceProperty[mice.Key] as Dictionary<string, object>;
-            data.TryGetValue("MiceCost", out value);
+            Dictionary<string, object> data = Global.miceProperty[mice.Key] as Dictionary<string, object>;
+            data.TryGetValue("MiceCost", out object value);
             _miceCost += Convert.ToInt32(value);
         }
-
-        UI.info_group.transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
-        UI.okBtn.SetActive(true);
+        // 顯示超過Cost紅字
         if (_miceCost > maxCost)
         {
             UI.info_group.transform.Find("Cost").GetComponent<UILabel>().text = "[FF0000]" + _miceCost + "[-]" + "[14B5DE]/" + maxCost + "[-]";
             UI.okBtn.SetActive(false);
             return false;
         }
-        else
-        {
-            return true;
-        }
+
+        UI.info_group.transform.Find("Cost").GetComponent<UILabel>().text = "[14B5DE]" + _miceCost + "/" + maxCost + "[-]";
+        UI.okBtn.SetActive(true);
+
+        return true;
+
     }
+    #endregion
 
-
-    //----------------------------------------------------------------------- diff
-
-    private void MatchStatusChk()
+    #region -- OnMiceClick 當按下老鼠時 --
+    public void OnMiceClick(GameObject btn_mice)
     {
-        if (Global.isMatching)
-        {
-            int waitTime = Global.WaitTime;
-            if (Global.isFriendMatching) waitTime = Global.WaitTime * 2;
+        // 雙擊事件(移動老鼠)
+        if (Time.time - _lastClickTime < _delayBetween2Clicks && _doubleClickChk == btn_mice)
+            btn_mice.SendMessage("Mice2Click");
 
-            if ((_escapeTime > waitTime) && _checkFlag)
-            {
-                //  Global.photonService.ExitWaitingRoom();
-                if (!Global.isFriendMatching)
-                {
-                    Global.photonService.MatchGameBot(Global.PrimaryID, Global.dictTeam);
-                }
-                else
-                {
-                    Global.photonService.ExitWaitingRoom();
-                    Global.isFriendMatching = false;
-                }
-                _checkTime = 0;
-                _checkFlag = false;
-            }
-            else
-            {
-                _checkFlag = true;
-
-                _checkTime = Time.fixedTime;
-            }
-        }
+        _lastClickTime = Time.time;
+        _doubleClickChk = btn_mice;
     }
+    #endregion
 
-    private void MatchScrollText()
-    {
-        try
-        {
-            UI.time_label.text = "(" + _escapeTime.ToString() + ")";
-        }
-        catch
-        {
-            throw;
-        }
-        //if (_lastTime > _time)
-        //{
-        //    matching_label.text = "尋找玩家...";
-        //}
-    }
-
-    private bool TeamCountChk()
-    {
-        return (Global.dictTeam.Count > 0 && Global.dictTeam.Count <= 5) ? true : false;
-    }
-
-    // Match按鈕使用 開始配對
+    #region -- OnMatchGame 開始配對 --
+    /// <summary>
+    /// Match按鈕使用 開始配對
+    /// </summary>
+    /// <param name="go"></param>
     public void OnMatchGame(GameObject go)
     {
         if (!Global.isMatching && Global.LoginStatus)
@@ -508,8 +489,12 @@ public class MatchUI : IMPPanelUI
             }
         }
     }
+    #endregion
 
-    // 接收 同意好友對戰
+    #region -- OnApplyMatchGameFriend 接收 同意好友對戰 --
+    /// <summary>
+    /// 接收 同意好友對戰
+    /// </summary>
     private void OnApplyMatchGameFriend()
     {
         if (Global.LoginStatus && !Global.isMatching)
@@ -522,51 +507,48 @@ public class MatchUI : IMPPanelUI
         UI.matchingPanel.SetActive(false);
 
         EventMaskSwitch.Resume();
-        if (EventMaskSwitch.lastPanel != m_RootUI)  //m_RootUI = gameobject
-            EventMaskSwitch.lastPanel.SetActive(false);
+        if (EventMaskSwitch.LastPanel != m_RootUI)  //m_RootUI = gameobject
+            EventMaskSwitch.LastPanel.SetActive(false);
         EventMaskSwitch.Switch(m_RootUI/*, false*/); //m_RootUI = gameobject
-        EventMaskSwitch.lastPanel = m_RootUI; //m_RootUI = gameobject
+        EventMaskSwitch.LastPanel = m_RootUI; //m_RootUI = gameobject
 
-        UIEventListener.Get(ok_btn).onClick = MatchGameFriend;
+        UIEventListener.Get(UI.okBtn).onClick = OnMatchGameFriend;
     }
+    #endregion
 
-
-    private void MatchGameFriend(GameObject go)
-    {
-        if (!Global.isMatching && Global.LoginStatus && OnCostCheck())
-        {
-            UI.matching_label.text = "等待好友同意...";
-            _escapeTime = 0;
-            Global.isMatching = true;
-            UIEventListener.Get(ok_btn).onClick = OnMatchGame;
-            UI.matchingPanel.SetActive(true);
-            UI.beforeMatchPanel.SetActive(false);
-            UI.time_label = UI.matching_label.transform.GetChild(0).GetComponent<UILabel>();
-            Global.isFriendMatching = true;
-            Global.photonService.MatchGameFriend();
-        }
-    }
-
+    #region -- OnExitWaiting 當收到配對超時 --
+    /// <summary>
+    /// 當收到配對超時
+    /// </summary>
     private void OnExitWaiting()
     {
         //matching_label.text = "等待超時，請重新配對！";
-        EventMaskSwitch.lastPanel = null;
         UI.beforeMatchPanel.SetActive(true);
         UI.matchingPanel.SetActive(false);
         ShowPanel(m_RootUI.transform.GetChild(0).name);
-        // GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(m_RootUI.gameObject);
-
     }
-    //-----------------------------------------------
+    #endregion
 
-
-    protected override int GetMustLoadedDataCount()
+    #region -- OnClosed --
+    public override void OnClosed(GameObject go)
     {
-        return (int)ENUM_Data.PlayerData * (int)ENUM_Data.PlayerItem;
+        EventMaskSwitch.LastPanel = null;
+        UI.beforeMatchPanel.SetActive(true);
+        if (Global.isMatching)
+            Global.photonService.ExitWaitingRoom();
+        ShowPanel(m_RootUI.transform.GetChild(0).name);
+        UI.matchingPanel.SetActive(false);
+
+    }
+    #endregion
+
+    public override void ShowPanel(string panelName)
+    {
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
+        base.ShowPanel(panelName);
     }
 
-
-
+    #region -- Release --
     public override void Release()
     {
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
@@ -575,13 +557,8 @@ public class MatchUI : IMPPanelUI
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
 
-
-
-        //if (Global.isMatching)
-        //    Global.photonService.ExitWaitingRoom();
-
         UI.beforeMatchPanel.SetActive(true);
         UI.matchingPanel.SetActive(false);
-        //UI.matchingPanel.transform.parent.parent.gameObject.SetActive(false);
     }
+    #endregion
 }

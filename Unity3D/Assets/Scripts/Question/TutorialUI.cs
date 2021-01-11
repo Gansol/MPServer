@@ -70,7 +70,7 @@ public class TutorialUI : IMPPanelUI
 
     public override void OnClosed(GameObject go)
     {
-        EventMaskSwitch.lastPanel = null;
+        EventMaskSwitch.LastPanel = null;
         ShowPanel(m_RootUI.name);
         //   GameObject.FindGameObjectWithTag("GM").GetComponent<PanelManager>().LoadPanel(go.transform.parent.gameObject);
     }
