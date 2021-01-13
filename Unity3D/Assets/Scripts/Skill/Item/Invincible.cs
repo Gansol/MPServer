@@ -30,7 +30,7 @@ public class Invincible : SkillItem {
 
     public override void Release()
     {
-        BattleSystem.SetInvincible(false); // 錯誤
+        MPGame.Instance.GetBattleSystem().SetInvincible(false); // 錯誤
 
         foreach(GameObject go in effects)
             GameObject.Destroy(go);
@@ -52,7 +52,7 @@ public class Invincible : SkillItem {
         effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform,"effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Yellow",-1,0f);
 
-        BattleSystem.SetInvincible(true);  // 錯誤
+        MPGame.Instance.GetBattleSystem().SetInvincible(true);  // 錯誤
 
         m_StartTime = Time.time;
     }
