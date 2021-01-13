@@ -34,7 +34,7 @@ public class FeverTime : SkillItem {
     public override void Release()
     {
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Normal);
-        BattleSystem.SetPropected(false);
+        MPGame.Instance.GetBattleSystem().SetPropected(false);
 
         foreach(GameObject go in effects)
             GameObject.Destroy(go);
@@ -58,7 +58,7 @@ public class FeverTime : SkillItem {
 
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.High);
         Global.photonService.UpdateEnergyRate(MPProtocol.ENUM_Rate.High);
-        BattleSystem.SetPropected(true);
+        MPGame.Instance.GetBattleSystem().SetPropected(true);
         m_StartTime = Time.time;
     }
 }

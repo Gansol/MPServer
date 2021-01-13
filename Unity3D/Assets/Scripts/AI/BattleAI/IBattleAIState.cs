@@ -134,7 +134,7 @@ public abstract class IBattleAIState
     {
         float offset;
 
-        offset = (battleAttr.isCombo) ? -stateAttr.intervalOffset : stateAttr.intervalOffset * 5;
+        offset = (battleAttr.bCombo) ? -stateAttr.intervalOffset : stateAttr.intervalOffset * 5;
 
         if (stateAttr.spawnOffset + offset >= stateAttr.minSpawnInterval && stateAttr.spawnOffset + offset <= stateAttr.maxSpawnInterval)
             stateAttr.spawnOffset += offset;

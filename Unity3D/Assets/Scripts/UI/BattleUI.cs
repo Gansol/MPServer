@@ -6,19 +6,20 @@ using UnityEngine;
 
 public class BattleUI : IMPPanelUI
 {
-    private AttachBtn_BattleUI UI;
     private BattleSystem m_BattleSystem;
+    private AttachBtn_BattleUI UI;
 
-    private Transform rewardPanel;
     private Dictionary<string, object> _dictItemReward;
+    private Transform rewardPanel;
+
     private Color _blueLifeColor, _redLifeColor;
     private int _dataLoadedCount;
     private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife, energy, feverEnergy, blueLife, redLife, tmpBlueLifeBar, tmpRedLifeBar;
     private float _tmpLife, _tmpOhterLife;
     [Range(0.1f, 1.0f)]
     private float _beautyHP;                // 美化血條用
-    //private bool _bLoadedPanel;
-    //private bool _bLoadedAsset;
+    private bool _bLoadedPanel;
+    private bool _bLoadedAsset;
 
                                             //  private bool bLoadPrefab;
                                             //private double _energy;
@@ -51,8 +52,8 @@ public class BattleUI : IMPPanelUI
         UI.avatarImage.spriteName = Global.PlayerImage;
         UI.otherAvatarImage.spriteName = Global.OpponentData.Image;
 
-        _tmpLife = m_BattleSystem.life;
-        _tmpOhterLife = m_BattleSystem.OtherLife;
+        _tmpLife = m_BattleSystem.GetBattleAttr().life;
+        _tmpOhterLife = m_BattleSystem.GetBattleAttr().otherLife;
 
         _blueLifeColor = UI.BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = UI.RedLifeBar.GetComponent<UISprite>().color;
@@ -65,6 +66,7 @@ public class BattleUI : IMPPanelUI
     public override void Update()
     {
         base.Update();
+
         if (Global.isGameStart)
         {
             #region 動畫類判斷 DisActive
@@ -153,10 +155,11 @@ public class BattleUI : IMPPanelUI
         //// 載入資產完成後 實體化 物件
         //if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
         //{
-
+        //    _bLoadedAsset = true;
         //}
 
-            if (Global.isGameStart)
+        #region // GUI 
+        if (Global.isGameStart)
         {
             BattleState();
             GUIVariables();
@@ -164,11 +167,12 @@ public class BattleUI : IMPPanelUI
 
             BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
             BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
-            BeautyBar(UI.RedEnergyBar, m_BattleSystem.otherEnergy / 100f, _beautyOtherEnergy);
+            BeautyBar(UI.RedEnergyBar, m_BattleSystem.GetBattleAttr().otherEnergy / 100f, _beautyOtherEnergy);
             BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
             BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
             BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
         }
+        #endregion
     }
 
     #region  BattleState 顯示目前遊戲狀態
@@ -201,17 +205,17 @@ public class BattleUI : IMPPanelUI
     private void GUIVariables()
     {
         energy = m_BattleSystem.GetEnergy() / 100f;
-        feverEnergy = m_BattleSystem.feverEnergy / 100f;
-        blueLife = m_BattleSystem.life / _tmpLife;
-        redLife = m_BattleSystem.OtherLife / _tmpOhterLife;
+        feverEnergy = m_BattleSystem.GetFeverEnergy() / 100f;
+        blueLife = m_BattleSystem.GetBattleAttr().life / _tmpLife;
+        redLife = m_BattleSystem.GetBattleAttr().otherLife / _tmpOhterLife;
         tmpBlueLifeBar = UI.BlueLifeBar.value;
         tmpRedLifeBar = UI.RedLifeBar.value;
-        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_BattleSystem.gameTime))).ToString();
-        UI.BlueScoreLabel.text = m_BattleSystem.score.ToString();         // 畫出分數值
-        UI.RedScoreLabel.text = m_BattleSystem.otherScore.ToString();     // 畫出分數值
-        UI.BlueLifeText.text = m_BattleSystem.life.ToString();
-        UI.RedLifeText.text = m_BattleSystem.OtherLife.ToString();
-        UI.ComboLabel.text = m_BattleSystem.combo.ToString();        // 畫出 UI.Combo值
+        UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_BattleSystem.GetBattleAttr().gameTime))).ToString();
+        UI.BlueScoreLabel.text = m_BattleSystem.GetBattleAttr().score.ToString();         // 畫出分數值
+        UI.RedScoreLabel.text = m_BattleSystem.GetBattleAttr().otherScore.ToString();     // 畫出分數值
+        UI.BlueLifeText.text = m_BattleSystem.GetBattleAttr().life.ToString();
+        UI.RedLifeText.text = m_BattleSystem.GetBattleAttr().otherLife.ToString();
+        UI.ComboLabel.text = m_BattleSystem.GetBattleAttr().combo.ToString();        // 畫出 UI.Combo值
 
         //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
         //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
@@ -223,7 +227,7 @@ public class BattleUI : IMPPanelUI
     #region ScoreBarAnim 分數條動畫
     private void ScoreBarAnim()
     {
-        float value = m_BattleSystem.score / (m_BattleSystem.score + m_BattleSystem.otherScore);                      // 得分百分比 兩邊都是0會 NaN
+        float value = m_BattleSystem.GetBattleAttr().score / (m_BattleSystem.GetBattleAttr().score + m_BattleSystem.GetBattleAttr().otherScore);                      // 得分百分比 兩邊都是0會 NaN
 
         if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
@@ -243,7 +247,7 @@ public class BattleUI : IMPPanelUI
             if (_beautyHP <= value)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (m_BattleSystem.score == 0 && m_BattleSystem.otherScore == 0)
+        else if (m_BattleSystem.GetBattleAttr().score == 0 && m_BattleSystem.GetBattleAttr().otherScore == 0)
         {
             UI.HPBar.value = _beautyHP;
             if (_beautyHP <= UI.HPBar.value && UI.HPBar.value > 0.5f)

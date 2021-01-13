@@ -22,64 +22,72 @@ using System.Linq;
 public class BattleAttr
 {
     public float score, gameTime;
+    public float otherScore;      // 對手分數
     public short combo;
-    public bool isCombo;
+    public short otherLife;           // 對手生命值
+    public short life;                      // 目前生命值 
+    public float otherEnergy;    // 對手能量
+    public bool bCombo;
     public List<GameObject> hole;
 }
 
 public class BattleSystem : IGameSystem
 {
-    public int feverEnergy;           // FeverTime 能量
-
-    private MissionSystem missionSystem;  // 任務管理員
-    private BattleUI battleHUD;            // HUD
-    private BotAI BotAI;
-
-    private BattleAttr battleAttr;
-    private AttachBtn_BattleUI UI;
-    private IBattleAIState battleAIState;           // 產生AI狀態 
-    private PlayerAIState playerAIState;             // Player狀態
-    
-    private GameObject m_RootUI = null;
-
-
-
-
-    //   public Dictionary<GameObject, GameObject> mice = new Dictionary<GameObject, GameObject>();
+    #region Variables 變數
+    private MissionSystem m_MissionSystem;  // 任務管理員
+    private AttachBtn_BattleUI UI;                          // BTN
+    private BattleUI m_BattleUI;                              // HUD
+    private IBattleAIState battleAIState;               // 產生AI狀態 
+    private PlayerAIState playerAIState;              // Player狀態
+    private BattleAttr battleAttr;                              // battle數值
+    private BotAI BotAI;                                            // 測試用AI
+    private GameObject m_RootUI = null;            // panel Root
 
     private ENUM_BattleAIState battleState = ENUM_BattleAIState.EasyMode;        // 正式版 要改private
     private SpawnStatus spawnStatus = SpawnStatus.LineL;  // 測試用
+    private Dictionary<string, Dictionary<string, object>> _dictMiceUseCount;   // 老鼠使用量
+    private Dictionary<string, Dictionary<string, object>> _dictItemUseCount;   // 道具使用量
 
-   // private List<GameObject> hole = null;
-
-    private Dictionary<string, Dictionary<string, object>> dictMiceUseCount;
-    private Dictionary<string, Dictionary<string, object>> dictItemUseCount;
-    private readonly Dictionary<int, GameObject> dictSkillBossMice = new Dictionary<int, GameObject>();
-
-    // 老鼠使用量、能量使用量、失誤數、老鼠產生總量、最大連擊數、目前連擊
-    private static short _eggMiceUsage, _energyUsage, _lostMice, _spawnCount, _maxCombo, _nowCombo;
-    private static int _energy = 0, _tmpEnergy;       // 能量
-    private static float /* battleAttr.gameTime,*/ _scoreRate = 1, _otherRate = 1;           // 經過時間、分數倍率、對手分數倍率
-    private static bool _isPropected, _isReflection, _isInvincible;   // 錯誤 保護、反射、無敵 要在伺服器判斷 偷懶亂寫 
     private static readonly int _defaultStartTime = 3;     // 經過時間
+    private static short _eggMiceUsage; // 老鼠使用量
+    private static short _energyUsage;    // 能量使用量
+    private static short _lostMice;             // 失誤數
+    private static short _spawnCount;     // 老鼠產生總量
+    private static short _maxCombo;       // 最大連擊數
+    private static short _nowCombo;      // 目前連擊
+    private static short  _energy;              // 能量
+    private static short _tmpEnergy;        // 測試用能量 不用刪除
+    private static float _scoreRate;           // 分數倍率
+    private static float _otherRate;           // 對手分數倍率
 
-    private int _healthValue, maxLife;
-    // 生命 對手生命 死亡老鼠數量 連擊
-    private short _life, _otherLife, _killMice;
-    // 最高得分、最高得分、平均輸出、對手平均輸出、上次時間、分數、對手分數、對手能量、檢查時間、檢查時間點
-    private float _maxScore, _gameScore, _myDPS, _otherDPS, _lastTime,  /*score,*/ _otherScore, _otherEnergy, checkTime, checkPoint = 2;
-    // 是否連擊 是否破分數紀錄 是否破Combo紀錄 同步開始
-    private bool  /*isCombo, */_isHighScore, _isHighCombo, isSyncStart;
 
+    private short _maxLife;             // 最大生命值
+    private short _killMice;            //  死亡老鼠數量 
+    private short _healthValue;     // 生命值
+    private short _feverEnergy;   // FeverTime 能量
+    private float _maxScore;         // 最高得分 (錯誤 沒有取得最高得分)
+    private float _gameScore;      // 目前遊戲分數
+    private float _myDPS;             // 平均輸出
+    private float _otherDPS;         // 對手平均輸出 
+
+    private float _lastTime;           // 上次開始時間
+    private float _checkTime;       // 檢查時間
+    private float _checkPoint;      // 檢查間格時間
+    private bool _bHighScore;      // 是否破分數紀錄
+    private bool _bHighCombo;   // 是否破Combo紀錄
+    private bool _bSyncStart;       //   同步開始
+    private bool _bPropected;      //  保護 要在伺服器判斷 偷懶亂寫  錯誤
+    private bool _bReflection;       // 反射
+    private bool _bInvincible;       // 無敵
 
     public bool SpawnFlag { get; set; }     // public 是給TestPanel使用的
-    public int MissionCombo { get; private set; }
-
+    public int MissionCombo { get; private set; }   // 任務開始時 儲存COMBO
+    //private readonly Dictionary<int, GameObject> _dictSkillBossMice = new Dictionary<int, GameObject>();
+    #endregion
 
     public BattleSystem(MPGame MPGame) : base(MPGame)
     {
         Debug.Log("--------------- BattleSystem Create ----------------");
-
     }
 
     // Use this for initialization
@@ -91,51 +99,45 @@ public class BattleSystem : IGameSystem
         battleAttr = new BattleAttr();
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
-        Debug.Log("m_RootUI:" + m_RootUI);
-        Debug.Log("UI:" + UI);
-        Debug.Log("UI:" + UI.hole);
-        //hole = UI.hole;
-        // poolManager = m_RootUI.GetComponentInChildren<PoolManager>();
-        missionSystem = m_MPGame.GetMissionSystem();
-        battleHUD = m_MPGame.GetBattleUI();
-
-        //spawnAI = new SpawnAI( poolManager, hole);
+        m_MissionSystem = m_MPGame.GetMissionSystem();
+        m_BattleUI = m_MPGame.GetBattleUI();
 
 
-        dictMiceUseCount = new Dictionary<string, Dictionary<string, object>>();
-        dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
+        _dictMiceUseCount = new Dictionary<string, Dictionary<string, object>>();
+        _dictItemUseCount = new Dictionary<string, Dictionary<string, object>>();
 
-        Global.photonService.MissionCompleteEvent += OnMissionComplete;
-        Global.photonService.ApplyMissionEvent += OnApplyMission;
-        Global.photonService.UpdateScoreEvent += OnUpdateScore;
-        Global.photonService.OtherScoreEvent += OnOtherScore;
-        Global.photonService.UpdateLifeEvent += OnUpdateLife;
-        Global.photonService.GetOpponentLifeEvent += OnGetOpponentLife;
-        Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
-
-        Global.photonService.GameOverEvent += OnGameOver;
-        Global.photonService.LoadSceneEvent += OnDestory;
-        //Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
-        Global.photonService.ApplySkillItemEvent += OnApplySkillItem;
-        Global.photonService.LoadSceneEvent += OnLoadScene;
-        Global.photonService.BossSkillEvent += OnBossSkill;
-        Global.photonService.ReLoginEvent += OnReLogin;
         Global.isExitingRoom = false;
-         battleAttr.isCombo = false;
-        isSyncStart = true;
+        battleAttr.bCombo = false;
+        _bSyncStart = true;
 
-        maxLife = _life = battleAttr.combo = _maxCombo = _nowCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
-         battleAttr.gameTime =  battleAttr.score = _maxScore = _gameScore = _otherScore = 0;
+        _maxLife = battleAttr.life = battleAttr.combo = _maxCombo = _nowCombo = _eggMiceUsage = _energyUsage = _lostMice = _killMice = _spawnCount = 0;
+        battleAttr.gameTime = battleAttr.score = battleAttr.otherScore = _maxScore = _gameScore  = 0;
         _energy = 0;
-        checkPoint = 3;
+        _checkPoint = 3;
         _healthValue = 25;
-        maxLife = _life;
-        _scoreRate = 1;
+        _maxLife = battleAttr.life;
+        _scoreRate = _otherRate = 1;
+        _checkTime = Time.time;
 
         SetSpawnState(new EasyBattleAIState(battleAttr));
         playerAIState = new PlayerAIState(this);
         InitUseCount();
         ClacPlayerLife();
+
+        Global.photonService.OtherMissionScoreEvent += OnOtherMissionComplete;
+        Global.photonService.MissionCompleteEvent += OnMissionComplete;
+        Global.photonService.GetOpponentLifeEvent += OnGetOpponentLife;
+        Global.photonService.ApplySkillItemEvent += OnApplySkillItem;
+        Global.photonService.ApplyMissionEvent += OnApplyMission;
+        Global.photonService.UpdateScoreEvent += OnUpdateScore;
+        Global.photonService.OtherScoreEvent += OnOtherScore;
+        Global.photonService.UpdateLifeEvent += OnUpdateLife;
+        Global.photonService.GameOverEvent += OnGameOver;
+        Global.photonService.LoadSceneEvent += OnLoadScene;
+        Global.photonService.LoadSceneEvent += OnDestory;
+        Global.photonService.BossSkillEvent += OnBossSkill;
+        Global.photonService.ReLoginEvent += OnReLogin;
+        //Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
     }
 
     /// <summary>
@@ -147,12 +149,12 @@ public class BattleSystem : IGameSystem
         {
             string _itemID = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", key));
 
-            dictMiceUseCount.Add(key, new Dictionary<string, object> { { "UseCount", 0 } });     // 加入老鼠使用量初始值
-            dictItemUseCount.Add(_itemID, new Dictionary<string, object> { { "UseCount", 0 } });                //  加入道具使用量初始值
+            _dictMiceUseCount.Add(key, new Dictionary<string, object> { { "UseCount", 0 } });     // 加入老鼠使用量初始值
+            _dictItemUseCount.Add(_itemID, new Dictionary<string, object> { { "UseCount", 0 } });                //  加入道具使用量初始值
         }
     }
 
-  public override  void Update()
+    public override void Update()
     {
         battleState = battleAIState.GetState();// 可能錯誤 還沒實體化
         GameConnStatusChk();
@@ -160,28 +162,28 @@ public class BattleSystem : IGameSystem
             _lastTime = Time.time; // 沒作用
 
         // 同步開始遊戲
-        if (m_MPGame.GetPoolSystem().PoolingFlag && isSyncStart)
+        if (m_MPGame.GetPoolSystem().PoolingFlag && _bSyncStart)
         {
             Debug.Log("Pooling Completed Start SyncGame");
 
             if (Global.MemberType == MemberType.Bot)
                 BotAI = new BotAI(m_MPGame.GetPoolSystem().GetPoolSkillMiceIDs());
 
-            if (feverEnergy == 100)
+            if (_feverEnergy == 100)
             {
-                feverEnergy = 0;
+                _feverEnergy = 0;
                 SetPlayerState((short)ENUM_Skill.FeverTime);
             }
-            isSyncStart = false;
+            _bSyncStart = false;
             Global.photonService.SyncGameStart();
         }
 
         if (Global.isGameStart && Time.time > _lastTime + _defaultStartTime)
         {
-             battleAttr.gameTime = Time.time - _lastTime - _defaultStartTime;    // 遊戲經過時間
-          //  battleState = battleAIState.GetState();
-            if ( battleAttr.combo > _maxCombo) _maxCombo =  battleAttr.combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
-            if ( battleAttr.score > _maxScore) _maxScore =  battleAttr.score; // 更新最高分
+            battleAttr.gameTime = Time.time - _lastTime - _defaultStartTime;    // 遊戲經過時間
+                                                                                //  battleState = battleAIState.GetState();
+            if (battleAttr.combo > _maxCombo) _maxCombo = battleAttr.combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
+            if (battleAttr.score > _maxScore) _maxScore = battleAttr.score; // 更新最高分
 
             // Update BotAI
             if (Global.MemberType == MemberType.Bot)
@@ -197,7 +199,7 @@ public class BattleSystem : IGameSystem
     /// </summary>
     private void GoodGame()
     {
-        if ( battleAttr.gameTime >= Global.GameTime || _life == 0 || _otherLife == 0)
+        if (battleAttr.gameTime >= Global.GameTime || battleAttr.life == 0 || battleAttr.otherLife == 0)
         {
             Global.isGameStart = false;
             List<string> columns = new List<string>();
@@ -205,11 +207,11 @@ public class BattleSystem : IGameSystem
             columns.Add("Rank");
             columns.Add("Exp");
             columns.Add("ItemCount");
-            string jMicesUseCount = MiniJSON.Json.Serialize(dictMiceUseCount);
-            string jItemsUseCount = MiniJSON.Json.Serialize(dictItemUseCount);
+            string jMicesUseCount = MiniJSON.Json.Serialize(_dictMiceUseCount);
+            string jItemsUseCount = MiniJSON.Json.Serialize(_dictItemUseCount);
 
-            Global.photonService.GameOver((short)_gameScore, (short)_otherScore, (short) battleAttr.gameTime, _maxCombo, _killMice, _lostMice, spawnCount, jMicesUseCount, jItemsUseCount, columns.ToArray());
-            Debug.Log("GameOver Time! " +  battleAttr.gameTime + "    jMicesUseCount:" + jMicesUseCount + "jItemsUseCount:" + jItemsUseCount + "  _maxCombo:" + _maxCombo);
+            Global.photonService.GameOver((short)_gameScore, (short)battleAttr.otherScore, (short)battleAttr.gameTime, _maxCombo, _killMice, _lostMice, _spawnCount, jMicesUseCount, jItemsUseCount, columns.ToArray());
+            Debug.Log("GameOver Time! " + battleAttr.gameTime + "    jMicesUseCount:" + jMicesUseCount + "jItemsUseCount:" + jItemsUseCount + "  _maxCombo:" + _maxCombo);
         }
     }
 
@@ -220,10 +222,10 @@ public class BattleSystem : IGameSystem
             battleAIState.UpdateState();            // 更新SpawnState邏輯 這裡寫時間 Time + lastime + 間隔
             playerAIState.UpdatePlayerState();      // 更新PlayerState邏輯
 
-            if ( battleAttr.gameTime % 5 == 0)
+            if (battleAttr.gameTime % 5 == 0)
             {
-                _myDPS =  battleAttr.score / Time.timeSinceLevelLoad;
-                _otherDPS = _otherScore / Time.timeSinceLevelLoad;
+                _myDPS = battleAttr.score / Time.timeSinceLevelLoad;
+                _otherDPS = battleAttr.otherScore / Time.timeSinceLevelLoad;
                 //Debug.Log("_myDPS: " + _myDPS + "\n  _otherDPS: " + _otherDPS);
             }
         }
@@ -240,7 +242,7 @@ public class BattleSystem : IGameSystem
             MissionCombo++;
             _spawnCount++;
             _killMice++;
-            Global.photonService.UpdateScore(miceID,  battleAttr.combo, aliveTime);
+            Global.photonService.UpdateScore(miceID, battleAttr.combo, aliveTime);
         }
     }
     #endregion
@@ -250,18 +252,18 @@ public class BattleSystem : IGameSystem
     {
         if (Global.isGameStart)
         {
-            if (!_isInvincible)
+            if (!_bInvincible)
             {
                 Debug.Log("BattleSystem LostScore aliveTime:" + aliveTime);
                 //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
                 if (miceID != -1 && miceID > 10000 && miceID < 11000)
                 {
-                    if (!_isPropected)
+                    if (!_bPropected)
                     {
                         BreakCombo();
                     }
 
-                    Global.photonService.UpdateScore(miceID,  battleAttr.combo, aliveTime);
+                    Global.photonService.UpdateScore(miceID, battleAttr.combo, aliveTime);
                     _spawnCount++;
                     _lostMice++;
                 }
@@ -271,13 +273,13 @@ public class BattleSystem : IGameSystem
     #endregion
 
     #region UpadateEnergy 更新能量
-    public void UpadateEnergy(int value)
+    public void UpadateEnergy(short value)
     {
-        feverEnergy = Math.Min(feverEnergy++, 100);
+        _feverEnergy = Math.Min(_feverEnergy++, (short)100);
         _energy += value;
 
-        _energy = Math.Min(_energy, 100);
-        _energy = Math.Max(_energy, 0);
+        _energy = Math.Min(_energy, (short)100);
+        _energy = Math.Max(_energy, (short)0);
         //        Debug.Log(_energy);
     }
     #endregion
@@ -286,7 +288,7 @@ public class BattleSystem : IGameSystem
     public void UpdateUseCount(short miceID, short useCount)
     {
         Dictionary<string, object> data;
-        dictMiceUseCount.TryGetValue(miceID.ToString(), out data);
+        _dictMiceUseCount.TryGetValue(miceID.ToString(), out data);
         data["UseCount"] = useCount;
     }
     #endregion
@@ -296,75 +298,75 @@ public class BattleSystem : IGameSystem
         _nowCombo++;
         //如果還在連擊 增加連擊數
 
-        if ( battleAttr.isCombo)
-             battleAttr.combo++;
+        if (battleAttr.bCombo)
+            battleAttr.combo++;
 
-        if (_nowCombo == 5 && ! battleAttr.isCombo)
+        if (_nowCombo == 5 && !battleAttr.bCombo)
         {
-             battleAttr.isCombo = true;
-             battleAttr.combo = 5;
+            battleAttr.bCombo = true;
+            battleAttr.combo = 5;
             _nowCombo = 0;
         }
 
         // 補血
-        if ( battleAttr.combo != 0 &&  battleAttr.combo % _healthValue == 0)
+        if (battleAttr.combo != 0 && battleAttr.combo % _healthValue == 0)
         {
-            if (_life + 1 <= maxLife)
+            if (battleAttr.life + 1 <= _maxLife)
                 Global.photonService.UpdateLife(1, false);  // FUCK 錯誤 補血由伺服器判斷
         }
 
-        if ( battleAttr.isCombo)
-            battleHUD.ComboMsg( battleAttr.combo);
+        if (battleAttr.bCombo)
+            m_BattleUI.ComboMsg(battleAttr.combo);
     }
 
     public void BreakCombo()
     {
         if (Global.isGameStart)
         {
-            if (!_isInvincible || !_isPropected &&  battleAttr.combo != 0)
+            if (!_bInvincible || !_bPropected && battleAttr.combo != 0)
             {
                 Global.photonService.UpdateLife(-1, false); // FUCK 扣血要由伺服器判斷
-                 battleAttr.isCombo = false;           // 結束 連擊
-                 battleAttr.combo = 0;                 // 恢復0
+                battleAttr.bCombo = false;           // 結束 連擊
+                battleAttr.combo = 0;                 // 恢復0
                 _nowCombo = 0;
-                battleHUD.ComboMsg( battleAttr.combo);
+                m_BattleUI.ComboMsg(battleAttr.combo);
                 battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() + .1f, 0);
             }
         }
     }
 
-    void OnUpdateScore(Int16 score, Int16 energy)    // 更新分數時
+    void OnUpdateScore(short score, short energy)    // 更新分數時
     {
         //Debug.Log("Get Energy:" + energy);
         _tmpEnergy = energy /** 10*/;
 
-        if (_isPropected || _isInvincible)
+        if (_bPropected || _bInvincible)
             score = Math.Max((short)0, score);
         //        Debug.Log("(Update)OnUpdateScore" + value);
         if (Global.isGameStart)
         {
-            Int16 _tmpScore = (Int16)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+            short _tmpScore = (short)(score * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
             // 如果再交換分數任務下，則不取得自己增加的分數
-            if (missionSystem.MissionMode == MissionMode.Opening)
+            if (m_MissionSystem.MissionMode == MissionMode.Opening)
             {
-                if (missionSystem.Mission == Mission.Exchange && score > 0)
+                if (m_MissionSystem.Mission == Mission.Exchange && score > 0)
                 {
-                    _otherScore += _tmpScore;
-                    if ( battleAttr.combo >= 5)
+                    battleAttr.otherScore += _tmpScore;
+                    if (battleAttr.combo >= 5)
                         UpadateEnergy(_tmpEnergy);
                 }
 
-                if (missionSystem.Mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
-                     battleAttr.score = (this.score + _tmpScore > 0) ? ( battleAttr.score += _tmpScore) : 0;
+                if (m_MissionSystem.Mission == Mission.Exchange && score < 0)    // 如果再交換分數任務下，則取得自己減少的分數
+                    battleAttr.score = (battleAttr.score + _tmpScore > 0) ? (battleAttr.score += _tmpScore) : 0;
             }
 
-            if (missionSystem.Mission != Mission.Exchange)
+            if (m_MissionSystem.Mission != Mission.Exchange)
             {
-                 battleAttr.score = (this.score + _tmpScore < 0) ? 0 :  battleAttr.score += _tmpScore;
+                battleAttr.score = (battleAttr.score + _tmpScore < 0) ? 0 : battleAttr.score += _tmpScore;
                 if (_tmpScore > 0) _gameScore += _tmpScore;
             }
 
-            if ( battleAttr.combo >= 5)
+            if (battleAttr.combo >= 5)
                 UpadateEnergy(_tmpEnergy);
         }
         //        Debug.Log(_tmpEnergy);
@@ -372,35 +374,35 @@ public class BattleSystem : IGameSystem
 
 
 
-    void OnOtherScore(Int16 value, int energy)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
+    void OnOtherScore(short value, int energy)     // 接收對手分數 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊ＢＵＧ　接收對手分數要ｘ對方的倍率＊＊＊＊＊＊＊＊＊＊＊＊
     {
         if (Global.isGameStart)
         {
-            Int16 _tmpScore = (Int16)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
+            short _tmpScore = (short)(value * _scoreRate);  // 真實分數 = 獲得的分數 * 倍率(＊＊＊＊＊＊＊有可能被記憶體修改＊＊＊＊＊＊＊)
             // 如果再交換分數任務下，取得對方增加的分數
-            if (missionSystem.MissionMode == MissionMode.Opening)
+            if (m_MissionSystem.MissionMode == MissionMode.Opening)
             {
-                if (missionSystem.Mission == Mission.Exchange && value > 0)
+                if (m_MissionSystem.Mission == Mission.Exchange && value > 0)
                 {
-                     battleAttr.score += _tmpScore;
+                    battleAttr.score += _tmpScore;
                     _gameScore += _tmpScore;
                 }
 
-                if (missionSystem.Mission == Mission.Exchange && value < 0)
-                    _otherScore = (this.otherScore + _tmpScore > 0) ? (_otherScore += _tmpScore) : 0;
+                if (m_MissionSystem.Mission == Mission.Exchange && value < 0)
+                    battleAttr.otherScore = (battleAttr.otherScore + _tmpScore > 0) ? (battleAttr.otherScore += _tmpScore) : 0;
 
-                if (missionSystem.Mission == Mission.HarvestRate)
+                if (m_MissionSystem.Mission == Mission.HarvestRate)
                 {
                     Int16 otherScore = (Int16)(value * _otherRate);
-                    _otherScore = (this.otherScore + otherScore > 0) ? _otherScore += otherScore : 0;
+                    battleAttr.otherScore = (battleAttr.otherScore + otherScore > 0) ? battleAttr.otherScore += otherScore : 0;
                 }
             }
 
-            if (missionSystem.Mission != Mission.Exchange && missionSystem.Mission != Mission.HarvestRate)
-                _otherScore = (this.otherScore + _tmpScore < 0) ? 0 : _otherScore += _tmpScore;
+            if (m_MissionSystem.Mission != Mission.Exchange && m_MissionSystem.Mission != Mission.HarvestRate)
+                battleAttr.otherScore = (battleAttr.otherScore + _tmpScore < 0) ? 0 : battleAttr.otherScore += _tmpScore;
 
-            _otherEnergy = Math.Min(energy, 100);
-            _otherEnergy = Math.Max(energy, 0);
+          battleAttr.otherEnergy = Math.Min(energy, 100);
+            battleAttr.otherEnergy = Math.Max(energy, 0);
             //            Debug.Log("OtherEnergy:" + _otherEnergy);
         }
     }
@@ -410,16 +412,16 @@ public class BattleSystem : IGameSystem
         Debug.Log("On BattleManager missionReward: " + missionReward);
         if (Global.isGameStart)
         {
-            if (missionSystem.Mission == Mission.HarvestRate)
+            if (m_MissionSystem.Mission == Mission.HarvestRate)
             {
                 _scoreRate = 1;
             }
             else
             {
-                 battleAttr.score = (this.score + missionReward < 0) ? 0 :  battleAttr.score += missionReward;
+                battleAttr.score = (battleAttr.score + missionReward < 0) ? 0 : battleAttr.score += missionReward;
             }
 
-            if (missionSystem.Mission == Mission.DrivingMice)
+            if (m_MissionSystem.Mission == Mission.DrivingMice)
             {
                 MissionCombo = 0;
             }
@@ -427,14 +429,14 @@ public class BattleSystem : IGameSystem
         }
     }
 
-    void OnOtherMissionComplete(Int16 otherMissionReward)
+    void OnOtherMissionComplete(short otherMissionReward)
     {
         if (Global.isGameStart)
         {
-            if (missionSystem.Mission == Mission.HarvestRate)
+            if (m_MissionSystem.Mission == Mission.HarvestRate)
                 _scoreRate = 1;
             else
-                _otherScore = (this.otherScore + otherMissionReward < 0) ? 0 : _otherScore += otherMissionReward;
+                battleAttr.otherScore = (battleAttr.otherScore + otherMissionReward < 0) ? 0 : battleAttr.otherScore += otherMissionReward;
         }
     }
 
@@ -469,7 +471,7 @@ public class BattleSystem : IGameSystem
                 case Mission.HarvestRate:
                     {
                         Debug.Log("Rate:" + value);
-                        if ( battleAttr.score > _otherScore)
+                        if (battleAttr.score > battleAttr.otherScore)
                         {
                             _scoreRate -= ((float)value / 100); //scoreRate 在伺服器以整數百分比儲存 這裡是0~1 所以要/100
                         }
@@ -490,7 +492,7 @@ public class BattleSystem : IGameSystem
                 case Mission.WorldBoss:
                     {
                         // 如果要測試 可以把 value改成Boss的ID
-                       m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
+                        m_MPGame.GetPoolSystem().SpawnBoss(UI.hole[4].transform, value, 0.1f, 0.1f, 6, 60);//missionScore這裡是HP SpawnBoss 的屬性錯誤 手動輸入的
                         break;
                     }
             }
@@ -499,14 +501,13 @@ public class BattleSystem : IGameSystem
 
     private void GameConnStatusChk()
     {
-        if (checkTime > checkPoint)
+        if (_checkTime > (Time.time + _checkPoint))
         {
             Global.photonService.CheckStatus();
-            checkPoint += checkPoint;
+            _checkPoint += _checkPoint;
+            _checkTime = Time.time;
             Debug.Log("Check");
         }
-
-        checkTime += Time.deltaTime;
     }
 
 
@@ -524,16 +525,16 @@ public class BattleSystem : IGameSystem
         if (maxScore > Global.MaxScore)
         {
             Global.MaxScore = maxScore;
-            _isHighScore = true;
+            _bHighScore = true;
         }
 
         if (maxCombo > Global.MaxCombo)
         {
             Global.MaxCombo = maxCombo;
-            _isHighCombo = true;
+            _bHighCombo = true;
         }
 
-        battleHUD.GoodGameMsg(score, result, exp, sliverReward, goldReward, jItemReward, _maxCombo, _killMice, _lostMice, evaluate, _isHighScore, _isHighCombo);
+        m_BattleUI.GoodGameMsg(score, result, exp, sliverReward, goldReward, jItemReward, _maxCombo, _killMice, _lostMice, evaluate, _bHighScore, _bHighCombo);
         Global.photonService.LoadPlayerData(Global.Account);
     }
 
@@ -568,10 +569,10 @@ public class BattleSystem : IGameSystem
         Global.photonService.ReLoginEvent -= OnReLogin;
     }
 
-    public Dictionary<int, GameObject> GetSkillBossMice()
-    {
-        return dictSkillBossMice;
-    }
+    //public Dictionary<int, GameObject> GetSkillBossMice()
+    //{
+    //    return _dictSkillBossMice;
+    //}
 
     private void ClacPlayerLife() // 應該改成由伺服器接收 OnLoadPlayerLife
     {
@@ -580,15 +581,15 @@ public class BattleSystem : IGameSystem
         foreach (KeyValuePair<string, object> item in Global.dictTeam)
         {
             value = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
-            _life += value;
+            battleAttr.life += value;
         }
 
-        Global.photonService.UpdateLife(_life, true);    // FUCK 錯誤 生命由伺服器判斷
+        Global.photonService.UpdateLife(battleAttr.life, true);    // FUCK 錯誤 生命由伺服器判斷
 
         foreach (KeyValuePair<string, object> item in Global.OpponentData.Team)
         {
             value = Convert.ToInt16(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "Life", item.Key));
-            _otherLife += value;
+            battleAttr.otherLife += value;
         }
 
     }
@@ -618,17 +619,17 @@ public class BattleSystem : IGameSystem
 
     void OnUpdateLife(short value)
     {
-        _life = value;
+        battleAttr.life = value;
     }
 
     void OnGetOpponentLife(short value)
     {
-        _otherLife = value;
+        battleAttr.otherLife = value;
     }
 
     void OnApplySkillItem(int itemID)     // 收到技能攻擊 
     {
-        if (!_isReflection || !_isPropected)
+        if (!_bReflection || !_bPropected)
         {
             Debug.Log("OnApplySkillItem itemID:" + itemID);
 
@@ -648,7 +649,7 @@ public class BattleSystem : IGameSystem
 
     void OnLoadScene()
     {
-      //  Global.photonService.ApplySkillMiceEvent -= OnApplySkillMice;
+        //  Global.photonService.ApplySkillMiceEvent -= OnApplySkillMice;
         Global.photonService.ApplySkillItemEvent -= OnApplySkillItem;
         Global.photonService.LoadSceneEvent -= OnLoadScene;
     }
@@ -657,6 +658,7 @@ public class BattleSystem : IGameSystem
     {
         battleAIState.SetValue(0, 0, battleAIState.GetIntervalTime() - .1f, 0);
     }
+
     public void OnExit()
     {
         Global.photonService.KickOther();
@@ -678,21 +680,21 @@ public class BattleSystem : IGameSystem
 
 
     //---亂寫區域 ---
-    public static void SetInvincible(bool value)
+    public  void SetInvincible(bool value)
     {
-        _isInvincible = value;
+        _bInvincible = value;
     }
-    public static void SetPropected(bool value)
+    public  void SetPropected(bool value)
     {
-        _isPropected = value;
+        _bPropected = value;
     }
-    public static void SetRefelcetion(bool value)
+    public  void SetRefelcetion(bool value)
     {
-        _isReflection = value;
+        _bReflection = value;
     }
 
     // 要改private 現在是提供給TestPanel使用
-    public  IBattleAIState GetBattleAIState()
+    public IBattleAIState GetBattleAIState()
     {
         return battleAIState;
     }
@@ -716,22 +718,30 @@ public class BattleSystem : IGameSystem
 
     public Dictionary<string, Dictionary<string, object>> GetMiceUseCount()
     {
-        return dictMiceUseCount;
+        return _dictMiceUseCount;
     }
 
     public Dictionary<string, Dictionary<string, object>> GetItemUseCount()
     {
-        return dictItemUseCount;
+        return _dictItemUseCount;
     }
     public int GetEnergy()
     {
         return _energy;
     }
-
+    public int GetFeverEnergy()
+    {
+        return _feverEnergy;
+    }
     public List<GameObject> GetHole()
     {
         return UI.hole;
     }
+    public BattleAttr GetBattleAttr()
+    {
+        return battleAttr;
+    }
+
     //---亂寫區域 ---
     public override void Release()
     {
@@ -755,27 +765,27 @@ public class BattleSystem : IGameSystem
 
 
     // 外部取用 戰鬥資料
-    public Int16 combo { get { return  battleAttr.combo; } }
-    public Int16 maxCombo { get { return _maxCombo; } }
-    public int tmpCombo { get { return _nowCombo; } }
-    public /*static */float gameTime { get { return  battleAttr.gameTime; } }
-    public float score { get { return  battleAttr.score; } }
-    public float gameScore { get { return _gameScore; } }
-    public float otherScore { get { return _otherScore; } }
-    public float otherEnergy { get { return _otherEnergy; } }
-    public float maxScore { get { return _maxScore; } }
-    public int eggMiceUsage { get { return _eggMiceUsage; } }
-    public int energyUsage { get { return _energyUsage; } }
-    public Int16 lostMice { get { return _lostMice; } }
-    public int hitMice { get { return _killMice; } }
-    public Int16 spawnCount { get { return _spawnCount; } }
-    public float myDPS { get { return _myDPS; } }
-    public float otherDPS { get { return _otherDPS; } }
-    public static float Energy { get { return _energy; } }
-    public bool isCombo { get { return  battleAttr.isCombo; } }
+    //public Int16 combo { get { return battleAttr.combo; } }
+    //public Int16 maxCombo { get { return _maxCombo; } }
+    //public int tmpCombo { get { return _nowCombo; } }
+    //public /*static */float gameTime { get { return battleAttr.gameTime; } }
+    //public float score { get { return battleAttr.score; } }
+    //public float gameScore { get { return _gameScore; } }
+    //public float otherScore { get { return battleAttr.otherScore; } }
+    //public float otherEnergy { get { return _otherEnergy; } }
+    //public float maxScore { get { return _maxScore; } }
+    //public int eggMiceUsage { get { return _eggMiceUsage; } }
+    //public int energyUsage { get { return _energyUsage; } }
+    //public Int16 lostMice { get { return _lostMice; } }
+    //public int hitMice { get { return _killMice; } }
+    //public Int16 spawnCount { get { return _spawnCount; } }
+    //public float myDPS { get { return _myDPS; } }
+    //public float otherDPS { get { return _otherDPS; } }
+    //public static float Energy { get { return _energy; } }
+    //public bool isCombo { get { return battleAttr.bCombo; } }
 
-    public short life { get { return _life; } }
-    public short OtherLife { get { return _otherLife; } }
+    //public short life { get { return battleAttr.life; } }
+    //public short OtherLife { get { return battleAttr.otherLife; } }
     /* 超亂亂數
 * using System;
 public Guid RNGGuid() // 超亂亂數
