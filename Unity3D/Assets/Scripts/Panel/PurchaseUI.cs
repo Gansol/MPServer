@@ -326,7 +326,7 @@ public class PurchaseUI : IMPPanelUI
     }
     #endregion
 
-    #region -- OnLoad   --
+    #region -- OnLoadPanel   --
     /// <summary>
     /// 當載入Panel時，載入資料
     /// </summary>

@@ -37,11 +37,11 @@ public class HardBattleAIState : IBattleAIState
 
         if ((battleAttr.score > carzyScore && battleAttr.combo > carzyCombo) || (battleAttr.score > carzyMaxScore && battleAttr.combo > carzyCombo) || battleAttr.gameTime > stateAttr.nextStateTime)
         {
-            MPGame.Instance.GetBattleSystem().SetSpawnState(new CrazyBattleAIState( battleAttr));
+            MPGame.Instance.GetBattleSystem().SetBattleAIState(new CrazyBattleAIState( battleAttr));
         }
         else if (battleAttr.combo < hardCombo && battleAttr.score < hardMaxScore && battleAttr.gameTime < stateAttr.pervStateTime)
         {
-            MPGame.Instance.GetBattleSystem().SetSpawnState(new NormalBattleAIState( battleAttr));
+            MPGame.Instance.GetBattleSystem().SetBattleAIState(new NormalBattleAIState( battleAttr));
         }
         else if (battleAttr.gameTime > stateAttr.lastTime + stateAttr.spawnOffset)
         {

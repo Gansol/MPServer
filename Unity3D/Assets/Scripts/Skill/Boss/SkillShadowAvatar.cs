@@ -52,7 +52,7 @@ public class ShadowAvatarSkill : SkillBoss
         skillFlag = true;
 
         int rnd = Random.Range(0, data.Length);
-        List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetHole();
+        List<GameObject> hole = MPGame.Instance.GetBattleSystem().GetBattleAttr().hole;
 
         //MPGFactory.GetCreatureFactory().SpawnBy1D(short.Parse(creature.m_go.name), data, 3.5f, 0, 0, 0, 0, true, false);
         //correctMice = hole[data[rnd]].transform;
@@ -60,7 +60,7 @@ public class ShadowAvatarSkill : SkillBoss
         // 這是原本的程式碼 有把實體化的老鼠加入陣列
         for (int i = 0; i < data.Length; i++)
         {
-            dictMice.Add(hole[data[i]].transform, m_PoolSystem.InstantiateMice(System.Convert.ToInt16(go.name), 3.5f, hole[data[i]].transform, true));
+            dictMice.Add(hole[data[i]].transform, MPGFactory.GetCreatureFactory().SpawnByOne(System.Convert.ToInt16(go.name), 3.5f, hole[data[i]].transform, true));
             if (i == rnd) correctMice = hole[data[i]].transform;
         }
 

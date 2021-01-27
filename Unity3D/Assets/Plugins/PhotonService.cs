@@ -44,12 +44,12 @@ public class PhotonService : IPhotonPeerListener
     public event ApplySkillItemHandler ApplySkillItemEvent;
 
     //委派事件 接收分數、對手分數
-    public delegate void UpdateScoreHandler(Int16 score, Int16 energy);
+    public delegate void UpdateScoreHandler(short score, short energy);
     public event UpdateScoreHandler UpdateScoreEvent;
 
 
     //委派事件 接收對手分數
-    public delegate void ScoreHandler(Int16 score, int energy);
+    public delegate void ScoreHandler(Int16 score, short energy);
     public event ScoreHandler OtherScoreEvent;
 
     //委派事件 接收對手BOSS傷害、接收BOSS受傷
@@ -118,11 +118,11 @@ public class PhotonService : IPhotonPeerListener
 
     public class PlayerItemData
     {
-        public string itemID { get; set; }
-        public string itemCount { get; set; }
-        public string itemType { get; set; }
-        public string isEquip { get; set; }
-        public string useCount { get; set; }
+        public string itemID;
+        public string itemCount;
+        public string itemType;
+        public string isEquip;
+        public string useCount;
     }
 
     public bool ServerConnected
@@ -221,6 +221,8 @@ public class PhotonService : IPhotonPeerListener
                 Global.OpponentData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
                 Global.OpponentData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
                 Global.nextScene = Global.Scene.Battle;
+
+             //   ExitWaitingEvent(); 錯誤 這是為了 MatchFriend寫的
                 ExitWaitingRoom();
                 LoadSceneEvent();
                 break;
@@ -306,7 +308,7 @@ public class PhotonService : IPhotonPeerListener
             //接收傷害
             case (byte)BattleResponseCode.Damage:
                 Int16 score = (Int16)eventResponse.Parameters[(byte)BattleParameterCode.Damage];
-                UpdateScoreEvent(score, 0);
+                UpdateScoreEvent(score, (byte)0);
                 //Debug.Log("GET OTHER:" + damage);
                 break;
 
@@ -926,7 +928,7 @@ public class PhotonService : IPhotonPeerListener
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
                             Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];
-                            Int16 energy = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Energy];
+                            byte energy = (byte)operationResponse.Parameters[(byte)BattleParameterCode.Energy];
                             UpdateScoreEvent(score, energy);
                         }
                     }

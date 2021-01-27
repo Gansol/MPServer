@@ -70,7 +70,7 @@ public class MiceAnimState : IAnimatorState
                 {
                     if (_animTime >= _deadTime / 3 && _animTime < _deadTime)
                     {
-                        Debug.Log("_animTime >= _deadTime / 3 && _animTime < _deadTime   " + _animTime + "   "+ _deadTime / 3 + "   " + _animTime + "   " + _deadTime);
+                     //   Debug.Log("_animTime >= _deadTime / 3 && _animTime < _deadTime   " + _animTime + "   "+ _deadTime / 3 + "   " + _animTime + "   " + _deadTime);
                         _bAnimationDown = true;
                     }
                     else if (_animTime >= _deadTime)   // 動畫撥放完畢時

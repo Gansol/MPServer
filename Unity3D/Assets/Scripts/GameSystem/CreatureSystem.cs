@@ -73,9 +73,17 @@ public class CreatureSystem : IGameSystem
                 // 如果老鼠HP>0 且逃離動畫播放完畢( 錯誤 應使用時間判斷) = 老鼠逃跑 
                 if (creature.Value.GetArribute().GetHP() > 0 && mice.GetAminState().GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.MiceRunAway)
                 {
-                    //斷COMBO、損失分數、加入等待移除列表
-                    m_MPGame.GetBattleSystem().BreakCombo();
-                    m_MPGame.GetBattleSystem().LostScore(short.Parse(miceClass.Key), mice.GetSurvivalTime());
+                    if (mice.GetArribute().name != "bali") //bali 錯誤
+                    {
+                        Debug.Log(mice.GetArribute().name);
+                        //斷COMBO、損失分數、加入等待移除列表
+                        m_MPGame.GetBattleSystem().BreakCombo();
+                        m_MPGame.GetBattleSystem().LostScore(short.Parse(miceClass.Key), mice.GetSurvivalTime());
+                    }
+                    else
+                    {
+                        Debug.Log("Bali");
+                    }
                     dictWaitingRemoveMice.Add(creature.Key, creature.Value);
                 }
             }
@@ -212,5 +220,13 @@ public class CreatureSystem : IGameSystem
                     mice.Value.m_go.SendMessage("OnEffect", skillName);
             }
         }
+    }
+
+    public override void Release()
+    {
+        base.Release();
+        dictBattleMice.Clear();
+        dictHoleMiceRefs.Clear();
+        dictWaitingRemoveMice.Clear();
     }
 }

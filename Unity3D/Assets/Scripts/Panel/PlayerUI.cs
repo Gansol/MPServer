@@ -106,7 +106,7 @@ public class PlayerUI : IMPPanelUI
             m_AssetLoaderSystem.Initialize();
             _LoadedAsset = false;
             InstantiateEquipIcon(Global.playerItem, UI.weaponEquip.transform, (int)StoreType.Armor);
-            LoadPlayerAvatorIcon();
+            InstantiatePlayerAvatorIcon();
             LoadPlayerInfo();
             LoadPlayerRecord();
             ResumeToggleTarget();
@@ -156,13 +156,43 @@ public class PlayerUI : IMPPanelUI
     /// </summary>
     protected override void GetMustLoadAsset()
     {
-        List<string> notLoadedAssetNameList;
+        //List<string> notLoadedAssetNameList;
+
+        //// 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
+        //if (_bFirstLoad)
+        //{
+        //    m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
+        //    notLoadedAssetNameList = m_AssetLoaderSystem.GetDontNotLoadAssetName(Global.playerItem, Global.itemProperty);
+        //    _bFirstLoad = false;
+        //}
+        //else
+        //{
+        //    // 排除過時資料
+        //    LoadProperty.ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedItemRefs);
+        //    LoadProperty.ExpectOutdataObject(Global.playerItem, _dictItemData, dictLoadedEquipedRefs);
+
+        //    // Where 找不存在的KEY 再轉換為Dictionary
+        //    _dictItemData = Global.playerItem.Where(kvp => !_dictItemData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        //    notLoadedAssetNameList = m_AssetLoaderSystem.GetDontNotLoadAssetName(_dictItemData, Global.itemProperty);
+        //}
+
+
+        List<string> notLoadedAssetNameList = new List<string>();
 
         // 如果是第一次載入 取得未載入物件。 否則 取得相異(新的)物件
         if (_bFirstLoad)
         {
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);  // 載入背包背景資產
-            notLoadedAssetNameList = GetDontNotLoadAssetName(Global.playerItem, Global.itemProperty);
+
+
+            foreach (KeyValuePair<string, object> item in Global.playerItem)
+            {
+                object serverBundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", item.Key);
+
+                if (serverBundleName != null)
+                    notLoadedAssetNameList.Add(serverBundleName.ToString());
+            }
             _bFirstLoad = false;
         }
         else
@@ -174,7 +204,13 @@ public class PlayerUI : IMPPanelUI
             // Where 找不存在的KEY 再轉換為Dictionary
             _dictItemData = Global.playerItem.Where(kvp => !_dictItemData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            notLoadedAssetNameList = GetDontNotLoadAssetName(_dictItemData, Global.itemProperty);
+            foreach (KeyValuePair<string, object> item in _dictItemData)
+            {
+                object serverBundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", item.Key);
+
+                if (serverBundleName != null)
+                    notLoadedAssetNameList.Add(serverBundleName.ToString());
+            }
         }
 
         // 載入老鼠ICON
@@ -227,11 +263,11 @@ public class PlayerUI : IMPPanelUI
     }
     #endregion
 
-    #region -- LoadPlayerAvatorIcon 載入 玩家頭像 -- 
+    #region -- InstantiatePlayerAvatorIcon 載入 玩家頭像 -- 
     /// <summary>
-    /// 載入 玩家頭像
+    /// 實體化 玩家頭像
     /// </summary>
-    private void LoadPlayerAvatorIcon()
+    private void InstantiatePlayerAvatorIcon()
     {
         // 如果尚未載入玩家頭像 實體化
         if (UI.playerImageBtn.transform.childCount == 0)
@@ -258,7 +294,7 @@ public class PlayerUI : IMPPanelUI
         // 如果還沒建立 背包道具
         if (itemPanel.transform.childCount == 0)
         {
-            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, (int)StoreType.Mice);
+            _lastEmptyItemGroup = MPGFactory.GetObjFactory().CreateEmptyObject(itemPanel, (int)StoreType.Mice);
             Vector2 pos = new Vector2();
             int i = 0;
 
@@ -306,7 +342,7 @@ public class PlayerUI : IMPPanelUI
 
         if (itemPanel.transform.childCount == 0)                // 如果還沒建立道具
         {
-            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, _itemType);
+            _lastEmptyItemGroup = MPGFactory.GetObjFactory().CreateEmptyObject(itemPanel, _itemType);
             Vector2 pos = new Vector2();
             int i = 0;
 
@@ -371,48 +407,49 @@ public class PlayerUI : IMPPanelUI
             var nestedData = item.Value as Dictionary<string, object>;
 
             nestedData.TryGetValue("ItemID", out object itemID);
-            string itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID.ToString()).ToString();
-
+            object itemName = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.itemProperty, "ItemName", itemID);
+            if (itemName != null) { 
             // 如果道具不在裝備欄位 
-            if (!dictLoadedEquipedRefs.ContainsKey(itemName))
+            if (!dictLoadedEquipedRefs.ContainsKey(itemName.ToString()))
             {
                 object isEquip, type;
                 nestedData.TryGetValue("IsEquip", out isEquip);
                 nestedData.TryGetValue("ItemType", out type);
 
-                if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
-                {
-                    string bundleName = Global.IconSuffix + itemName;
-                    //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
-
-                    // 已載入資產時
-                    if (!string.IsNullOrEmpty(bundleName) && m_AssetLoaderSystem.GetAsset(bundleName) != null)
+                    if (System.Convert.ToBoolean(isEquip) && System.Convert.ToInt32(type) == itemType)                                // 如果道具是裝備狀態
                     {
-                        // 如果沒有ICON才實體化
-                        if (equipIconParent.childCount == 0)
+                        string bundleName = Global.IconSuffix + itemName;
+                        //  string bundleName = AssetBundleManager.GetAssetBundleNamePath(Global.IconSuffix + itemName);
+
+                        // 已載入資產時
+                        if (!string.IsNullOrEmpty(bundleName) && m_AssetLoaderSystem.GetAsset(bundleName) != null)
                         {
-                            equipIconParent.parent.name = itemID.ToString();
-                            equipIconParent.parent.tag = "Equip";
+                            // 如果沒有ICON才實體化
+                            if (equipIconParent.childCount == 0)
+                            {
+                                equipIconParent.parent.name = itemID.ToString();
+                                equipIconParent.parent.tag = "Equip";
 
-                            UIEventListener.Get(equipIconParent.parent.gameObject).onClick = OnEquipClick;
-                            GameObject equipIconAsset = m_AssetLoaderSystem.GetAsset(bundleName);
-                            equipIconAsset = MPGFactory.GetObjFactory().Instantiate(equipIconAsset, equipIconParent, bundleName, Vector3.zero, Vector3.one, new Vector2(_iconSize.x, _iconSize.y), _iconDepth);
+                                UIEventListener.Get(equipIconParent.parent.gameObject).onClick = OnEquipClick;
+                                GameObject equipIconAsset = m_AssetLoaderSystem.GetAsset(bundleName);
+                                equipIconAsset = MPGFactory.GetObjFactory().Instantiate(equipIconAsset, equipIconParent, bundleName, Vector3.zero, Vector3.one, new Vector2(_iconSize.x, _iconSize.y), _iconDepth);
 
-                            // 刪除 weapon拖曳按鈕 錯誤 暫時移除的方法
-                            GameObject.Destroy(equipIconAsset.GetComponentInParent<ButtonSwitcher>());
-                            GameObject.Destroy(equipIconAsset.GetComponentInParent<UIDragObject>());
-                            GameObject.Destroy(equipIconAsset.GetComponentInParent<Rigidbody>());
+                                // 刪除 weapon拖曳按鈕 錯誤 暫時移除的方法
+                                GameObject.Destroy(equipIconAsset.GetComponentInParent<ButtonSwitcher>());
+                                GameObject.Destroy(equipIconAsset.GetComponentInParent<UIDragObject>());
+                                GameObject.Destroy(equipIconAsset.GetComponentInParent<Rigidbody>());
 
-                            // 加入載入的裝備索引
-                            if (!dictLoadedEquipedRefs.ContainsKey(itemID.ToString()))
-                                dictLoadedEquipedRefs.Add(itemID.ToString(), equipIconParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
+                                // 加入載入的裝備索引
+                                if (!dictLoadedEquipedRefs.ContainsKey(itemID.ToString()))
+                                    dictLoadedEquipedRefs.Add(itemID.ToString(), equipIconParent.parent.gameObject);      // 參考至 老鼠所在的MiceBtn位置
 
-                            i++;
+                                i++;
+                            }
                         }
-                    }
-                    else
-                    {
-                        Debug.LogError("Can't get assetbundle or assetbundle name is null.");
+                        else
+                        {
+                            Debug.LogError("Can't get assetbundle or assetbundle name is null.");
+                        }
                     }
                 }
             }
@@ -539,7 +576,7 @@ public class PlayerUI : IMPPanelUI
     {
         //_bUpdateAvatarImage = true;
         // 重新載入玩家頭像
-        LoadPlayerAvatorIcon();
+        InstantiatePlayerAvatorIcon();
     }
 
     protected override int GetMustLoadedDataCount()

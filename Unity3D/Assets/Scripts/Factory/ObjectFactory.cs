@@ -96,6 +96,24 @@ public class ObjectFactory : IFactory
     }
     #endregion
 
+    #region -- CreateEmptyObject 建立空物件 --
+    /// <summary>
+    /// 建立空物件群組
+    /// </summary>
+    /// <param name="parent">上層物件</param>
+    /// <param name="itemType">群組類型(名稱)</param>
+    /// <returns></returns>
+    public GameObject CreateEmptyObject(Transform parent, int itemType)
+    {
+        GameObject emptyGroup = new GameObject(itemType.ToString());   // 商品物件空群組
+        emptyGroup.transform.parent = parent;
+        emptyGroup.layer = parent.gameObject.layer;
+        emptyGroup.transform.localPosition = Vector3.zero;
+        emptyGroup.transform.localScale = Vector3.one;
+        return emptyGroup;
+    }
+    #endregion
+
     //#region -- InstantiateMice 實體化老鼠 --
     ///// <summary>
     ///// 產生老鼠 還不完整
@@ -216,7 +234,7 @@ public class ObjectFactory : IFactory
     /// <param name="dictionary"></param>
     /// <param name="columns">ItemID SkillID etc</param>
     /// <param name="miceName"></param>
-    /// <returns></returns>
+    /// <returns>null = -1</returns>
     #region -- GetIDFromName --
     public int GetIDFromName(Dictionary<string, object> dictionary, string columns, string miceName)
     {
@@ -239,18 +257,19 @@ public class ObjectFactory : IFactory
     /// 從特定ID取得欄位資料
     /// </summary>
     /// <param name="dictionary">字典資料</param>
-    /// <param name="columns">欄位</param>
+    /// <param name="columns">欄位</param>c
     /// <param name="objectID">ID</param>
     /// <returns></returns>
-    public object GetColumnsDataFromID(Dictionary<string, object> dictionary, string columns, string objectID)
+    public T  GetColumnsDataFromID<T>(Dictionary<string, T> dictionary, string columns, T objectID)
     {
-        if (dictionary.TryGetValue(objectID, out object value))
+
+        if (dictionary.TryGetValue(objectID.ToString(), out T value))
         {
-            Dictionary<string, object> dictSkill = value as Dictionary<string, object>;
-            if (dictSkill.TryGetValue(columns, out value))
-                return value;
+            Dictionary<string, T> dictSkill = value as Dictionary<string, T>;
+            if (dictSkill.TryGetValue(columns, out T nestedValue))
+                return nestedValue;
         }
-        return -1;    //回傳 NULL會導致錯誤
+        return   default(T);    //回傳 NULL會導致錯誤
     }
 
     #region -- GetItemInfoFromType 取得特定(類別)道具詳細資料  --

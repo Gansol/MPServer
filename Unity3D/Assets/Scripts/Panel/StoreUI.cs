@@ -535,7 +535,7 @@ public class StoreUI : IMPPanelUI
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.StoreItemAssetName + Global.ext);  // 道具Slot
             _bLoadedAsset = LoadIconObjectsAssetByName(GetItemNameList(itemDetailData), _folderString);
         }
-        else if (GetDontNotLoadAssetName(itemDetailData).Count > 0)
+        else if (m_AssetLoaderSystem.GetDontNotLoadAssetName(itemDetailData).Count > 0)
         {
             _bLoadedAsset = LoadIconObjectsAssetByName(GetItemNameList(itemDetailData), _folderString);
         }

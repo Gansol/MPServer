@@ -71,7 +71,6 @@ public class MatchUI : IMPPanelUI
         _dictTeamData = new Dictionary<string, object>();
         _dictLoadedMiceBtnRefs = new Dictionary<string, GameObject>();
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
-
         _delayBetween2Clicks = 0.3f;
         _bFirstLoad = true;
     }
@@ -243,35 +242,33 @@ public class MatchUI : IMPPanelUI
     /// </summary>
     protected override void GetMustLoadAsset()
     {
-        List<string> notLoadedAssetList;
+        List<string> dictNotLoadedAsset;
 
         // 如果是第一次載入 載入全部資產 否則 載入必要資產
         if (_bFirstLoad)
         {
-            notLoadedAssetList = GetDontNotLoadAssetName(Global.dictMiceAll);
+            dictNotLoadedAsset = m_AssetLoaderSystem.GetDontNotLoadAssetName(Global.dictMiceAll);
         }
         else
         {
-            LoadItemCount(Global.playerItem, UI.mice_group.transform);
+            // 移除過舊資料
             LoadProperty.ExpectOutdataObject(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs);
             LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
-
             // Where 找不存在的KEY 再轉換為Dictionary
             Dictionary<string, object> newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            notLoadedAssetList = GetDontNotLoadAssetName(newAssetData);
+            dictNotLoadedAsset = m_AssetLoaderSystem.GetDontNotLoadAssetName(newAssetData);
         }
-
         // 如果 有未載入物件 載入AB
-        if (notLoadedAssetList.Count > 0)
+        if (dictNotLoadedAsset.Count > 0)
         {
             // _bLoadedEffect = LoadEffectAsset(dictNotLoadedAsset);    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-            _bLoadedAsset = LoadIconObjectsAssetByName(notLoadedAssetList, Global.MiceIconUniquePath);
+            _bLoadedAsset = LoadIconObjectsAssetByName(dictNotLoadedAsset, Global.MiceIconUniquePath);
         }
         else
         {
+            // 已載入物件 實體化
             _bLoadedAsset = true;
         }
-
         _dictMiceData = Global.dictMiceAll;
         _dictTeamData = Global.dictTeam;
     }
@@ -318,7 +315,7 @@ public class MatchUI : IMPPanelUI
     /// <returns></returns>
     private void MatchScrollText()
     {
-            UI.time_label.text = "(" + _escapeTime.ToString() + ")";
+        UI.time_label.text = "(" + _escapeTime.ToString() + ")";
     }
     #endregion
 
@@ -524,8 +521,8 @@ public class MatchUI : IMPPanelUI
     private void OnExitWaiting()
     {
         //matching_label.text = "等待超時，請重新配對！";
-        UI.beforeMatchPanel.SetActive(true);
         UI.matchingPanel.SetActive(false);
+        UI.beforeMatchPanel.SetActive(true);
         ShowPanel(m_RootUI.transform.GetChild(0).name);
     }
     #endregion
@@ -546,6 +543,7 @@ public class MatchUI : IMPPanelUI
     public override void ShowPanel(string panelName)
     {
         m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
+        //  EventMaskSwitch.LastPanel = m_RootUI;
         base.ShowPanel(panelName);
     }
 
@@ -558,8 +556,11 @@ public class MatchUI : IMPPanelUI
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
 
-        UI.beforeMatchPanel.SetActive(true);
-        UI.matchingPanel.SetActive(false);
+        if (UI != null)
+        {
+            UI.beforeMatchPanel.SetActive(true);
+            UI.matchingPanel.SetActive(false);
+        }
     }
     #endregion
 }

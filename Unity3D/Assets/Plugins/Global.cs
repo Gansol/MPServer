@@ -106,7 +106,7 @@ public static class Global
     public static bool isGameStart = false;         // 是否開始遊戲
     public static bool isApplySkill = false;        // 是否受到技能傷害
     public static bool spawnFlag = false;           // 是否產生完成
-    public static bool isMissionCompleted = false;  // 是否任務完成
+    //public static bool isMissionCompleted = false;  // 是否任務完成
     public static bool missionFlag = true;         // 是否執行任務
     public static bool exitingGame = false;         // 是否執行任務
     public static string prevScene = Scene.LogoScene;  // 上一個場景
