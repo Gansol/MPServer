@@ -105,6 +105,6 @@ public class HeroMice : IMice
 
     public override void Release()
     {
-        throw new System.NotImplementedException();
+        base.Release();
     }
 }

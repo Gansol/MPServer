@@ -37,7 +37,7 @@ public class BotAI
         foreach (int miceID in skillMiceIDs)
         {
             object value;
-            value = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", miceID.ToString());
+            value = MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemID", miceID);
             if (value != null)
                 _skillItemIDs.Add(int.Parse(value.ToString()));
         }

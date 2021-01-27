@@ -9,20 +9,37 @@ public class BattleUI : IMPPanelUI
     private BattleSystem m_BattleSystem;
     private AttachBtn_BattleUI UI;
 
+    #region -- Variables 變數 -- #endregion
     private Dictionary<string, object> _dictItemReward;
     private Transform rewardPanel;
+    private Color _blueLifeColor;
+    private Color _redLifeColor;
 
-    private Color _blueLifeColor, _redLifeColor;
-    private int _dataLoadedCount;
-    private float _beautyEnergy, _beautyOtherEnergy, _beautyFever, _beautyLife, _beautyOtherLife, energy, feverEnergy, blueLife, redLife, tmpBlueLifeBar, tmpRedLifeBar;
-    private float _tmpLife, _tmpOhterLife;
+    private int _dataLoadedCount;           // 資料載入量
+    private float _energy;                            // 能量
+    private float _myLife;                            // 生命
+    private float _otherLife;                       // 對手生命
+    private float _myMaxLife;                   // 最大生命
+    private float _feverEnergy;                 // fever能量
+    private float _ohterMaxLife;              // 對手最大生命
+    private float _tmpMyLifeBar;            // 生命條數值
+    private float _tmpOtherLifeBar;       // 對手生命條數值
+
+    private float _beautyLife;                     // 美化生命條數值
+    private float _beautyFever;                 // 美化FerverTime條數值
+    private float _beautyEnergy;               // 美化能量條數值
+    private float _beautyOtherLife;          // 美化對手生命條數值
+    private float _beautyOtherEnergy;    // 美化對手能量條數值
+
     [Range(0.1f, 1.0f)]
-    private float _beautyHP;                // 美化血條用
-    private bool _bLoadedPanel;
-    private bool _bLoadedAsset;
+    private float _beautyHP;                 // 美化血條用
+    private bool _bLoadedPanel;         // 是否載入Panel
+    private bool _bLoadedAsset;         // 是否載入資產
 
-                                            //  private bool bLoadPrefab;
-                                            //private double _energy;
+    //  private bool bLoadPrefab;
+    //private double _energy;
+    #endregion
+
 
     public BattleUI(MPGame MPGame) : base(MPGame)
     {
@@ -33,39 +50,54 @@ public class BattleUI : IMPPanelUI
     public override void Initialize()
     {
         Debug.Log("--------------- BattleUI Initialize ----------------");
+
+        m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
         m_RootUI = GameObject.Find(Global.Scene.BattleAsset.ToString());
         UI = m_RootUI.GetComponentInChildren<AttachBtn_BattleUI>();
-        _beautyHP = 0.5f;
-        //UI.WaitObject.transform.gameObject.SetActive(true); // 開始才顯示
-       
-        m_AssetLoaderSystem = MPGame.Instance.GetAssetLoaderSystem();
-       //m_AssetLoaderSystem.Initialize();
-        m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
-        m_AssetLoaderSystem.SetLoadAllAseetCompleted();
 
-        //_energy = 0d;
+        _dataLoadedCount = (int)ENUM_Data.None;
+        _beautyHP = 0.5f;
         _beautyEnergy = _beautyFever = 0f;
         UI.playerName.text = Global.Nickname;
         UI.otherPlayerName.text = Global.OpponentData.Nickname;
-        rewardPanel = UI.GGObject.transform.Find("Result").Find("Reward").GetChild(0).GetChild(0).GetChild(0);
-
         UI.avatarImage.spriteName = Global.PlayerImage;
         UI.otherAvatarImage.spriteName = Global.OpponentData.Image;
+        rewardPanel = UI.GoodGamePanel.transform.Find("Result").Find("Reward").GetChild(0).GetChild(0).GetChild(0);
 
-        _tmpLife = m_BattleSystem.GetBattleAttr().life;
-        _tmpOhterLife = m_BattleSystem.GetBattleAttr().otherLife;
+        _myMaxLife = m_BattleSystem.GetBattleAttr().life;
+        _ohterMaxLife = m_BattleSystem.GetBattleAttr().otherLife;
 
         _blueLifeColor = UI.BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = UI.RedLifeBar.GetComponent<UISprite>().color;
 
+        UIEventListener.Get(UI.exitBtn).onClick = OnClosed;
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
-        Global.photonService.LoadSceneEvent += OnLoadScene;
+     //   Global.photonService.LoadSceneEvent += OnLoadScene;
         Global.photonService.GameStartEvent += OnGameStart;
+      //  Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
+      //  Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
     }
 
     public override void Update()
     {
         base.Update();
+
+        //#region // 資料庫資料載入完成時 載入資產
+        //if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
+        //{
+        //    OnLoadPanel();
+        //}
+        //#endregion
+
+        //#region // 載入資產完成後 實體化 物件
+        //if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset /*&& _bLoadedEffect*/)
+        //{
+        //    Debug.Log("UI OK");
+        //    m_AssetLoaderSystem.Initialize();
+        //    _bLoadedAsset = false;
+        //    ResumeToggleTarget();
+        //}
+        //#endregion
 
         if (Global.isGameStart)
         {
@@ -90,7 +122,7 @@ public class BattleUI : IMPPanelUI
 
             if (UI.StartObject.activeSelf && !UI.WaitObject.activeSelf && Global.isGameStart)
             {
-              //  Debug.Log("Start 321................");
+                //  Debug.Log("Start 321................");
                 Animator startAnims = UI.StartObject.GetComponent<Animator>();
                 AnimatorStateInfo startState = startAnims.GetCurrentAnimatorStateInfo(0);             // 取得目前動畫狀態 (0) = Layer1
 
@@ -139,43 +171,29 @@ public class BattleUI : IMPPanelUI
             #endregion
         }
     }
+
+    #region -- OnGUI --
     public override void OnGUI()
     {
-        // load data
-        // load asset initialize
-        // instantiate
-        // game start
 
-        //if (_dataLoadedCount == GetMustLoadedDataCount() && !_bLoadedPanel)
-        //{
-        //    _bLoadedPanel = true;
-        //    GetMustLoadAsset();
-        //}
-
-        //// 載入資產完成後 實體化 物件
-        //if (m_AssetLoaderSystem.IsLoadAllAseetCompleted && _bLoadedAsset /*&& _bLoadedEffect*/)    // 可以使用了 只要畫SkillICON 並修改載入SkillICON
-        //{
-        //    _bLoadedAsset = true;
-        //}
-
-        #region // GUI 
         if (Global.isGameStart)
         {
             BattleState();
-            GUIVariables();
+            GUIShowVariables();
             ScoreBarAnim();
 
-            BeautyBar(UI.EnergyBar, energy, _beautyEnergy);
-            BeautyBar(UI.BlueEnergyBar, energy, _beautyEnergy);
+            BeautyBar(UI.EnergyBar, _energy, _beautyEnergy);
+            BeautyBar(UI.BlueEnergyBar, _energy, _beautyEnergy);
             BeautyBar(UI.RedEnergyBar, m_BattleSystem.GetBattleAttr().otherEnergy / 100f, _beautyOtherEnergy);
-            BeautyBar(UI.FeverBar, feverEnergy, _beautyFever);
-            BeautyBar(UI.BlueLifeBar, blueLife, _beautyLife);
-            BeautyBar(UI.RedLifeBar, redLife, _beautyOtherLife);
+            BeautyBar(UI.FeverBar, _feverEnergy, _beautyFever);
+            BeautyBar(UI.BlueLifeBar, _myLife, _beautyLife);
+            BeautyBar(UI.RedLifeBar, _otherLife, _beautyOtherLife);
         }
-        #endregion
-    }
 
-    #region  BattleState 顯示目前遊戲狀態
+    }
+    #endregion
+
+    #region  -- BattleState 顯示目前遊戲狀態 --
     // 顯示目前BattleState ICON
     private void BattleState()
     {
@@ -200,16 +218,18 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region GUIVariables GUI數值顯示
+    #region -- GUIShowVariables GUI數值顯示 --
     // GUI 顯示數值
-    private void GUIVariables()
+    private void GUIShowVariables()
     {
-        energy = m_BattleSystem.GetEnergy() / 100f;
-        feverEnergy = m_BattleSystem.GetFeverEnergy() / 100f;
-        blueLife = m_BattleSystem.GetBattleAttr().life / _tmpLife;
-        redLife = m_BattleSystem.GetBattleAttr().otherLife / _tmpOhterLife;
-        tmpBlueLifeBar = UI.BlueLifeBar.value;
-        tmpRedLifeBar = UI.RedLifeBar.value;
+        _myLife = m_BattleSystem.GetBattleAttr().life / _myMaxLife;
+        _otherLife = m_BattleSystem.GetBattleAttr().otherLife / _ohterMaxLife;
+        _energy = m_BattleSystem.GetBattleAttr().energy / 100f;
+        _feverEnergy = m_BattleSystem.GetBattleAttr().feverEnergy / 100f;
+
+        _tmpMyLifeBar = UI.BlueLifeBar.value;
+        _tmpOtherLifeBar = UI.RedLifeBar.value;
+
         UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_BattleSystem.GetBattleAttr().gameTime))).ToString();
         UI.BlueScoreLabel.text = m_BattleSystem.GetBattleAttr().score.ToString();         // 畫出分數值
         UI.RedScoreLabel.text = m_BattleSystem.GetBattleAttr().otherScore.ToString();     // 畫出分數值
@@ -224,27 +244,28 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region ScoreBarAnim 分數條動畫
+    #region -- ScoreBarAnim 分數條動畫 --
     private void ScoreBarAnim()
     {
-        float value = m_BattleSystem.GetBattleAttr().score / (m_BattleSystem.GetBattleAttr().score + m_BattleSystem.GetBattleAttr().otherScore);                      // 得分百分比 兩邊都是0會 NaN
+        // 得分百分比 兩邊都是0會 NaN
+        float scorePrecent = m_BattleSystem.GetBattleAttr().score / (m_BattleSystem.GetBattleAttr().score + m_BattleSystem.GetBattleAttr().otherScore);
 
-        if (_beautyHP == value)                                             // 如果HPBar值在中間 (0.5=0.5)
+        if (_beautyHP == scorePrecent)                                             // 如果HPBar值在中間 (0.5=0.5)
         {
-            UI.HPBar.value = value;
+            UI.HPBar.value = scorePrecent;
         }
-        else if (_beautyHP > value)                                         // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
+        else if (_beautyHP > scorePrecent)                                         // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
         {
             UI.HPBar.value = _beautyHP;                                        // 先等於目前值，然後慢慢減少
 
-            if (_beautyHP >= value)
+            if (_beautyHP >= scorePrecent)
                 _beautyHP -= 0.01f;                                         // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
         }
-        else if (_beautyHP < value)                                         // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
+        else if (_beautyHP < scorePrecent)                                         // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
         {
             UI.HPBar.value = _beautyHP;                                        // 先等於目前值，然後慢慢增加
 
-            if (_beautyHP <= value)
+            if (_beautyHP <= scorePrecent)
                 _beautyHP += 0.01f;                                         // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
         }
         else if (m_BattleSystem.GetBattleAttr().score == 0 && m_BattleSystem.GetBattleAttr().otherScore == 0)
@@ -264,11 +285,11 @@ public class BattleUI : IMPPanelUI
     #region EnergyTextAnim 能量數值(數字) 動畫 ***還沒寫***
     private void EnergyTextAnim()
     {
-        UI.energyLabel.text = m_BattleSystem.GetEnergy().ToString();
+        UI.energyLabel.text = m_BattleSystem.GetBattleAttr().energy.ToString();
     }
     #endregion
 
-    #region BeautyBar 平滑Slider動畫
+    #region -- BeautyBar 平滑Slider動畫 --
     /// <summary>
     /// 平滑Slider動畫
     /// </summary>
@@ -277,10 +298,9 @@ public class BattleUI : IMPPanelUI
     /// <param name="tmpValue"></param>
     private void BeautyBar(UISlider bar, float value, float tmpValue)
     {
-
         bar.value = Mathf.Lerp(bar.value, value, 0.1f);
 
-        if (value == Math.Round(bar.value, 6)) bar.value = tmpValue = value;
+        if (value == Math.Round(bar.value, 6)) bar.value /*= tmpValue */= value;
 
         //if (value > tmpValue)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
         //{
@@ -299,7 +319,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region ShowBossHPBar 顯示BossHP Bar
+    #region -- ShowBossHPBar 顯示BossHP Bar --
     /// <summary>
     /// 顯示BossHP Bar
     /// </summary>
@@ -321,7 +341,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region MissionMsg 任務訊息
+    #region -- MissionMsg 任務訊息 --
     public void MissionMsg(Mission mission, float value)
     {
         UI.MissionObject.SetActive(true);
@@ -357,7 +377,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region MissionCompletedMsg 任務完成訊息
+    #region -- MissionCompletedMsg 任務完成訊息 --
     public void MissionCompletedMsg(Mission mission, float missionReward)
     {
         if (missionReward != 0)     // ScorePlus 動畫
@@ -395,7 +415,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region OtherScoreMsg 顯示對手分數 訊息
+    #region -- OtherScoreMsg 顯示對手分數 訊息 --
     public void OtherScoreMsg(float missionReward)
     {
         if (missionReward != 0) // ScorePlus 動畫
@@ -417,7 +437,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region MissionFailedMsg 任務失敗訊息
+    #region -- MissionFailedMsg 任務失敗訊息 --
     /// <summary>
     /// 任務失敗訊息
     /// </summary>
@@ -440,7 +460,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region ComboMsg 連擊訊息
+    #region -- ComboMsg 連擊訊息 --
     public void ComboMsg(int value)
     {
         if (Global.isGameStart)
@@ -466,7 +486,7 @@ public class BattleUI : IMPPanelUI
     }
     #endregion
 
-    #region GoodGameMsg 遊戲結束訊息
+    #region -- GoodGameMsg 遊戲結束訊息 --
     /// <summary>
     /// 遊戲結束
     /// </summary>
@@ -478,7 +498,7 @@ public class BattleUI : IMPPanelUI
     public void GoodGameMsg(int score, bool result, int exp, int sliverReward, int goldReward, string jItemReward, int combo, int killMice, int lostMice, string evaluate, bool isHighScore, bool isHighCombo)
     {
         float maxExp = Clac.ClacExp(Global.Rank + 1);
-        float _exp = Global.Exp + exp;
+        float sumExp = Global.Exp + exp;
         float value;
         _dictItemReward = new Dictionary<string, object>(MiniJSON.Json.Deserialize(jItemReward) as Dictionary<string, object>);
 
@@ -488,34 +508,33 @@ public class BattleUI : IMPPanelUI
         InstantiateItemReward();
 
         // EXP動畫還沒寫
-        if (_exp > maxExp)
+        if (sumExp > maxExp)
         {
             Debug.Log("LEVEL UP!");
-            _exp -= maxExp;
+            sumExp -= maxExp;
         }
-        value = _exp;
+        value = sumExp;
         value /= maxExp;
-        Debug.Log("Exp Percent:" + value + " _exp:" + _exp);
+        Debug.Log("Exp Percent:" + value + " _exp:" + sumExp);
 
         // 顯示對戰結束 資訊
-        UI.GGObject.SetActive(true);
-        UI.GGObject.transform.Find(result == true ? "Win" : "Lose").gameObject.SetActive(true);
-        UI.GGObject.transform.Find("Result").Find("Score").GetComponent<UILabel>().text = score.ToString();
-        UI.GGObject.transform.Find("Result").Find("Combo").GetComponent<UILabel>().text = combo.ToString();
-        UI.GGObject.transform.Find("Result").Find("Kill").GetComponent<UILabel>().text = killMice.ToString();
-        UI.GGObject.transform.Find("Result").Find("Lost").GetComponent<UILabel>().text = lostMice.ToString();
-        UI.GGObject.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
-        UI.GGObject.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
-        UI.GGObject.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
+        UI.GoodGamePanel.SetActive(true);
+        UI.GoodGamePanel.transform.Find(result == true ? "Win" : "Lose").gameObject.SetActive(true);
+        UI.GoodGamePanel.transform.Find("Result").Find("Score").GetComponent<UILabel>().text = score.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Combo").GetComponent<UILabel>().text = combo.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Kill").GetComponent<UILabel>().text = killMice.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Lost").GetComponent<UILabel>().text = lostMice.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
+        UI.GoodGamePanel.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
     }
     #endregion
 
-    #region LoadItemICON 載入道具圖示
+    #region -- LoadItemICON 載入道具圖示 --
     private bool LoadItemICON()
     {
         if (_dictItemReward.Count != 0)
         {
-         //   m_AssetLoaderSystem.Initialize();
             foreach (KeyValuePair<string, object> item in _dictItemReward)
             {
                 string itemName = Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(Global.miceProperty, "ItemName", item.Key));
@@ -530,26 +549,32 @@ public class BattleUI : IMPPanelUI
     #endregion
 
     #region -- InstantiateRewardsBG 實體化背包物件背景--
-
-    private Dictionary<string, GameObject> InstantiateRewardsBG(Dictionary<string, object> itemData, string itemName, Transform parent, Vector2 offset)
+    /// <summary>
+    /// 實體化背包物件背景
+    /// </summary>
+    /// <param name="itemData">道具資料</param>
+    /// <param name="bgAssetName">道具名稱</param>
+    /// <param name="parent"></param>
+    /// <param name="offset">物件間格</param>
+    private void InstantiateRewardsBG(Dictionary<string, object> itemData, string bgAssetName, Transform parent, Vector2 offset)
     {
         Vector2 pos = new Vector2();
-        Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
+        //      Dictionary<string, GameObject> dictItem = new Dictionary<string, GameObject>();
 
-        foreach (KeyValuePair<string, object> item in itemData)
+        if (m_AssetLoaderSystem.GetAsset(bgAssetName) != null)                  // 已載入資產時
         {
-            if (m_AssetLoaderSystem.GetAsset(itemName) != null)                  // 已載入資產時
+        foreach (KeyValuePair<string, object> item in itemData)
             {
-                GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(itemName), parent, item.Key, new Vector3(pos.x, pos.y), Vector3.one, Vector2.zero, -1);
-                dictItem.Add(item.Key, go);    // 存入道具資料索引
+                GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(bgAssetName), parent, item.Key, pos, Vector3.one, Vector2.zero, -1);
+                //     dictItem.Add(item.Key, go);    // 存入道具資料索引
                 pos.x += offset.x;
             }
         }
-        return dictItem;
+        // return dictItem;
     }
     #endregion
 
-    #region InstantiateItemReward 顯示道具獎勵
+    #region -- InstantiateItemReward 顯示道具獎勵 --
     private void InstantiateItemReward()
     {
         // todo show itemReward goldReward
@@ -573,11 +598,17 @@ public class BattleUI : IMPPanelUI
                 i++;
             }
         }
-        //    bLoadPrefab = true;
     }
     #endregion
 
-    private void BarTweenColor(UISlider bar, Color toColor, Color defaultColor)
+    #region -- BarTweenColor Sprite底色變換 -- 
+    /// <summary>
+    /// Sprite底色變換
+    /// </summary>
+    /// <param name="bar">Sprite</param>
+    /// <param name="defaultColor">目前的顏色</param>
+    /// <param name="toColor">變換的顏色</param>
+    private void BarTweenColor(UISlider bar, Color defaultColor, Color toColor)
     {
         Color color = bar.GetComponent<UISprite>().color;
         // 0.137255   // green -35
@@ -588,7 +619,9 @@ public class BattleUI : IMPPanelUI
             bar.GetComponent<UISprite>().color = new Color(Mathf.Min(color.r - (defaultColor.r * (1 - bar.value)), 0), Mathf.Max(color.g + ((1 - defaultColor.g) * (1 - bar.value)), 1), Mathf.Min(color.b - ((defaultColor.b) * (1 - bar.value)), 0));
         //  color = new Color(1 - bar.value, color.g - color.g * (1 - bar.value), Math.Max(color.b - color.b * (1 - bar.value), 0));
     }
+    #endregion
 
+    #region -- HPBar_Shing HP減少閃爍動畫 (沒寫) -- 
     /// <summary>
     /// HPBar 受傷 閃爍
     /// </summary>
@@ -596,65 +629,92 @@ public class BattleUI : IMPPanelUI
     {
         Debug.Log("FUCK HPBar_Shing !");
     }
+    #endregion
 
+    #region -- OnWaitingPlayer 收到等待玩家開始 -- 
     void OnWaitingPlayer()
     {
+        // 顯示等待文字
         if (!Global.isGameStart)
             UI.WaitObject.transform.gameObject.SetActive(true);
     }
+    #endregion
 
-    void OnLoadScene()
+    #region -- OnLoadData 載入資料區 -- 
+    protected override void OnLoading()
     {
-
+        throw new NotImplementedException();
     }
+
+    //private void OnLoadScene()
+    //{
+    //    Debug.Log("OnLoadScene NotImplementedException");
+    //}
+
+    protected override void OnLoadPanel()
+    {
+        Debug.Log("OnLoadPanel NotImplementedException");
+    }
+
     //void OnLoadPlayerData()
     //{
+    //    Debug.Log("OnLoadPlayerData UI");
     //    _dataLoadedCount *= (int)ENUM_Data.PlayerData;
     //}
     //void OnLoadPlayerItem()
     //{
+    //    Debug.Log("OnLoadPlayerItem UI");
     //    _dataLoadedCount *= (int)ENUM_Data.PlayerItem;
     //}
 
+    protected override int GetMustLoadedDataCount()
+    {
+        Debug.Log("GetMustLoadedDataCount NotImplementedException");
+        return 0;
+    }
+    #endregion
+
+
+    #region -- OnGameStart 收到遊戲開始 -- 
     void OnGameStart()
     {
+        // 關閉等待文字 顯示開始文字
         Global.isGameStart = true;
+        UI.WaitObject.transform.gameObject.SetActive(false);
         UI.StartObject.SetActive(true);
         Debug.Log(" ----  Game Start!  ---- ");
     }
+    #endregion
 
-
+    #region -- OnExit 按下離開按扭時 -- 
     public override void OnClosed(GameObject go)
     {
-        throw new System.NotImplementedException();
+        m_BattleSystem.Release();
+        MPGame.Instance.GetCreatureSystem().Release();
+        MPGame.Instance.GetPoolSystem().Release();
+        MPGame.Instance.GetBattleUI().Release();
+        MPGame.Instance.GetMissionSystem().Release();
+        // 剔除對手 並離開房間
+        Global.photonService.KickOther();
+        Global.photonService.ExitRoom();
     }
+    #endregion
 
-
-
+    #region -- GetMustLoadAsset 載入必要資料  -- 
     protected override void GetMustLoadAsset()
     {
-        throw new System.NotImplementedException();
+       
     }
+    #endregion
 
-    protected override int GetMustLoadedDataCount()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    protected override void OnLoading()
-    {
-
-    }
-
-    protected override void OnLoadPanel()
-    {
-        throw new System.NotImplementedException();
-    }
-
+    #region -- Release  -- 
     public override void Release()
     {
         Global.photonService.WaitingPlayerEvent -= OnWaitingPlayer;
-        Global.photonService.LoadSceneEvent -= OnLoadScene;
+        //Global.photonService.LoadSceneEvent -= OnLoadScene;
         Global.photonService.GameStartEvent -= OnGameStart;
+       // Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
+      //  Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
     }
+    #endregion
 }

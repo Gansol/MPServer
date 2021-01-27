@@ -48,7 +48,7 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.MainGame)
         {
-           // m_AssetLoaderSystem.Initialize();
+           m_AssetLoaderSystem.Initialize();
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.MainGameAsset + Global.ext);
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.MusicsPath + "bgm_001" + Global.ext);
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.SoundsPath + "se_click001" + Global.ext);
@@ -58,8 +58,9 @@ public class SyncLoad : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == Global.Scene.Battle)
         {
-            //m_AssetLoaderSystem.Initialize();
+            m_AssetLoaderSystem.Initialize();
             m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.Scene.BattleAsset + Global.ext);
+            m_AssetLoaderSystem.LoadAssetFormManifest(Global.PanelUniquePath + Global.InvItemAssetName + Global.ext);
             m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             _bLoadScene = true;
         }

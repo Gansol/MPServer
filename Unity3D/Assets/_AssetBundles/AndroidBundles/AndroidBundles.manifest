@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 2960144898
+CRC: 1058602380
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -116,7 +116,7 @@ AssetBundleManifest:
       Dependencies:
         Dependency_0: itemicon/share/atlas_itemicon.unity3d
     Info_30:
-      Name: itemicon/unique/icon_iornhammer.unity3d
+      Name: itemicon/unique/icon_ironhammer.unity3d
       Dependencies:
         Dependency_0: itemicon/share/atlas_itemicon.unity3d
     Info_31:

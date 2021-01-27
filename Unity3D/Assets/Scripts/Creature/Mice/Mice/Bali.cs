@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class Bali : IMice
 {
-   // private BattleSystem battleManager;
+    // private BattleSystem battleManager;
     private float _lastTime, _survivalTime;     // 出生時間、存活時間
-  //  UICamera cam;
+                                                //  UICamera cam;
 
     public override void Initialize()
     {
@@ -81,9 +81,8 @@ public class Bali : IMice
             Debug.Log("Play Shadow");
     }
 
-public override void Release()
-{
-
-
-}
+    public override void Release()
+    {
+        base.Release();
+    }
 }

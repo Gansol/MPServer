@@ -115,7 +115,6 @@ public class TeamUI : IMPPanelUI
         {
             m_AssetLoaderSystem.Initialize();
             _bLoadedActor = false;
-            Debug.Log("CC");
             string actorName = _btnClick.gameObject.GetComponentInChildren<UISprite>().spriteName.Replace(Global.IconSuffix, "");
             InstantiateActor(actorName, UI.miceImage.transform, _actorScale);
         }
@@ -336,9 +335,7 @@ public class TeamUI : IMPPanelUI
         // 如果是第一次載入 載入全部資產 否則 載入必要資產
         if (_bFirstLoad)
         {
-            dictNotLoadedAsset = GetDontNotLoadAssetName(Global.dictMiceAll);
-            _dictMiceData = Global.dictMiceAll;
-            _dictTeamData = Global.dictTeam;
+            dictNotLoadedAsset = m_AssetLoaderSystem.GetDontNotLoadAssetName(Global.dictMiceAll);
         }
         else
         {
@@ -347,7 +344,7 @@ public class TeamUI : IMPPanelUI
             LoadProperty.ExpectOutdataObject(Global.dictTeam, _dictMiceData, _dictLoadedTeamBtnRefs);
             // Where 找不存在的KEY 再轉換為Dictionary
             Dictionary<string, object> newAssetData = Global.dictMiceAll.Where(kvp => !_dictMiceData.ContainsKey(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            dictNotLoadedAsset = GetDontNotLoadAssetName(newAssetData);
+            dictNotLoadedAsset = m_AssetLoaderSystem.GetDontNotLoadAssetName(newAssetData);
         }
         // 如果 有未載入物件 載入AB
         if (dictNotLoadedAsset.Count > 0)
@@ -360,6 +357,8 @@ public class TeamUI : IMPPanelUI
             // 已載入物件 實體化
             _bLoadedAsset = true;
         }
+        _dictMiceData = Global.dictMiceAll;
+        _dictTeamData = Global.dictTeam;
     }
     #endregion
 

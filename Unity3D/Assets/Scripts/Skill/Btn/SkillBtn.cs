@@ -8,7 +8,8 @@ public class SkillBtn : MonoBehaviour
 
     private int _energyValue;
     private bool _upFlag, _downFlag, _btnFlag, bClick;                                                          // 是否向上、是否向下、按鈕切換
-    private byte _useTimes, _skillTimes, _miceUseCount, _cost;                                                                // 使用次數、技能次數上限、使用量
+    private byte _useTimes, _skillTimes, _miceUseCount;                                                                // 使用次數、技能次數上限、
+    private short _cost;//使用量
     private short _miceID, _itemID, _skillID, _skillType, _miceCount, _itemCount, _miceUsed, _itemUsed; // 老鼠ID、道具ID、技能ID、技能類別、老鼠數量、道具數量、老鼠使用量、道具使用量
     private float _upDistance = 30, _lerpSpeedParm1 = 0.1f, lerpSpeedParm2 = 8f;   // 上升速度、能量值、加速參數1、加速參數2
 
@@ -56,9 +57,9 @@ public class SkillBtn : MonoBehaviour
     void Update()
     {
 
-        if (BattleSystem.Energy  >= _cost)
+        if (battleManager.GetBattleAttr().energy  >= _cost)
             AnimationColor(true);
-        if (BattleSystem.Energy < _cost)
+        if (battleManager.GetBattleAttr().energy < _cost)
             AnimationColor(false);
 
         //if (BattleManager.energy >= _energyValue && _upFlag)
@@ -80,16 +81,14 @@ public class SkillBtn : MonoBehaviour
             if (!_btnFlag)
             {
                 // 能量是否足夠使用技能
-                if (BattleSystem.Energy >= _cost && _miceCount > _miceUsed)
+                if (battleManager.GetBattleAttr().energy >= _cost && _miceCount > _miceUsed)
                 {
                     Global.photonService.SendSkillMice(_miceID, _cost);
-                    battleManager.UpadateEnergy(-_cost);
+                    battleManager.UpadateEnergy((short)-_cost);
                     
                     _useTimes++;
                     _miceUsed++;
-
-                    Dictionary<string, object> data = battleManager.GetMiceUseCount()[_miceID.ToString()];
-                    data["UseCount"] = _miceUsed;
+                    battleManager.UpdateMiceUseCount(_miceID, 1);
                 }
 
                 // to do change Item iamge
@@ -115,8 +114,7 @@ public class SkillBtn : MonoBehaviour
                 transform.GetChild(2).gameObject.SetActive(false);
                 _itemUsed++;
 
-                Dictionary<string, object> data = battleManager.GetItemUseCount()[_itemID.ToString()];
-                data["UseCount"] = _miceUsed;
+               battleManager.UpdateItemUseCount(_itemID, 1);
 
                 _btnFlag = !_btnFlag;
                 //if (_miceCount - _miceUsed != 0) { }

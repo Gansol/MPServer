@@ -14,14 +14,14 @@ public class Mice : IMice
         // m_AIState = null;
         // m_Arribute = null;
         // m_AnimState = null;
-       // m_AnimState.Init(m_go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
+        // m_AnimState.Init(m_go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime);
         m_go.transform.localPosition = new Vector3(0, 0);
         _lastTime = Time.fixedTime; // 出生時間
         MPGame.Instance.GetCreatureSystem().OnEffect += OnEffect;
     }
 
 
-    public override void  Update()
+    public override void Update()
     {
         if (Global.isGameStart && m_go.activeSelf)
         {
@@ -118,7 +118,12 @@ public class Mice : IMice
 
     public override void Release()
     {
-        SetAI(null);
+        base.Release();
+        //m_go = null;
+        //m_Skill = null;
+        //m_AnimState = null;
+        //m_Arribute = null;
+        //m_AI = null;
         MPGame.Instance.GetCreatureSystem().OnEffect -= OnEffect;
     }
 

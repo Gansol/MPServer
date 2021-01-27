@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 /* ***************************************************************
@@ -91,7 +92,7 @@ public class AssetLoaderSystem : IGameSystem
         if ((_dependenciesAssetCunter == _alreadyLoadDependenciesCount + _loadedDependenciesAssetCount) && _dependenciesAssetCunter > 0)
             _bLoadAllDependenciesAsset = true;  // 全部依賴資產已經載入
         // 全部依賴資產已經載入完成 不須載入
-        if ((_dependenciesAssetCunter == _alreadyLoadDependenciesCount)  && _dependenciesAssetCunter > 0)
+        if ((_dependenciesAssetCunter == _alreadyLoadDependenciesCount) && _dependenciesAssetCunter > 0)
             _bLoadAllDependenciesAsset = true;  // 全部依賴資產已經載入
 
         // 如果所有物件數量 = 已經載入物件 + 目前載入完成的物件
@@ -140,8 +141,8 @@ public class AssetLoaderSystem : IGameSystem
                 //foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
                 //    Debug.Log(dependencyManifestAssetPath);
 
-                    // 如果資源不存在
-                    if (!GetIsLoadedAssetbundle(manifestAssetName))
+                // 如果資源不存在
+                if (!GetIsLoadedAssetbundle(manifestAssetName))
                 {
                     // 載入Mainfest 中GameObject Dependencies資產物件
                     foreach (string dependencyManifestAssetPath in dependenciesManifestAssetPath)
@@ -157,7 +158,7 @@ public class AssetLoaderSystem : IGameSystem
                             _alreadyLoadDependenciesCount++;
                             Ret = "C001";
                             ReturnMessage = "(已載入依賴物件): " + dependencyManifestAssetPath;
-                           // Debug.Log("(已載入依賴物件): " + dependencyManifestAssetPath+ "  _alreadyLoadDependenciesCount:" + _alreadyLoadDependenciesCount);
+                            // Debug.Log("(已載入依賴物件): " + dependencyManifestAssetPath+ "  _alreadyLoadDependenciesCount:" + _alreadyLoadDependenciesCount);
                         }
                     }
                     // 載入遊戲物件
@@ -169,7 +170,7 @@ public class AssetLoaderSystem : IGameSystem
                     Ret = "C001";
                     ReturnMessage = "(已載入物件): " + manifestAssetName;
                     _loadedAssetCount++;
-                    _alreadyLoadDependenciesCount+= dependenciesManifestAssetPath.Length;
+                    _alreadyLoadDependenciesCount += dependenciesManifestAssetPath.Length;
                     // Debug.Log("(已載入遊戲物件): " + manifestAssetName + "  _loadedAssetCount: " + _loadedAssetCount);
                 }
             }
@@ -359,6 +360,49 @@ public class AssetLoaderSystem : IGameSystem
             return abRef.assetBundle;
         return null;
     }
+    #endregion
+
+    #region -- GetDontNotLoadAsset 取得未載入Asset --
+    /// <summary>
+    /// 取得未載入Asset
+    /// </summary>
+    /// <param name="dictAssetData"></param>
+    /// <returns></returns>
+    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictAssetData)
+    {
+        List<string> notLoadedAssetNameList = new List<string>();
+
+        // 取得未載入物件
+        foreach (KeyValuePair<string, object> item in dictAssetData)
+        {
+            string serverBundleName = item.Value.ToString();
+            if (serverBundleName != null)
+                if (GetAsset(serverBundleName.ToString()) == null)
+                    notLoadedAssetNameList.Add(serverBundleName);
+        }
+        return notLoadedAssetNameList;
+    }
+
+    ///// <summary>
+    ///// 取得未載入Asset (nestedDict)
+    ///// </summary>
+    ///// <param name="dictServer">NewAssetData</param>
+    ///// <param name="itemNameData">name Data(OldAssetData)</param>
+    ///// <returns></returns>
+    //public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictServer, Dictionary<string, object> itemNameData)
+    //{
+    //    List<string> notLoadedAssetNameList = new List<string>();
+    //    // 取得未載入物件
+    //    foreach (KeyValuePair<string, object> item in dictServer)
+    //    {
+    //        object serverBundleName = MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key);
+
+    //        if (serverBundleName!=null)
+    //            if (GetAsset(serverBundleName.ToString()) == null)
+    //            notLoadedAssetNameList.Add(serverBundleName.ToString());
+    //    }
+    //    return notLoadedAssetNameList;
+    //}
     #endregion
 
     #region -- SetLoadAllAseetCompleted 通知AssetLoader已經準備好全部要載入的Asset -- 

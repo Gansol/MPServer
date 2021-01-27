@@ -220,7 +220,6 @@ MonoBehaviour:
   StartObject: {fileID: 127784}
   ScorePlusObject: {fileID: 101414}
   OtherPlusObject: {fileID: 101418}
-  GGObject: {fileID: 101428}
   SkillArea: {fileID: 183280}
   BossHPBar: {fileID: 11401562}
   GameTime: {fileID: 11428638}
@@ -229,7 +228,10 @@ MonoBehaviour:
   - {fileID: 113626}
   - {fileID: 113628}
   - {fileID: 113624}
-  messagePanel: {fileID: 101762}
+  MessagePanel: {fileID: 101330}
+  GoodGamePanel: {fileID: 101428}
+  TestPanel: {fileID: 142894}
+  exitBtn: {fileID: 124396}
   hole:
   - {fileID: 101680}
   - {fileID: 101682}

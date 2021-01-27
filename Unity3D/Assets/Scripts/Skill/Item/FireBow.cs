@@ -49,7 +49,7 @@ public class FireBow : SkillItem
         GameObject bundle = assetLoader.GetAsset("effect_" + skillData.SkillName);
         
        // effects.Add(objFactory.Instantiate(bundle, GameObject.Find("HUD(Panel)").transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
-        effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, MPGame.Instance.GetBattleSystem().GetHole()[0].transform.parent.transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
+        effects.Add(MPGFactory.GetObjFactory().Instantiate(bundle, MPGame.Instance.GetBattleSystem().GetBattleAttr().hole[0].transform.parent.transform, "effect_" + skillData.SkillName, Vector3.zero, Vector3.one, Vector2.one, 1));
         effects[0].GetComponent<Animator>().Play("Layer1.Effect1",-1,0f);
 
         m_StartTime = Time.time;

@@ -26,13 +26,16 @@ public class AttachBtn_BattleUI : MonoBehaviour
     public GameObject StartObject;
     public GameObject ScorePlusObject;
     public GameObject OtherPlusObject;
-    public GameObject GGObject;
+    
     public GameObject SkillArea;
     public UISlider BossHPBar;
     public UILabel GameTime;
     public UILabel energyLabel;
     public GameObject[] StateICON;
-    public GameObject messagePanel;
+    public GameObject MessagePanel;
+    public GameObject GoodGamePanel;
+    public GameObject TestPanel;
+    public GameObject exitBtn;
     public List<GameObject> hole;
 
   [Range(0.1f, 1.0f)]

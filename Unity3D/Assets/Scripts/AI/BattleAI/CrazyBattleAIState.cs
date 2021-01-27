@@ -36,7 +36,7 @@ public class CrazyBattleAIState : IBattleAIState
     {
         if (battleAttr.combo < carzyCombo && battleAttr.score < carzyMaxScore && battleAttr.gameTime < stateAttr.pervStateTime)
         {
-            MPGame.Instance.GetBattleSystem().SetSpawnState(new HardBattleAIState( battleAttr));
+            MPGame.Instance.GetBattleSystem().SetBattleAIState(new HardBattleAIState( battleAttr));
         }
         else if (battleAttr.gameTime > stateAttr.lastTime + stateAttr.spawnOffset)
         {

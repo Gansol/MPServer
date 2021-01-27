@@ -18,7 +18,7 @@ using System.Collections;
 public class MPGame
 {
     // Panel開啟狀態
-    private static bool  _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
+    private static bool _bLoadPlayerPanel, _bLoadTeamPanel, _bLoadStorePanel, _bLoadMatchPanel, _bloadMainScene, _bLoadFriendPanel, _bLoadPurchasePanel, _bLoadTutorialPanel, _bLoadBattlelPanel;
     private static bool _loginStatus;                    // 登入狀態
     private static MPGame _instance = null;     // 單例實體化
 
@@ -121,11 +121,11 @@ public class MPGame
 
         if (_bLoadBattlelPanel)
         {
+            m_BattleUI.Update();
             m_BattleSystem.Update();
             m_PoolSystem.Update();
             m_CreatureSystem.Update();
             m_MissionSystem.Update();
-            m_BattleUI.Update();
         }
     }
     public void FixedUpdate()
@@ -186,17 +186,35 @@ public class MPGame
         switch (panelName.name)
         {
             case "menuui":
+                m_BattleUI.Release();
+                m_BattleSystem.Release();
+                m_PoolSystem.Release();
+                m_MissionSystem.Release();
+                m_CreatureSystem.Release();
+
                 m_MenuUI.Initialize();
                 m_LoginUI.Initialize();
+                _bLoadBattlelPanel = false;
                 _bloadMainScene = true;
                 break;
 
             case "gameui":
+                m_LoginUI.Release();
+                m_TeamUI.Release();
+                m_StoreUI.Release();
+                m_MenuUI.Release();
+                m_PlayerUI.Release();
+                m_MatchUI.Release();
+                m_FriendUI.Release();
+                m_TutorialUI.Release();
+                m_PurchaseUI.Release();
+
                 m_BattleUI.Initialize();
                 m_BattleSystem.Initialize();
                 m_PoolSystem.Initialize();
                 m_MissionSystem.Initialize();
                 _bLoadBattlelPanel = true;
+                _bloadMainScene = false;
                 break;
         }
     }

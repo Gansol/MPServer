@@ -810,7 +810,7 @@ namespace MPServer
 
                                 Actor actor = _server.Actors.GetActorFromAccount(account);
                                 Actor otherActor = _server.Actors.GetActorFromAccount(otherAccount);  // 用primaryID取得角色資料
-                                Log.Debug("otherAccount: " + otherAccount + "memberType: " + memberType);
+                                Log.Debug("otherAccount: " + otherAccount + "  memberType: " + memberType);
                                 MPServerPeer otherPeer;
 
 
@@ -818,7 +818,7 @@ namespace MPServer
                                 if (memberType != (byte)MemberType.Bot && otherActor != null)
                                 {
                                     otherPeer = _server.Actors.GetPeerFromGuid(otherActor.guid);
-                                    Log.Debug("otherActor.guid: " + otherActor.guid + "  " + otherActor.Nickname + "otherPeer: " + otherPeer.LocalIP);
+                                    Log.Debug("otherActor.guid: " + otherActor.guid + "  " + otherActor.Nickname + "  otherPeer: " + otherPeer.LocalIP);
                                     Dictionary<byte, object> parameter = new Dictionary<byte, object> { { (byte)MatchGameParameterCode.OtherAccount, account }, { (byte)MatchGameParameterCode.Nickname, actor.Nickname } };
                                     EventData eventData = new EventData((byte)MatchGameResponseCode.InviteMatchGame, parameter);
                                     otherPeer.SendEvent(eventData, new SendParameters());

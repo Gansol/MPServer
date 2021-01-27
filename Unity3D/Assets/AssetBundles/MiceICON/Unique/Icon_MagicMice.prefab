@@ -84,6 +84,6 @@ MonoBehaviour:
   bottomType: 1
   topType: 1
   mAtlas: {fileID: 11400000, guid: 9fa90fde179d63a46a4e0399dacea693, type: 2}
-  mSpriteName: icon_magicmic
+  mSpriteName: icon_magicmice
   mFixedAspect: 0
   mFillCenter: 1

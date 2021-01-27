@@ -79,5 +79,12 @@ public abstract class IMice : ICreature
         this.m_Arribute = arribute;
     }
 
-
+    public override void Release()
+    {
+        SetAI(null);
+        SetGameObject(null);
+        SetSkill(null);
+        SetAnimState(null);
+        SetArribute(null);
+    }
 }

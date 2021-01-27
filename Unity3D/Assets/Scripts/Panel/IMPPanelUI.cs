@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /* ***************************************************************
@@ -128,7 +129,7 @@ public abstract class IMPPanelUI
         // 如果還沒建立道具 實體化
         if (itemPanel.transform.childCount == 0)                                                            
         {
-            _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
+            _lastEmptyItemGroup =MPGFactory.GetObjFactory(). CreateEmptyObject(itemPanel, itemType);
             return InstantiateItemBGSub(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
         }
         else
@@ -143,7 +144,7 @@ public abstract class IMPPanelUI
             else if ((_lastEmptyItemGroup != itemPanel.Find(itemType.ToString())))   // 如果沒有對應道具類別資料 建立道具
             {
                 _lastEmptyItemGroup.SetActive(false);
-                _lastEmptyItemGroup = CreateEmptyObject(itemPanel, itemType);
+                _lastEmptyItemGroup = MPGFactory.GetObjFactory().CreateEmptyObject(itemPanel, itemType);
                 return InstantiateItemBGSub(itemData, itemName, itemType, _lastEmptyItemGroup.transform, itemData.Count, offset, tableCount, rowCount);
             }
         }
@@ -205,7 +206,7 @@ public abstract class IMPPanelUI
     }
     #endregion
 
-    #region -- LoadIconObject 載入載入ICON物件 --
+    #region -- LoadIconObjectsAssetByName 載入載入ICON物件 --
     /// <summary>
     /// 載入ICON物件 by BundleName
     /// </summary>
@@ -233,73 +234,14 @@ public abstract class IMPPanelUI
     }
     #endregion
 
-    #region -- CreateEmptyObject 建立空物件 --
-    /// <summary>
-    /// 建立空物件群組
-    /// </summary>
-    /// <param name="parent">上層物件</param>
-    /// <param name="itemType">群組類型(名稱)</param>
-    /// <returns></returns>
-    public GameObject CreateEmptyObject(Transform parent, int itemType)
-    {
-        GameObject emptyGroup = new GameObject(itemType.ToString());   // 商品物件空群組
-        emptyGroup.transform.parent = parent;
-        emptyGroup.layer = parent.gameObject.layer;
-        emptyGroup.transform.localPosition = Vector3.zero;
-        emptyGroup.transform.localScale = Vector3.one;
-        return emptyGroup;
-    }
-    #endregion
-
-    #region -- GetDontNotLoadAsset 取得未載入Asset --
-    /// <summary>
-    /// 取得未載入Asset
-    /// </summary>
-    /// <param name="dictAssetData"></param>
-    /// <returns></returns>
-    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictAssetData)
-    {
-        List<string> notLoadedAssetNameList = new List<string>();
-
-        // 取得未載入物件
-        foreach (KeyValuePair<string, object> item in dictAssetData)
-        {
-            string serverBundleName = item.Value.ToString();
-            if (!string.IsNullOrEmpty(serverBundleName) && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
-                notLoadedAssetNameList.Add(serverBundleName);
-        }
-        return notLoadedAssetNameList;
-    }
-
-    /// <summary>
-    /// 取得未載入Asset (nestedDict)
-    /// </summary>
-    /// <param name="dictServer"></param>
-    /// <param name="itemNameData">name Data</param>
-    /// <returns></returns>
-    public List<string> GetDontNotLoadAssetName(Dictionary<string, object> dictServer, Dictionary<string, object> itemNameData)
-    {
-        List<string> notLoadedAssetNameList = new List<string>();
-        // 取得未載入物件
-        foreach (KeyValuePair<string, object> item in dictServer)
-        {
-            string serverBundleName = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString());
-
-            if (!string.IsNullOrEmpty(serverBundleName) && serverBundleName != "-1" && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
-                notLoadedAssetNameList.Add(serverBundleName);
-        }
-        return notLoadedAssetNameList;
-    }
-    #endregion
-
     #region -- ResumeToggleTarget 復原視窗焦點 --
     /// <summary>
-    /// 復原視窗焦點
+    /// 復原視窗焦點(錯誤，目前只在Menu作用
     /// </summary>
     protected void ResumeToggleTarget()
     {
         EventMaskSwitch.Resume();
-        m_RootUI.transform.parent.GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel.SetActive(false);
+        m_RootUI.transform.parent.GetComponentInChildren<AttachBtn_MenuUI>().loadingPanel.SetActive(false); //錯誤 目前只在Menu作用
 
         EventMaskSwitch.Switch(m_RootUI);
         EventMaskSwitch.LastPanel = m_RootUI;
@@ -314,6 +256,7 @@ public abstract class IMPPanelUI
     /// <returns>Panel</returns>
     public virtual void ShowPanel(string panelName)
     {
+      //  EventMaskSwitch.LastPanel = m_RootUI;
         panelName = panelName.Replace("(Panel)", "");
         _activePanelName = panelName;
 
@@ -440,7 +383,7 @@ public abstract class IMPPanelUI
     }
     #endregion
 
-    #region   --  AddLoadedActorRefs加入 已載入的角色索引 --
+    #region   --  AddLoadedActorRefs 加入已載入的角色索引 --
     /// <summary>
     /// 加入 已載入的角色索引
     /// </summary>
@@ -497,24 +440,4 @@ public abstract class IMPPanelUI
     protected abstract int GetMustLoadedDataCount();    // 取得需要載入的資料總和
     public abstract void OnClosed(GameObject go);
     public abstract void Release();
-
-    ///// <summary>
-    ///// 取得未載入Asset (nestedDict)
-    ///// </summary>
-    ///// <param name="ServerDict"></param>
-    ///// <param name="itemNameData">name Data</param>
-    ///// <returns></returns>
-    //public Dictionary<string, object> GetDontNotLoadAsset(Dictionary<string, object> ServerDict, Dictionary<string, object> itemNameData)
-    //{
-    //    Dictionary<string, object> dictNotLoadedAsset = new Dictionary<string, object>();
-
-    //    foreach (KeyValuePair<string, object> item in ServerDict)       // 取得未載入物件
-    //    {
-    //        string serverBundleName = System.Convert.ToString(MPGFactory.GetObjFactory().GetColumnsDataFromID(itemNameData, "ItemName", item.Key.ToString()).ToString());
-
-    //        if (!string.IsNullOrEmpty(serverBundleName) && serverBundleName != "-1" && m_AssetLoaderSystem.GetAsset(serverBundleName) == null)
-    //            dictNotLoadedAsset.Add(item.Key.ToString(), serverBundleName);
-    //    }
-    //    return dictNotLoadedAsset;
-    //}
 }

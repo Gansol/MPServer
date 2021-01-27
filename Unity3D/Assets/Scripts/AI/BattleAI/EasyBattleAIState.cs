@@ -44,7 +44,7 @@ public class EasyBattleAIState : IBattleAIState
     {
         if ((battleAttr.score > normalScore && battleAttr.combo > normalCombo) || battleAttr.score > normalMaxScore || battleAttr.gameTime > stateAttr.nextStateTime)
         {
-          MPGame.Instance.GetBattleSystem().SetSpawnState(new NormalBattleAIState( battleAttr));
+          MPGame.Instance.GetBattleSystem().SetBattleAIState(new NormalBattleAIState( battleAttr));
         }
         else if (battleAttr.gameTime > stateAttr.lastTime + stateAttr.spawnOffset)
         {

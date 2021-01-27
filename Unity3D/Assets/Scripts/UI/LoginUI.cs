@@ -121,8 +121,8 @@ public class LoginUI : IMPPanelUI
 
 
 
-        m_RootUI = GameObject.Find("Login(Panel)");
-        UI = m_RootUI.GetComponentInChildren<AttachBtn_LoginUI>();
+        m_RootUI = GameObject.Find(Global.Scene.MainGameAsset).GetComponentInChildren<AttachBtn_MenuUI>().loginPanel ;
+        UI = m_RootUI.transform.GetChild(0).GetComponent<AttachBtn_LoginUI>();  // GetChild(0) 是因為隱藏會抓不到
 
         UIEventListener.Get(UI.gansolLoginBtn).onClick = Login;
         UIEventListener.Get(UI.joinBtn).onClick = ShowJoinPanel;

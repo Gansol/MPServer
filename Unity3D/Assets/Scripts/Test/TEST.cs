@@ -16,13 +16,20 @@ public class TEST : MonoBehaviour
     {
         // 第一個字母大寫
         //Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
+        object a = new object();
+        a = 10;
+        string s ="1";
+        Debug.Log(GetT(1));
+        Debug.Log(GetT("FUCK"));
+        Debug.Log(GetT(true));
+    }
 
-        string a = "ASSSS";
 
-        string s;
-        s = a.Replace("SSSS", "");
-        Debug.Log(s);
-        Debug.Log(a.Replace("D", ""));
+    public T GetT<T>(T haha)
+    {
+        if (haha != null)
+            return haha;
+        return default(T);
     }
 
 
