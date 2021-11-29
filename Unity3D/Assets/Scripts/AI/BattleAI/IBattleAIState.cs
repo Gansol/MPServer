@@ -59,18 +59,32 @@ public abstract class IBattleAIState
     /// <returns>routine</returns>
     protected virtual Coroutine Spawn(short miceID, BattleAIStateAttr stateAttr )
     {
-        //        Debug.Log(Time.time);
-        Random.InitState(unchecked((int)System.DateTime.Now.Ticks));
-        bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
-        // spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<SpawnAI>();
-
-        coroutine = MPGFactory.GetCreatureFactory().Spawn(miceID,stateAttr, true, false, reSpawn);
-        stateAttr.totalSpawn += stateAttr.spawnCount;
-        SpawnNaturalMice(stateAttr.totalSpawn);
-
-
-        return coroutine;
+        MPGame.Instance.GetSpawnController().AddCoroutine(new RandomSpawnCommand(miceID, stateAttr));
+        MPGame.Instance.GetSpawnController().Extecutor();
+        return null;
     }
+
+    ///// <summary>
+    ///// 產生老鼠
+    ///// </summary>
+    ///// <param name="miceID">老鼠ID</param>
+    ///// <returns>routine</returns>
+    //protected virtual Coroutine Spawn(short miceID, BattleAIStateAttr stateAttr)
+    //{
+    //    //        Debug.Log(Time.time);
+    //    Random.InitState(unchecked((int)System.DateTime.Now.Ticks));
+    //    bool reSpawn = System.Convert.ToBoolean(Random.Range(0, 1 + 1));
+    //    // spawner = GameObject.FindGameObjectWithTag("GM").GetComponent<SpawnAI>();
+
+    //    // spawnController spawn
+
+    //    coroutine = MPGFactory.GetCreatureFactory().Spawn(miceID, stateAttr, true, false, reSpawn);
+    //    stateAttr.totalSpawn += stateAttr.spawnCount;
+    //    SpawnNaturalMice(stateAttr.totalSpawn);
+
+
+    //    return coroutine;
+    //}
 
     //生成 自然單位老鼠
     private void SpawnNaturalMice(int totalSpawn)

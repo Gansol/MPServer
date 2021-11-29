@@ -576,12 +576,13 @@ public class PoolSystem : IGameSystem
     /// <param name="miceID">老鼠類別ID</param>
     /// <param name="hashID">老鼠HashID</param>
     /// <param name="mice">老鼠Class</param>
-    public void AddMicePool(string miceID, string hashID, IMice mice)
+    public void AddMicePool(string miceID, string hashID, IMice oldMice)
     {
         MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID);
-        mice.Release();
+        ICreature mice = new Mice();
+
         mice.SetArribute(miceAttr);
-        mice.SetGameObject(mice.m_go);
+        mice.SetGameObject(oldMice.m_go);
         mice.SetAI(new MiceAI(mice));
         mice.m_go.transform.parent = objectPool.transform.Find(miceID);
         mice.m_go.transform.GetChild(0).localScale = Vector3.one;
@@ -589,7 +590,9 @@ public class PoolSystem : IGameSystem
         mice.m_go.transform.GetChild(0).localPosition = Vector3.zero;
         mice.m_go.GetComponent<BoxCollider2D>().enabled = true;
         mice.m_go.SetActive(false);
+        oldMice.Release();
         _dictMicePool[miceID].Add(hashID, mice); // 錯誤 應該給新的Hash
+
         Debug.Log("Return Pooling MiceID: " + miceID);
         System.GC.Collect();
     }

@@ -1,5 +1,5 @@
-lastUpgrade=01009
-proj.pluginVersion=0.10.09
+lastUpgrade=01013
+proj.pluginVersion=0.10.13
 proj.AppId=160815280379
 and.BundleId=com.Gansol.MicePow1
 proj.classDir=Assets

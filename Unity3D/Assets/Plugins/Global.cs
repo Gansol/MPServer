@@ -8,8 +8,8 @@ using System.Diagnostics;
 
 public static class Global
 {
-    public static string serverIP = "180.218.166.204";
-    public static string serverPath = "http://180.218.166.204:58767/MicePowBETA";//Server路徑
+    public static string serverIP = "180.218.165.99";
+    public static string serverPath = "http://180.218.165.99:58767/MicePowFTP/";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
