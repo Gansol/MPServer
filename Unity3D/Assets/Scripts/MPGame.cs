@@ -30,6 +30,7 @@ public class MPGame
     private BattleSystem m_BattleSystem = null;
     private AudioSystem m_AudioSystem = null;
     private PoolSystem m_PoolSystem = null;
+    private SpawnController m_SpawnController = null;
 
     // GameUI
     private LoginUI m_LoginUI = null;
@@ -75,6 +76,7 @@ public class MPGame
         m_MessageSystem = new MessageSystem(this);
         m_MissionSystem = new MissionSystem(this);
         m_AudioSystem = new AudioSystem(this);
+        m_SpawnController = new SpawnController(this);
 
         // Init GameUI
         m_MenuUI = new MenuUI(this);
@@ -265,6 +267,13 @@ public class MPGame
         if (m_CreatureSystem == null)
             m_CreatureSystem = new CreatureSystem(this);
         return m_CreatureSystem;
+    }
+
+    public SpawnController GetSpawnController()
+    {
+        if (m_SpawnController == null)
+            m_SpawnController = new SpawnController(this);
+        return m_SpawnController;
     }
 
     public BattleUI GetBattleUI()

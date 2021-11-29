@@ -292,6 +292,7 @@ public class CreatureFactory :IFactory
             j = arrY = 0;
             arrX++;
         }
+
         return MPGame.Instance.StartCoroutine(IESpawnBy2D(miceID, buffer, spawnTime, intervalTime, lerpTime, spawnCount, startAt, isSkill, reSpawn));
     }
 
@@ -499,7 +500,7 @@ public class CreatureFactory :IFactory
     {
         Debug.Log("OnApplySkill miceID:" + miceID);
 
-        //   0.OnApplySkill需要改寫，接收數量、參數
+        //   0.OnApplySkill需要改寫，接收數量、參數  錯誤
         SpawnByRandom(miceID, (sbyte[])SpawnData.GetSpawnData(SpawnStatus.LineL), 1.5f, 0.25f, 0.25f, 6, true);
     }
 
