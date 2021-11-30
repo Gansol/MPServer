@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using MPProtocol;
 using System.Linq;
 using System.Diagnostics;
+using UnityEngine.Networking;
 
 public static class Global
 {
     public static string serverIP = "180.218.165.99";
-    public static string serverPath = "http://180.218.165.99:58767/MicePowFTP/";//Server路徑
+    public static string serverPath = "http://180.218.165.99:58767/MicePowBATA/";//Server路徑
 
     //Android or iOS or Win 伺服器中的 檔案列表路徑
     public static readonly string serverListPath = serverPath +
@@ -55,14 +56,24 @@ public static class Global
     "/_AssetBundles/STANDALONE_OSX/";
 #endif
 
-    public static string dataPath =
+    public static UnityWebRequest dataPath = UnityWebRequest.Get(
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
- Application.dataPath + "/StreamingAssets";
+ Application.dataPath + "/StreamingAssets");
 #elif UNITY_ANDROID
-    "jar:file://" + Application.dataPath + "!/assets/";
-#elif UNITY_IPHONE  || UNITY_IOS
-    Application.dataPath + "/Raw";
+    "jar:file://" + Application.dataPath + "!/assets/");
+#elif UNITY_IPHONE || UNITY_IOS
+    Application.dataPath + "/Raw");
 #endif
+    
+
+    //    public static string dataPath =
+    //#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    // Application.dataPath + "/StreamingAssets";
+    //#elif UNITY_ANDROID
+    //    "jar:file://" + Application.dataPath + "!/assets/";
+    //#elif UNITY_IPHONE  || UNITY_IOS
+    //    Application.dataPath + "/Raw";
+    //#endif
 
     public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務

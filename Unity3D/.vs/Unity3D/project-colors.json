@@ -10,7 +10,22 @@
       "ProjectGuid": "7a8de0dd-2aaa-d81d-c50b-eb5f579fb317",
       "DisplayName": "Assembly-CSharp-firstpass",
       "ColorIndex": 1
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "其他檔案",
+      "ColorIndex": -1
+    },
+    "2db0506b-d772-4115-8633-844652575935": {
+      "ProjectGuid": "2db0506b-d772-4115-8633-844652575935",
+      "DisplayName": "MPProtocol",
+      "ColorIndex": 2
+    },
+    "311699b2-c6b8-42c6-903b-0cacc21c6bdb": {
+      "ProjectGuid": "311699b2-c6b8-42c6-903b-0cacc21c6bdb",
+      "DisplayName": "MPCOM_IO",
+      "ColorIndex": 3
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 4
 }
