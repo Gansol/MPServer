@@ -32,8 +32,8 @@ namespace MPCOM
     [Transaction(TransactionOption.Required)]
     public class CurrencyIO : ServicedComponent                 // ServicedComponent 表示所有使用 COM+ 服務之類別的基底類別。
     {
-        static string host = "localhost\\MPSQLSERVER";           //主機位置 IP(本機)\\伺服器名稱
-        static string id = "Krola";                             // SQL Server帳號
+        static string host = "localhost"/*\\MPSQLSERVER"*/;           //主機位置 IP(本機)\\伺服器名稱
+        static string id = "Gansol";                             // SQL Server帳號
         static string pwd = "1234";                             // SQL Server密碼
         static string database = "MicePowDB";                   // 資料庫名稱
         string connectionString = string.Format("Server = {0};Database = {1};User ID = {2};Password = {3};", host, database, id, pwd); //格式化連線字串
@@ -44,7 +44,7 @@ namespace MPCOM
         {
             return true;
         }
-
+        
         #region LoadCurrency 載入貨幣資料
         /// <summary>
         /// 載入貨幣資料
