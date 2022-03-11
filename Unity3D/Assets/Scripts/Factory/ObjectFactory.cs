@@ -243,7 +243,7 @@ public class ObjectFactory : IFactory
         {
             var nestedData = item.Value as Dictionary<string, object>;
             nestedData.TryGetValue("ItemName", out value);
-            if (miceName == value.ToString())
+            if (miceName == value.ToString().ToLower())
             {
                 nestedData.TryGetValue(columns, out value);
                 return int.Parse(value.ToString());

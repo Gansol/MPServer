@@ -25,7 +25,37 @@
       "ProjectGuid": "311699b2-c6b8-42c6-903b-0cacc21c6bdb",
       "DisplayName": "MPCOM_IO",
       "ColorIndex": 3
+    },
+    "16011319-f9eb-45e9-baa8-46cda2ecdc54": {
+      "ProjectGuid": "16011319-f9eb-45e9-baa8-46cda2ecdc54",
+      "DisplayName": "MPCOM_Data",
+      "ColorIndex": 4
+    },
+    "d2f9da47-d2d1-4a8a-9109-6626f03cd621": {
+      "ProjectGuid": "d2f9da47-d2d1-4a8a-9109-6626f03cd621",
+      "DisplayName": "MPCOM_Logic",
+      "ColorIndex": 5
+    },
+    "fb03ebb8-5230-4f77-9bfb-bd1224d175db": {
+      "ProjectGuid": "fb03ebb8-5230-4f77-9bfb-bd1224d175db",
+      "DisplayName": "MPCOM_UI",
+      "ColorIndex": 6
+    },
+    "73080d09-b054-42b8-82cb-585145a907f3": {
+      "ProjectGuid": "73080d09-b054-42b8-82cb-585145a907f3",
+      "DisplayName": "MPServer",
+      "ColorIndex": 7
+    },
+    "5a52808a-2bcc-45dc-8520-59e40ac2a150": {
+      "ProjectGuid": "5a52808a-2bcc-45dc-8520-59e40ac2a150",
+      "DisplayName": "Gansol",
+      "ColorIndex": 8
+    },
+    "cca76e42-e9d5-4cbf-3222-f488c499dcf3": {
+      "ProjectGuid": "cca76e42-e9d5-4cbf-3222-f488c499dcf3",
+      "DisplayName": "Assembly-CSharp-Editor",
+      "ColorIndex": 9
     }
   },
-  "NextColorIndex": 4
+  "NextColorIndex": 10
 }

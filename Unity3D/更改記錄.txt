@@ -1,3 +1,26 @@
 1.2019.3>2019.4
 2.2019.4>2020.3
 3.ExternalDependencyManager\Editor\1.2.167\ > Google.IOSResolver > Disable Editor	取消IOS GooglePlay支援，下載Unity IOS Planform Builder可解決
+4.Keytool notfound 必須完整關閉UnityHub再開啟 (就算已經設定環境變數)
+
+
+
+1.安裝AndroidStudio(含SDK)、OpenSSL、JDK。
+2.加入環境變數 JDK/bin、Opnessl/bin、android platform-tools
+3.Edit>Perferences>AndroidSDK複製路徑、取消勾選、貼上路徑，修復Facebook登入插件抓不到SDK
+3.更新資源包 Unity>windows>Package Manager>Upgrades
+
+
+Pooling沒有老鼠，卡住不會消失，應該是老鼠死掉動畫消失，還在UptateAnim
+
+NullReferenceException: Object reference not set to an instance of an object
+PoolSystem.ActiveMice (System.Int16 miceID, System.Single miceSize, UnityEngine.Transform hole, System.Boolean impose) (at Assets/Scripts/Battle/PoolSystem.cs:425)
+RandomSpawnCommand+<Spawn>d__1.MoveNext () (at Assets/Scripts/BattleTest/RandomSpawnCommand.cs:39)
+UnityEngine.SetupCoroutine.InvokeMoveNext (System.Collections.IEnumerator enumerator, System.IntPtr returnValueAddress) (at <f98083cbc97e4fa0a4ef2f523feff5e1>:0)
+
+NullReferenceException: Object reference not set to an instance of an object
+Mice.Update () (at Assets/Scripts/Creature/Mice/Mice/Mice.cs:29)
+CreatureSystem.CreatureUpdate () (at Assets/Scripts/GameSystem/CreatureSystem.cs:41)
+CreatureSystem.Update () (at Assets/Scripts/GameSystem/CreatureSystem.cs:31)
+MPGame.Update () (at Assets/Scripts/MPGame.cs:129)
+GameLoop.Update () (at Assets/GameLoop.cs:19)

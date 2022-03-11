@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class IAnimatorState
 {
-    protected GameObject m_go;
+    protected static GameObject m_go;
     protected Animator m_Animator;
     protected AnimatorStateInfo animatorStateInfo;
     protected ENUM_AnimatorState animState = ENUM_AnimatorState.None;
@@ -35,7 +35,7 @@ public abstract class IAnimatorState
         _lifeTime = lifeTime;
         _upAnimSpeed = upSpeed;
         m_go = go;
-        m_Animator = go.GetComponentInChildren<Animator>();
+        m_Animator = m_go.GetComponentInChildren<Animator>();
         animatorStateInfo = m_Animator.GetCurrentAnimatorStateInfo(0);
 
         Initialize();
@@ -171,7 +171,7 @@ public abstract class IAnimatorState
         float distance = Vector3.Distance(m_go.transform.position, _toWorldPos);
         if (distance >= 0 && distance <= 0.05f)
         {
-            m_go.transform.transform.position = _toWorldPos;
+            m_go.transform.position = _toWorldPos;
             _toFlag = false;
         }
         else

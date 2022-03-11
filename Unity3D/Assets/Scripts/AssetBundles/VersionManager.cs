@@ -83,9 +83,9 @@ public class VersionManager : MonoBehaviour
         }
 
         // 第一次檢查
-        if (visionChecker.visionChk && connCheck.ConnStatus)
+        if (visionChecker.VisionChk && connCheck.ConnStatus)
         {
-            if (!visionChecker.isNewlyVision )
+            if (!visionChecker.IsNewlyVision )
             {
                 if (!bGoStore)
                 {

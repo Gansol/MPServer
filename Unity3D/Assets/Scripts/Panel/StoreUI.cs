@@ -389,7 +389,7 @@ public class StoreUI : IMPPanelUI
 
         // 載入商品資訊
         dictItemProperty.TryGetValue(StoreProperty.ItemName.ToString(), out value);
-        itemInfoBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
+        itemInfoBox.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().ToLower().Replace(" ", "");
         dictItemProperty.TryGetValue(StoreProperty.Description.ToString(), out value);
         itemInfoBox.GetChild(0).Find(StoreProperty.Description.ToString()).GetComponent<UILabel>().text = value.ToString();
 
@@ -445,7 +445,7 @@ public class StoreUI : IMPPanelUI
 
         // 顯示圖示
         UI.checkout_msgBox.transform.GetChild(0).Find("Image").GetComponent<UISprite>().atlas = _lastItemBtn.GetComponentInChildren<UISprite>().atlas;
-        UI.checkout_msgBox.transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().Replace(" ", "");
+        UI.checkout_msgBox.transform.GetChild(0).Find("Image").GetComponent<UISprite>().spriteName = Global.IconSuffix + value.ToString().ToLower().Replace(" ", "");
 
         // 顯示商品資訊
         UI.checkout_msgBox.transform.GetChild(0).Find("Count").GetComponent<UILabel>().text = "1";  // count = 1

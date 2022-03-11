@@ -221,7 +221,7 @@ public abstract class IMPPanelUI
             foreach (string assetName in assetNameData)
             {
                 if (!string.IsNullOrEmpty(assetName))
-                    m_AssetLoaderSystem.LoadAssetFormManifest(folder + Global.IconSuffix + assetName + Global.ext);
+                    m_AssetLoaderSystem.LoadAssetFormManifest(folder + Global.IconSuffix + assetName.ToLower() + Global.ext);
             }
             m_AssetLoaderSystem.SetLoadAllAseetCompleted();
             return true;

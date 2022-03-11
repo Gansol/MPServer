@@ -28,9 +28,9 @@ public class VersionChecker
     private bool _isNewlyVision;
     private string _vision;
 
-    public bool visionChk { get { return _visionChk; } }
-    public string vision { get { return _vision; } }
-    public bool isNewlyVision { get { return _isNewlyVision; } }
+    public bool VisionChk { get { return _visionChk; } }
+    public string Vision { get { return _vision; } }
+    public bool IsNewlyVision { get { return _isNewlyVision; } }
 
     void Start()
     {
