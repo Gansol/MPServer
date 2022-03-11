@@ -117,8 +117,9 @@ public class MuchAnimState : IAnimatorState {
         }
     }
 
-    private void AnimationUp()
+    protected override void  AnimationUp()
     {
+        //base.AnimationUp();
         //_upDistance = _isBoss ? go.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
         //float moveTo = go.transform.localPosition.y + _upDistance;
         //iTween.MoveTo(go, iTween.Hash("y", moveTo.ToString(), "time", "1", "easyType", "easeOutCirc"));
@@ -136,7 +137,7 @@ public class MuchAnimState : IAnimatorState {
         }
     }
 
-    private void AnimationDown() // 2   = 2 ~ 1
+    protected override void AnimationDown() // 2   = 2 ~ 1
     {
         _tmpSpeed = Mathf.Lerp(_tmpSpeed, 20, _lerpSpeed);
 
@@ -158,7 +159,7 @@ public class MuchAnimState : IAnimatorState {
         }
     }
 
-    private void AnimationTo()
+    protected override void AnimationTo()
     {
        // _tmpSpeed = Mathf.Lerp(_tmpSpeed, 1, _lerpSpeed);
         float distance = Vector3.Distance(m_go.transform.position, _toWorldPos);
@@ -173,7 +174,7 @@ public class MuchAnimState : IAnimatorState {
         }
     }
 
-    private void AnimationScale()
+    protected override void AnimationScale()
     {
         if (m_go.transform.localScale != _scale)
         {

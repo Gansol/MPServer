@@ -34,7 +34,7 @@ public class PlayerUI : IMPPanelUI
     public static Dictionary<string, GameObject> dictLoadedItemRefs { get; set; }               // 錯誤
 
     private static Dictionary<string, object> _dictItemData /*,_dictEquipData*/;        // 道具資料、裝備資料
-    private static GameObject _lastEmptyItemGroup;                                                          // 上一個實體的空群組
+    private static GameObject _lastEmptyItemGroup,_avatorImage;                                                          // 上一個實體的空群組
 
     private Vector2 _itemOffset;      // 道具位置間格
     private Vector2 _iconSize;           // Icon大小
@@ -271,7 +271,7 @@ public class PlayerUI : IMPPanelUI
     {
         // 如果尚未載入玩家頭像 實體化
         if (UI.playerImageBtn.transform.childCount == 0)
-            MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(Global.PlayerImage), UI.playerImageBtn.transform, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
+            MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset( Global.PlayerImage), UI.playerImageBtn.transform, "AvatarImage", Vector3.one, Vector2.one, new Vector2(280, 280), -390);
         // 顯示
         UISprite playerImage = UI.playerImageBtn.transform.GetChild(0).GetComponent<UISprite>();
         playerImage.spriteName = Global.PlayerImage;

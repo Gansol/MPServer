@@ -323,7 +323,7 @@ public class PoolSystem : IGameSystem
             }
             else
             {
-                Debug.LogError("bundle is null!");
+                Debug.LogError("bundle is null! "+ item.Value.ToString());
             }
 
         }

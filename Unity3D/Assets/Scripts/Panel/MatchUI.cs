@@ -203,12 +203,12 @@ public class MatchUI : IMPPanelUI
         List<string> keys = loadedBtnRefs.Keys.ToList();
         foreach (KeyValuePair<string, object> item in dictServerData)
         {
-            string bundleName = Global.IconSuffix + item.Value.ToString();
+            string bundleName = Global.IconSuffix + item.Value.ToString().ToLower();
 
             if (m_AssetLoaderSystem.GetAsset(bundleName) != null)                                   // 已載入資產時
             {
                 GameObject bundle = m_AssetLoaderSystem.GetAsset(bundleName);
-                Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString());
+                Transform miceBtn = myParent.Find(myParent.name + (i + 1).ToString().ToLower());
 
                 if (miceBtn.childCount == 0)                                                // 如果 按鈕下 沒有物件 實體化物件
                 {
@@ -216,7 +216,7 @@ public class MatchUI : IMPPanelUI
                     miceBtn.gameObject.AddMissingComponent<BtnSwitch>().Initialize(ref _dictLoadedMiceBtnRefs, ref _dictLoadedTeamBtnRefs, ref myParent);
                     miceBtn.GetComponent<BtnSwitch>().SendMessage("EnableBtn");          // 開啟按鈕功能
                 }
-                else if (item.Key.ToString() != keys[i])                                    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
+                else if (item.Key.ToString().ToLower() != keys[i].ToLower())                                    // 如果 按鈕下 有物件 且資料不同步時 修正按鈕
                 {
                     miceBtn.GetComponentInChildren<UISprite>().gameObject.name = item.Key;  // 如果Key不相同 重新載入ICON 修正ICON ID
                     miceBtn.GetComponentInChildren<UISprite>().spriteName = bundleName;     // 如果Key不相同 重新載入ICON 修正ICON SPRITE
