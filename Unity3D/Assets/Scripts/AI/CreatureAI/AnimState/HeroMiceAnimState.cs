@@ -3,7 +3,6 @@ using System.Collections;
 
 public class HeroMiceAnimState : IAnimatorState
 {
-
     public HeroMiceAnimState(GameObject go, bool isBoss, float lerpSpeed, float upSpeed, float upDistance, float lifeTime)
         : base(go, isBoss, lerpSpeed, upSpeed, upDistance, lifeTime)
     {
@@ -77,7 +76,7 @@ public class HeroMiceAnimState : IAnimatorState
                     }
                     else if (animatorStateInfo.normalizedTime > 1 && !m_Animator.IsInTransition(0))                       // 動畫撥放完畢時
                     {
-                        Play(ENUM_AnimatorState.Died);
+                        Play(ENUM_AnimatorState.Died,m_go);
                         _bEating = true;
                     }
                 }
@@ -90,7 +89,7 @@ public class HeroMiceAnimState : IAnimatorState
                 if (_animTime >= .5f && _isBoss)                       // 動畫撥放完畢時
                 {
                     animState = ENUM_AnimatorState.Idle;
-                    Play(animState);
+                    Play(animState,m_go);
                 }
             }
         }

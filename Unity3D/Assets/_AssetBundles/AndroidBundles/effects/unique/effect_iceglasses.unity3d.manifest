@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 984575047
+CRC: 222152351
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6f79bea212ae6f33694acb5b0d198d90
+    Hash: a596496d6078201a745ea52070108678
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 6cd780319471c3f4302504aa5bc8b971
+    Hash: 7817d0e751328815ad65d6b7a18d359d
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,14 +24,15 @@ ClassTypes:
 - Class: 95
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/effects/unique/effect_iceglasses.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

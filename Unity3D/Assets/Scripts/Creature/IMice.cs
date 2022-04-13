@@ -8,19 +8,14 @@ public abstract class IMice : ICreature
 
     public override void Initialize()
     {
-       m_go.GetComponent<BoxCollider2D>().enabled =true ;
+      //  m_go.GetComponent<BoxCollider2D>().enabled = true;
     }
 
 
     public override void Update()
     {
-        m_AI.UpdateAI();
+            m_AI.UpdateAI();
     }
-
-    ///// <summary>
-    ///// On Touch / On Click
-    ///// </summary>
-    //protected abstract void OnHit();
 
     /// <summary>
     /// 接收效果
@@ -35,14 +30,14 @@ public abstract class IMice : ICreature
     /// <param name="damage"></param>
     protected override void OnInjured(short damage, bool myAttack)
     {
-        m_Arribute.SetHP(Mathf.Max(0, m_Arribute.GetHP() - damage));
+        m_Attribute.SetHP(Mathf.Max(0, m_Attribute.GetHP() - damage));
     }
 
     public override void SetSkill(ISkill skill)
     {
-        if (this.m_Skill != null)
-            this.m_Skill.Release();
-        this.m_Skill = skill;
+        if (m_Skill != null)
+            m_Skill.Release();
+        m_Skill = skill;
     }
     public override void SetAI(ICreatureAI creatureAI)
     {
@@ -53,9 +48,9 @@ public abstract class IMice : ICreature
 
     public override void SetGameObject(GameObject go)
     {
-        if (this.m_go != null)
-            this.m_go = null; // release GC 解構
-        this.m_go = go;
+        if (m_go != null)
+            m_go = null; // release GC 解構
+        m_go = go;
     }
 
     //public override void SetState(IAIState state)
@@ -67,24 +62,24 @@ public abstract class IMice : ICreature
 
     public override void SetAnimState(IAnimatorState state)
     {
-        if (this.m_AnimState != null)
-            this.m_AnimState = null;
-        this.m_AnimState = state;
+        if (m_AnimState != null)
+            m_AnimState = null;
+        m_AnimState = state;
     }
 
-    public override void SetArribute(ICreatureAttr arribute)
+    public override void SetAttribute(ICreatureAttr attribute)
     {
-        if (this.m_Arribute != null)
-            this.m_Arribute = null;
-        this.m_Arribute = arribute;
+        if (m_Attribute != null)
+            m_Attribute = null;
+        m_Attribute = attribute;
     }
 
     public override void Release()
     {
         SetAI(null);
-        SetGameObject(null);
         SetSkill(null);
+        SetAttribute(null);
         SetAnimState(null);
-        SetArribute(null);
+        SetGameObject(null);
     }
 }

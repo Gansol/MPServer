@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3175102970
+CRC: 787762681
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a470ed37a2c36273189004b813704234
+    Hash: a786f60834fac06ed521117301d5e0b3
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8de51064219e4f947fb7fea9d09a4e34
+    Hash: 06b3c4882d380e5fe8ce10e0f2e14683
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,6 +17,7 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/musics/se/se_snow.prefab
 Dependencies: []

@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1878238536
+CRC: 2097558049
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d1dbd61cdb426291e73bd2ac1dc28156
+    Hash: 2cd35394ce5571d5d7e4dff717b3bbd5
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2622fcc33b2ee4d452250bd430f8317c
+    Hash: 58e3b22c5965c1fa8a90b72e0da96882
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,8 +19,9 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/miceicon/share/atlas_miceicon.mat
-- Assets/AssetBundles/miceicon/share/atlas_miceicon.asset
 - Assets/AssetBundles/miceicon/share/atlas_miceicon.png
+- Assets/AssetBundles/miceicon/share/atlas_miceicon.asset
 Dependencies: []

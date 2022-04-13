@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2630042200
+CRC: 3972510032
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c90b9c6a9339430f6708460c6795c190
+    Hash: 414121cd6fb06a5e492363fe37fb3210
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -25,7 +25,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/effects/unique/effect_scoreplus.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

@@ -26,7 +26,7 @@ public class MiceBossAI : ICreatureAI
             m_Creature.Play(IAnimatorState.ENUM_AnimatorState.Hello);
 
         // 如果HP<0 切換死亡狀態
-        if (m_Creature.GetArribute().GetHP() < 0 || m_Creature.GetAIState()== ICreature.ENUM_CreatureAIState.Died && !_bDead )
+        if (m_Creature.GetAttribute().GetHP() < 0 || m_Creature.GetAIState()== ICreature.ENUM_CreatureAIState.Died && !_bDead )
         {
             _bDead = true;
             SetAIState(new DiedAIState(/*this*/)); // 如果外部使用SetAIState已經設定死亡會設定2次 錯誤

@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2716155954
+CRC: 4193827839
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a885f7cd48c045323477981bc4ed1c91
+    Hash: fd8d51999f8a456bc6a62f35a4290dfa
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2622fcc33b2ee4d452250bd430f8317c
+    Hash: 58e3b22c5965c1fa8a90b72e0da96882
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,6 +19,7 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/panel/share/PanelUI.mat
 - Assets/AssetBundles/panel/share/PanelUI.png

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3878322753
+CRC: 1463816887
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5dfd1d5105f667d01d19c24c7dd9518f
+    Hash: 3fd5a622ee9e9b9fb1e3a38b0a975b48
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -19,7 +19,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_woodhammer.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

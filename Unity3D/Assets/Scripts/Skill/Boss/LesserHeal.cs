@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LesserHeal : SkillBoss
 {
-    ICreatureAttr arribute;
+    ICreatureAttr attribute;
     public LesserHeal(SkillAttr skill)
         : base(skill)
     {
@@ -16,14 +16,14 @@ public class LesserHeal : SkillBoss
 
     public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        arribute = creature.GetArribute();
+        attribute = creature.GetAttribute();
     }
 
     public override void UpdateEffect()
     {
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
-            arribute.SetHP(arribute.GetHP() + Random.Range(skillData.Attr, skillData.Attr + skillData.AttrDice + 1));
+            attribute.SetHP(attribute.GetHP() + Random.Range(skillData.Attr, skillData.Attr + skillData.AttrDice + 1));
             m_LastTime = Time.time;
         }
 

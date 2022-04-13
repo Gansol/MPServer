@@ -136,11 +136,6 @@ public class BattleSystem : IGameSystem
 
         Global.photonService.BossSkillEvent += OnApplyBossSkill;
         Global.photonService.ReLoginEvent += OnReLogin;
-
-      //  Global.photonService.LoadPlayerItem(Global.Account);
-      //  Global.photonService.LoadPlayerData(Global.Account);
-        //  Global.photonService.LoadSceneEvent += OnLoadScene;
-        //Global.photonService.ApplySkillMiceEvent += OnApplySkillMice;
     }
 
     #region -- InitUseCount 初始化老鼠道具用量 -- 
@@ -160,35 +155,20 @@ public class BattleSystem : IGameSystem
 
     public override void Update()
     {
-        battleState = battleAIState.GetState();// 可能錯誤 還沒實體化
-        GameConnStatusChk();
-
         if (!Global.isGameStart)
-            _lastTime = Time.time; // 沒作用
+            _lastTime = Time.time;
 
-        #region // 同步開始遊戲
-        if (m_MPGame.GetPoolSystem().GetPoolingComplete() && _bSyncStart)
-        {
-            Debug.Log("Pooling Completed Start SyncGame");
+        GameConnStatusChk();
+        SyncGameStart();
 
-            // 如果是BOT 新增AI
-            if (Global.MemberType == MemberType.Bot)
-                BotAI = new BotAI(m_MPGame.GetPoolSystem().GetPoolSkillMiceIDs());
-
-
-
-            _bSyncStart = false;
-            Global.photonService.SyncGameStart();
-        }
-        #endregion
 
         #region // 遊戲邏輯
         if (Global.isGameStart && Time.time > _lastTime + _defaultStartTime)
         {
-            battleAttr.gameTime = Time.time - _lastTime - _defaultStartTime;    // 遊戲經過時間
-                                                                                //  battleState = battleAIState.GetState();
-            if (battleAttr.combo > _maxCombo) _maxCombo = battleAttr.combo;     // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
-            if (battleAttr.score > _maxScore) _maxScore = battleAttr.score; // 更新最高分
+            battleAttr.gameTime = Time.time - _lastTime - _defaultStartTime;             // 遊戲經過時間
+
+            if (battleAttr.combo > _maxCombo) _maxCombo = battleAttr.combo;    // 假如目前連擊數 大於 _maxCombo  更新 _maxCombo
+            if (battleAttr.score > _maxScore) _maxScore = battleAttr.score;                   // 更新最高分
 
             // Update BotAI
             if (Global.MemberType == MemberType.Bot)
@@ -217,7 +197,22 @@ public class BattleSystem : IGameSystem
         }
     }
 
+    #region -- SyncGameStart 同步開始遊戲 --
+    // 應該使用監聽事件
+    private void SyncGameStart()
+    {
+        if (m_MPGame.GetPoolSystem().GetPoolingComplete() && _bSyncStart)
+        {
+            Debug.Log("Pooling Completed Start SyncGame");
 
+            // 如果是BOT 新增AI
+            if (Global.MemberType == MemberType.Bot)
+                BotAI = new BotAI(m_MPGame.GetPoolSystem().GetPoolSkillMiceIDs());
+            _bSyncStart = false;
+            Global.photonService.SyncGameStart();
+        }
+    }
+    #endregion
 
     #region -- ClacDPS 計算平均輸出 --
     private void ClacDPS()
@@ -265,6 +260,7 @@ public class BattleSystem : IGameSystem
     /// <param name="aliveTime"></param>
     public void UpadateScore(short miceID, float aliveTime)
     {
+        // 錯誤 不應該出現數字ID
         if (miceID != -1 && miceID > 10000 && miceID < 11000)
         {
             //Debug.Log("BattleSystem UpadateScore aliveTime:" + aliveTime);
@@ -290,7 +286,7 @@ public class BattleSystem : IGameSystem
         {
             if (!_bInvincible)
             {
-                Debug.Log("BattleSystem LostScore aliveTime:" + aliveTime);
+               // Debug.Log("BattleSystem LostScore aliveTime:" + aliveTime);
                 //計分公式 存活時間 / 食量 / 吃東西速度 ex:4 / 1 / 0.5 = 8
                 if (miceID != -1 && miceID > 10000 && miceID < 11000)
                 {
@@ -701,6 +697,7 @@ public class BattleSystem : IGameSystem
     #region -- OnUpdateData 收到伺服器資料 -- 
     void OnUpdateLife(short value)
     {
+        Debug.Log("Get Life");
         battleAttr.life = value;
     }
 
@@ -739,7 +736,7 @@ public class BattleSystem : IGameSystem
     #region -- GetBattleState 取得Battle狀態 -- 
     public ENUM_BattleAIState GetBattleState()
     {
-        return battleState;
+        return  battleAIState.GetState();
     }
     #endregion
 
@@ -840,8 +837,6 @@ public class BattleSystem : IGameSystem
         Global.photonService.ApplySkillItemEvent -= OnApplySkillItem;
         Global.photonService.BossSkillEvent -= OnApplyBossSkill;
         Global.photonService.ReLoginEvent -= OnReLogin;
-        //Global.photonService.LoadSceneEvent -= OnLoadScene;
-        //Global.photonService.ApplySkillMiceEvent -= OnApplySkillMice;
     }
     #endregion
 

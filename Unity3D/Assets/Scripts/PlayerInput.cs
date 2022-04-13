@@ -46,7 +46,7 @@ public class PlayerInput : MonoBehaviour
                     if (raycast2D.transform.GetChild(0).name == "anims" || raycast2D.transform.name == "anims")
                     {
                         // 取得老鼠 觸發 死亡動畫
-                        creature = m_MPGame.GetCreatureSystem().GetActiveHoleMice(raycast2D.transform.parent);
+                        creature = m_MPGame.GetCreatureSystem().GetMice(raycast2D.transform.parent);
                         if(creature!=null)
                             creature.OnHit();
                     }
@@ -81,7 +81,7 @@ public class PlayerInput : MonoBehaviour
                         {
                             if (raycast2D.transform.GetChild(0).name == "anims" || raycast2D.transform.name == "anims")
                             {
-                                creature = m_MPGame.GetCreatureSystem().GetActiveHoleMice(raycast2D.transform.parent);
+                                creature = m_MPGame.GetCreatureSystem().GetMice(raycast2D.transform.parent);
                                 if(creature!=null)
                                     creature.OnHit();
                                 //raycast2D.transform.SendMessage("OnHit");

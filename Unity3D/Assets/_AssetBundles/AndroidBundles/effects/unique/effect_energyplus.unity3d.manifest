@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 230013375
+CRC: 1268573312
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6345d90426117502782ec862eb27f318
+    Hash: 74f945abbc89c2817ec365df9e0026e2
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -25,7 +25,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/effects/unique/effect_energyplus.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

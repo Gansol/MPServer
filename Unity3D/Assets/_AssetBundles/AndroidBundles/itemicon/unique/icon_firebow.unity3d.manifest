@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3731848926
+CRC: 3493352756
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5e799d6f4d1f99e393ecb105faf79da2
+    Hash: 3fed1b204b5031096ae425283f93b4bc
   TypeTreeHash:
     serializedVersion: 2
-    Hash: af4a21052e2a1880bacfaa1f8e858a1d
+    Hash: b324b8f4b8534b1f4aea98c884acc1b2
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -14,14 +14,15 @@ ClassTypes:
 - Class: 4
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/itemicon/unique/icon_firebow.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

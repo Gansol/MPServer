@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3718503295
+CRC: 2654429981
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3dbdd093abe7aa34a69200c5b8e466f9
+    Hash: 6a78d00dede2321d57781c38735d0fb8
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8de51064219e4f947fb7fea9d09a4e34
+    Hash: 06b3c4882d380e5fe8ce10e0f2e14683
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,6 +17,7 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/musics/se/se_firebow.prefab
 Dependencies: []

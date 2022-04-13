@@ -15,7 +15,7 @@ public class SkillShield : SkillBoss
 
     public override void Display(ICreature creature/*, CreatureAttr arribute/*, IAIState state*/)
     {
-        creature.GetArribute().SetShield(skillData.Attr);
+        creature.GetAttribute().SetShield(skillData.Attr);
     }
 
     public override void UpdateEffect()

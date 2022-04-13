@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3932989966
+CRC: 3274277258
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3ed7799dfdcd2e9289db59e687ee4fff
+    Hash: 92804c87b825b235c52629d19ae996fb
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 44912aa95bf28c03affddc6817be15fe
+    Hash: 4de8b25cbd6d858cd4c6ce40521297b9
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -17,6 +17,7 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 128
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/panel/share/LiHeiPro.ttf
 Dependencies: []

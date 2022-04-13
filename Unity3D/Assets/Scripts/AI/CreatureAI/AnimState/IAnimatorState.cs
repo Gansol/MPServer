@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class IAnimatorState
 {
-    protected static GameObject m_go;
+    protected GameObject m_go;
     protected Animator m_Animator;
     protected AnimatorStateInfo animatorStateInfo;
     protected ENUM_AnimatorState animState = ENUM_AnimatorState.None;
@@ -60,19 +60,30 @@ public abstract class IAnimatorState
 
     public virtual void UpdateAnimation()
     {
+        //if (m_go.activeSelf)
+        //{
         _survivalTime = Time.time - _lastTime;
-      //  Debug.Log("UpdateAnimation:" + m_go.transform.localPosition.y + "    " + _upDistance);
-        if (_bMotion && !_toFlag && (_bAnimationUp && m_go.transform.localPosition.y < _upDistance))        // AnimationUp
-            AnimationUp();
+            //  Debug.Log("UpdateAnimation:" + m_go.transform.localPosition.y + "    " + _upDistance);
+            if (_bMotion && !_toFlag && (_bAnimationUp && m_go.transform.localPosition.y < _upDistance))        // AnimationUp
+            {
+                AnimationUp();
+              //  Debug.Log("UpdateAnimation Up:" + "   " + m_go.transform.parent.name + "   " + m_go.name);
+            }
 
-        if (_bMotion && !_toFlag && (_bAnimationDown && m_go.transform.localPosition.y > -_upDistance)) // AnimationDown
-            AnimationDown();
+            if (_bMotion && !_toFlag && (_bAnimationDown && m_go.transform.localPosition.y > -_upDistance)) // AnimationDown
+            {
+                AnimationDown();
+               // Debug.Log("UpdateAnimation Down:" + "   " + m_go.transform.parent.name + "   " + m_go.name);
+            }
 
-        if (_bMotion && _toFlag && (Vector3.Distance(m_go.transform.position, _toWorldPos) > 0)) // AnimationTo
-            AnimationTo();
+            if (_bMotion && _toFlag && (Vector3.Distance(m_go.transform.position, _toWorldPos) > 0)) // AnimationTo
+                AnimationTo();
 
-        if (_bMotion && _toScale && (Vector3.Distance(m_go.transform.position, _toWorldPos) > 0)) // AnimationScale
-            AnimationScale();
+            if (_bMotion && _toScale && (Vector3.Distance(m_go.transform.position, _toWorldPos) > 0)) // AnimationScale
+                AnimationScale();
+        //}
+
+       // Debug.Log("Animation Update : " + m_go.name);
     }
 
 
@@ -85,10 +96,13 @@ public abstract class IAnimatorState
 
 
 
-    public virtual void Play(ENUM_AnimatorState animState)
+    public virtual void Play(ENUM_AnimatorState animState,GameObject go)
     {
         this.animState = animState;
-        m_Animator = m_go.GetComponentInChildren<Animator>();
+        m_Animator = go.GetComponentInChildren<Animator>();
+
+        if (m_Animator == null)
+            Debug.LogError("FUCK ANIM NULL");
 
         switch (animState)
         {
@@ -119,10 +133,6 @@ public abstract class IAnimatorState
     /// </summary>
     protected virtual void AnimationUp()
     {
-        Debug.Log("AnimationUp");
-        //_upDistance = _isBoss ? go.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
-        //float moveTo = go.transform.localPosition.y + _upDistance;
-        //iTween.MoveTo(go, iTween.Hash("y", moveTo.ToString(), "time", "1", "easyType", "easeOutCirc"));
         _upDistance = _isBoss ? m_go.GetComponent<BoxCollider2D>().size.x * 0.4f : _upDistance;
         _tmpSpeed = Mathf.Lerp(_tmpSpeed, 1, _lerpSpeed);
 
@@ -190,11 +200,6 @@ public abstract class IAnimatorState
         m_go.transform.localScale = Vector3.Lerp(m_go.transform.localScale, _scale, 0.1f);
 
     }
-
-
-
-
-
 
     /// <summary>
     /// 設定 移動位置

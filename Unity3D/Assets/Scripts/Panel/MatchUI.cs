@@ -85,6 +85,7 @@ public class MatchUI : IMPPanelUI
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
+        Global.photonService.SceneChangeEvent += OnSceneChange;
         Global.photonService.UpdateMiceEvent += OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
@@ -373,18 +374,20 @@ public class MatchUI : IMPPanelUI
     /// </summary>
     protected override void OnLoadPanel()
     {
-        if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.mice_group.transform) || _bFirstLoad)
-            InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
+        if (m_RootUI.activeSelf)
+        {
+            if (!SwitchBtnMethod.MemberChk(Global.dictMiceAll, _dictMiceData, _dictLoadedMiceBtnRefs, UI.mice_group.transform) || _bFirstLoad)
+                InstantiateIcon(Global.dictMiceAll, _dictLoadedMiceBtnRefs, UI.mice_group.transform);
 
-        if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.team_group.transform) || _bFirstLoad)
-            InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
+            if (!SwitchBtnMethod.MemberChk(Global.dictTeam, _dictTeamData, _dictLoadedTeamBtnRefs, UI.team_group.transform) || _bFirstLoad)
+                InstantiateIcon(Global.dictTeam, _dictLoadedTeamBtnRefs, UI.team_group.transform);
 
-        SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
+            SwitchBtnMethod.ActiveMice(Global.dictTeam, _dictLoadedMiceBtnRefs);
 
-        _bFirstLoad = false;
-        _dictMiceData = Global.dictMiceAll;
-        _dictTeamData = Global.dictTeam;
-
+            _bFirstLoad = false;
+            _dictMiceData = Global.dictMiceAll;
+            _dictTeamData = Global.dictTeam;
+        }
     }
     #endregion
 
@@ -527,6 +530,19 @@ public class MatchUI : IMPPanelUI
     }
     #endregion
 
+    #region -- OnSceneChange 當配對成功改變場景時 --
+    /// <summary>
+    /// 當配對成功改變場景時
+    /// </summary>
+    private void OnSceneChange()
+    {
+        //matching_label.text = "等待超時，請重新配對！";
+        UI.matchingPanel.SetActive(false);
+        UI.beforeMatchPanel.SetActive(true);
+        ShowPanel(m_RootUI.transform.GetChild(0).name);
+    }
+    #endregion
+
     #region -- OnClosed --
     public override void OnClosed(GameObject go)
     {
@@ -536,14 +552,13 @@ public class MatchUI : IMPPanelUI
             Global.photonService.ExitWaitingRoom();
         ShowPanel(m_RootUI.transform.GetChild(0).name);
         UI.matchingPanel.SetActive(false);
-
     }
     #endregion
 
     public override void ShowPanel(string panelName)
     {
         m_RootUI = GameObject.Find(Global.Scene.MainGameAsset.ToString()).GetComponentInChildren<AttachBtn_MenuUI>().matchPanel;
-        //  EventMaskSwitch.LastPanel = m_RootUI;
+          EventMaskSwitch.LastPanel = m_RootUI;
         base.ShowPanel(panelName);
     }
 
@@ -553,6 +568,7 @@ public class MatchUI : IMPPanelUI
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent -= OnExitWaiting;
+        Global.photonService.SceneChangeEvent -= OnSceneChange;
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
 
@@ -560,6 +576,7 @@ public class MatchUI : IMPPanelUI
         {
             UI.beforeMatchPanel.SetActive(true);
             UI.matchingPanel.SetActive(false);
+            UI.transform.parent.gameObject.SetActive(false);
         }
     }
     #endregion

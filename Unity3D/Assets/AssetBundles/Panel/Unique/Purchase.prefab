@@ -294,7 +294,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 115658}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a71220e41b5de746a07e9d6ce3e0fe3, type: 3}
+  m_Script: {fileID: 11500000, guid: b567ff97cb128574f9810f808caa7273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   itemPanel: {fileID: 174322}
@@ -317,7 +317,7 @@ GameObject:
   - component: {fileID: 6521372}
   - component: {fileID: 6521370}
   m_Layer: 9
-  m_Name: Mask
+  m_Name: CloseBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -525,7 +525,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3003
+  startingRenderQueue: 3002
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 3

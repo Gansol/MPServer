@@ -21,7 +21,7 @@ public class HeroMice : IMice
     public override void Update()
     {
         //        Debug.Log("Hero State: "+m_AnimState.GetAnimState().ToString());
-        if (Global.isGameStart)
+        if (Global.isGameStart && m_go.activeSelf)
         {
             m_AnimState.UpdateAnimation();
         }
@@ -30,25 +30,44 @@ public class HeroMice : IMice
             m_go.SetActive(false);
         }
 
+        SpellEffect();
+    }
+
+    public override void OnHit()
+    {
+        //  Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + m_go.layer + " ENUM_AIState:" + creatureAIState.ToString() + " m_Arribute.GetHP():" + m_Arribute.GetHP());
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled &&*/ m_go.GetComponent<BoxCollider2D>().enabled)
+        {
+            m_go.GetComponent<BoxCollider2D>().enabled = false;
+            MPGame.Instance.GeAudioSystem().PlaySound("Hit");
+            //OnInjured(1, true);
+            Play(IAnimatorState.ENUM_AnimatorState.Eat);
+        }
+    }
+    /// <summary>
+    /// 被擊中時施放技能
+    /// </summary>
+    private void SpellEffect()
+    {
         if (m_AnimState.GetENUM_AnimState() == IAnimatorState.ENUM_AnimatorState.Died && !bDead)
         {
             bDead = true;
             m_go.GetComponent<BoxCollider2D>().enabled = false;
-            if (Global.isGameStart /*&& enabled /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& m_Arribute.GetHP() > 0)
+            if (Global.isGameStart /*&& enabled /*&& ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) */&& m_Attribute.GetHP() > 0)
             {
                 Play(IAnimatorState.ENUM_AnimatorState.Eat);
 
-           CreatureSystem m_CreatureSystem=   MPGame.Instance.GetCreatureSystem();
+                CreatureSystem m_CreatureSystem = MPGame.Instance.GetCreatureSystem();
                 Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
                 pos.Add(0, m_go.transform.position);
 
-                m_CreatureSystem.SetEffect(this.m_Arribute.name, pos);
+                m_CreatureSystem.SetEffect(this.m_Attribute.name, pos);
 
                 //Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
 
                 //foreach (KeyValuePair<Transform, GameObject> item in buffer)
                 //{
-                    
+
                 //    if (item.Value != null && Global.dictBattleMiceRefs.ContainsKey(item.Key))
                 //    {
                 //        if (item.Value.GetComponent<IMice>() != null)
@@ -59,17 +78,6 @@ public class HeroMice : IMice
         }
     }
 
-    public override void OnHit()
-    {
-      //  Debug.Log("HeroMice:" + "cam.eventReceiverMask:" + cam.eventReceiverMask + " gameObject.layer:" + m_go.layer + " ENUM_AIState:" + creatureAIState.ToString() + " m_Arribute.GetHP():" + m_Arribute.GetHP());
-        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled &&*/ m_go.GetComponent<BoxCollider2D>().enabled)
-        {
-            m_go.GetComponent<BoxCollider2D>().enabled = false;
-            MPGame.Instance.GeAudioSystem().PlaySound("Hit");
-            //OnInjured(1, true);
-            Play(IAnimatorState.ENUM_AnimatorState.Eat);
-        }
-    }
 
     //protected override void OnDead(float lifeTime)
     //{

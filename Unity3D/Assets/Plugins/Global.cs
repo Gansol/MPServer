@@ -56,24 +56,24 @@ public static class Global
     "/_AssetBundles/STANDALONE_OSX/";
 #endif
 
-    public static UnityWebRequest dataPath = UnityWebRequest.Get(
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
- Application.dataPath + "/StreamingAssets");
-#elif UNITY_ANDROID
-    "jar:file://" + Application.dataPath + "!/assets/");
-#elif UNITY_IPHONE || UNITY_IOS
-    Application.dataPath + "/Raw");
-#endif
-    
+//    public static UnityWebRequest dataPath = UnityWebRequest.Get(
+//#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+// Application.dataPath + "/StreamingAssets");
+//#elif UNITY_ANDROID
+//    "jar:file://" + Application.dataPath + "!/assets/");
+//#elif UNITY_IPHONE || UNITY_IOS
+//    Application.dataPath + "/Raw");
+//#endif
 
-    //    public static string dataPath =
-    //#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-    // Application.dataPath + "/StreamingAssets";
-    //#elif UNITY_ANDROID
-    //    "jar:file://" + Application.dataPath + "!/assets/";
-    //#elif UNITY_IPHONE  || UNITY_IOS
-    //    Application.dataPath + "/Raw";
-    //#endif
+
+    public static string dataPath =
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+     Application.dataPath + "/StreamingAssets";
+#elif UNITY_ANDROID
+        "jar:file://" + Application.dataPath + "!/assets/";
+#elif UNITY_IPHONE || UNITY_IOS
+        Application.dataPath + "/Raw";
+#endif
 
     public static readonly string defaultVersion = "{\"vision4\": \"v1.0.4\"}";
     public static PhotonService photonService = new PhotonService();    // Photon ServerClient服務

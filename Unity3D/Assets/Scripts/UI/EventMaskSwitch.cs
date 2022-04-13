@@ -116,6 +116,7 @@ public static class EventMaskSwitch
         foreach (Camera cam in Camera.allCameras)
         {
             cam.GetComponent<UICamera>().eventReceiverMask = _dictSceneDefaultEventMask[SceneManager.GetActiveScene().name][i];
+           // Debug.Log(SceneManager.GetActiveScene().name + "    "+i);
             i--;
         }
         _prevLayerMask.Clear(); // 最後要清除所有Mask 因為會回到DefaultMask

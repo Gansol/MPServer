@@ -37,17 +37,17 @@ public class Bali : IMice
     /// </summary>
     public override void OnHit()
     {
-        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ GetAIState() != ENUM_CreatureAIState.Died && m_Arribute.GetHP() > 0)
+        if (Global.isGameStart && /*((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) &&*/ GetAIState() != ENUM_CreatureAIState.Died && m_Attribute.GetHP() > 0)
         {
             MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died, m_go);
         }
         else
         {
-            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Attribute.GetHP(): " + m_Attribute.GetHP());
         }
     }
 

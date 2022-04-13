@@ -9666,7 +9666,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 168574}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56b2c0bd58930094eaff20c49ce09b78, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c7030d57ca609c40b355ef1a5c96b5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   level: {fileID: 11403466}
@@ -9689,7 +9689,7 @@ MonoBehaviour:
   chkoutCancelBtn: {fileID: 154556}
   gashaponConfirmBtn: {fileID: 121954}
   gashaponCancelBtn: {fileID: 121950}
-  miceCollider: {fileID: 122060}
+  miceCollider: {fileID: 173578}
   itemCollider: {fileID: 173578}
   chcekoutBoxCollider: {fileID: 154588}
   gashaponBoxCollider: {fileID: 121984}

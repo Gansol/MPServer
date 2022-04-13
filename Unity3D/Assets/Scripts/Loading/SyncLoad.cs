@@ -111,7 +111,6 @@ public class SyncLoad : MonoBehaviour
 
         if (Global.nextScene == Global.Scene.MainGame)
             Global.dictLoadedScene[Global.Scene.MainGameAsset].SetActive(true);
-            
 
         // 防止HUDCamera無法顯示
         if (SceneManager.GetActiveScene().name != Global.Scene.BundleCheck)
@@ -119,6 +118,7 @@ public class SyncLoad : MonoBehaviour
             _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = false;
             _scene.transform.Find("HUDCamera").GetComponent<Camera>().enabled = true;
         }
+
         MPGame.Instance.InitScene(_scene);
         // 儲存目前場景
         Global.prevScene = SceneManager.GetActiveScene().name;

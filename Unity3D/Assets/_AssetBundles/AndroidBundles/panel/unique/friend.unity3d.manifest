@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1885768037
+CRC: 327711477
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3b318b9f54c242f11c51f3e00aaa0384
+    Hash: 0e6a9ff306d57276d8cac56d34460d77
   TypeTreeHash:
     serializedVersion: 2
-    Hash: a735aad73cfb31118b0e3456cb737ca7
+    Hash: 6f052026bd50e670e02979549791a440
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -16,33 +16,34 @@ ClassTypes:
 - Class: 65
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 75e7459110b9666449485c40f25362a5, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: d81807633ea807d4c8e3fff7e10c6000, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 9e2747e3775af504da1a4d5a46c5a1ce, type: 3}
+  Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: baff6866c04b43a478339957e0a84b24, type: 3}
+  Script: {fileID: 11500000, guid: 25c3ebe7e4f355744a247a3b21430d23, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9e2747e3775af504da1a4d5a46c5a1ce, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: ac5060295fbd39b4a88d20d0c83d925e, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 07c4de3b4b6fe9045b059ee627c100df, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/panel/unique/Friend.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

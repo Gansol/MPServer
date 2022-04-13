@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2705601131
+CRC: 1825546244
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a4ba05a0b3cd893f76c74bd247a4aaa9
+    Hash: 9f86e6047150645ef1c735e49d7d069f
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2622fcc33b2ee4d452250bd430f8317c
+    Hash: 58e3b22c5965c1fa8a90b72e0da96882
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,8 +19,9 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/candymice/share/atlas_candymice.mat
-- Assets/AssetBundles/mice/candymice/share/atlas_candymice.asset
 - Assets/AssetBundles/mice/candymice/share/atlas_candymice.png
+- Assets/AssetBundles/mice/candymice/share/atlas_candymice.asset
+- Assets/AssetBundles/mice/candymice/share/atlas_candymice.mat
 Dependencies: []

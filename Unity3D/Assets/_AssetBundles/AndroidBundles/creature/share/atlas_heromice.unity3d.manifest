@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2962787285
+CRC: 2760356393
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 7ac9eb05ab449779efc0d7c467851df9
+    Hash: 9af0f0cff7e94ac819d39725f7ec7b5d
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8a54f921be9e95a99076cbb9c276b333
+    Hash: 6bd64dcfb1e002ffab04916538d8dc20
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -21,8 +21,9 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/share/atlas_heromice.mat
-- Assets/AssetBundles/creature/share/atlas_heromice.asset
 - Assets/AssetBundles/creature/share/atlas_heromice.png
+- Assets/AssetBundles/creature/share/atlas_heromice.asset
+- Assets/AssetBundles/creature/share/atlas_heromice.mat
 Dependencies: []

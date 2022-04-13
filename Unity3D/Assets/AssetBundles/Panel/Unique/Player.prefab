@@ -3943,7 +3943,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 120112}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5517fa16a9306d846b08b010c5019630, type: 3}
+  m_Script: {fileID: 11500000, guid: 467293f9722d59a4e99592e916786446, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerImageBtn: {fileID: 100714}

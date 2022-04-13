@@ -36,7 +36,10 @@ public class RandomSpawnCommand : ISpawnCommand
         for (holePos = 0; count < _stateAttr.spawnCount; holePos++)
         {
             holePos = SetStartPos(holeArray.Length, holePos, false);
-            m_PoolSystem.ActiveMice(_miceID, _miceSize, MPGame.Instance.GetBattleSystem().GetBattleAttr().hole[rndHoleArray[holePos]].transform, reSpawn);
+            ICreature creature =m_PoolSystem.ActiveMice(_miceID, _miceSize, MPGame.Instance.GetBattleSystem().GetBattleAttr().hole[rndHoleArray[holePos]].transform, false);
+            if (creature != null)
+                creature.Play(IAnimatorState.ENUM_AnimatorState.Hello);
+
             count++;
             yield return new WaitForSeconds(_stateAttr.spawnTime);
         }

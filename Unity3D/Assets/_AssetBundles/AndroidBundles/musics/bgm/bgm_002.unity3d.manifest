@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 946593826
+CRC: 1842970942
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1eb271ac91c0192c9dcf8968cd0e0862
+    Hash: 2f2d562924349e7f00aa373f7a45f092
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8de51064219e4f947fb7fea9d09a4e34
+    Hash: 06b3c4882d380e5fe8ce10e0f2e14683
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,6 +17,7 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/musics/bgm/bgm_002.prefab
 Dependencies: []

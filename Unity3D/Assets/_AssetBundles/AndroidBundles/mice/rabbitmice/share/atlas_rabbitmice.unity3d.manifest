@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3040003807
+CRC: 2834648281
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 45357a3b8ba648e9eab7e464c4198e0a
+    Hash: 80d2e98e2b277e0f41530fef9e4af73e
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2622fcc33b2ee4d452250bd430f8317c
+    Hash: 58e3b22c5965c1fa8a90b72e0da96882
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,8 +19,9 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/AssetBundles/mice/rabbitmice/share/atlas_rabbitmice.asset
 - Assets/AssetBundles/mice/rabbitmice/share/atlas_rabbitmice.png
 - Assets/AssetBundles/mice/rabbitmice/share/atlas_rabbitmice.mat
-- Assets/AssetBundles/mice/rabbitmice/share/atlas_rabbitmice.asset
 Dependencies: []

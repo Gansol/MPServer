@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 4207620790
+CRC: 1258783926
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6f50e9672cbfbfd1b58270b5b55fac13
+    Hash: 0ad3efe28efa1dad704797a7041522bd
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2622fcc33b2ee4d452250bd430f8317c
+    Hash: 58e3b22c5965c1fa8a90b72e0da96882
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,6 +19,7 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/mice/ninjamice/share/atlas_ninjamice.png
 - Assets/AssetBundles/mice/ninjamice/share/atlas_ninjamice.mat

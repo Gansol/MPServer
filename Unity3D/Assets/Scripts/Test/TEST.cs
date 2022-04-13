@@ -14,23 +14,51 @@ public class TEST : MonoBehaviour
 
     private void Start()
     {
-        // 第一個字母大寫
-        //Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
-        object a = new object();
-        a = 10;
-        string s ="1";
-        Debug.Log(GetT(1));
-        Debug.Log(GetT("FUCK"));
-        Debug.Log(GetT(true));
+        ICreature c ;
+        c = new Mice();
+        Debug.Log(c.ToString() + c.GetType());
+        c.GetType();
     }
 
 
-    public T GetT<T>(T haha)
-    {
-        if (haha != null)
-            return haha;
-        return default(T);
-    }
+    //private void Start()
+    //{
+    //    Dictionary<string, Dictionary<string, string>> data = new Dictionary<string, Dictionary<string,string>>();
+    //    Dictionary<string, string> data2 = new Dictionary<string, string>();
+    //    data2.Add("1", "A");
+    //    data2.Add("2", "B");
+    //    data.Add("1", data2 );
+
+
+    //    var keys = data2.Where(q => q.Value =="B").Select(q => q.Key);
+    //    List<string> list = new List<string>();
+    //    list = keys.ToList();
+    //    foreach (var key in keys)
+    //    {
+    //        Debug.Log(key.ToString());
+    //    }
+    //}
+
+
+    //private void Start()
+    //{
+    //    // 第一個字母大寫
+    //    //Debug.Log(    System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase("aAAa".ToLower()));
+    //    object a = new object();
+    //    a = 10;
+    //    string s ="1";
+    //    Debug.Log(GetT(1));
+    //    Debug.Log(GetT("FUCK"));
+    //    Debug.Log(GetT(true));
+    //}
+
+
+    //public T GetT<T>(T haha)
+    //{
+    //    if (haha != null)
+    //        return haha;
+    //    return default(T);
+    //}
 
 
     //// add dymic scripts componment

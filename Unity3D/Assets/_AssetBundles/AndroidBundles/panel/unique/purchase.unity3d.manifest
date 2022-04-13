@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 577768731
+CRC: 1425313278
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f431a13f728d3a5406af9fc12e645352
+    Hash: aabd60508680f7553d5a9ea6e4eed9f3
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 0cd6b5eba4dc3b2a5dfb88dc23962105
+    Hash: 1f129ebbb127c4bf12d37e4e09c5d689
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -16,22 +16,23 @@ ClassTypes:
 - Class: 65
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: d81807633ea807d4c8e3fff7e10c6000, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+  Script: {fileID: 11500000, guid: b567ff97cb128574f9810f808caa7273, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 5a71220e41b5de746a07e9d6ce3e0fe3, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/panel/unique/Purchase.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

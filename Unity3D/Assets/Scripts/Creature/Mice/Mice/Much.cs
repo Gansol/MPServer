@@ -48,7 +48,7 @@ public class Much : IMice
             Dictionary<int, Vector3> pos = new Dictionary<int, Vector3>();
             pos.Add(0, m_go.transform.position);
 
-            m_CreatureSystem.SetEffect(this.m_Arribute.name, pos);
+            m_CreatureSystem.SetEffect(this.m_Attribute.name, pos);
 
             //Dictionary<Transform, GameObject> buffer = new Dictionary<Transform, GameObject>(Global.dictBattleMiceRefs);
             //foreach (KeyValuePair<Transform, GameObject> item in buffer)
@@ -74,17 +74,17 @@ public class Much : IMice
     public override void OnHit()
     {
         
-        if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && */ m_Arribute.GetHP() > 0)
+        if (Global.isGameStart &&/* ((cam.eventReceiverMask & gameObject.layer) == cam.eventReceiverMask) && enabled && */ m_Attribute.GetHP() > 0)
         {
             MPGame.Instance.GeAudioSystem().PlaySound("Hit");
             m_AnimState.SetMotion(true);
             OnInjured(1, true);
             _survivalTime = Time.fixedTime - _lastTime;                // 老鼠存活時間 
-            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died);
+            m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died, m_go);
         }
         else
         {
-            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Arribute.GetHP(): " + m_Arribute.GetHP());
+            Debug.Log("ENUM_AIState: " + GetAIState().ToString() + "   Collider: " + m_go.GetComponent<BoxCollider2D>().enabled + "  m_Attribute.GetHP(): " + m_Attribute.GetHP());
         }
     }
 

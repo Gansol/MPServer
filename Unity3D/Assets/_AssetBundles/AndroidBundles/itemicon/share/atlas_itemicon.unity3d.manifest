@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 933223343
+CRC: 3543558683
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f82c480cecf4e129d5e6f105c381ca92
+    Hash: e13c061ebc94991b3fad723a076a8adc
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 5d2e305d0061bd54b59415286d23bc7c
+    Hash: dc28cc8fa6b5d909b99a813e3fcbcab6
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -20,16 +20,17 @@ ClassTypes:
 - Class: 48
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/itemicon/share/atlas_itemicon.prefab
-- Assets/AssetBundles/itemicon/share/atlas_itemicon.png
 - Assets/AssetBundles/itemicon/share/atlas_itemicon.mat
 - Assets/AssetBundles/itemicon/share/atlas_itemicon.asset
+- Assets/AssetBundles/itemicon/share/atlas_itemicon.png
 Dependencies: []

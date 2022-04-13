@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2901575922
+CRC: 2813159421
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e962720203f6bf421fc84c7a48ebce5b
+    Hash: 0d873cad7fc475f2fbfbffb56f587d9e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -25,7 +25,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/skill/eggmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/eggmice/share/atlas_eggmice.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/eggmice/share/atlas_eggmice.unity3d

@@ -50,7 +50,7 @@ public class CreateJSON
         //HashComplier(pathURL, dictBundles, ".");
         //HashComplier(pathURL, dictBundles, ".manifest");
         HashComplier(pathURL, dictBundles, "*");
-        Debug.Log(Json.Serialize(dictBundles));
+        //Debug.Log(Json.Serialize(dictBundles));
         CreateFile(Json.Serialize(dictBundles), itemListURL, Global.itemListFile); //建立 新 檔案列表
     }
 

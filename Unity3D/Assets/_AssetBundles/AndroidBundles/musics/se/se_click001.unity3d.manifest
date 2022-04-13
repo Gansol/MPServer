@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2341962881
+CRC: 5338897
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d331c9b8cc1f595fd16233c2f52dc51d
+    Hash: 4278f577310e163b7c3a540f2cb3891d
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8de51064219e4f947fb7fea9d09a4e34
+    Hash: 06b3c4882d380e5fe8ce10e0f2e14683
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -17,6 +17,7 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/musics/se/se_click001.prefab
 Dependencies: []

@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 57347456
+CRC: 3990502205
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ea92194effb07dc4e779cf4d1e4944a2
+    Hash: 85b6e9082bde3331111cffdd5477c553
   TypeTreeHash:
     serializedVersion: 2
-    Hash: dad01587df1aa8449c5b0ccdbfd96950
+    Hash: 7b6435ed09dff2ab1e81441750244946
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,14 +24,15 @@ ClassTypes:
 - Class: 95
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 19fe7e8e677775c439de8045dfafc7d9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/effects/unique/effect_lighting.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

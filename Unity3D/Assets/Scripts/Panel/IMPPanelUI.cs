@@ -315,6 +315,7 @@ public abstract class IMPPanelUI
                 // 如果Panel已開啟 關閉Panel並Realse
                 Release();
                 //  scrollView.scroll = true;
+             //   Debug.Log("Last Panel Name: " + EventMaskSwitch.LastPanel.name);
                 EventMaskSwitch.LastPanel.SetActive(false);
                 EventMaskSwitch.Resume();
                 panelState.go.SetActive(false);

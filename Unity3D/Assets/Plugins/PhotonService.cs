@@ -66,6 +66,7 @@ public class PhotonService : IPhotonPeerListener
     public event SceneHandler GameStartEvent;
     public event SceneHandler WaitingPlayerEvent;
     public event SceneHandler ExitWaitingEvent;
+    public event SceneHandler SceneChangeEvent;
     public event SceneHandler ActorOnlineEvent;
     public event SceneHandler ApplyMatchGameFriendEvent;
 
@@ -221,9 +222,8 @@ public class PhotonService : IPhotonPeerListener
                 Global.OpponentData.RoomPlace = (string)eventResponse.Parameters[(byte)MatchGameParameterCode.RoomPlace];
                 Global.OpponentData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
                 Global.nextScene = Global.Scene.Battle;
-
+                SceneChangeEvent();
              //   ExitWaitingEvent(); 錯誤 這是為了 MatchFriend寫的
-                ExitWaitingRoom();
                 LoadSceneEvent();
                 break;
 
@@ -927,8 +927,9 @@ public class PhotonService : IPhotonPeerListener
                     {
                         if (operationResponse.ReturnCode == (short)ErrorCode.Ok)
                         {
-                            Int16 score = (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score];
-                            byte energy = (byte)operationResponse.Parameters[(byte)BattleParameterCode.Energy];
+                            // Int16 score =    (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score]>0 ? (Int16)operationResponse.Parameters[(byte)BattleParameterCode.Score] : (Int16)0;
+                            short score = (short)operationResponse.Parameters[(byte)BattleParameterCode.Score];
+                            short energy = (short)operationResponse.Parameters[(byte)BattleParameterCode.Energy];
                             UpdateScoreEvent(score, energy);
                         }
                     }
@@ -1660,7 +1661,7 @@ public class PhotonService : IPhotonPeerListener
     /// <summary>
     /// 傳送技能攻擊 傳送資料到Server
     /// </summary>
-    public void SendSkillMice(short miceID, int energy) //攻擊測試
+    public void SendSkillMice(short miceID, short energy) //攻擊測試
     {
         Debug.Log("IN Services SendSkill:" + miceID);
         try

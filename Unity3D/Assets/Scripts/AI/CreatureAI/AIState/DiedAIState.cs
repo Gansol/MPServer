@@ -15,6 +15,6 @@ public class DiedAIState : IAIState
 
     public override void Update()
     {
-
+     //   Debug.Log("Died State");
     }
 }

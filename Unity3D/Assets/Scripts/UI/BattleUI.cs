@@ -70,6 +70,7 @@ public class BattleUI : IMPPanelUI
         _blueLifeColor = UI.BlueLifeBar.GetComponent<UISprite>().color;
         _redLifeColor = UI.RedLifeBar.GetComponent<UISprite>().color;
 
+        UIEventListener.Get(UI.GoodGamePanel.transform.Find("Exit_Btn").gameObject).onClick = OnClosed;
         UIEventListener.Get(UI.exitBtn).onClick = OnClosed;
         Global.photonService.WaitingPlayerEvent += OnWaitingPlayer;
      //   Global.photonService.LoadSceneEvent += OnLoadScene;
@@ -364,7 +365,7 @@ public class BattleUI : IMPPanelUI
                 Debug.Log("Mission : Reduce! 豐收祭典 花費: " + value + " 糧食");
                 break;
             case Mission.DrivingMice:
-                UI.MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "達成 " + value.ToString() + "  UI.Combo!";
+                UI.MissionObject.transform.GetChild(0).GetComponent<UILabel>().text = "達成 " + value.ToString() + "  Combo!";
                 Debug.Log("Mission : DrivingMice! 驅趕老鼠 數量: " + value + " 隻");
                 break;
             case Mission.WorldBoss:
@@ -469,7 +470,7 @@ public class BattleUI : IMPPanelUI
             if (value > 0)
             {
                 UI.Combo.transform.GetChild(0).GetComponent<UILabel>().text = value.ToString();
-                UI.Combo.transform.GetChild(1).GetComponent<UILabel>().text = " UI.Combo";
+                UI.Combo.transform.GetChild(1).GetComponent<UILabel>().text = " Combo";
                 UI.Combo.GetComponent<Animator>().Play("Layer1.ComboFadeIn", -1, 0f);
             }
             else
@@ -515,7 +516,7 @@ public class BattleUI : IMPPanelUI
         }
         value = sumExp;
         value /= maxExp;
-        Debug.Log("Exp Percent:" + value + " _exp:" + sumExp);
+        Debug.Log("Exp Percent:" + value + " _exp:" + sumExp +" Result: "+result);
 
         // 顯示對戰結束 資訊
         UI.GoodGamePanel.SetActive(true);
@@ -527,6 +528,8 @@ public class BattleUI : IMPPanelUI
         UI.GoodGamePanel.transform.Find("Result").Find("Rice").GetComponent<UILabel>().text = sliverReward.ToString();
         UI.GoodGamePanel.transform.Find("Result").Find("Evaluate").GetComponent<UILabel>().text = evaluate.ToString();
         UI.GoodGamePanel.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().value = value;
+        UI.GoodGamePanel.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().enabled = false;
+        UI.GoodGamePanel.transform.Find("Result").Find("Rank").GetChild(0).GetComponent<UISlider>().enabled = true;
     }
     #endregion
 

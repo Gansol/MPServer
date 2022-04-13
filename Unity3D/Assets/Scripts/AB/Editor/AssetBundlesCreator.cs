@@ -92,14 +92,14 @@ public class AssetBundlesCreator : EditorWindow
 
     public static string publishFolder =
 #if UNITY_ANDROID
- "E:/MicePowBETA/AndroidBundles/";
+ "D:/MicePowBATA/AndroidBundles/";
 #elif UNITY_IPHONE || UNITY_IOS
     "E:/MicePowBETA/iOSBundles/";
 #endif
 
     public static string publishHashFolder =
 #if UNITY_ANDROID
- "E:/MicePowBETA/AndroidList/";
+ "D:/MicePowBATA/AndroidList/";
 #elif UNITY_IPHONE  || UNITY_IOS
     "E:/MicePowBETA/iOSList/";
 #endif

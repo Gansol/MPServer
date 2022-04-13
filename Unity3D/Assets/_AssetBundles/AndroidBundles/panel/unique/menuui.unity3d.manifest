@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1183315425
+CRC: 1779645657
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a233fc3c6ebf7c261dfc4856da62a61c
+    Hash: 4b8a11e3dc124f1e3f71e2712fb9f903
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 879f101f09893a17ae23fa5bd0e99604
+    Hash: 4997e67307935c6bac8ee8b7e6f684cf
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -40,61 +40,65 @@ ClassTypes:
 - Class: 111
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 7a9db341cf2acf846b418cb80961708e, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 75e7459110b9666449485c40f25362a5, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 858a20c1b21a3f94bb5b2d3b901c9aaf, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 2199b7539bd9af4429cf208f532579e3, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: b5a8477358cede346b3e5ec5dacbc7ab, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: eaee0fa3c7a782f43ac65b3fea68c1d6, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 9e2747e3775af504da1a4d5a46c5a1ce, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 8f533d052c03ac0458620d98e52e642b, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 3f093ad5830afe44aba6efa8b8a5d5b9, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 2c5ecb5660b11414fb042fb826e03b73, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 446d504799d99174383957fca80713c8, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 2a92b5d748695fd44aac9feef17ba415, type: 3}
+  Script: {fileID: 11500000, guid: 59b92ba690a9ce84ea3c64cb041cf59e, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: ac5060295fbd39b4a88d20d0c83d925e, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 57e428c9b6087304da439ec665b56a2d, type: 3}
+  Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: d7d07c7bf3bea5a458888e4355a42be2, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 6816844cbfa720c479ee8918d36fd7e9, type: 3}
+  Script: {fileID: 11500000, guid: a721a8bfffce7154ea7c942bec5797d9, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 9fb4b04d908736c4196b4087536d1c89, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 28ea68eda9b10e0438f5a5e3d5995035, type: 3}
+  Script: {fileID: 11500000, guid: eaee0fa3c7a782f43ac65b3fea68c1d6, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+  Script: {fileID: 11500000, guid: 2a92b5d748695fd44aac9feef17ba415, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 46c3f16f0ca57d349beaaee94fd924fe, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 6e796d6fe129c4b4a87d4140263fc4c9, type: 3}
+  Script: {fileID: 11500000, guid: 858a20c1b21a3f94bb5b2d3b901c9aaf, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: a721a8bfffce7154ea7c942bec5797d9, type: 3}
+  Script: {fileID: 11500000, guid: 3f093ad5830afe44aba6efa8b8a5d5b9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2199b7539bd9af4429cf208f532579e3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 125b9f6e6906d6e4897a443b3c12729c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 57e428c9b6087304da439ec665b56a2d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7a9db341cf2acf846b418cb80961708e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2c5ecb5660b11414fb042fb826e03b73, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7186a1580cb8c5144a9a47c19808f238, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 65ee607e1177db1479c3cbf94cac327e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: cfa4a4a103e4fed43a7e9e9df4a6915c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: bed49f8f5cec2e744a054cff9eb4836d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e1d8bef2cd9e67e468e65dbedfe62e47, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9e2747e3775af504da1a4d5a46c5a1ce, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ac5060295fbd39b4a88d20d0c83d925e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6816844cbfa720c479ee8918d36fd7e9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -103,12 +107,13 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/panel/unique/MenuUI.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainback.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainfront.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/shareobject.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainback.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/mainfront.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/shareobject.unity3d

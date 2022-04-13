@@ -43,7 +43,7 @@ public class AttachBtn_BattleUI : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Hole:"+hole.Count);
-        Debug.Log(hole[0].name);
+       // Debug.Log("Hole:"+hole.Count);
+       // Debug.Log(hole[0].name);
     }
 }

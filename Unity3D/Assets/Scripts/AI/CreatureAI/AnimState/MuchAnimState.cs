@@ -59,7 +59,7 @@ public class MuchAnimState : IAnimatorState {
 
                     if ((_animTime > _lifeTime || _survivalTime > _lifeTime) && !_isBoss)                       // 動畫撥放完畢時
                     {
-                        Play(ENUM_AnimatorState.Eat);
+                        Play(ENUM_AnimatorState.Eat, m_go);
                     }
             }
             else if (animatorStateInfo.fullPathHash == Animator.StringToHash("Layer1.Eat"))
@@ -69,7 +69,7 @@ public class MuchAnimState : IAnimatorState {
                 {
                     if (animatorStateInfo.normalizedTime > 1 && !m_Animator.IsInTransition(0))                       // 動畫撥放完畢時
                     {
-                        Play(ENUM_AnimatorState.Died);
+                        Play(ENUM_AnimatorState.Died, m_go);
                         _bEating = true;
                     }
                 }
@@ -82,16 +82,16 @@ public class MuchAnimState : IAnimatorState {
                 if (_animTime >= .5f && _isBoss)                       // 動畫撥放完畢時
                 {
                     animState = ENUM_AnimatorState.Idle;
-                    Play(animState);
+                    Play(animState,m_go);
                 }
             }
         }
     }
 
-    public override void Play(ENUM_AnimatorState animState)
+    public override void Play(ENUM_AnimatorState animState,GameObject go)
     {
         this.animState = animState;
-        m_Animator = m_go.GetComponentInChildren<Animator>();
+        m_Animator = go.GetComponentInChildren<Animator>();
 
         switch (animState)
         {

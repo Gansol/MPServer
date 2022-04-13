@@ -29,6 +29,8 @@ public class MenuUI : IMPPanelUI
         UIEventListener.Get(UI.settingBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.battleBtn).onClick = m_MPGame.ShowPanel;
         UIEventListener.Get(UI.survivalBtn).onClick = m_MPGame.ShowPanel;
+
+        EventMaskSwitch.Resume();
     }
 
     public override void Update()

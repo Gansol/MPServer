@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3947886899
+CRC: 2716433081
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: dd143dec9df11947700562dd84be7ccd
+    Hash: ef1991367b12bbb1f5dead5dcb39a7ce
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -25,7 +25,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
 - Class: 115
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/AssetBundles/skill/blackmice.prefab
 Dependencies:
-- D:/Administartor/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/blackmice/share/atlas_blackmice.unity3d
+- D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/blackmice/share/atlas_blackmice.unity3d

@@ -11,7 +11,7 @@ public class SugarAntsSkill : SkillBoss
         skillFlag = true;
     }
 
-    ICreatureAttr arribute = null;
+    ICreatureAttr attribute = null;
 
     public override void Initialize()
     {
@@ -23,10 +23,10 @@ public class SugarAntsSkill : SkillBoss
     {
         if (Time.time > m_LastTime + skillData.ColdDown && (Time.time - m_StartTime) < skillData.SkillTime)
         {
-            if (arribute.GetHP() < arribute.GetHP() / 3 && skillFlag)
+            if (attribute.GetHP() < attribute.GetHP() / 3 && skillFlag)
             {
                 go.GetComponent<Animator>().Play("Effect1");
-                arribute.SetHP(arribute.GetHP() + skillData.Attr + Random.Range(0, skillData.AttrDice + 1));
+                attribute.SetHP(attribute.GetHP() + skillData.Attr + Random.Range(0, skillData.AttrDice + 1));
                 skillFlag = false;
             }
         }
@@ -40,7 +40,7 @@ public class SugarAntsSkill : SkillBoss
     {
         Debug.Log("SugerAnts Display!");
         this.go = go;
-        this.arribute = arribute;
+        this.attribute = attribute;
         Global.photonService.UpdateScoreRate(MPProtocol.ENUM_Rate.Low);
 
     }

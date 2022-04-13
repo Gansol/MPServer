@@ -31,9 +31,9 @@ public abstract class ISkill
     /// 使用生物技能
     /// </summary>
     /// <param name="go"></param>
-    /// <param name="arribute"></param>
+    /// <param name="attribute"></param>
     /// <param name="state"></param>
-    public virtual void Display(ICreature creature/*, CreatureAttr arribute, IAIState state*/)
+    public virtual void Display(ICreature creature/*, CreatureAttr attribute, IAIState state*/)
     {
         m_Creature = creature;
     }

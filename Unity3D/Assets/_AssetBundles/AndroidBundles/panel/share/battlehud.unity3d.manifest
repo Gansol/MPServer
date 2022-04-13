@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1187530393
+CRC: 2429091803
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5e83a0ef2b0d6267ea233c1cd1f14246
+    Hash: ef274f34b6999e526f7c1a4b2e28838d
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 8a54f921be9e95a99076cbb9c276b333
+    Hash: 6bd64dcfb1e002ffab04916538d8dc20
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -21,8 +21,9 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/BattleHUD.png
-- Assets/AssetBundles/panel/share/BattleHUD.asset
 - Assets/AssetBundles/panel/share/BattleHUD.mat
+- Assets/AssetBundles/panel/share/BattleHUD.asset
+- Assets/AssetBundles/panel/share/BattleHUD.png
 Dependencies: []

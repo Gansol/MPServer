@@ -7,7 +7,7 @@ public abstract class ICreature
     protected ISkill m_Skill = null;
     //protected IAIState m_AIState = null;
     protected IAnimatorState m_AnimState = null;
-    protected ICreatureAttr m_Arribute = null;
+    protected ICreatureAttr m_Attribute = null;
     protected ICreatureAI m_AI = null;
 
     public enum ENUM_CreatureAIState
@@ -18,26 +18,30 @@ public abstract class ICreature
         Invincible,
     }
 
-    public abstract void SetGameObject(GameObject go);
-    public abstract void SetSkill(ISkill skill);
     //public abstract void SetState(IAIState state);
+    public abstract void SetGameObject(GameObject go);
     public abstract void SetAnimState(IAnimatorState state);
-    public abstract void SetArribute(ICreatureAttr arribute);
+    public abstract void SetAttribute(ICreatureAttr attribute);
     public abstract void SetAI(ICreatureAI ai);
+    public abstract void SetSkill(ISkill skill);
 
     protected abstract void OnInjured(short damage, bool myAttack);
     public abstract void Initialize();
     public abstract void Update();
     public abstract void Release();
-    /// <summary>
-    /// 受到攻擊
-    /// </summary>
     public abstract void OnHit();
 
     public virtual void Play(IAnimatorState.ENUM_AnimatorState state)
     {
         if (m_AnimState != null)
-            m_AnimState.Play(state);
+        {
+            m_AnimState.Play(state,m_go);
+            Debug.Log("ICreature Play:" + "   " + m_go.transform.parent.name + "   " + m_go.name + "  "+state.ToString());
+        }
+        else
+        {
+            Debug.Log("ICreature Play anim BUG");
+        }
     }
 
     public IAnimatorState GetAminState()
@@ -54,13 +58,14 @@ public abstract class ICreature
     {
         return m_AnimState.GetSurvivalTime();
     }
+
     public ICreatureAI GetAI()
     {
         return m_AI;
     }
 
-    public ICreatureAttr GetArribute()
+    public ICreatureAttr GetAttribute()
     {
-        return m_Arribute;
+        return m_Attribute;
     }
 }
