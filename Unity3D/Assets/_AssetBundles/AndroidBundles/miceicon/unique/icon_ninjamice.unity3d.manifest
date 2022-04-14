@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3838627366
+CRC: 2268601718
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4b7324b1a43e02f5349d70f2a32fcb6f
+    Hash: a044e9ba8e743e11665a15ded9255038
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/miceicon/unique/icon_ninjamice.prefab
+- Assets/AssetBundles/MiceICON/Unique/Icon_NinjaMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

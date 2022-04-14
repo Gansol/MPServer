@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3412272794
+CRC: 3726509954
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d3fc942be2b8e626b6038c5461e44b97
+    Hash: 56bf31e2dbc70fb408a85860f2f20803
   TypeTreeHash:
     serializedVersion: 2
     Hash: 8d592e4aff1f66731c2a72a2d4f37b60
@@ -53,7 +53,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Match.prefab
+- Assets/AssetBundles/Panel/Unique/Match.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 732681054
+CRC: 3692246675
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 082be17ca3a606e2ce0a3fc3d082364a
+    Hash: 73c83a7d49d9fb7ace04bcace9c7c179
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/miceicon/unique/icon_heromice.prefab
+- Assets/AssetBundles/MiceICON/Unique/Icon_HeroMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

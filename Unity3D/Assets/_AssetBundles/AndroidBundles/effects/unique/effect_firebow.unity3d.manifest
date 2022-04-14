@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1243213949
+CRC: 244018658
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0c88b73514f143e83c2bce4d5b1fb284
+    Hash: fb69131bc245d574d8da2f5a3d233033
   TypeTreeHash:
     serializedVersion: 2
     Hash: 6cc270808f2d7210f4b49389dac152ea
@@ -47,6 +47,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_firebow.prefab
+- Assets/AssetBundles/Effects/Unique/effect_firebow.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

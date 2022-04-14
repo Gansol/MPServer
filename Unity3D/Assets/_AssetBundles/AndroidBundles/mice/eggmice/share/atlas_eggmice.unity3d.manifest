@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 810276448
+CRC: 4086339866
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c99677418cd186dbf4d14bd6bb681943
+    Hash: f6578fe9eb470668851fd27963188496
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/eggmice/share/atlas_eggmice.mat
-- Assets/AssetBundles/mice/eggmice/share/atlas_eggmice.asset
-- Assets/AssetBundles/mice/eggmice/share/atlas_eggmice.png
+- Assets/AssetBundles/Mice/EggMice/share/atlas_eggmice.mat
+- Assets/AssetBundles/Mice/EggMice/share/atlas_eggmice.asset
+- Assets/AssetBundles/Mice/EggMice/share/atlas_eggmice.png
 Dependencies: []

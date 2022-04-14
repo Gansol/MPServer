@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3007993165
+CRC: 2125149763
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: bbff361a9bfd952d3a868a1460fb1411
+    Hash: 826f070c33121de10f5c27ae0fb4c33c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 6bd64dcfb1e002ffab04916538d8dc20
@@ -23,7 +23,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/share/atlas_bali.mat
-- Assets/AssetBundles/creature/share/atlas_bali.asset
-- Assets/AssetBundles/creature/share/atlas_bali.png
+- Assets/AssetBundles/Creature/share/atlas_bali.mat
+- Assets/AssetBundles/Creature/share/atlas_bali.asset
+- Assets/AssetBundles/Creature/share/atlas_bali.png
 Dependencies: []

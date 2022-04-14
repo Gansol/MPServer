@@ -17,6 +17,7 @@ public class BattleUI : IMPPanelUI
 
     private int _dataLoadedCount;           // 資料載入量
     private float _energy;                            // 能量
+    private float _otherEnergy;                            // 對手能量
     private float _myLife;                            // 生命
     private float _otherLife;                       // 對手生命
     private float _myMaxLife;                   // 最大生命
@@ -183,12 +184,13 @@ public class BattleUI : IMPPanelUI
             GUIShowVariables();
             ScoreBarAnim();
 
-            BeautyBar(UI.EnergyBar, _energy, _beautyEnergy);
-            BeautyBar(UI.BlueEnergyBar, _energy, _beautyEnergy);
-            BeautyBar(UI.RedEnergyBar, m_BattleSystem.GetBattleAttr().otherEnergy / 100f, _beautyOtherEnergy);
-            BeautyBar(UI.FeverBar, _feverEnergy, _beautyFever);
-            BeautyBar(UI.BlueLifeBar, _myLife, _beautyLife);
-            BeautyBar(UI.RedLifeBar, _otherLife, _beautyOtherLife);
+             _beautyEnergy= BeautyBar(UI.EnergyBar, _energy, _beautyEnergy,1f);
+             _beautyEnergy = BeautyBar(UI.BlueEnergyBar, _energy, _beautyEnergy,1f);
+            _beautyOtherEnergy= BeautyBar(UI.RedEnergyBar, _otherEnergy, _beautyOtherEnergy,1f);
+             _beautyFever= BeautyBar(UI.FeverBar, _feverEnergy, _beautyFever,1f);
+
+            _beautyLife= BeautyBar(UI.BlueLifeBar, _myLife, _beautyLife, _myMaxLife);
+            _beautyOtherLife= BeautyBar(UI.RedLifeBar, _otherLife, _beautyOtherLife, _ohterMaxLife);
         }
 
     }
@@ -223,9 +225,10 @@ public class BattleUI : IMPPanelUI
     // GUI 顯示數值
     private void GUIShowVariables()
     {
-        _myLife = m_BattleSystem.GetBattleAttr().life / _myMaxLife;
-        _otherLife = m_BattleSystem.GetBattleAttr().otherLife / _ohterMaxLife;
+        _myLife = m_BattleSystem.GetBattleAttr().life /*/ _myMaxLife*/;
+        _otherLife = m_BattleSystem.GetBattleAttr().otherLife /*/ _ohterMaxLife*/;
         _energy = m_BattleSystem.GetBattleAttr().energy / 100f;
+        _otherEnergy = m_BattleSystem.GetBattleAttr().otherEnergy / 100f;
         _feverEnergy = m_BattleSystem.GetBattleAttr().feverEnergy / 100f;
 
         _tmpMyLifeBar = UI.BlueLifeBar.value;
@@ -237,7 +240,7 @@ public class BattleUI : IMPPanelUI
         UI.BlueLifeText.text = m_BattleSystem.GetBattleAttr().life.ToString();
         UI.RedLifeText.text = m_BattleSystem.GetBattleAttr().otherLife.ToString();
         UI.ComboLabel.text = m_BattleSystem.GetBattleAttr().combo.ToString();        // 畫出 UI.Combo值
-
+        
         //if (tmpBlueLifeBar > BlueLifeBar.value)   // 扣血變色 未完成
         //    BarTweenColor(BlueLifeBar, Color.green, _blueLifeColor);
         //else
@@ -297,26 +300,28 @@ public class BattleUI : IMPPanelUI
     /// <param name="bar"></param>
     /// <param name="value"></param>
     /// <param name="tmpValue"></param>
-    private void BeautyBar(UISlider bar, float value, float tmpValue)
+    private float BeautyBar(UISlider bar, float value, float tmpValue,float maxValue)
     {
         bar.value = Mathf.Lerp(bar.value, value, 0.1f);
 
-        if (value == Math.Round(bar.value, 6)) bar.value /*= tmpValue */= value;
+        if (value == Math.Round(bar.value, 6)) bar.value = tmpValue = value;
 
-        //if (value > tmpValue)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
-        //{
-        //    bar.value = tmpValue;           // 先等於目前值，然後慢慢減少
-        //    tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
-        //}
-        //else if (value < tmpValue)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
-        //{
-        //    bar.value = (float)tmpValue;           // 先等於目前值，然後慢慢增加
-        //    tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
-        //}
-        //else
-        //{
-        //    bar.value = value;
-        //}
+        Debug.Log("MY:" + value +"  TMP:" + tmpValue);
+        if (value > tmpValue)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
+        {
+            bar.value = Mathf.Max((float)tmpValue / maxValue, 0);            // 先等於目前值，然後慢慢減少
+            tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就減少一些 直到數值相等 (可以造成平滑動畫)
+        }
+        else if (value < tmpValue)                      // 如果 舊值>目前值 (我的值比0.5大 分數比別人高)
+        {
+            bar.value = Mathf.Max((float)tmpValue/ maxValue,0);           // 先等於目前值，然後慢慢增加
+            tmpValue = Mathf.Lerp(tmpValue, value, 0.1f);                                        // 每次執行就增加一些 直到數值相等 (可以造成平滑動畫)
+        }
+        else
+        {
+            bar.value =Mathf.Max(value / maxValue, 0);
+        }
+        return tmpValue;
     }
     #endregion
 

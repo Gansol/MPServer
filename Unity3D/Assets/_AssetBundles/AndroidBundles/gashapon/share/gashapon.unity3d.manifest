@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2452412944
+CRC: 810697253
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 711dc2c9aa8088554c8f9d8a458f2fab
+    Hash: 593f61f2fac62634678a9328f9312cb5
   TypeTreeHash:
     serializedVersion: 2
     Hash: b0363f7088f9761414f730641bf9a24b
@@ -13,5 +13,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/gashapon/share/gashapon.png
+- Assets/AssetBundles/Gashapon/Share/Gashapon.png
 Dependencies: []

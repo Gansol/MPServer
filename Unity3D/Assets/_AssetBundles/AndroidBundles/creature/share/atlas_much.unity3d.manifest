@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3663013509
+CRC: 3585625741
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: bbec3e1b466e83bba06e8eedca6cadc8
+    Hash: 6bb4c0e8dbaac6e7943ec440b00d18df
   TypeTreeHash:
     serializedVersion: 2
     Hash: 6bd64dcfb1e002ffab04916538d8dc20
@@ -23,7 +23,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/share/atlas_much.mat
-- Assets/AssetBundles/creature/share/atlas_much.asset
-- Assets/AssetBundles/creature/share/atlas_much.png
+- Assets/AssetBundles/Creature/share/atlas_much.mat
+- Assets/AssetBundles/Creature/share/atlas_much.asset
+- Assets/AssetBundles/Creature/share/atlas_much.png
 Dependencies: []

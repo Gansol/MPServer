@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 191977502
+CRC: 2342716413
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f92652f4bb3b8fba7848c3b89ca83782
+    Hash: 5faa829ab5ce298a9bbb6b9b2f9d0316
   TypeTreeHash:
     serializedVersion: 2
     Hash: 2ef04e66c209cdcc3496a33c7f03416b
@@ -37,7 +37,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Tutorial.prefab
+- Assets/AssetBundles/Panel/Unique/Tutorial.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2800077746
+CRC: 4294564527
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: fd9cd942705f416f39ad8c2579c7c591
+    Hash: 38bff320356abd34b19f47ab4c3452dc
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/miceicon/unique/icon_candymice.prefab
+- Assets/AssetBundles/MiceICON/Unique/Icon_CandyMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d

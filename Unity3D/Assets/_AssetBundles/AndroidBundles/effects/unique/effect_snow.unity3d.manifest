@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3209488460
+CRC: 377847105
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1842b7693f9ab2f084c968765fc0587e
+    Hash: b9c47687e5d0d42add67e4319980b804
   TypeTreeHash:
     serializedVersion: 2
     Hash: 9aaad2f2f14316bb8fc2be39701424f0
@@ -43,6 +43,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_snow.prefab
+- Assets/AssetBundles/Effects/Unique/effect_snow.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

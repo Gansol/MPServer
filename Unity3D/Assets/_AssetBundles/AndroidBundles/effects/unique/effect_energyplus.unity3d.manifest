@@ -3,7 +3,7 @@ CRC: 1268573312
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 74f945abbc89c2817ec365df9e0026e2
+    Hash: 0a9a93d17bd14b69127d1e647468267e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_energyplus.prefab
+- Assets/AssetBundles/Effects/Unique/effect_energyplus.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

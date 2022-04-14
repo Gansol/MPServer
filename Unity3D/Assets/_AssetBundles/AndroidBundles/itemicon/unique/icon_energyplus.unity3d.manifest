@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4185947009
+CRC: 308311373
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a1cd70809a3d80d7f088726205d01033
+    Hash: da565ad92dd22a73b8e6f3c3635df2e4
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_energyplus.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_Energyplus.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

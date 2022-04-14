@@ -223,7 +223,7 @@ public class PhotonService : IPhotonPeerListener
                 Global.OpponentData.Image = (string)eventResponse.Parameters[(byte)PlayerDataParameterCode.PlayerImage];
                 Global.nextScene = Global.Scene.Battle;
                 SceneChangeEvent();
-             //   ExitWaitingEvent(); 錯誤 這是為了 MatchFriend寫的
+               // ExitWaitingEvent(); //錯誤 這是為了 MatchFriend寫的
                 LoadSceneEvent();
                 break;
 

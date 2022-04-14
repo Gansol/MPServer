@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4008764192
+CRC: 312165132
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 68e54d059dcb3de3003f14094892dd2a
+    Hash: d8e2d83a1f3152426b4a00713fb204c2
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0939c1584c8d7948d9c1fefabc96923b
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/ComicFontOutline.mat
-- Assets/AssetBundles/panel/share/ComicFontOutline.asset
+- Assets/AssetBundles/Panel/Share/ComicFontOutline.mat
+- Assets/AssetBundles/Panel/Share/ComicFontOutline.asset
 Dependencies: []

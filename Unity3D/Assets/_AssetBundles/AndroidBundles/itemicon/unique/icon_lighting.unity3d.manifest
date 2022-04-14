@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 980988137
+CRC: 1142055580
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 81d2caef9c0c88af159ff768405a615c
+    Hash: e31831078636353cfd9bff56f00f8691
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_lighting.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_Lighting.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

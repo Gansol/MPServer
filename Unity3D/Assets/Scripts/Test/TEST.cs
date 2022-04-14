@@ -14,10 +14,12 @@ public class TEST : MonoBehaviour
 
     private void Start()
     {
-        ICreature c ;
-        c = new Mice();
-        Debug.Log(c.ToString() + c.GetType());
-        c.GetType();
+        int a = 1;
+        int b;
+
+        Debug.Log(b = a);
+        Debug.Log(a =2);
+        Debug.Log(b);
     }
 
 

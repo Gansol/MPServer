@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2266809310
+CRC: 778965796
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d7f4b0723a665e6ea913911daedf41ad
+    Hash: 64334611471eb4a89c649050a0627c84
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_reflection.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_Reflection.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

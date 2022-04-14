@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1209695215
+CRC: 2751100195
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6cf37299d093601aec640f5f82cab7e0
+    Hash: f4fb5838da51c220c9de3cb5df96f69d
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_invincible.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_Invincible.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

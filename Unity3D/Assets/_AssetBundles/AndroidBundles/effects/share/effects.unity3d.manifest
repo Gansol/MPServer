@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3880550925
+CRC: 3168043722
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c4d146b0e50865d30708603c5a7b3233
+    Hash: 2fc6a7715ce483d4447fbc76c7e6e1fc
   TypeTreeHash:
     serializedVersion: 2
     Hash: dc28cc8fa6b5d909b99a813e3fcbcab6
@@ -29,8 +29,8 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/share/effects.mat
-- Assets/AssetBundles/effects/share/effects.png
-- Assets/AssetBundles/effects/share/effects.asset
-- Assets/AssetBundles/effects/share/effects.prefab
+- Assets/AssetBundles/Effects/Share/effects.mat
+- Assets/AssetBundles/Effects/Share/effects.png
+- Assets/AssetBundles/Effects/Share/effects.asset
+- Assets/AssetBundles/Effects/Share/effects.prefab
 Dependencies: []

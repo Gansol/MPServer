@@ -3,7 +3,7 @@ CRC: 1425313278
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: aabd60508680f7553d5a9ea6e4eed9f3
+    Hash: a6a7af19b5fe62c06326e9c7c72487da
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1f129ebbb127c4bf12d37e4e09c5d689
@@ -33,6 +33,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Purchase.prefab
+- Assets/AssetBundles/Panel/Unique/Purchase.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

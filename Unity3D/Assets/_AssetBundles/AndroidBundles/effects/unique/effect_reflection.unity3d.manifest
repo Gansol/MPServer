@@ -3,7 +3,7 @@ CRC: 1062504666
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1b3085f78443e65113fd6e82a7ee7e44
+    Hash: 358006b0e1cd64613a0a4b0d3308aa5e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_reflection.prefab
+- Assets/AssetBundles/Effects/Unique/effect_reflection.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

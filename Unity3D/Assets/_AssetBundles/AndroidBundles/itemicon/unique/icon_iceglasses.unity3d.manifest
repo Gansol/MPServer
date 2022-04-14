@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1937896093
+CRC: 519926662
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8e8491221912ff60f82de87b8d5d126e
+    Hash: 9b457188e14621a7c1d046c68f060e51
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_iceglasses.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_IceGlasses.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

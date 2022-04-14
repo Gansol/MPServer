@@ -3,7 +3,7 @@ CRC: 327711477
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0e6a9ff306d57276d8cac56d34460d77
+    Hash: 73a3f13fe138d7c85a3b5f9e19b028d1
   TypeTreeHash:
     serializedVersion: 2
     Hash: 6f052026bd50e670e02979549791a440
@@ -43,7 +43,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Friend.prefab
+- Assets/AssetBundles/Panel/Unique/Friend.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

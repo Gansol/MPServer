@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1258783926
+CRC: 2496632988
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0ad3efe28efa1dad704797a7041522bd
+    Hash: ffe11e1cbfa7a6ac5a991058022034e0
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/ninjamice/share/atlas_ninjamice.png
-- Assets/AssetBundles/mice/ninjamice/share/atlas_ninjamice.mat
-- Assets/AssetBundles/mice/ninjamice/share/atlas_ninjamice.asset
+- Assets/AssetBundles/Mice/NinjaMice/share/atlas_ninjamice.png
+- Assets/AssetBundles/Mice/NinjaMice/share/atlas_ninjamice.mat
+- Assets/AssetBundles/Mice/NinjaMice/share/atlas_ninjamice.asset
 Dependencies: []

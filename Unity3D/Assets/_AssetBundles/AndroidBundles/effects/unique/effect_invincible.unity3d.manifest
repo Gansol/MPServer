@@ -3,7 +3,7 @@ CRC: 1099698090
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 7a2ed0af1e27722b160ee52c86c15163
+    Hash: b6e5f81daf958e883e90b6e7fc7e06a3
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_invincible.prefab
+- Assets/AssetBundles/Effects/Unique/effect_invincible.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

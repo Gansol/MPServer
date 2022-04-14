@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2336242291
+CRC: 4254752130
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1216d4479bcc9b0962ffdf43e07baf2c
+    Hash: bef4f9c977bad1dddb060d08d865b0d5
   TypeTreeHash:
     serializedVersion: 2
     Hash: 75be4fa2d9f2558ca0b43a5a1ef43252
@@ -103,7 +103,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/GameUI.prefab
+- Assets/AssetBundles/Panel/Unique/GameUI.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/miceicon/share/atlas_miceicon.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/battlehud.unity3d

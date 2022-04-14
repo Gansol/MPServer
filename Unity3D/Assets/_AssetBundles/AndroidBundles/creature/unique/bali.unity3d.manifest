@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1970940116
+CRC: 3269313540
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 31eecea057370289d317684950d4e97b
+    Hash: d7686c4a9fba3014d95db2a26aa382df
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -29,6 +29,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/unique/bali.prefab
+- Assets/AssetBundles/Creature/Unique/Bali.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/atlas_bali.unity3d

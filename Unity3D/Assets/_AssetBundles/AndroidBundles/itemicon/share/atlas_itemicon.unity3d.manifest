@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3543558683
+CRC: 2950015539
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e13c061ebc94991b3fad723a076a8adc
+    Hash: 1ed086b27a980a1dd58fff0f88a704e1
   TypeTreeHash:
     serializedVersion: 2
     Hash: dc28cc8fa6b5d909b99a813e3fcbcab6
@@ -29,8 +29,8 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/share/atlas_itemicon.prefab
-- Assets/AssetBundles/itemicon/share/atlas_itemicon.mat
-- Assets/AssetBundles/itemicon/share/atlas_itemicon.asset
-- Assets/AssetBundles/itemicon/share/atlas_itemicon.png
+- Assets/AssetBundles/ItemICON/share/atlas_itemicon.prefab
+- Assets/AssetBundles/ItemICON/share/atlas_itemicon.mat
+- Assets/AssetBundles/ItemICON/share/atlas_itemicon.asset
+- Assets/AssetBundles/ItemICON/share/atlas_itemicon.png
 Dependencies: []

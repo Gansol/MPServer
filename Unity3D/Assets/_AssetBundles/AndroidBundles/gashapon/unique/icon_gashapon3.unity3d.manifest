@@ -3,7 +3,7 @@ CRC: 2120715741
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2c9d030ec35a703a243e6ddbbd8927d6
+    Hash: e088fd64b4b27c4a702f2c65eb510b5d
   TypeTreeHash:
     serializedVersion: 2
     Hash: cd4081c94633e7c3c8d496dd039c2374
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/gashapon/unique/icon_gashapon3.prefab
+- Assets/AssetBundles/Gashapon/unique/icon_gashapon3.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/gashapon/share/atlas_gashapon.unity3d

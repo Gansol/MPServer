@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 970953897
+CRC: 589917374
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8d8655a7b7257632597b13338b4a3b35
+    Hash: 3db2096fbc59f227c30dc4f157e05a51
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -29,6 +29,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/unique/much.prefab
+- Assets/AssetBundles/Creature/Unique/Much.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/atlas_much.unity3d

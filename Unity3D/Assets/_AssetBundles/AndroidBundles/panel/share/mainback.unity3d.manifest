@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3197674900
+CRC: 2269009314
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 07272969d9476b1a88d24498b0a85877
+    Hash: 6fe56bb0271464ac34c6dcc43ecc59d0
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/MainBack.asset
-- Assets/AssetBundles/panel/share/MainBack.mat
-- Assets/AssetBundles/panel/share/MainBack.png
+- Assets/AssetBundles/Panel/Share/MainBack.asset
+- Assets/AssetBundles/Panel/Share/MainBack.mat
+- Assets/AssetBundles/Panel/Share/MainBack.png
 Dependencies: []

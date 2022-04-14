@@ -3,7 +3,7 @@ CRC: 2737161325
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f567973ca5461d6465de23b00ff66ef1
+    Hash: 1342fc08af6785f96e4a83e7811dcecb
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1020fe0907a7fa0fa9a5641cd14a586e
@@ -37,6 +37,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_landfire.prefab
+- Assets/AssetBundles/Effects/Unique/effect_landfire.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

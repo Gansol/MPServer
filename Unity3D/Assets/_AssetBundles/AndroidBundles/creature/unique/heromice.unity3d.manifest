@@ -3,7 +3,7 @@ CRC: 647751188
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1eb21946742192ab9a76f26cb0b95f7d
+    Hash: a588643c40677b827462f2267a512024
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -29,6 +29,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/creature/unique/heromice.prefab
+- Assets/AssetBundles/Creature/Unique/heromice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/creature/share/atlas_heromice.unity3d

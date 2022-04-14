@@ -3,7 +3,7 @@ CRC: 2892936191
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3b2d617516ce18d179ee0fbb53ec0ea7
+    Hash: 5b5ac52fcca3349e0ef110960938f8dc
   TypeTreeHash:
     serializedVersion: 2
     Hash: d76b10983399e1f2ccec2e1ca486cc07
@@ -41,7 +41,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Store.prefab
+- Assets/AssetBundles/Panel/Unique/Store.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d

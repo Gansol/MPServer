@@ -3,7 +3,7 @@ CRC: 3990502205
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 85b6e9082bde3331111cffdd5477c553
+    Hash: a19621ddadefa2e822ee381ce13c5c3c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 7b6435ed09dff2ab1e81441750244946
@@ -33,6 +33,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_lighting.prefab
+- Assets/AssetBundles/Effects/Unique/effect_lighting.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

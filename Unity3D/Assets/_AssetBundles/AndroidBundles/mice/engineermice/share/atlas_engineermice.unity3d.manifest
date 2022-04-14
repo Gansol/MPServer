@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 820456793
+CRC: 3428160899
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 72f526f63ef615a084b8d50d2558e555
+    Hash: 53bd0296551974d94db0a2bb6537dbc8
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/engineermice/share/atlas_engineermice.asset
-- Assets/AssetBundles/mice/engineermice/share/atlas_engineermice.png
-- Assets/AssetBundles/mice/engineermice/share/atlas_engineermice.mat
+- Assets/AssetBundles/Mice/EngineerMice/share/atlas_engineermice.asset
+- Assets/AssetBundles/Mice/EngineerMice/share/atlas_engineermice.png
+- Assets/AssetBundles/Mice/EngineerMice/share/atlas_engineermice.mat
 Dependencies: []

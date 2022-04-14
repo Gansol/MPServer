@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3421767230
+CRC: 17415047
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1783400fd4bb87e2f9423d312d72f6d9
+    Hash: 054e61680e731685c0fad75ba7e33a68
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -29,6 +29,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/thiefmice/unique/thiefmice.prefab
+- Assets/AssetBundles/Mice/ThiefMice/Unique/ThiefMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/thiefmice/share/atlas_thiefmice.unity3d

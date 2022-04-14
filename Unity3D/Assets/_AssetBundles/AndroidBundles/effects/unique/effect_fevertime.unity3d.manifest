@@ -3,7 +3,7 @@ CRC: 3283043848
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 87f7a25e72ce250daa0136d1fa8e0202
+    Hash: cc9e03075662552ed1969597f2bab6ac
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_fevertime.prefab
+- Assets/AssetBundles/Effects/Unique/effect_fevertime.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

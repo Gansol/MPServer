@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1453961664
+CRC: 4022435536
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f52195ac54232c77648e2a52f5412e45
+    Hash: dd9b381880e977de019769921db6fa08
   TypeTreeHash:
     serializedVersion: 2
     Hash: 20956480b755a3cd9b29d1738752ec95
@@ -23,7 +23,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/LiHeiProFont.mat
-- Assets/AssetBundles/panel/share/LiHeiProFont.asset
-- Assets/AssetBundles/panel/share/LiHeiProFont.png
+- Assets/AssetBundles/Panel/Share/LiHeiProFont.mat
+- Assets/AssetBundles/Panel/Share/LiHeiProFont.asset
+- Assets/AssetBundles/Panel/Share/LiHeiProFont.png
 Dependencies: []

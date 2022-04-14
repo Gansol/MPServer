@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1578579924
+CRC: 73906974
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d67753163503c5395736831aeaa3cc27
+    Hash: a33c1be1c22342676206faec4d062791
   TypeTreeHash:
     serializedVersion: 2
     Hash: 48366753b50165ede4c82e8b8e34a350
@@ -29,6 +29,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/engineermice/unique/engineermice.prefab
+- Assets/AssetBundles/Mice/EngineerMice/Unique/EngineerMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/engineermice/share/atlas_engineermice.unity3d

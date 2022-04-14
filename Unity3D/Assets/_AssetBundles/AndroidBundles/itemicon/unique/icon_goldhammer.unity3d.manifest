@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3309138828
+CRC: 1635810960
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 629eeceba365102782fdd9712f297d36
+    Hash: 62bc2d387c7563c01b647b01eb034a8e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_goldhammer.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_GoldHammer.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

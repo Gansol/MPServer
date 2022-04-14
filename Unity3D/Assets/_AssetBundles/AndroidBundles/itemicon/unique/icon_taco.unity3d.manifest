@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1991947990
+CRC: 23256418
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6cf3b7f923a9096c77d60bb9544b9f39
+    Hash: 99a49f0541a9e2fb4f04fdc1d2cf3157
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_taco.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_Taco.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

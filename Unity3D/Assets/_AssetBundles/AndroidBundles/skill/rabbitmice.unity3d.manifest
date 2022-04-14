@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1296753832
+CRC: 1607749139
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0458cbbb62d6a46845fb17ad19a9fe52
+    Hash: 6a4a57be4024f027984d4c9e60155f48
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/skill/rabbitmice.prefab
+- Assets/AssetBundles/Skill/RabbitMice.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/mice/rabbitmice/share/atlas_rabbitmice.unity3d

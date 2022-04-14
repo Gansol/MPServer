@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2697471427
+CRC: 1662216889
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: da389809f1e78f7674b624ca2ebc32cb
+    Hash: 567db1b929886acd4029b4d5ad82f67a
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/blackmice/share/atlas_blackmice.mat
-- Assets/AssetBundles/mice/blackmice/share/atlas_blackmice.asset
-- Assets/AssetBundles/mice/blackmice/share/atlas_blackmice.png
+- Assets/AssetBundles/Mice/BlackMice/share/atlas_blackmice.mat
+- Assets/AssetBundles/Mice/BlackMice/share/atlas_blackmice.asset
+- Assets/AssetBundles/Mice/BlackMice/share/atlas_blackmice.png
 Dependencies: []

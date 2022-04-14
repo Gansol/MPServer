@@ -73,6 +73,8 @@ public class MatchUI : IMPPanelUI
         _dictLoadedTeamBtnRefs = new Dictionary<string, GameObject>();
         _delayBetween2Clicks = 0.3f;
         _bFirstLoad = true;
+
+        Global.photonService.SceneChangeEvent += OnSceneChange;
     }
 
     public override void Initialize()
@@ -85,7 +87,7 @@ public class MatchUI : IMPPanelUI
         Global.photonService.LoadPlayerDataEvent += OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent += OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent += OnExitWaiting;
-        Global.photonService.SceneChangeEvent += OnSceneChange;
+        
         Global.photonService.UpdateMiceEvent += OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent += OnApplyMatchGameFriend;
     }
@@ -537,9 +539,13 @@ public class MatchUI : IMPPanelUI
     private void OnSceneChange()
     {
         //matching_label.text = "等待超時，請重新配對！";
-        UI.matchingPanel.SetActive(false);
-        UI.beforeMatchPanel.SetActive(true);
-        ShowPanel(m_RootUI.transform.GetChild(0).name);
+        if (UI != null)
+        {
+            if (UI.transform.parent.gameObject.activeSelf)
+            {
+                OnClosed(UI.gameObject);
+            }
+        }
     }
     #endregion
 
@@ -568,7 +574,7 @@ public class MatchUI : IMPPanelUI
         Global.photonService.LoadPlayerDataEvent -= OnLoadPlayerData;
         Global.photonService.LoadPlayerItemEvent -= OnLoadPlayerItem;
         Global.photonService.ExitWaitingEvent -= OnExitWaiting;
-        Global.photonService.SceneChangeEvent -= OnSceneChange;
+        //Global.photonService.SceneChangeEvent -= OnSceneChange;
         Global.photonService.UpdateMiceEvent -= OnUpdateMice;
         Global.photonService.ApplyMatchGameFriendEvent -= OnApplyMatchGameFriend;
 

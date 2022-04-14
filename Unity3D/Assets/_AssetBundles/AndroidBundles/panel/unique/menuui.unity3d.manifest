@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1779645657
+CRC: 2169675216
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4b8a11e3dc124f1e3f71e2712fb9f903
+    Hash: c6f5d4b19c86faae505e7630e5e175f5
   TypeTreeHash:
     serializedVersion: 2
     Hash: 4997e67307935c6bac8ee8b7e6f684cf
@@ -109,7 +109,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/MenuUI.prefab
+- Assets/AssetBundles/Panel/Unique/MenuUI.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d

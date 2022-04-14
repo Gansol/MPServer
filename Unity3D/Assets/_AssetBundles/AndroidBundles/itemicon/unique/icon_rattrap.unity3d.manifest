@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2821845717
+CRC: 2865895653
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 72db7403e7cab230ef7c281657fd909f
+    Hash: 4ced9aa57240c5ef0bfe089c8aeb61fd
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0a3bd6d2803c128e4e6cc1d021910d84
@@ -21,6 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/itemicon/unique/icon_rattrap.prefab
+- Assets/AssetBundles/ItemICON/Unique/Icon_RatTrap.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/itemicon/share/atlas_itemicon.unity3d

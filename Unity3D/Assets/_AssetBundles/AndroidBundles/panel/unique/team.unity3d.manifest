@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 516891404
+CRC: 884966628
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9a363c63b0cb18a3811b2e0688054302
+    Hash: e49ca86112dafcc06978ad7c8a76f5d4
   TypeTreeHash:
     serializedVersion: 2
     Hash: b5908fa13455434aaef0e56afc6248fc
@@ -53,7 +53,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/Team.prefab
+- Assets/AssetBundles/Panel/Unique/Team.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/liheipro.unity3d

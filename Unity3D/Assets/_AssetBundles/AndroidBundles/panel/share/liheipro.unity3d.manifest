@@ -3,7 +3,7 @@ CRC: 3274277258
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 92804c87b825b235c52629d19ae996fb
+    Hash: eb2b079f096adb7da33be2f0837f98ec
   TypeTreeHash:
     serializedVersion: 2
     Hash: 4de8b25cbd6d858cd4c6ce40521297b9
@@ -19,5 +19,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/LiHeiPro.ttf
+- Assets/AssetBundles/Panel/Share/LiHeiPro.ttf
 Dependencies: []

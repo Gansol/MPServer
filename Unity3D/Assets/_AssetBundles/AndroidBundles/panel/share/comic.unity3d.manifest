@@ -3,7 +3,7 @@ CRC: 3458920244
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: fac90353155c4543885643aec8914848
+    Hash: a5293e2993d538f6e3fb6fce8f4401bb
   TypeTreeHash:
     serializedVersion: 2
     Hash: 4de8b25cbd6d858cd4c6ce40521297b9
@@ -19,5 +19,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/share/Comic.ttf
+- Assets/AssetBundles/Panel/Share/Comic.ttf
 Dependencies: []

@@ -3,7 +3,7 @@ CRC: 2041594961
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 761a4348210e88ade7b5526a36f72178
+    Hash: 44321c18f510a83c498bf15dbdce1eae
   TypeTreeHash:
     serializedVersion: 2
     Hash: add4c4e9327a67111969e9a206b80f4e
@@ -37,7 +37,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/panel/unique/InvItem.prefab
+- Assets/AssetBundles/Panel/Unique/InvItem.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/comic.unity3d
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/panel/share/panelui.unity3d

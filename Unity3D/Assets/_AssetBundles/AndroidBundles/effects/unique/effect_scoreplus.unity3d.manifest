@@ -3,7 +3,7 @@ CRC: 3972510032
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 414121cd6fb06a5e492363fe37fb3210
+    Hash: 904cc1a299eebebd127dbd69831297ca
   TypeTreeHash:
     serializedVersion: 2
     Hash: 567d3a8ac1a70bcc8d78d48b4d51355e
@@ -27,6 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/effects/unique/effect_scoreplus.prefab
+- Assets/AssetBundles/Effects/Unique/effect_scoreplus.prefab
 Dependencies:
 - D:/OneDrive - kroladev/Desktop/ProjectM/OneDrive/ProjectM/GIT/MPServer/Unity3D/Assets/_Assetbundles/AndroidBundles/effects/share/effects.unity3d

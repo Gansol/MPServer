@@ -211,8 +211,8 @@ public class MPGame
                 m_TutorialUI.Release();
                 m_PurchaseUI.Release();
 
-                m_BattleUI.Initialize();
                 m_BattleSystem.Initialize();
+                m_BattleUI.Initialize();
                 m_PoolSystem.Initialize();
                 m_MissionSystem.Initialize();
                 _bLoadBattlelPanel = true;

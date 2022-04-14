@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1120782538
+CRC: 3048117844
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a0e0d2037dcddaf8560bcc4952abf630
+    Hash: 13b545f7801cd3f2852af4dc6849d551
   TypeTreeHash:
     serializedVersion: 2
     Hash: 58e3b22c5965c1fa8a90b72e0da96882
@@ -21,7 +21,7 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.asset
-- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.png
-- Assets/AssetBundles/mice/thiefmice/share/atlas_thiefmice.mat
+- Assets/AssetBundles/Mice/ThiefMice/share/atlas_thiefmice.asset
+- Assets/AssetBundles/Mice/ThiefMice/share/atlas_thiefmice.png
+- Assets/AssetBundles/Mice/ThiefMice/share/atlas_thiefmice.mat
 Dependencies: []

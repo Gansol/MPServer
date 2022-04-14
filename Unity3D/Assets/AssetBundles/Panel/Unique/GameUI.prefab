@@ -108,7 +108,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3005
+  startingRenderQueue: 3006
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -1065,7 +1065,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3005
+  startingRenderQueue: 3006
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -16060,7 +16060,7 @@ MonoBehaviour:
   anchorOffset: 0
   softBorderPadding: 1
   renderQueue: 0
-  startingRenderQueue: 3005
+  startingRenderQueue: 3006
   mClipTexture: {fileID: 0}
   mAlpha: 1
   mClipping: 0
@@ -23442,7 +23442,7 @@ MonoBehaviour:
   aspectRatio: 1.0309278
   mType: 3
   mFillDirection: 4
-  mFillAmount: 0.85
+  mFillAmount: 1
   mInvert: 1
   mFlip: 1
   mApplyGradient: 1
@@ -23529,7 +23529,7 @@ MonoBehaviour:
   aspectRatio: 1.0306122
   mType: 3
   mFillDirection: 4
-  mFillAmount: 0.85
+  mFillAmount: 1
   mInvert: 0
   mFlip: 1
   mApplyGradient: 1
@@ -51108,9 +51108,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   thumb: {fileID: 0}
-  mBG: {fileID: 0}
-  mFG: {fileID: 11472068}
-  mValue: 0
+  mBG: {fileID: 11472068}
+  mFG: {fileID: 11444982}
+  mValue: 1
   mFill: 0
   numberOfSteps: 0
   onChange: []
@@ -51220,9 +51220,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   thumb: {fileID: 0}
-  mBG: {fileID: 0}
-  mFG: {fileID: 11472074}
-  mValue: 0
+  mBG: {fileID: 11472074}
+  mFG: {fileID: 11444980}
+  mValue: 1
   mFill: 0
   numberOfSteps: 0
   onChange: []
