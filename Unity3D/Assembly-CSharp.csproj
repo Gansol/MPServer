@@ -1,0 +1,1207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace></RootNamespace>
+    <ProjectGuid>{7214E491-EE9D-B906-A42D-2F3EA3DCD8FE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>.</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Temp\Bin\Debug\</OutputPath>
+    <DefineConstants>UNITY_2020_3_23;UNITY_2020_3;UNITY_2020;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_INCLUDE_TESTS;USE_SEARCH_ENGINE_API;SCENE_TEMPLATE_MODULE;ENABLE_AR;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_NATIVE_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_RUNTIME_PERMISSIONS;ENABLE_ENGINE_CODE_STRIPPING;ENABLE_ONSCREEN_KEYBOARD;INCLUDE_DYNAMIC_GI;ENABLE_MONO_BDWGC;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;ENABLE_VIDEO;PLATFORM_ANDROID;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;UNITY_CAN_SHOW_SPLASH_SCREEN;UNITY_HAS_GOOGLEVR;UNITY_HAS_TANGO;ENABLE_SPATIALTRACKING;PLATFORM_EXTENDS_VULKAN_DEVICE;PLATFORM_HAS_MULTIPLE_SWAPCHAINS;UNITY_ANDROID_SUPPORTS_SHADOWFILES;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;NET_4_6;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoConfig>true</NoConfig>
+    <NoStdLib>true</NoStdLib>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
+    <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <UnityProjectGenerator>Package</UnityProjectGenerator>
+    <UnityProjectGeneratorVersion>2.0.15</UnityProjectGeneratorVersion>
+    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityBuildTarget>Android:13</UnityBuildTarget>
+    <UnityVersion>2020.3.23f1</UnityVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Scripts\HAHA.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenScale.cs" />
+    <Compile Include="Assets\Scripts\Panel\StoreUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvDatabase.cs" />
+    <Compile Include="Assets\Scripts\Battle\HoleState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIAnchor.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\WorldBoss\MiceBoss.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\CrossHorSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Test\Constructor\cTest.cs" />
+    <Compile Include="Assets\Scripts\GameSystem\AssetLoaderSystem.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\BillingHVSpawnState.cs" />
+    <Compile Include="Assets\Scripts\TestPanelScript.cs" />
+    <Compile Include="Assets\Scripts\Test\Constructor\Zombie.cs" />
+    <Compile Include="Assets\Scripts\Test\Del\CX.cs" />
+    <Compile Include="Assets\GooglePlayGames\OurUtils\PlatformUtils.cs" />
+    <Compile Include="Assets\Scripts\UI\BattleUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\LagRotation.cs" />
+    <Compile Include="Assets\Scripts\IAP\IabWrapper.cs" />
+    <Compile Include="Assets\Scripts\UI\DataUI.cs" />
+    <Compile Include="Assets\Scripts\Test\TEST2.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIScrollView.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIToggle.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\UIStorageSlot.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Events\Event.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\LogView.cs" />
+    <Compile Include="Assets\Scripts\Test\FocusExample.cs" />
+    <Compile Include="Assets\Scripts\GameSystem\AudioSystem.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\ISavedGameMetadata.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UI2DSpriteAnimation.cs" />
+    <Compile Include="Assets\Scripts\Panel\PlayerUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UISavedOption.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\IBattleAIState.cs" />
+    <Compile Include="Assets\Scripts\Test\Date.cs" />
+    <Compile Include="Assets\Scripts\Battle\PoolSystem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonOffset.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIScrollBar.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AnimState\HeroMiceAnimState.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\VersionChecker.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragResize.cs" />
+    <Compile Include="Assets\Scripts\Store\InvItem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\PropertyBinding.cs" />
+    <Compile Include="Assets\GooglePlayGames\OurUtils\NearbyHelperObject.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UITextList.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_LoginUI.cs" />
+    <Compile Include="Assets\SDK\MicePowServices\GPGSIds.cs" />
+    <Compile Include="Assets\Scripts\AI\BotAI\BotAI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIEventTrigger.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Video\VideoCapabilities.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\DummyClient.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_PurchaseUI.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesPlatform.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UISoundVolume.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AnimState\IAnimatorState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButton.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillShadowAvatar.cs" />
+    <Compile Include="Assets\Scripts\BattleTest\SpawnController.cs" />
+    <Compile Include="Assets\Scripts\MPGame.cs" />
+    <Compile Include="Assets\Scripts\Clients\ConnectServices.cs" />
+    <Compile Include="Assets\Scripts\PlayerInput.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_StoreUI.cs" />
+    <Compile Include="Assets\Scripts\Factory\MPGFactory.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesAchievement.cs" />
+    <Compile Include="Assets\Scripts\Clients\PhotonConnect.cs" />
+    <Compile Include="Assets\Scripts\Database.cs" />
+    <Compile Include="Assets\Scripts\Battle\BattleSystem.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Events\IEvent.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UISpriteData.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIPlayTween.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\ExampleDragDropSurface.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\SpringPosition.cs" />
+    <Compile Include="Assets\Scripts\Panel\FriendUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UICamera.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIEventListener.cs" />
+    <Compile Include="Assets\Scripts\Test\abstract\AbTest.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\INearbyConnectionClient.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragObject.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" />
+    <Compile Include="Assets\Scripts\Data\MiceAttr.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\DialogShare.cs" />
+    <Compile Include="Assets\Scripts\Panel\MenuUI.cs" />
+    <Compile Include="Assets\Scripts\Test\Del\del2.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\Tutorial5.cs" />
+    <Compile Include="Assets\Scripts\Battle\MissionSystem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonRotation.cs" />
+    <Compile Include="Assets\Scripts\GameSystem\MessageSystem.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\EasyBattleAIState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\ByteReader.cs" />
+    <Compile Include="Assets\Scripts\Test\Del\del.cs" />
+    <Compile Include="Assets\Scripts\Data\StoreAttr.cs" />
+    <Compile Include="Assets\Scripts\Effects\Scorched.cs" />
+    <Compile Include="Assets\Scripts\Menu\ScrollView.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIStretch.cs" />
+    <Compile Include="Assets\Scripts\Test\Coll.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UISpriteCollection.cs" />
+    <Compile Include="Assets\Scripts\Test\Del\AX.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AIState\IAIState.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\CommonStatusCodes.cs" />
+    <Compile Include="Assets\Scripts\AI\PlayerAI\NormalState.cs" />
+    <Compile Include="Assets\Scripts\Test\abstract\A.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvGameItem.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_MatchUI.cs" />
+    <Compile Include="Assets\Scripts\Test\abstract\InterfaceD.cs" />
+    <Compile Include="Assets\Scripts\GameSystem\IGameSystem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIWidget.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\PlayerProfile.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragScrollView.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\NGUIMath.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIPlayAnimation.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Player.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\IceGlasses.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SignInStatus.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Achievement.cs" />
+    <Compile Include="Assets\Scripts\Factory\IFactory.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\LookAtTarget.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\SpawnState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\UISliderColors.cs" />
+    <Compile Include="Assets\Scripts\Test\abstract\C.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidJavaConverter.cs" />
+    <Compile Include="Assets\Scripts\IAP\MPIAPManager.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\Mice\Bali.cs" />
+    <Compile Include="Assets\Scripts\Test\CorountineTest.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UISpriteAnimation.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidTaskUtils.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenFOV.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\NGUIAtlas.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UILabel.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\AppRequests.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UICenterOnClick.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\LagPosition.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UISnapshotPoint.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\Lighting.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\NGUIFont.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\SetColorPickerColor.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragDropContainer.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenHeight.cs" />
+    <Compile Include="Assets\Scripts\Question\TutorialUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonMessage.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\DummyNearbyConnectionClient.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\AssetBundlesDownloader.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\PlayGamesClientFactory.cs" />
+    <Compile Include="Assets\GooglePlayGames\GameInfo.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesLocalUser.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\NGUIText.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\BillingXSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Test\UIlabelTest.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIKeyNavigation.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\SetColorOnSelection.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\Localization.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragCamera.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\ChatInput.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\CloseDoorSpawnState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\BetterList.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UILocalize.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Events\IEventsClient.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\OpenURLOnClick.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\LesserHeal.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidNearbyConnectionClient.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Video\iVideoClient.cs" />
+    <Compile Include="Assets\Scripts\Data\SkillAttr.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesScore.cs" />
+    <Compile Include="Assets\Scripts\AudioManager.cs" />
+    <Compile Include="Assets\Scripts\Test\dem.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidSavedGameClient.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIPopupList.cs" />
+    <Compile Include="Assets\Scripts\Test\CoroutineWithData.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\WindowDragTilt.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\LoadLevelOnClick.cs" />
+    <Compile Include="Assets\Scripts\SceneAnimsManager.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\BMGlyph.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UITexture.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\RatTrap.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\IPlayGamesClient.cs" />
+    <Compile Include="Assets\Scripts\Test\SpawnTest.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillSteal.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\FeatherSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Panel\Button\BtnSwitch.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Video\CaptureOverlayStateListener.cs" />
+    <Compile Include="Assets\Scripts\Test\LoadTextrue.cs" />
+    <Compile Include="Assets\Scripts\AD\ADBanner.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\CommonTypes.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UITooltip.cs" />
+    <Compile Include="Assets\Scripts\Menu\ScrollView.bak.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\AnimatedWidget.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenFill.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenPosition.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIFont.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\LanguageSelection.cs" />
+    <Compile Include="Assets\Scripts\UI\LoginUI.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\MiceBossAI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UITable.cs" />
+    <Compile Include="Assets\Scripts\Skill\SkillBoss.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidSnapshotMetadata.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\ScorePageToken.cs" />
+    <Compile Include="Assets\Scripts\TeamSlotChk.cs" />
+    <Compile Include="Assets\Scripts\ObjectPool.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidVideoClient.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\FeverTime.cs" />
+    <Compile Include="Assets\Scripts\Test\LoadSceneDestroyTest.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\Taco.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AIState\IdleAIState.cs" />
+    <Compile Include="Assets\Scripts\Panel\MatchUI.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\PlayGamesClientConfiguration.cs" />
+    <Compile Include="Assets\Scripts\Data\ICreatureAttr.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvAttachmentPoint.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\SnakeSpawnState.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\MenuBase.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\CrossVertSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillDontTouchMe.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenWidth.cs" />
+    <Compile Include="Assets\Scripts\GameLoop.cs" />
+    <Compile Include="Assets\GooglePlayGames\PluginVersion.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AIState\InvincibleAIState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIPanel.cs" />
+    <Compile Include="Assets\Scripts\Factory\EffectsFactory.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\UIItemSlot.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIImageButton.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\FishSpawnState.cs" />
+    <Compile Include="Assets\Scripts\AD\UnityAds.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\TestHash.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIProgressBar.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\AnimatedAlpha.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\BMSymbol.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragDropItem.cs" />
+    <Compile Include="Assets\Scripts\Creature\IMice.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\LeaderboardScoreData.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonColor.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_FriendUI.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\Reflection.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\Mice\Much.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\PropertyReference.cs" />
+    <Compile Include="Assets\Scripts\GPGSIds.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\ICreatureAI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIRoot.cs" />
+    <Compile Include="Assets\GooglePlayGames\OurUtils\Logger.cs" />
+    <Compile Include="Assets\Scripts\Skill\Mice\SkillTest.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\Mice\Mice.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIColorPicker.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenOrthoSize.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\PlayerStats.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDragDropRoot.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\MiceAI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIToggledComponents.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\Invincible.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\AdvertisingResult.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\AssetBundlesHash.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Video\VideoCaptureState.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\TokenClient.cs" />
+    <Compile Include="Assets\Scripts\ShowInfo.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\CrazyBattleAIState.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\X.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\ActiveAnimation.cs" />
+    <Compile Include="Assets\Scripts\Loading\SyncLoad.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AIState\DiedAIState.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SignInInteractivity.cs" />
+    <Compile Include="Assets\Scripts\Data\LoadProperty.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenColor.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIWidgetContainer.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_BattleUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\UIEquipmentSlot.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\DownloadTexture.cs" />
+    <Compile Include="Assets\GooglePlayGames\OurUtils\Misc.cs" />
+    <Compile Include="Assets\Scripts\Creature\ICreature.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvEquipment.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AnimState\MiceAnimState.cs" />
+    <Compile Include="Assets\Scripts\Data\DepthManager.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\SwimSpawnState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\RealTime.cs" />
+    <Compile Include="Assets\Scripts\Test\JsonSample.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenVolume.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\SavedGameMetadataUpdate.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidHelperFragment.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\NGUITools.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\ExampleDragDropItem.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillCallMice.cs" />
+    <Compile Include="Assets\Scripts\InstantiatePanel.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\ConnectionResponse.cs" />
+    <Compile Include="Assets\Scripts\CloudAnimation.cs" />
+    <Compile Include="Assets\Scripts\Factory\AttrFactory.cs" />
+    <Compile Include="Assets\Scripts\GameSystem\CreatureSystem.cs" />
+    <Compile Include="Assets\Scripts\Test\Constructor\Human.cs" />
+    <Compile Include="Assets\Scripts\Skill\ISkill.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_MenuUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIRect.cs" />
+    <Compile Include="Assets\Scripts\Skill\SkillItem.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvStat.cs" />
+    <Compile Include="Assets\Scripts\Panel\Button\SwitchBtnComponent.cs" />
+    <Compile Include="Assets\Scripts\Factory\SkillFactory.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\STwinSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\Mice\HeroMice.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\EndlessBattleAIState.cs" />
+    <Compile Include="Assets\Scripts\Effects\TapBorad.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenAlpha.cs" />
+    <Compile Include="Assets\Scripts\Factory\ObjectFactory.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\AssetBundleChecker.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIWrapContent.cs" />
+    <Compile Include="Assets\Scripts\Data\Clac.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\Game\UIItemStorage.cs" />
+    <Compile Include="Assets\Scripts\Creature\Mice\IMiceBoss.cs" />
+    <Compile Include="Assets\Scripts\Test\abstract\B.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\AnimationOrTween.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\ConnectionRequest.cs" />
+    <Compile Include="Assets\Scripts\Skill\SkillPlayer.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidEventsClient.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\ISavedGameClient.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\VersionManager.cs" />
+    <Compile Include="Assets\Scripts\Skill\SkillCreature.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIInput.cs" />
+    <Compile Include="Assets\Scripts\Test3.cs" />
+    <Compile Include="Assets\Scripts\Drag.cs" />
+    <Compile Include="Assets\GooglePlayGames\OurUtils\PlayGamesHelperObject.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\ConsoleBase.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesLeaderboard.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UISlider.cs" />
+    <Compile Include="Assets\Scripts\AD\ADTest.cs" />
+    <Compile Include="Assets\Scripts\BattleTest\RandomSpawnCommand.cs" />
+    <Compile Include="Assets\Scripts\UI\EventMaskSwitch.cs" />
+    <Compile Include="Assets\Scripts\Panel\Button\ButtonSwitcher.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\Spin.cs" />
+    <Compile Include="Assets\Scripts\Data\DontDestory.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\GraphRequest.cs" />
+    <Compile Include="Assets\Scripts\Data\AttrBase.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIInputOnGUI.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\CreateJSON.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\FireBow.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\EnergyPlus.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\NearbyConnectionConfiguration.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonScale.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIViewport.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\PanWithMouse.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\HardBattleAIState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonKeys.cs" />
+    <Compile Include="Assets\Scripts\AD\ADCommon.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillShield.cs" />
+    <Compile Include="Assets\Scripts\WaitAnims.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\PerspectivePixelPerfect.cs" />
+    <Compile Include="Assets\Scripts\Factory\AnimFactory.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\AppLinks.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\AccessTokenMenu.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\FreezeEnergy.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\NearbyConnectionClientFactory.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\SpawnAI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\MinMaxRangeAttribute.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\EnvelopContent.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\MainMenu.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\SpinWithMouse.cs" />
+    <Compile Include="Assets\Scripts\Clients\LogoFadeLoadScene.cs" />
+    <Compile Include="Assets\Scripts\Factory\CreatureFactory.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIToggledObjects.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\Other\WindowAutoYaw.cs" />
+    <Compile Include="Assets\Scripts\Test\PhotonTestOnly.cs" />
+    <Compile Include="Assets\Scripts\AI\PlayerAI\PlayerAIState.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\SignInHelper.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\ScorePlus.cs" />
+    <Compile Include="Assets\Scripts\AI\BattleAI\NormalBattleAIState.cs" />
+    <Compile Include="Assets\Scripts\Test\TEST.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidClient.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIShowControlScheme.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenLetters.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIBasicSprite.cs" />
+    <Compile Include="Assets\SDK\NGUI\Examples\Scripts\InventorySystem\System\InvBaseItem.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillRndDebuff.cs" />
+    <Compile Include="Assets\Scripts\Clients\InternetChecker.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIAtlas.cs" />
+    <Compile Include="Assets\Scripts\Panel\Button\MPButton.cs" />
+    <Compile Include="Assets\Scripts\Skill\SkillMice.cs" />
+    <Compile Include="Assets\Scripts\PatchFileChecker.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_PlayerUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIForwardEvents.cs" />
+    <Compile Include="Assets\Scripts\Question\Question.cs" />
+    <Compile Include="Assets\GooglePlayGames\Platforms\Android\AndroidTokenClient.cs" />
+    <Compile Include="Assets\Scripts\Store\Item.cs" />
+    <Compile Include="Assets\Scripts\Test\Del\BX.cs" />
+    <Compile Include="Assets\Scripts\Panel\IMPPanelUI.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\Pay.cs" />
+    <Compile Include="Assets\Scripts\Skill\Btn\SkillBtn.cs" />
+    <Compile Include="Assets\Scripts\Skill\Boss\SkillSugarAnts.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\LoopCircleSpawnState.cs" />
+    <Compile Include="Assets\Scripts\Skill\Item\Snow.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\EventDelegate.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIDrawCall.cs" />
+    <Compile Include="Assets\Scripts\Test\InsABTest.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UI2DSprite.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIPlaySound.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIDraggableCamera.cs" />
+    <Compile Include="Assets\Scripts\Battle\SpawnState\CrossSpawnState.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIGrid.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_TutorialUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\AnimatedColor.cs" />
+    <Compile Include="Assets\Scripts\AI\CreatureAI\AnimState\MuchAnimState.cs" />
+    <Compile Include="Assets\Scripts\Test\AudioTest.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenTransform.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\BMFont.cs" />
+    <Compile Include="Assets\Scripts\Test\DictionaryTest.cs" />
+    <Compile Include="Assets\Scripts\Panel\PurchaseUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UICenterOnChild.cs" />
+    <Compile Include="Assets\Scripts\Panel\TeamUI.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\UITweener.cs" />
+    <Compile Include="Assets\Scripts\AD\AdInterstitial.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\UIGeometry.cs" />
+    <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesUserProfile.cs" />
+    <Compile Include="Assets\GooglePlayGames\BasicApi\Nearby\EndpointDetails.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\SpringPanel.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UISprite.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIButtonActivate.cs" />
+    <Compile Include="Assets\Scripts\BattleTest\ISpawnCommand.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\UIKeyBinding.cs" />
+    <Compile Include="Assets\Scripts\AssetBundles\X2.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Interaction\TypewriterEffect.cs" />
+    <Compile Include="Assets\Scripts\Loading\SceneLoader.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Internal\NGUIDebug.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\UI\UIOrthoCamera.cs" />
+    <Compile Include="Assets\SDK\FacebookSDK\Examples\Scripts\SubMenus\AppEvents.cs" />
+    <Compile Include="Assets\SDK\NGUI\Scripts\Tweening\TweenRotation.cs" />
+    <Compile Include="Assets\Scripts\UI\AttachBtn_TeamUI.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\GooglePlayGames\Plugins\Android\GooglePlayGamesManifest.androidlib\AndroidManifest.xml" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Wooden\Arimo20.txt" />
+    <None Include="Assets\SDK\FacebookSDK\link.xml" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\iOS\Facebook.Unity.IOS.dll" />
+    <None Include="Assets\UnityAds\UnityEngine.Advertisements.Unsupported.dll" />
+    <None Include="Assets\SDK\NGUI\Examples\Models\Orc\Orc Skin.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\SciFi\SciFi Font - Header.txt" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Packed 3.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Shaders\Unlit - Depth Cutout.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Masked 3.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored (TextureClip).shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Masked.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Premultiplied Colored 1.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (TextureClip).shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Packed.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Shaders\Unlit - Depth.shader" />
+    <None Include="Assets\SDK\NGUI\ReadMe - 2019.3.0.txt" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Settings\Facebook.Unity.Settings.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Packed 2.shader" />
+    <None Include="Assets\SDK\NGUI\ReadMe - 3.8.0.txt" />
+    <None Include="Assets\UnityAds\UnityEngine.Monetization.Editor.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Premultiplied Colored 2.shader" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Canvas\Facebook.Unity.Canvas.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored 2.shader" />
+    <None Include="Assets\UnityAds\UnityEngine.Advertisements.Editor.dll" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Refractive\Refractive Font - Normal.txt" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Masked 2.shader" />
+    <None Include="Assets\UnityAds\UnityEngine.Advertisements.iOS.dll" />
+    <None Include="Assets\UnityAds\UnityEngine.Monetization.iOS.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Text 3.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Text 2.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Text.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Premultiplied Colored (TextureClip).shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored.shader" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Facebook.Unity.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Packed 1.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Resources\Localization.txt" />
+    <None Include="Assets\UnityAds\link.xml" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Wooden\Arimo18.txt" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Gameroom\Facebook.Unity.Gameroom.dll" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Refractive\Refractive Font - Header.txt" />
+    <None Include="Assets\SDK\NGUI\Examples\Shaders\Refractive.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Shaders\Unlit - Masked Colored.shader" />
+    <None Include="Assets\UnityAds\UnityEngine.Monetization.Unsupported.dll" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\SciFi\SciFi Font - Normal.txt" />
+    <None Include="Assets\UnityAds\UnityEngine.Advertisements.Android.dll" />
+    <None Include="Assets\UnityAds\UnityEngine.Monetization.Android.dll" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Wooden\Arimo14.txt" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Android\Facebook.Unity.Android.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Masked 1.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored 3.shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
+    <None Include="Assets\SDK\NGUI\Examples\Models\Orc Armor\Orc Armor.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Premultiplied Colored.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Premultiplied Colored 3.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Text (TextureClip).shader" />
+    <None Include="Assets\SDK\NGUI\Examples\Shaders\Unlit - Additive Colored.shader" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Text 1.shader" />
+    <None Include="Assets\Atlas\Font\Comic.fnt" />
+    <None Include="Assets\SDK\FacebookSDK\Plugins\Gameroom\FacebookNamedPipeClient.dll" />
+    <None Include="Assets\SDK\NGUI\Resources\Shaders\Unlit - Transparent Colored 1.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ARModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ARModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AccessibilityModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AccessibilityModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AndroidJNIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AndroidJNIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CrashReportingModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.CrashReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DSPGraphModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.DSPGraphModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.GIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GridModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.HotReloadModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.LocalizationModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.LocalizationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PerformanceReportingModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.PerformanceReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ProfilerModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ProfilerModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.ScreenCaptureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.SharedInternalsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteMaskModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.SpriteMaskModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteShapeModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.SpriteShapeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StreamingModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.StreamingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubsystemsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.SubsystemsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TLSModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TLSModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TextCoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TilemapModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.TilemapModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsNativeModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsNativeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UNETModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UNETModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UmbraModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UmbraModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityAnalyticsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityConnectModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityCurlModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityCurlModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityTestProtocolModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityTestProtocolModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VFXModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.VFXModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VRModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.VRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VehiclesModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.VehiclesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.VideoModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WindModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.WindModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.CoreModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.GraphViewModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.GraphViewModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.PackageManagerUIModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.PackageManagerUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.SceneTemplateModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.SceneTemplateModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIElementsModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIElementsSamplesModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIElementsSamplesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIServiceModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIServiceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UnityConnectModule">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>Assets\Plugins\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>Assets\Plugins\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity.Gameroom">
+      <HintPath>Assets\SDK\FacebookSDK\Plugins\Gameroom\Facebook.Unity.Gameroom.dll</HintPath>
+    </Reference>
+    <Reference Include="MPProtocol">
+      <HintPath>Assets\Plugins\MPProtocol.dll</HintPath>
+    </Reference>
+    <Reference Include="Gansol">
+      <HintPath>Assets\Plugins\Gansol.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N">
+      <HintPath>Assets\Plugins\I18N.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Monetization.Editor">
+      <HintPath>Assets\UnityAds\UnityEngine.Monetization.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Advertisements.Editor">
+      <HintPath>Assets\UnityAds\UnityEngine.Advertisements.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N.West">
+      <HintPath>Assets\Plugins\I18N.West.dll</HintPath>
+    </Reference>
+    <Reference Include="I18N.CJK">
+      <HintPath>Assets\Plugins\I18N.CJK.dll</HintPath>
+    </Reference>
+    <Reference Include="WP8PopUps">
+      <HintPath>Assets\Plugins\WP8PopUps.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniJSON">
+      <HintPath>Assets\Plugins\MiniJSON.dll</HintPath>
+    </Reference>
+    <Reference Include="FacebookNamedPipeClient">
+      <HintPath>Assets\SDK\FacebookSDK\Plugins\Gameroom\FacebookNamedPipeClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity.Settings">
+      <HintPath>Assets\SDK\FacebookSDK\Plugins\Settings\Facebook.Unity.Settings.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity">
+      <HintPath>Assets\SDK\FacebookSDK\Plugins\Facebook.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Common">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Xml.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.IO.Compression.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Microsoft.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Win32.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\Microsoft.Win32.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\netstandard.dll</HintPath>
+    </Reference>
+    <Reference Include="System.AppContext">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.AppContext.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Concurrent">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Collections.Concurrent.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.NonGeneric">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Collections.NonGeneric.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Specialized">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Collections.Specialized.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ComponentModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.EventBasedAsync">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ComponentModel.EventBasedAsync.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ComponentModel.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.TypeConverter">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ComponentModel.TypeConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Console">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Console.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.Common">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Data.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.Contracts">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.Debug">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.Debug.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.FileVersionInfo">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.FileVersionInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.Process">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.Process.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.StackTrace">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.StackTrace.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.TextWriterTraceListener">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.TextWriterTraceListener.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.Tools">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.Tools.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.TraceSource">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Diagnostics.TraceSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Drawing.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Dynamic.Runtime">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Dynamic.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Globalization.Calendars">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Globalization.Calendars.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Globalization">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Globalization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Globalization.Extensions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Globalization.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression.ZipFile">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.Compression.ZipFile.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.FileSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.DriveInfo">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.FileSystem.DriveInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.FileSystem.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Watcher">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.FileSystem.Watcher.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.IsolatedStorage">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.IsolatedStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.MemoryMappedFiles">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.MemoryMappedFiles.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Pipes">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.Pipes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.UnmanagedMemoryStream">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.IO.UnmanagedMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Linq">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Linq.Expressions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Linq.Expressions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Linq.Parallel">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Linq.Parallel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Linq.Queryable">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Linq.Queryable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Rtc">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Http.Rtc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.NameResolution">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.NameResolution.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.NetworkInformation">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.NetworkInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Ping">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Ping.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Requests">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Requests.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Security">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Sockets">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.Sockets.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.WebHeaderCollection">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.WebHeaderCollection.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.WebSockets.Client">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.WebSockets.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.WebSockets">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Net.WebSockets.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ObjectModel">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Emit">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.Emit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Emit.ILGeneration">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.Emit.ILGeneration.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Emit.Lightweight">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.Emit.Lightweight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Extensions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Reflection.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Resources.Reader">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Resources.Reader.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Resources.ResourceManager">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Resources.ResourceManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Resources.Writer">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Resources.Writer.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.VisualC">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.CompilerServices.VisualC.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Extensions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Handles">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Handles.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.InteropServices.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.WindowsRuntime">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.InteropServices.WindowsRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Numerics">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Formatters">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Serialization.Formatters.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Json">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Serialization.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Serialization.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Xml">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Runtime.Serialization.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Claims">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Claims.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Csp">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Cryptography.Csp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Cryptography.Encoding.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Cryptography.X509Certificates.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.Principal.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.SecureString">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Security.SecureString.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Duplex">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ServiceModel.Duplex.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Http">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ServiceModel.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.NetTcp">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ServiceModel.NetTcp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Primitives">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ServiceModel.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Security">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ServiceModel.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Text.Encoding.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.Extensions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Text.Encoding.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.RegularExpressions">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Text.RegularExpressions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Overlapped">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.Overlapped.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Parallel">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.Tasks.Parallel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Thread">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.Thread.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.ThreadPool">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.ThreadPool.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Timer">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Threading.Timer.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.ReaderWriter">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.ReaderWriter.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XDocument">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XmlDocument">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XmlDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XmlSerializer">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XmlSerializer.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XPath">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XPath.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XPath.XDocument">
+      <HintPath>D:\Program Files\Unity\Unity2020.3.23f1\2020.3.23f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VSCode.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualStudio.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline">
+      <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.PlasticSCM.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{7A8DE0DD-2AAA-D81D-C50B-EB5F579FB317}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
+    <ProjectReference Include="GoogleMobileAds.csproj">
+      <Project>{E5F2F1D3-9218-80C8-2946-B8FF68725B0A}</Project>
+      <Name>GoogleMobileAds</Name>
+    </ProjectReference>
+    <ProjectReference Include="GoogleMobileAds.Editor.csproj">
+      <Project>{F8734F1A-12BA-DE8C-378E-D337DE3E928E}</Project>
+      <Name>GoogleMobileAds.Editor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

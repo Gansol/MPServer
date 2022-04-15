@@ -1628,25 +1628,6 @@ i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm
 i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\
 i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\scripts\
 i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\unityads\editor\unityads\scripts\
-++SDK
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\
-++UnityAds
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\unityads\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\unityads\editor\unityads\
-++Font
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\atlas\font\
-++BasicApi
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\
-++ISocialPlatform
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\
-++OurUtils
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\
-++GameInfo.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\gameinfo.cs
-++PluginVersion.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\pluginversion.cs
 ++AD
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ad\
 ++AI
@@ -1657,6 +1638,12 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battle\
 ++BattleTest
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\
+++ISpawnCommand.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\ispawncommand.cs
+++RandomSpawnCommand.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\randomspawncommand.cs
+++SpawnController.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\spawncontroller.cs
 ++Clients
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\clients\
 ++Creature
@@ -1725,97 +1712,25 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\testpanelscript.cs
 ++WaitAnims.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\waitanims.cs
-++FacebookSDK
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\
-++MicePowServices
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\micepowservices\
-++NGUI
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\
-++link.xml
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\link.xml
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\link.xml
-++UnityEngine.Advertisements.Android.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.android.dll
-++UnityEngine.Advertisements.Editor.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.editor.dll
-++UnityEngine.Advertisements.iOS.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.ios.dll
-++UnityEngine.Advertisements.Unsupported.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.unsupported.dll
-++UnityEngine.Monetization.Android.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.android.dll
-++UnityEngine.Monetization.Editor.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.editor.dll
-++UnityEngine.Monetization.iOS.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.ios.dll
-++UnityEngine.Monetization.Unsupported.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.unsupported.dll
-++Comic.fnt
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\atlas\font\comic.fnt
-++Events
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\
-++Nearby
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\
-++SavedGame
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\
-++Video
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\
-++Achievement.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\achievement.cs
-++CommonStatusCodes.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\commonstatuscodes.cs
-++CommonTypes.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\commontypes.cs
-++IPlayGamesClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\iplaygamesclient.cs
-++LeaderboardScoreData.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\leaderboardscoredata.cs
-++Player.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\player.cs
-++PlayerProfile.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playerprofile.cs
-++PlayerStats.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playerstats.cs
-++PlayGamesClientConfiguration.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playgamesclientconfiguration.cs
-++ScorePageToken.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\scorepagetoken.cs
-++SignInHelper.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signinhelper.cs
-++SignInInteractivity.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signininteractivity.cs
-++SignInStatus.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signinstatus.cs
-++PlayGamesAchievement.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesachievement.cs
-++PlayGamesLeaderboard.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesleaderboard.cs
-++PlayGamesLocalUser.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgameslocaluser.cs
-++PlayGamesPlatform.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesplatform.cs
-++PlayGamesScore.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesscore.cs
-++PlayGamesUserProfile.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesuserprofile.cs
-++Logger.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\logger.cs
-++Misc.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\misc.cs
-++NearbyHelperObject.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\nearbyhelperobject.cs
-++PlatformUtils.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\platformutils.cs
-++PlayGamesHelperObject.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\playgameshelperobject.cs
-++NearbyConnectionClientFactory.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\nearbyconnectionclientfactory.cs
-++PlayGamesClientFactory.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\playgamesclientfactory.cs
-++TokenClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\tokenclient.cs
+++SDK
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\
+++UnityAds
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\unityads\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\unityads\editor\unityads\
+++Font
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\atlas\font\
+++BasicApi
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\
+++ISocialPlatform
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\
+++OurUtils
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\
+++GameInfo.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\gameinfo.cs
+++PluginVersion.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\pluginversion.cs
 ++ADBanner.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ad\adbanner.cs
 ++ADCommon.cs
@@ -1862,12 +1777,6 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battle\missionsystem.cs
 ++PoolSystem.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battle\poolsystem.cs
-++ISpawnCommand.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\ispawncommand.cs
-++RandomSpawnCommand.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\randomspawncommand.cs
-++SpawnController.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\battletest\spawncontroller.cs
 ++ConnectServices.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\clients\connectservices.cs
 ++InternetChecker.cs
@@ -2058,73 +1967,97 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ui\eventmaskswitch.cs
 ++LoginUI.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ui\loginui.cs
-++Examples
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\examples\
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\
-i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\
-++Resources
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\resources\
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\resources\
-++ReadMe - 2019.3.0.txt
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\readme - 2019.3.0.txt
-++ReadMe - 3.8.0.txt
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\readme - 3.8.0.txt
-++Event.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\event.cs
-++IEvent.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\ievent.cs
-++IEventsClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\ieventsclient.cs
-++AdvertisingResult.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\advertisingresult.cs
-++ConnectionRequest.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\connectionrequest.cs
-++ConnectionResponse.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\connectionresponse.cs
-++DummyNearbyConnectionClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\dummynearbyconnectionclient.cs
-++EndpointDetails.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\endpointdetails.cs
-++INearbyConnectionClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\inearbyconnectionclient.cs
-++NearbyConnectionConfiguration.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\nearbyconnectionconfiguration.cs
-++ISavedGameClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\isavedgameclient.cs
-++ISavedGameMetadata.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\isavedgamemetadata.cs
-++SavedGameMetadataUpdate.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\savedgamemetadataupdate.cs
-++CaptureOverlayStateListener.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\captureoverlaystatelistener.cs
-++IVideoClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\ivideoclient.cs
-++VideoCapabilities.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\videocapabilities.cs
-++VideoCaptureState.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\videocapturestate.cs
-++AndroidClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidclient.cs
-++AndroidEventsClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androideventsclient.cs
-++AndroidHelperFragment.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidhelperfragment.cs
-++AndroidJavaConverter.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidjavaconverter.cs
-++AndroidNearbyConnectionClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidnearbyconnectionclient.cs
-++AndroidSavedGameClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidsavedgameclient.cs
-++AndroidSnapshotMetadata.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidsnapshotmetadata.cs
-++AndroidTaskUtils.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidtaskutils.cs
-++AndroidTokenClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidtokenclient.cs
-++AndroidVideoClient.cs
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidvideoclient.cs
-++GooglePlayGamesManifest.androidlib
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\plugins\android\googleplaygamesmanifest.androidlib\
+++FacebookSDK
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\
+++MicePowServices
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\micepowservices\
+++NGUI
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\
+++link.xml
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\link.xml
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\link.xml
+++UnityEngine.Advertisements.Android.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.android.dll
+++UnityEngine.Advertisements.Editor.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.editor.dll
+++UnityEngine.Advertisements.iOS.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.ios.dll
+++UnityEngine.Advertisements.Unsupported.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.advertisements.unsupported.dll
+++UnityEngine.Monetization.Android.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.android.dll
+++UnityEngine.Monetization.Editor.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.editor.dll
+++UnityEngine.Monetization.iOS.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.ios.dll
+++UnityEngine.Monetization.Unsupported.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\unityads\unityengine.monetization.unsupported.dll
+++Comic.fnt
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\atlas\font\comic.fnt
+++Events
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\
+++Nearby
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\
+++SavedGame
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\
+++Video
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\
+++Achievement.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\achievement.cs
+++CommonStatusCodes.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\commonstatuscodes.cs
+++CommonTypes.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\commontypes.cs
+++IPlayGamesClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\iplaygamesclient.cs
+++LeaderboardScoreData.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\leaderboardscoredata.cs
+++Player.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\player.cs
+++PlayerProfile.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playerprofile.cs
+++PlayerStats.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playerstats.cs
+++PlayGamesClientConfiguration.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\playgamesclientconfiguration.cs
+++ScorePageToken.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\scorepagetoken.cs
+++SignInHelper.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signinhelper.cs
+++SignInInteractivity.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signininteractivity.cs
+++SignInStatus.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\signinstatus.cs
+++PlayGamesAchievement.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesachievement.cs
+++PlayGamesLeaderboard.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesleaderboard.cs
+++PlayGamesLocalUser.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgameslocaluser.cs
+++PlayGamesPlatform.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesplatform.cs
+++PlayGamesScore.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesscore.cs
+++PlayGamesUserProfile.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\isocialplatform\playgamesuserprofile.cs
+++Logger.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\logger.cs
+++Misc.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\misc.cs
+++NearbyHelperObject.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\nearbyhelperobject.cs
+++PlatformUtils.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\platformutils.cs
+++PlayGamesHelperObject.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\ourutils\playgameshelperobject.cs
+++NearbyConnectionClientFactory.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\nearbyconnectionclientfactory.cs
+++PlayGamesClientFactory.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\playgamesclientfactory.cs
+++TokenClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\tokenclient.cs
 ++CrazyBattleAIState.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ai\battleai\crazybattleaistate.cs
 ++EasyBattleAIState.cs
@@ -2263,27 +2196,73 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\test\del\del.cs
 ++del2.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\test\del\del2.cs
-++Canvas
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\canvas\
-++Gameroom
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\gameroom\
-++Settings
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\settings\
-++Facebook.Unity.dll
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\facebook.unity.dll
-++Atlases
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\atlases\
-++Models
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\models\
-++Shaders
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\shaders\
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\resources\shaders\
-++Interaction
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\interaction\
-++Internal
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\internal\
-++Tweening
-i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\tweening\
+++Examples
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\examples\
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\
+i:{cca76e42-e9d5-4cbf-3222-f488c499dcf3}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\
+++Resources
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\resources\
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\resources\
+++ReadMe - 2019.3.0.txt
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\readme - 2019.3.0.txt
+++ReadMe - 3.8.0.txt
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\readme - 3.8.0.txt
+++Event.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\event.cs
+++IEvent.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\ievent.cs
+++IEventsClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\events\ieventsclient.cs
+++AdvertisingResult.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\advertisingresult.cs
+++ConnectionRequest.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\connectionrequest.cs
+++ConnectionResponse.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\connectionresponse.cs
+++DummyNearbyConnectionClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\dummynearbyconnectionclient.cs
+++EndpointDetails.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\endpointdetails.cs
+++INearbyConnectionClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\inearbyconnectionclient.cs
+++NearbyConnectionConfiguration.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\nearby\nearbyconnectionconfiguration.cs
+++ISavedGameClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\isavedgameclient.cs
+++ISavedGameMetadata.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\isavedgamemetadata.cs
+++SavedGameMetadataUpdate.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\savedgame\savedgamemetadataupdate.cs
+++CaptureOverlayStateListener.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\captureoverlaystatelistener.cs
+++iVideoClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\ivideoclient.cs
+++VideoCapabilities.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\videocapabilities.cs
+++VideoCaptureState.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\basicapi\video\videocapturestate.cs
+++AndroidClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidclient.cs
+++AndroidEventsClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androideventsclient.cs
+++AndroidHelperFragment.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidhelperfragment.cs
+++AndroidJavaConverter.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidjavaconverter.cs
+++AndroidNearbyConnectionClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidnearbyconnectionclient.cs
+++AndroidSavedGameClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidsavedgameclient.cs
+++AndroidSnapshotMetadata.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidsnapshotmetadata.cs
+++AndroidTaskUtils.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidtaskutils.cs
+++AndroidTokenClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidtokenclient.cs
+++AndroidVideoClient.cs
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\platforms\android\androidvideoclient.cs
+++GooglePlayGamesManifest.androidlib
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\googleplaygames\plugins\android\googleplaygamesmanifest.androidlib\
 ++DiedAIState.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\ai\creatureai\aistate\diedaistate.cs
 ++IAIState.cs
@@ -2310,6 +2289,27 @@ i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\creature\mice\mice\much.cs
 ++MiceBoss.cs
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\scripts\creature\mice\worldboss\miceboss.cs
+++Canvas
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\canvas\
+++Gameroom
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\gameroom\
+++Settings
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\settings\
+++Facebook.Unity.dll
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\plugins\facebook.unity.dll
+++Atlases
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\atlases\
+++Models
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\models\
+++Shaders
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\examples\shaders\
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\resources\shaders\
+++Interaction
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\interaction\
+++Internal
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\internal\
+++Tweening
+i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\ngui\scripts\tweening\
 ++SubMenus
 i:{7214e491-ee9d-b906-a42d-2f3ea3dcd8fe}:d:\onedrive - kroladev\desktop\projectm\onedrive\projectm\git\mpserver\unity3d\assets\sdk\facebooksdk\examples\scripts\submenus\
 ++ConsoleBase.cs

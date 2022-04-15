@@ -211,43 +211,42 @@ public class PoolSystem : IGameSystem
         // play hole anim
         // spawn
 
-        try
+        if (hole.GetComponent<HoleState>().holeState == HoleState.State.Closed)
         {
-            if (hole.GetComponent<HoleState>().holeState == HoleState.State.Closed)
+            ICreature creature = m_CreatureSystem.GetMice(hole);
+
+            if (creature != null)
             {
-                ICreature creature = m_CreatureSystem.GetMice(hole);
+                creature.OnHit();
+                creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
+                creature.GetAI().SetAIState(new DiedAIState());
 
-                if (creature != null)
-                {
-                    creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
-                    m_CreatureSystem.RemoveBattleMice_HoleRefs(hole);
-                }
+                m_CreatureSystem.RemoveBattleMice_HoleRefs(hole);
             }
-
-            ICreature boss = new MiceBoss();
-            MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
-            ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
-            MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
-            GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
-
-            // 播放洞口動畫
-            hole.GetComponent<Animator>().enabled = true;
-            hole.GetComponent<Animator>().Play("Layer1.HoleScale", -1, 0f);
-
-            miceAttr.SetHP(); // 沒有BOSS的血量
-            boss.SetAttribute(miceAttr);
-            boss.SetGameObject(go);
-            boss.SetSkill(skill);
-            boss.SetAnimState(animState);
-            boss.Initialize();  // 錯誤 可能非必要
-            boss.m_go.SetActive(true);
-
-            m_CreatureSystem.AddBattleMiceRefs(hole, miceID.ToString(), go.GetHashCode().ToString(), boss);
         }
-        catch
-        {
-            throw;
-        }
+        Debug.Log("BOSS MiceID:" + miceID);
+        ICreature boss = new MiceBoss();
+        MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
+        ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
+        MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
+        GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
+
+        // 播放洞口動畫
+        hole.GetComponent<Animator>().enabled = true;
+        hole.GetComponent<Animator>().Play("Layer1.HoleScale", -1, 0f);
+
+        //miceAttr.SetHP(); // 沒有BOSS的血量
+        boss.SetAttribute(miceAttr);
+        boss.SetGameObject(go);
+        boss.SetSkill(skill);
+        boss.SetAnimState(animState);
+        boss.Initialize();  // 錯誤 可能非必要
+        boss.m_go.SetActive(true);
+
+        boss.m_go.transform.localScale = new Vector3(1.3f, 1.3f);
+        boss.m_go.transform.localPosition = Vector2.zero;
+
+        m_CreatureSystem.AddBattleMiceRefs(hole, miceID.ToString(), go.GetHashCode().ToString(), boss);
     }
     #endregion
 
@@ -372,8 +371,8 @@ public class PoolSystem : IGameSystem
     {
         if (Global.isGameStart)
         {
-           // 如果強制產生 且 老鼠在存活列表中 強制將老鼠死亡
-              if (impose)
+            // 如果強制產生 且 老鼠在存活列表中 強制將老鼠死亡
+            if (impose)
                 RemoveDuplicateInHoleMice(hole);
 
             // Debug.Log("InstantiateMice: Hole:" + hole + "  miceID: " + miceID);
@@ -429,10 +428,10 @@ public class PoolSystem : IGameSystem
             creature.OnHit();  // 錯誤  應該+0分
             creature.GetAI().SetAIState(new DiedAIState());
 
-            if (m_CreatureSystem.GetMice(hole) != null && m_CreatureSystem.GetMice(hole).GetAttribute().GetHP() <1)
+            if (m_CreatureSystem.GetMice(hole) != null && m_CreatureSystem.GetMice(hole).GetAttribute().GetHP() < 1)
                 m_CreatureSystem.RemoveBattleMice_HoleRefs(hole);
 
-            AddMicePool( creature);
+            AddMicePool(creature);
         }
     }
     #endregion
@@ -568,13 +567,13 @@ public class PoolSystem : IGameSystem
     /// 將 戰鬥老鼠 初始化 並 放入物件池
     /// </summary>
     /// <param name="reCircleMice">老鼠Class</param>
-    public void AddMicePool( ICreature reCircleMice)
+    public void AddMicePool(ICreature reCircleMice)
     {
         ICreature mice;
         GameObject go = reCircleMice.m_go;
         string miceID = go.name;
         string hashID = go.GetHashCode().ToString();
-        
+
         // 初始化物件位置
         go.transform.parent = objectPool.transform.Find(miceID);
         go.transform.GetChild(0).localScale = Vector3.one;

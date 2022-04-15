@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BattleUI : IMPPanelUI
 {
-    private BattleSystem m_BattleSystem;
+    private readonly BattleSystem m_BattleSystem;
     private AttachBtn_BattleUI UI;
 
     #region -- Variables 變數 -- #endregion
@@ -23,8 +23,6 @@ public class BattleUI : IMPPanelUI
     private float _myMaxLife;                   // 最大生命
     private float _feverEnergy;                 // fever能量
     private float _ohterMaxLife;              // 對手最大生命
-    private float _tmpMyLifeBar;            // 生命條數值
-    private float _tmpOtherLifeBar;       // 對手生命條數值
 
     private float _beautyLife;                     // 美化生命條數值
     private float _beautyFever;                 // 美化FerverTime條數值
@@ -58,7 +56,7 @@ public class BattleUI : IMPPanelUI
 
         _dataLoadedCount = (int)ENUM_Data.None;
         _beautyHP = 0.5f;
-        _beautyEnergy = _beautyFever = 0f;
+        _beautyEnergy = _beautyFever = _beautyOtherEnergy = 0f;
         UI.playerName.text = Global.Nickname;
         UI.otherPlayerName.text = Global.OpponentData.Nickname;
         UI.avatarImage.spriteName = Global.PlayerImage;
@@ -231,9 +229,6 @@ public class BattleUI : IMPPanelUI
         _otherEnergy = m_BattleSystem.GetBattleAttr().otherEnergy / 100f;
         _feverEnergy = m_BattleSystem.GetBattleAttr().feverEnergy / 100f;
 
-        _tmpMyLifeBar = UI.BlueLifeBar.value;
-        _tmpOtherLifeBar = UI.RedLifeBar.value;
-
         UI.GameTime.text = (Math.Max(0, Math.Floor(Global.GameTime - m_BattleSystem.GetBattleAttr().gameTime))).ToString();
         UI.BlueScoreLabel.text = m_BattleSystem.GetBattleAttr().score.ToString();         // 畫出分數值
         UI.RedScoreLabel.text = m_BattleSystem.GetBattleAttr().otherScore.ToString();     // 畫出分數值
@@ -306,7 +301,7 @@ public class BattleUI : IMPPanelUI
 
         if (value == Math.Round(bar.value, 6)) bar.value = tmpValue = value;
 
-        Debug.Log("MY:" + value +"  TMP:" + tmpValue);
+
         if (value > tmpValue)                           // 如果 舊值>目前值 (我的值比0.5小 分數比別人低)
         {
             bar.value = Mathf.Max((float)tmpValue / maxValue, 0);            // 先等於目前值，然後慢慢減少

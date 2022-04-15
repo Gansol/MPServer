@@ -532,6 +532,7 @@ public class BattleSystem : IGameSystem
 
         if (Global.isGameStart)
         {
+            mission = Mission.WorldBoss;    // 錯誤 測試用
             switch (mission)
             {
                 case Mission.Harvest: // 收穫

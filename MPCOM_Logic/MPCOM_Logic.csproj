@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D2F9DA47-D2D1-4A8A-9109-6626F03CD621}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MPCOM_Logic</RootNamespace>
+    <AssemblyName>MPCOM_Logic</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\dll_4.0\x64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>MPCOM_Logic.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ExitGamesLibs, Version=1.0.1.0, Culture=neutral, PublicKeyToken=eac0edd9746a4aa0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\dll_4.0\x64\ExitGamesLibs.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\dll_4.0\x64\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniJSON">
+      <HintPath>..\dll_4.0\x64\MiniJSON.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CurrencyLogic.cs" />
+    <Compile Include="BattleLogic.cs" />
+    <Compile Include="GashaponLogic.cs" />
+    <Compile Include="ItemLogic.cs" />
+    <Compile Include="MiceDataLogic.cs" />
+    <Compile Include="PlayerDataLogic.cs" />
+    <Compile Include="MemberLogic.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurchaseLogic.cs" />
+    <Compile Include="SkillLogic.cs" />
+    <Compile Include="StoreDataLogic.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MPCOM_Logic.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gansol\Gansol.csproj">
+      <Project>{5a52808a-2bcc-45dc-8520-59e40ac2a150}</Project>
+      <Name>Gansol</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MPCOM_Data\MPCOM_Data.csproj">
+      <Project>{16011319-f9eb-45e9-baa8-46cda2ecdc54}</Project>
+      <Name>MPCOM_Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MPCOM_IO\MPCOM_IO.csproj">
+      <Project>{311699b2-c6b8-42c6-903b-0cacc21c6bdb}</Project>
+      <Name>MPCOM_IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MPProtocol\MPProtocol.csproj">
+      <Project>{2db0506b-d772-4115-8633-844652575935}</Project>
+      <Name>MPProtocol</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
