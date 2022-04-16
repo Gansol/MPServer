@@ -57,8 +57,7 @@ public class MiceAnimState : IAnimatorState
 
                 if (_animTime >= .5f && _isBoss)                       // 動畫撥放完畢時
                 {
-                    animState = ENUM_AnimatorState.Died;
-                    _bAnimationDown = true;
+                    animState = ENUM_AnimatorState.Idle;
                     Play(animState, m_go);
                 }
             }

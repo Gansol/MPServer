@@ -202,15 +202,13 @@ public class PoolSystem : IGameSystem
     #region -- SpawnBoss --
     public void SpawnBoss(Transform hole, short miceID, float lerpSpeed, float lerpTime, float upSpeed, float upDistance)// 怪怪的 程式碼太長 錯誤
     {
-        Debug.Log("------------------- Mice Boss ID:  " + miceID + " ------------------------");
+        Debug.Log("------------------- SpawnBoss Mice Boss ID:  " + miceID + " ------------------------");
 
-        // new MiceBoss (default scale x 1.3)
-        // init mice go
-        // Composite go attr skill ai state anim
-        // if hole closed kill mice
-        // play hole anim
-        // spawn
+        // 播放洞口動畫
+        hole.GetComponent<Animator>().enabled = true;
+        hole.GetComponent<Animator>().Play("Layer1.HoleScale", -1, 0f);
 
+        // 移除重複老鼠
         if (hole.GetComponent<HoleState>().holeState == HoleState.State.Closed)
         {
             ICreature creature = m_CreatureSystem.GetMice(hole);
@@ -220,31 +218,29 @@ public class PoolSystem : IGameSystem
                 creature.OnHit();
                 creature.Play(IAnimatorState.ENUM_AnimatorState.Died);
                 creature.GetAI().SetAIState(new DiedAIState());
-
                 m_CreatureSystem.RemoveBattleMice_HoleRefs(hole);
             }
         }
-        Debug.Log("BOSS MiceID:" + miceID);
-        ICreature boss = new MiceBoss();
-        MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
-        ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
-        MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
-        GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);
 
-        // 播放洞口動畫
-        hole.GetComponent<Animator>().enabled = true;
-        hole.GetComponent<Animator>().Play("Layer1.HoleScale", -1, 0f);
+        miceID = 10001; // 錯誤 測試用
+        ICreature boss = new MiceBoss();
+        ISkill skill = MPGFactory.GetSkillFactory().GetSkill(Global.miceProperty, miceID);
+        MiceAttr miceAttr = MPGFactory.GetAttrFactory().GetMiceProperty(miceID.ToString());
+        GameObject go = MPGFactory.GetObjFactory().Instantiate(m_AssetLoaderSystem.GetAsset(miceAttr.name), hole, miceID.ToString(), Vector3.zero, Vector3.one, Vector2.one, -1);   // 錯誤 應該調用物件池老鼠
 
         //miceAttr.SetHP(); // 沒有BOSS的血量
-        boss.SetAttribute(miceAttr);
         boss.SetGameObject(go);
+        boss.SetAttribute(miceAttr);
+        boss.SetAI(new MiceAI(boss));
         boss.SetSkill(skill);
+
+        MiceAnimState animState = new MiceAnimState(boss.m_go, true, lerpSpeed, miceAttr.MiceSpeed, upDistance, miceAttr.LifeTime);
         boss.SetAnimState(animState);
         boss.Initialize();  // 錯誤 可能非必要
-        boss.m_go.SetActive(true);
-
+       
         boss.m_go.transform.localScale = new Vector3(1.3f, 1.3f);
         boss.m_go.transform.localPosition = Vector2.zero;
+        boss.m_go.SetActive(true);
 
         m_CreatureSystem.AddBattleMiceRefs(hole, miceID.ToString(), go.GetHashCode().ToString(), boss);
     }

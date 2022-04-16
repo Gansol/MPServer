@@ -3,12 +3,12 @@ using System.Collections;
 
 public abstract class IMiceBoss : ICreature
 {
-    public static UICamera cam;
-    public static BattleUI battleUI = null;
-    protected int _shield = 0;
-    protected int myHits, otherHits;              // 打擊紀錄
-    protected float m_LastTime, m_StartTime;
-    protected bool flag;
+    //public static UICamera cam;
+    private BattleUI m_BattleUI;
+    private int _shield = 0;
+    private int myHits, otherHits;              // 打擊紀錄
+    private float m_LastTime, m_StartTime;
+    private bool flag;
 
 
     public IMiceBoss()
@@ -19,8 +19,8 @@ public abstract class IMiceBoss : ICreature
     {
         m_go.GetComponent<BoxCollider2D>().enabled = true;
         m_go.transform.localPosition = Vector3.zero;
-        battleUI = MPGame.Instance.GetBattleUI();
-        cam = Camera.main.GetComponent<UICamera>();
+        m_BattleUI = MPGame.Instance.GetBattleUI();
+        // cam = Camera.main.GetComponent<UICamera>();
 
         m_StartTime = m_LastTime = Time.time;
 
@@ -35,7 +35,7 @@ public abstract class IMiceBoss : ICreature
         if (Global.isGameStart)
         {
             m_AI.UpdateAI();
-            battleUI.ShowBossHPBar(m_Attribute.GetHPPrecent(), false);    // 顯示血調
+            m_BattleUI.ShowBossHPBar(m_Attribute.GetHPPrecent(), false);    // 顯示血調
             m_AnimState.UpdateAnimation();
             if (Time.time < m_StartTime + m_Skill.GetSkillTime())
                 m_Skill.UpdateEffect();
@@ -95,8 +95,8 @@ public abstract class IMiceBoss : ICreature
         }
         else
         {
+            m_BattleUI.ShowBossHPBar(m_Attribute.GetHPPrecent(), true);
             m_AnimState.Play(IAnimatorState.ENUM_AnimatorState.Died, m_go);
-            battleUI.ShowBossHPBar(m_Attribute.GetHPPrecent(), true);
             if (Global.OpponentData.RoomPlace != "Host")
             {
                 short percent = (short)Mathf.Round((float)myHits / (float)(myHits + otherHits) * 100); // 整數百分比0~100% 目前是用打擊次數當百分比 如果傷害公式有變動需要修正
