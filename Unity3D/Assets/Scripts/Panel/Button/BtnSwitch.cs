@@ -178,7 +178,7 @@ public class BtnSwitch : MonoBehaviour
             }
             else
             {
-                Debug.Log("FUCK");
+                Debug.Log("FUCK 這裡拖曳按鈕會造成 無法切換角色動畫");
             }
             // A>A B>B 
             _originPos = _toPos;                                    // B1>B2時會改變原始做標，所以要儲存移動後的座標位置
